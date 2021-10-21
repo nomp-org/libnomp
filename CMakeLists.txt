@@ -4,7 +4,7 @@ project(libgnomp VERSION 0.0.1 DESCRIPTION "gnomp runtime library" LANGUAGES C)
 
 include(GNUInstallDirs)
 
-add_library(gnomp SHARED src/init.c)
+add_library(gnomp SHARED src/opencl.c src/gnomp.c)
 set_target_properties(gnomp PROPERTIES
   VERSION ${PROJECT_VERSION}
   SOVERSION 1
