@@ -10,7 +10,7 @@
 struct backend {
   int backend;
   cl_command_queue queue;
-  cl_context context;
+  cl_context ctx;
 };
 
 struct mem {
@@ -19,10 +19,19 @@ struct mem {
   size_t size, usize;
 };
 
+struct prog {
+  cl_program prg;
+};
+
 int opencl_init(struct backend *ocl, int platform_id, int device_id);
+
 int opencl_map_to(struct backend *ocl, struct mem *m, void *ptr, size_t id0,
                   size_t id1, size_t usize, int alloc);
+
 int opencl_map_from(struct backend *ocl, struct mem *m, size_t id0, size_t id1,
                     size_t usize);
+
+int opencl_build_program(struct backend *ocl, struct prog *prg,
+                         const char *source);
 
 #endif // _LIB_GNOMP_IMPL_H_

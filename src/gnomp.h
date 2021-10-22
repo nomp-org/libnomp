@@ -33,6 +33,8 @@ int gnomp_map_to(void *ptr, size_t id0, size_t id1, size_t usize, int handle);
 
 int gnomp_map_from(void *ptr, size_t id0, size_t id1, size_t usize, int handle);
 
+int gnomp_build_program(const char *source, int handle);
+
 #ifdef __cplusplus
 }
 #endif

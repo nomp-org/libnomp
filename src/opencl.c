@@ -27,9 +27,8 @@ int opencl_init(struct backend *ocl, int platform_id, int device_id) {
                        &num_devices);
   cl_device_id device = cl_devices[device_id];
 
-  ocl->context = clCreateContext(NULL, 1, &device, NULL, NULL, &err);
-  ocl->queue =
-      clCreateCommandQueueWithProperties(ocl->context, device, NULL, &err);
+  ocl->ctx = clCreateContext(NULL, 1, &device, NULL, NULL, &err);
+  ocl->queue = clCreateCommandQueueWithProperties(ocl->ctx, device, NULL, &err);
   ocl->backend = GNOMP_OCL;
 
   free(cl_devices);
@@ -45,8 +44,8 @@ int opencl_map_to(struct backend *ocl, struct mem *m, void *ptr, size_t id0,
     m->size = id1 - id0;
     m->usize = usize;
     m->h_ptr = ptr;
-    m->d_ptr = clCreateBuffer(ocl->context, CL_MEM_READ_WRITE,
-                              (id1 - id0) * usize, NULL, &err);
+    m->d_ptr = clCreateBuffer(ocl->ctx, CL_MEM_READ_WRITE, (id1 - id0) * usize,
+                              NULL, &err);
   }
 
   // copy the content now
@@ -63,4 +62,16 @@ int opencl_map_from(struct backend *ocl, struct mem *m, size_t id0, size_t id1,
                       m->h_ptr, 0, NULL, NULL);
 
   return 0;
+}
+
+int opencl_build_program(struct backend *ocl, struct prog *prg,
+                         const char *source) {
+  cl_int err;
+  prg->prg = clCreateProgramWithSource(ocl->ctx, 1, (const char **)(&source),
+                                       NULL, &err);
+  // TODO: check_error
+  err = clBuildProgram(prg->prg, 0, NULL, NULL, NULL, NULL);
+  // TODO: check_error
+
+  return err;
 }
