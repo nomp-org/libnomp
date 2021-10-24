@@ -1,9 +1,5 @@
 #include <gnomp-impl.h>
 
-static struct backend *backends = NULL;
-static int backends_n = 0;
-static int backends_max = 0;
-
 static void check_handle_(int handle, int max, const char *file, int line) {
   if (handle < 0 || handle >= max) {
     fprintf(stderr, "check_handle failure in %s:%d\n", file, line);
@@ -12,6 +8,10 @@ static void check_handle_(int handle, int max, const char *file, int line) {
 }
 
 #define check_handle(handle, max) check_handle_(handle, max, __FILE__, __LINE__)
+
+static struct backend *backends = NULL;
+static int backends_n = 0;
+static int backends_max = 0;
 
 int gnomp_init(char *backend, int platform, int device) {
   size_t n = strnlen(backend, 32);
@@ -33,8 +33,6 @@ int gnomp_init(char *backend, int platform, int device) {
   int err;
   if (strncmp(be, "opencl", 32) == 0) {
     err = opencl_init(&backends[backends_n], platform, device);
-  } else if (strncmp(be, "cuda", 32) == 0) {
-    // err = cuda_init(device);
   } else {
     return GNOMP_INVALID_BACKEND;
   }
@@ -49,13 +47,17 @@ static struct mem *mems = NULL;
 static int mems_n = 0;
 static int mems_max = 0;
 
-int gnomp_map_to(void *ptr, size_t id0, size_t id1, size_t usize, int handle) {
+int gnomp_map(void *ptr, size_t idx0, size_t idx1, size_t usize, int direction,
+              int handle) {
   // See if we mapped this ptr already
   int i;
   for (i = 0; i < mems_n; i++)
     if (mems[i].h_ptr == ptr)
       break;
-  int alloc = (i == mems_n) ? 1 : 0;
+
+  int alloc = 0;
+  if (direction == GNOMP_H2D && i == mems_n)
+    alloc = 1;
 
   if (mems_n == mems_max) {
     mems_max += mems_max / 2 + 1;
@@ -63,32 +65,15 @@ int gnomp_map_to(void *ptr, size_t id0, size_t id1, size_t usize, int handle) {
   }
 
   check_handle(handle, backends_n);
-  int err;
+  int err = 0;
   if (backends[handle].backend == GNOMP_OCL)
-    err =
-        opencl_map_to(&backends[handle], &mems[i], ptr, id0, id1, usize, alloc);
+    err = opencl_map(&backends[handle], &mems[i], ptr, idx0, idx1, usize,
+                     direction, alloc);
+  else
+    err = GNOMP_INVALID_BACKEND;
 
-  if (alloc)
+  if (err == 0 && alloc == 1)
     mems_n++;
-
-  return err;
-}
-
-int gnomp_map_from(void *ptr, size_t id0, size_t id1, size_t usize,
-                   int handle) {
-  // See if we mapped this ptr already
-  int i;
-  for (i = 0; i < mems_n; i++)
-    if (mems[i].h_ptr == ptr)
-      break;
-
-  if (i == mems_n)
-    return GNOMP_INVALID_MAP_PTR;
-
-  check_handle(handle, backends_n);
-  int err;
-  if (backends[handle].backend == GNOMP_OCL)
-    err = opencl_map_from(&backends[handle], &mems[i], id0, id1, usize);
 
   return err;
 }

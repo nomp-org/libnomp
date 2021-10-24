@@ -29,9 +29,8 @@ extern "C" {
 
 int gnomp_init(char *backend, int platform, int device);
 
-int gnomp_map_to(void *ptr, size_t id0, size_t id1, size_t usize, int handle);
-
-int gnomp_map_from(void *ptr, size_t id0, size_t id1, size_t usize, int handle);
+int gnomp_map(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
+              int direction, int handle);
 
 int gnomp_build_program(const char *source, int handle);
 
