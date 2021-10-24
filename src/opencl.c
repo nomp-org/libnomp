@@ -64,8 +64,8 @@ int opencl_map(struct backend *ocl, struct mem *m, void *ptr, size_t id0,
   return 0;
 }
 
-int opencl_build_program(struct backend *ocl, struct prog *prg,
-                         const char *source) {
+int opencl_build_knl(struct backend *ocl, struct prog *prg, const char *source,
+                     const char *name) {
   cl_int err;
   prg->prg = clCreateProgramWithSource(ocl->ctx, 1, (const char **)(&source),
                                        NULL, &err);
@@ -73,8 +73,22 @@ int opencl_build_program(struct backend *ocl, struct prog *prg,
     return 1;
 
   err = clBuildProgram(prg->prg, 0, NULL, NULL, NULL, NULL);
-  if (err != CL_SUCCESS)
+  if (err != CL_SUCCESS) {
+    prg->prg = NULL;
+    prg->knl = NULL;
     return 1;
+  }
 
+  prg->knl = clCreateKernel(prg->prg, name, &err);
+  if (err != CL_SUCCESS) {
+    prg->knl = NULL;
+    return 1;
+  }
+
+  return 0;
+}
+
+int opencl_run_knl(struct backend *ocl, struct prog *prg, int nargs,
+                   va_list args) {
   return 0;
 }

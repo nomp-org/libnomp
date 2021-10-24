@@ -24,6 +24,7 @@ struct mem {
 
 struct prog {
   cl_program prg;
+  cl_kernel knl;
 };
 
 int opencl_init(struct backend *ocl, int platform_id, int device_id);
@@ -31,7 +32,10 @@ int opencl_init(struct backend *ocl, int platform_id, int device_id);
 int opencl_map(struct backend *ocl, struct mem *m, void *ptr, size_t id0,
                size_t id1, size_t usize, int direction, int alloc);
 
-int opencl_build_program(struct backend *ocl, struct prog *prg,
-                         const char *source);
+int opencl_build_knl(struct backend *ocl, struct prog *prg, const char *source,
+                     const char *name);
+
+int opencl_run_knl(struct backend *ocl, struct prog *prg, int nargs,
+                   va_list args);
 
 #endif // _LIB_GNOMP_IMPL_H_

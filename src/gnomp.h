@@ -11,6 +11,7 @@
 
 #include <ctype.h>
 #include <math.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -32,7 +33,8 @@ int gnomp_init(char *backend, int platform, int device);
 int gnomp_map(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
               int direction, int handle);
 
-int gnomp_build_program(const char *source, int handle);
+int gnomp_run(int *id, const char *source, const char *name, int handle,
+              int nargs, ...);
 
 #ifdef __cplusplus
 }

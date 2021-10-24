@@ -31,11 +31,10 @@ int gnomp_init(char *backend, int platform, int device) {
   }
 
   int err;
-  if (strncmp(be, "opencl", 32) == 0) {
+  if (strncmp(be, "opencl", 32) == 0)
     err = opencl_init(&backends[backends_n], platform, device);
-  } else {
+  else
     return GNOMP_INVALID_BACKEND;
-  }
 
   if (err == 0)
     backends_n++;
@@ -82,19 +81,31 @@ static struct prog *progs = NULL;
 static int progs_n = 0;
 static int progs_max = 0;
 
-int gnomp_build_program(const char *source, int handle) {
+int gnomp_run(int *id, const char *source, const char *name, int handle,
+              int nargs, ...) {
   if (progs_n == progs_max) {
     progs_max += progs_max / 2 + 1;
     progs = (struct prog *)realloc(progs, sizeof(struct prog) * progs_max);
   }
 
   check_handle(handle, backends_n);
-  int err;
-  if (backends[handle].backend == GNOMP_OCL)
-    err = opencl_build_program(&backends[handle], &progs[progs_n], source);
+  int err = 0;
+  if (*id == -1) {
+    if (backends[handle].backend == GNOMP_OCL)
+      err = opencl_build_knl(&backends[handle], &progs[progs_n], source, name);
+    if (err == 0) {
+      *id = progs_n;
+      progs_n++;
+    }
+  }
 
-  if (err == 0)
-    progs_n++;
+  if (id >= 0 && err == 0) {
+    va_list args;
+    va_start(args, nargs);
+    if (backends[handle].backend == GNOMP_OCL)
+      err = opencl_run_knl(&backends[handle], &progs[*id], nargs, args);
+    va_end(args);
+  }
 
   return err;
 }
