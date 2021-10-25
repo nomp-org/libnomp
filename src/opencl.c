@@ -1,6 +1,7 @@
 #include <gnomp-impl.h>
 
-int opencl_init(struct backend *ocl, int platform_id, int device_id) {
+int opencl_init(struct backend *ocl, const int platform_id,
+                const int device_id) {
   cl_uint num_platforms;
   cl_int err = clGetPlatformIDs(0, NULL, &num_platforms);
   // TODO: check err
@@ -37,26 +38,27 @@ int opencl_init(struct backend *ocl, int platform_id, int device_id) {
   return 0;
 }
 
-int opencl_map(struct backend *ocl, struct mem *m, void *ptr, size_t id0,
-               size_t id1, size_t usize, int direction, int alloc) {
+int opencl_map(struct backend *ocl, struct mem *m, void *ptr, const size_t id0,
+               const size_t id1, const size_t usize, const int direction,
+               const int alloc) {
   cl_int err;
   if (alloc) {
     m->size = id1 - id0;
     m->usize = usize;
-    m->h_ptr = ptr;
-    m->d_ptr = clCreateBuffer(ocl->ctx, CL_MEM_READ_WRITE, (id1 - id0) * usize,
-                              NULL, &err);
+    m->hptr = ptr;
+    m->dptr = clCreateBuffer(ocl->ctx, CL_MEM_READ_WRITE, (id1 - id0) * usize,
+                             NULL, &err);
   }
   if (err != CL_SUCCESS)
     return 1;
 
   // copy the content now
   if (direction == GNOMP_H2D)
-    err = clEnqueueWriteBuffer(ocl->queue, m->d_ptr, CL_TRUE, 0,
-                               (id1 - id0) * usize, m->h_ptr, 0, NULL, NULL);
+    err = clEnqueueWriteBuffer(ocl->queue, m->dptr, CL_TRUE, 0,
+                               (id1 - id0) * usize, m->hptr, 0, NULL, NULL);
   else if (direction == GNOMP_D2H)
-    err = clEnqueueReadBuffer(ocl->queue, m->d_ptr, CL_TRUE, 0,
-                              (id1 - id0) * usize, m->h_ptr, 0, NULL, NULL);
+    err = clEnqueueReadBuffer(ocl->queue, m->dptr, CL_TRUE, 0,
+                              (id1 - id0) * usize, m->hptr, 0, NULL, NULL);
 
   if (err != CL_SUCCESS)
     return 1;
@@ -88,7 +90,21 @@ int opencl_build_knl(struct backend *ocl, struct prog *prg, const char *source,
   return 0;
 }
 
-int opencl_run_knl(struct backend *ocl, struct prog *prg, int nargs,
-                   va_list args) {
+int opencl_set_knl_arg(struct prog *prg, const int index, const size_t size,
+                       void *arg) {
+  cl_int err = clSetKernelArg(prg->knl, index, size, arg);
+  if (err != CL_SUCCESS)
+    return 1;
   return 0;
 }
+
+int opencl_run_knl(struct backend *ocl, struct prog *prg, const int ndim,
+                   const size_t *global, const size_t *local) {
+  cl_int err = clEnqueueNDRangeKernel(ocl->queue, prg->knl, ndim, NULL, global,
+                                      local, 0, NULL, NULL);
+  if (err != CL_SUCCESS)
+    return 1;
+  return 0;
+}
+
+#undef set_knl_arg

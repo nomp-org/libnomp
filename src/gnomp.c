@@ -13,7 +13,8 @@ static struct backend *backends = NULL;
 static int backends_n = 0;
 static int backends_max = 0;
 
-int gnomp_init(char *backend, int platform, int device) {
+int gnomp_init(int *handle, const char *backend, const int platform,
+               const int device) {
   size_t n = strnlen(backend, 32);
   if (n == 32)
     return GNOMP_INVALID_BACKEND;
@@ -37,7 +38,9 @@ int gnomp_init(char *backend, int platform, int device) {
     return GNOMP_INVALID_BACKEND;
 
   if (err == 0)
-    backends_n++;
+    *handle = backends_n++;
+  else
+    *handle = -1;
 
   return err;
 }
@@ -46,14 +49,18 @@ static struct mem *mems = NULL;
 static int mems_n = 0;
 static int mems_max = 0;
 
-int gnomp_map(void *ptr, size_t idx0, size_t idx1, size_t usize, int direction,
-              int handle) {
-  // See if we mapped this ptr already
+static int idx_if_mapped(void *p) {
   int i;
   for (i = 0; i < mems_n; i++)
-    if (mems[i].h_ptr == ptr)
+    if (mems[i].hptr == p)
       break;
+  return i;
+}
 
+int gnomp_map(void *ptr, const size_t idx0, const size_t idx1,
+              const size_t usize, const int direction, const int handle) {
+  // See if we mapped this ptr already
+  int i = idx_if_mapped(ptr);
   int alloc = 0;
   if (direction == GNOMP_H2D && i == mems_n)
     alloc = 1;
@@ -81,8 +88,9 @@ static struct prog *progs = NULL;
 static int progs_n = 0;
 static int progs_max = 0;
 
-int gnomp_run(int *id, const char *source, const char *name, int handle,
-              int nargs, ...) {
+int gnomp_run(int *id, const char *source, const char *name, const int handle,
+              const int ndim, const size_t *global, const size_t *local,
+              const int nargs, ...) {
   if (progs_n == progs_max) {
     progs_max += progs_max / 2 + 1;
     progs = (struct prog *)realloc(progs, sizeof(struct prog) * progs_max);
@@ -93,18 +101,76 @@ int gnomp_run(int *id, const char *source, const char *name, int handle,
   if (*id == -1) {
     if (backends[handle].backend == GNOMP_OCL)
       err = opencl_build_knl(&backends[handle], &progs[progs_n], source, name);
-    if (err == 0) {
-      *id = progs_n;
-      progs_n++;
-    }
+    if (err == 0)
+      *id = progs_n, progs_n++;
+    else
+      return err;
   }
 
-  if (id >= 0 && err == 0) {
+  if (id >= 0) {
     va_list args;
     va_start(args, nargs);
-    if (backends[handle].backend == GNOMP_OCL)
-      err = opencl_run_knl(&backends[handle], &progs[*id], nargs, args);
+
+    int i;
+    for (i = 0; i < nargs; i++) {
+      /* short, int, long, double, float or pointer */
+      int type = va_arg(args, int);
+      size_t size, idx;
+      union gnomp_arg arg;
+      switch (type) {
+      case GNOMP_SHORT:
+        arg.s = va_arg(args, int);
+        size = sizeof(short);
+        break;
+      case GNOMP_USHORT:
+        arg.us = va_arg(args, unsigned int);
+        size = sizeof(unsigned short);
+        break;
+      case GNOMP_INT:
+        arg.i = va_arg(args, int);
+        size = sizeof(int);
+        break;
+      case GNOMP_UINT:
+        arg.ui = va_arg(args, unsigned int);
+        size = sizeof(unsigned int);
+        break;
+      case GNOMP_LONG:
+        arg.l = va_arg(args, long);
+        size = sizeof(long);
+        break;
+      case GNOMP_ULONG:
+        arg.ul = va_arg(args, unsigned long);
+        size = sizeof(unsigned long);
+        break;
+      case GNOMP_FLOAT:
+        arg.f = va_arg(args, double);
+        size = sizeof(float);
+        break;
+      case GNOMP_DOUBLE:
+        arg.d = va_arg(args, double);
+        size = sizeof(double);
+        break;
+      case GNOMP_PTR:
+        arg.p = va_arg(args, void *);
+        idx = idx_if_mapped(arg.p);
+        if (idx < mems_n) {
+          arg.p = mems[idx].dptr;
+          size = sizeof(mems[idx].dptr);
+        } else
+          return GNOMP_INVALID_MAP_PTR;
+        break;
+      default:
+        break;
+      }
+
+      if (backends[handle].backend == GNOMP_OCL)
+        opencl_set_knl_arg(&progs[*id], i, size, &arg);
+    }
+
     va_end(args);
+
+    if (backends[handle].backend == GNOMP_OCL)
+      err = opencl_run_knl(&backends[handle], &progs[*id], ndim, global, local);
   }
 
   return err;
