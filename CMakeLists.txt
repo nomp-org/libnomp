@@ -15,6 +15,10 @@ configure_file(gnomp.pc.in gnomp.pc @ONLY)
 find_package(OpenCL REQUIRED)
 target_link_libraries(gnomp OpenCL::OpenCL)
 
+add_executable(vec_init tests/vec_init.c)
+target_link_libraries(vec_init gnomp)
+target_include_directories(vec_init PUBLIC src)
+
 install(TARGETS gnomp
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   PUBLIC_HEADER DESTINATION ${CMAKE_PUBLIC_INCLUDEDIR})

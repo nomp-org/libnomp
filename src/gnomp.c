@@ -102,7 +102,7 @@ int gnomp_run(int *id, const char *source, const char *name, const int handle,
     if (backends[handle].backend == GNOMP_OCL)
       err = opencl_build_knl(&backends[handle], &progs[progs_n], source, name);
     if (err == 0)
-      *id = progs_n, progs_n++;
+      *id = progs_n++;
     else
       return err;
   }
@@ -151,8 +151,7 @@ int gnomp_run(int *id, const char *source, const char *name, const int handle,
         size = sizeof(double);
         break;
       case GNOMP_PTR:
-        arg.p = va_arg(args, void *);
-        idx = idx_if_mapped(arg.p);
+        idx = idx_if_mapped(va_arg(args, void *));
         if (idx < mems_n) {
           arg.p = mems[idx].dptr;
           size = sizeof(mems[idx].dptr);
@@ -160,6 +159,7 @@ int gnomp_run(int *id, const char *source, const char *name, const int handle,
           return GNOMP_INVALID_MAP_PTR;
         break;
       default:
+        return GNOMP_INVALID_TYPE;
         break;
       }
 

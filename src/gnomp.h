@@ -1,29 +1,20 @@
 #if !defined(_LIB_GNOMP_H_)
 #define _LIB_GNOMP_H_
 
-#define CL_TARGET_OPENCL_VERSION 220
+#include <stddef.h>
 
-#ifdef __APPLE__
-#include <OpenCL/cl.h>
-#else
-#include <CL/cl.h>
-#endif
-
-#include <ctype.h>
-#include <math.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+/* Map Direction */
+#define GNOMP_H2D 0
+#define GNOMP_D2H 1
 
 /* Errors */
 #define GNOMP_INVALID_BACKEND -1
 #define GNOMP_INVALID_PLATFORM -2
 #define GNOMP_INVALID_DEVICE -4
+#define GNOMP_INVALID_TYPE -8
+#define GNOMP_INVALID_MAP_PTR -16
 
 #define GNOMP_MALLOC_ERROR -128
-
-#define GNOMP_INVALID_MAP_PTR -256
 
 /* Types */
 #define GNOMP_SHORT 0

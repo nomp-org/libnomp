@@ -3,12 +3,23 @@
 
 #include <gnomp.h>
 
+#define CL_TARGET_OPENCL_VERSION 220
+#ifdef __APPLE__
+#include <OpenCL/cl.h>
+#else
+#include <CL/cl.h>
+#endif
+
+#include <ctype.h>
+#include <math.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #define GNOMP_OCL 1
 #define GNOMP_CUDA 2
 #define GNOMP_HIP 4
-
-#define GNOMP_H2D 0
-#define GNOMP_D2H 1
 
 struct backend {
   int backend;
@@ -17,9 +28,9 @@ struct backend {
 };
 
 struct mem {
-  cl_mem dptr;
-  void *hptr;
   size_t size, usize;
+  void *hptr;
+  cl_mem dptr;
 };
 
 struct prog {
