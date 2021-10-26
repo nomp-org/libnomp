@@ -66,4 +66,5 @@ int opencl_set_knl_arg(struct prog *prg, const int index, const size_t size,
 int opencl_run_knl(struct backend *ocl, struct prog *prg, const int ndim,
                    const size_t *global, const size_t *local);
 
+int opencl_finalize(struct backend *ocl);
 #endif // _LIB_GNOMP_IMPL_H_

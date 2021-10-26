@@ -107,4 +107,15 @@ int opencl_run_knl(struct backend *ocl, struct prog *prg, const int ndim,
   return 0;
 }
 
+int opencl_finalize(struct backend *ocl) {
+  cl_int err = clReleaseCommandQueue(ocl->queue);
+  if (err != CL_SUCCESS)
+    return 1;
+  err = clReleaseContext(ocl->ctx);
+  if (err != CL_SUCCESS)
+    return 1;
+
+  return 0;
+}
+
 #undef set_knl_arg

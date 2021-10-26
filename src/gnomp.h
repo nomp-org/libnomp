@@ -42,6 +42,10 @@ int gnomp_run(int *id, const char *source, const char *name, const int handle,
               const int ndim, const size_t *global, const size_t *local,
               const int nargs, ...);
 
+int gnomp_err_str(int err_id, char *buf, int buf_size);
+
+int gnomp_finalize(int *handle);
+
 #ifdef __cplusplus
 }
 #endif

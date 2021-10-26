@@ -176,4 +176,45 @@ int gnomp_run(int *id, const char *source, const char *name, const int handle,
   return err;
 }
 
+int gnomp_err_str(int err_id, char *buf, int buf_size) {
+  switch (err_id) {
+  case GNOMP_INVALID_BACKEND:
+    strncpy(buf, "Invalid gnomp backend", buf_size);
+    break;
+  case GNOMP_INVALID_PLATFORM:
+    strncpy(buf, "Invalid gnomp platform", buf_size);
+    break;
+  case GNOMP_INVALID_DEVICE:
+    strncpy(buf, "Invalid gnomp device", buf_size);
+    break;
+  case GNOMP_INVALID_TYPE:
+    strncpy(buf, "Invalid gnomp type", buf_size);
+    break;
+  case GNOMP_INVALID_MAP_PTR:
+    strncpy(buf, "Invalid gnomp map pointer", buf_size);
+    break;
+  case GNOMP_MALLOC_ERROR:
+    strncpy(buf, "gnomp malloc error", buf_size);
+    break;
+  default:
+    break;
+  }
+
+  return 0;
+}
+
+int gnomp_finalize(int *handle) {
+  check_handle(*handle, backends_n);
+
+  int err = 0;
+  if (backends[*handle].backend == GNOMP_OCL)
+    err = opencl_finalize(&backends[*handle]);
+  else
+    return GNOMP_INVALID_BACKEND;
+
+  if (err == 0)
+    *handle = -1;
+  return err;
+}
+
 #undef check_handle
