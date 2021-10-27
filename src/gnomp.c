@@ -107,7 +107,7 @@ int gnomp_run(int *id, const char *source, const char *name, const int handle,
       return err;
   }
 
-  if (id >= 0) {
+  if (*id >= 0) {
     va_list args;
     va_start(args, nargs);
 
@@ -171,6 +171,8 @@ int gnomp_run(int *id, const char *source, const char *name, const int handle,
 
     if (backends[handle].backend == GNOMP_OCL)
       err = opencl_run_knl(&backends[handle], &progs[*id], ndim, global, local);
+    else
+      return GNOMP_INVALID_BACKEND;
   }
 
   return err;

@@ -48,9 +48,9 @@ int opencl_map(struct backend *ocl, struct mem *m, void *ptr, const size_t id0,
     m->hptr = ptr;
     m->dptr = clCreateBuffer(ocl->ctx, CL_MEM_READ_WRITE, (id1 - id0) * usize,
                              NULL, &err);
+    if (err != CL_SUCCESS)
+      return 1;
   }
-  if (err != CL_SUCCESS)
-    return 1;
 
   // copy the content now
   if (direction == GNOMP_H2D)
