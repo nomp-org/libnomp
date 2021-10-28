@@ -1,6 +1,18 @@
 #include <gnomp-impl.h>
 
-int opencl_init(struct backend *ocl, const int platform_id,
+#define CL_TARGET_OPENCL_VERSION 220
+#ifdef __APPLE__
+#include <OpenCL/cl.h>
+#else
+#include <CL/cl.h>
+#endif
+
+struct opencl_backend {
+  cl_command_queue queue;
+  cl_context ctx;
+};
+
+int opencl_init(struct backend *bnd, const int platform_id,
                 const int device_id) {
   cl_uint num_platforms;
   cl_int err = clGetPlatformIDs(0, NULL, &num_platforms);
@@ -28,9 +40,11 @@ int opencl_init(struct backend *ocl, const int platform_id,
                        &num_devices);
   cl_device_id device = cl_devices[device_id];
 
+  bnd->backend = GNOMP_OCL;
+  struct opencl_backend *ocl = bnd->bptr =
+      calloc(1, sizeof(struct opencl_backend));
   ocl->ctx = clCreateContext(NULL, 1, &device, NULL, NULL, &err);
   ocl->queue = clCreateCommandQueueWithProperties(ocl->ctx, device, NULL, &err);
-  ocl->backend = GNOMP_OCL;
 
   free(cl_devices);
   free(cl_platforms);
@@ -38,27 +52,31 @@ int opencl_init(struct backend *ocl, const int platform_id,
   return 0;
 }
 
-int opencl_map(struct backend *ocl, struct mem *m, void *ptr, const size_t id0,
-               const size_t id1, const size_t usize, const int direction,
+struct opencl_mem {
+  cl_mem mem;
+};
+
+int opencl_map(struct backend *bnd, struct mem *m, const int direction,
                const int alloc) {
+  struct opencl_backend *ocl = bnd->bptr;
   cl_int err;
   if (alloc) {
-    m->size = id1 - id0;
-    m->usize = usize;
-    m->hptr = ptr;
-    m->dptr = clCreateBuffer(ocl->ctx, CL_MEM_READ_WRITE, (id1 - id0) * usize,
-                             NULL, &err);
+    struct opencl_mem *ocl_mem = m->bptr = calloc(1, sizeof(struct opencl_mem));
+    ocl_mem->mem = clCreateBuffer(ocl->ctx, CL_MEM_READ_WRITE,
+                                  (m->idx1 - m->idx0) * m->usize, NULL, &err);
     if (err != CL_SUCCESS)
       return 1;
   }
 
-  // copy the content now
+  struct opencl_mem *ocl_mem = m->bptr;
   if (direction == GNOMP_H2D)
-    err = clEnqueueWriteBuffer(ocl->queue, m->dptr, CL_TRUE, 0,
-                               (id1 - id0) * usize, m->hptr, 0, NULL, NULL);
+    err = clEnqueueWriteBuffer(ocl->queue, ocl_mem->mem, CL_TRUE, 0,
+                               (m->idx1 - m->idx0) * m->usize, m->hptr, 0, NULL,
+                               NULL);
   else if (direction == GNOMP_D2H)
-    err = clEnqueueReadBuffer(ocl->queue, m->dptr, CL_TRUE, 0,
-                              (id1 - id0) * usize, m->hptr, 0, NULL, NULL);
+    err = clEnqueueReadBuffer(ocl->queue, ocl_mem->mem, CL_TRUE, 0,
+                              (m->idx1 - m->idx0) * m->usize, m->hptr, 0, NULL,
+                              NULL);
 
   if (err != CL_SUCCESS)
     return 1;
@@ -66,24 +84,40 @@ int opencl_map(struct backend *ocl, struct mem *m, void *ptr, const size_t id0,
   return 0;
 }
 
-int opencl_build_knl(struct backend *ocl, struct prog *prg, const char *source,
+int opencl_get_mem_ptr(union gnomp_arg *arg, size_t *size, struct mem *m) {
+  struct opencl_mem *mem = m->bptr;
+  arg->p = mem->mem;
+  *size = sizeof(cl_mem);
+  return 0;
+}
+
+struct opencl_prog {
+  cl_program prg;
+  cl_kernel knl;
+};
+
+int opencl_build_knl(struct backend *bnd, struct prog *prg, const char *source,
                      const char *name) {
+  struct opencl_backend *ocl = bnd->bptr;
+  struct opencl_prog *ocl_prg = prg->bptr =
+      calloc(1, sizeof(struct opencl_prog));
+
   cl_int err;
-  prg->prg = clCreateProgramWithSource(ocl->ctx, 1, (const char **)(&source),
-                                       NULL, &err);
+  ocl_prg->prg = clCreateProgramWithSource(
+      ocl->ctx, 1, (const char **)(&source), NULL, &err);
   if (err != CL_SUCCESS)
     return 1;
 
-  err = clBuildProgram(prg->prg, 0, NULL, NULL, NULL, NULL);
+  err = clBuildProgram(ocl_prg->prg, 0, NULL, NULL, NULL, NULL);
   if (err != CL_SUCCESS) {
-    prg->prg = NULL;
-    prg->knl = NULL;
+    ocl_prg->prg = NULL;
+    ocl_prg->knl = NULL;
     return 1;
   }
 
-  prg->knl = clCreateKernel(prg->prg, name, &err);
+  ocl_prg->knl = clCreateKernel(ocl_prg->prg, name, &err);
   if (err != CL_SUCCESS) {
-    prg->knl = NULL;
+    ocl_prg->knl = NULL;
     return 1;
   }
 
@@ -92,28 +126,35 @@ int opencl_build_knl(struct backend *ocl, struct prog *prg, const char *source,
 
 int opencl_set_knl_arg(struct prog *prg, const int index, const size_t size,
                        void *arg) {
-  cl_int err = clSetKernelArg(prg->knl, index, size, arg);
+  struct opencl_prog *ocl_prg = prg->bptr;
+  cl_int err = clSetKernelArg(ocl_prg->knl, index, size, arg);
   if (err != CL_SUCCESS)
     return 1;
   return 0;
 }
 
-int opencl_run_knl(struct backend *ocl, struct prog *prg, const int ndim,
+int opencl_run_knl(struct backend *bnd, struct prog *prg, const int ndim,
                    const size_t *global, const size_t *local) {
-  cl_int err = clEnqueueNDRangeKernel(ocl->queue, prg->knl, ndim, NULL, global,
-                                      local, 0, NULL, NULL);
+  struct opencl_backend *ocl = bnd->bptr;
+  struct opencl_prog *ocl_prg = prg->bptr;
+  cl_int err = clEnqueueNDRangeKernel(ocl->queue, ocl_prg->knl, ndim, NULL,
+                                      global, local, 0, NULL, NULL);
   if (err != CL_SUCCESS)
     return 1;
   return 0;
 }
 
-int opencl_finalize(struct backend *ocl) {
-  cl_int err = clReleaseCommandQueue(ocl->queue);
-  if (err != CL_SUCCESS)
-    return 1;
-  err = clReleaseContext(ocl->ctx);
-  if (err != CL_SUCCESS)
-    return 1;
+int opencl_finalize(struct backend *bnd) {
+  struct opencl_backend *ocl = bnd->bptr;
+  if (ocl != NULL) {
+    cl_int err = clReleaseCommandQueue(ocl->queue);
+    if (err != CL_SUCCESS)
+      return 1;
+    err = clReleaseContext(ocl->ctx);
+    if (err != CL_SUCCESS)
+      return 1;
+    free(ocl);
+  }
 
   return 0;
 }

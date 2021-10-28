@@ -3,13 +3,6 @@
 
 #include <gnomp.h>
 
-#define CL_TARGET_OPENCL_VERSION 220
-#ifdef __APPLE__
-#include <OpenCL/cl.h>
-#else
-#include <CL/cl.h>
-#endif
-
 #include <ctype.h>
 #include <math.h>
 #include <stdarg.h>
@@ -23,19 +16,19 @@
 
 struct backend {
   int backend;
-  cl_command_queue queue;
-  cl_context ctx;
-};
-
-struct mem {
-  size_t size, usize;
-  void *hptr;
-  cl_mem dptr;
+  void *bptr;
 };
 
 struct prog {
-  cl_program prg;
-  cl_kernel knl;
+  int backend;
+  void *bptr;
+};
+
+struct mem {
+  size_t idx0, idx1;
+  size_t usize;
+  void *hptr;
+  void *bptr;
 };
 
 union gnomp_arg {
@@ -53,9 +46,10 @@ union gnomp_arg {
 int opencl_init(struct backend *ocl, const int platform_id,
                 const int device_id);
 
-int opencl_map(struct backend *ocl, struct mem *m, void *ptr, const size_t id0,
-               const size_t id1, const size_t usize, const int direction,
+int opencl_map(struct backend *ocl, struct mem *m, const int direction,
                const int alloc);
+
+int opencl_get_mem_ptr(union gnomp_arg *arg, size_t *size, struct mem *m);
 
 int opencl_build_knl(struct backend *ocl, struct prog *prg, const char *source,
                      const char *name);
@@ -67,4 +61,5 @@ int opencl_run_knl(struct backend *ocl, struct prog *prg, const int ndim,
                    const size_t *global, const size_t *local);
 
 int opencl_finalize(struct backend *ocl);
+
 #endif // _LIB_GNOMP_IMPL_H_

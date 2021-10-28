@@ -59,22 +59,26 @@ static int idx_if_mapped(void *p) {
 
 int gnomp_map(void *ptr, const size_t idx0, const size_t idx1,
               const size_t usize, const int direction, const int handle) {
-  // See if we mapped this ptr already
-  int i = idx_if_mapped(ptr);
-  int alloc = 0;
-  if (direction == GNOMP_H2D && i == mems_n)
-    alloc = 1;
-
   if (mems_n == mems_max) {
     mems_max += mems_max / 2 + 1;
     mems = (struct mem *)realloc(mems, sizeof(struct mem) * mems_max);
   }
 
+  // See if we mapped this ptr already
+  int idx = idx_if_mapped(ptr);
+  int alloc = 0;
+  if (direction == GNOMP_H2D && idx == mems_n) {
+    alloc = 1;
+    mems[idx].idx0 = idx0;
+    mems[idx].idx1 = idx1;
+    mems[idx].usize = usize;
+    mems[idx].hptr = ptr;
+  }
+
   check_handle(handle, backends_n);
   int err = 0;
   if (backends[handle].backend == GNOMP_OCL)
-    err = opencl_map(&backends[handle], &mems[i], ptr, idx0, idx1, usize,
-                     direction, alloc);
+    err = opencl_map(&backends[handle], &mems[idx], direction, alloc);
   else
     err = GNOMP_INVALID_BACKEND;
 
@@ -87,6 +91,18 @@ int gnomp_map(void *ptr, const size_t idx0, const size_t idx1,
 static struct prog *progs = NULL;
 static int progs_n = 0;
 static int progs_max = 0;
+
+static int get_mem_ptr(union gnomp_arg *arg, size_t *size, int handle,
+                       void *ptr) {
+  unsigned int idx = idx_if_mapped(ptr);
+  if (idx < mems_n) {
+    if (backends[handle].backend == GNOMP_OCL)
+      opencl_get_mem_ptr(arg, size, &mems[idx]);
+    else
+      return GNOMP_INVALID_BACKEND;
+  } else
+    return GNOMP_INVALID_MAP_PTR;
+}
 
 int gnomp_run(int *id, const char *source, const char *name, const int handle,
               const int ndim, const size_t *global, const size_t *local,
@@ -115,7 +131,7 @@ int gnomp_run(int *id, const char *source, const char *name, const int handle,
     for (i = 0; i < nargs; i++) {
       /* short, int, long, double, float or pointer */
       int type = va_arg(args, int);
-      size_t size, idx;
+      size_t size;
       union gnomp_arg arg;
       switch (type) {
       case GNOMP_SHORT:
@@ -151,12 +167,7 @@ int gnomp_run(int *id, const char *source, const char *name, const int handle,
         size = sizeof(double);
         break;
       case GNOMP_PTR:
-        idx = idx_if_mapped(va_arg(args, void *));
-        if (idx < mems_n) {
-          arg.p = mems[idx].dptr;
-          size = sizeof(mems[idx].dptr);
-        } else
-          return GNOMP_INVALID_MAP_PTR;
+        get_mem_ptr(&arg, &size, handle, va_arg(args, void *));
         break;
       default:
         return GNOMP_INVALID_TYPE;
