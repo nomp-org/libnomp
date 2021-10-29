@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <gnomp.h>
+#include <math.h>
 #include <stdio.h>
 
 #define print_err(str)                                                         \
@@ -7,7 +8,7 @@
     if (err > 0) {                                                             \
       gnomp_err_str(err, buf, BUFSIZ);                                         \
       printf(str, buf);                                                        \
-      return err;                                                              \
+      return 1;                                                                \
     }                                                                          \
   } while (0)
 
@@ -45,11 +46,18 @@ int main(int argc, char *argv[]) {
   err = gnomp_map(a, 0, 10, sizeof(double), GNOMP_D2H, handle);
   print_err("gnomp_map failed: %s\n");
 
-  int i;
+  int i, ret_val = 0;
   for (i = 0; i < 10; i++)
-    printf("a[%d] = %lf\n", i, a[i]);
+    if (fabs(a[i] - 1.0) > 1e-10) {
+      printf("err: a[%d] != 1.0\n", i);
+      ret_val = 1;
+      break;
+    }
 
-  return 0;
+  err = gnomp_finalize(&handle);
+  print_err("gnomp_finalize failed: %s\n");
+
+  return ret_val;
 }
 
 #undef print_err

@@ -10,9 +10,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define GNOMP_OCL 1
-#define GNOMP_CUDA 2
-#define GNOMP_HIP 4
+#define GNOMP_OCL 0
+#define GNOMP_CUDA 1
+#define GNOMP_HIP 2
 
 struct backend {
   int backend;

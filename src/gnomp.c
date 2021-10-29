@@ -1,13 +1,11 @@
 #include <gnomp-impl.h>
 
-static void check_handle_(int handle, int max, const char *file, int line) {
-  if (handle < 0 || handle >= max) {
-    fprintf(stderr, "check_handle failure in %s:%d\n", file, line);
-    exit(1);
-  }
+static int check_handle(int handle, int max) {
+  if (handle < 0 || handle >= max)
+    return 1;
+  else
+    return 0;
 }
-
-#define check_handle(handle, max) check_handle_(handle, max, __FILE__, __LINE__)
 
 static struct backend *backends = NULL;
 static int backends_n = 0;
@@ -59,23 +57,28 @@ static int idx_if_mapped(void *p) {
 
 int gnomp_map(void *ptr, const size_t idx0, const size_t idx1,
               const size_t usize, const int direction, const int handle) {
+  if (check_handle(handle, backends_n) != 0)
+    return GNOMP_INVALID_HANDLE;
+
   if (mems_n == mems_max) {
     mems_max += mems_max / 2 + 1;
     mems = (struct mem *)realloc(mems, sizeof(struct mem) * mems_max);
   }
 
   // See if we mapped this ptr already
-  int idx = idx_if_mapped(ptr);
   int alloc = 0;
-  if (direction == GNOMP_H2D && idx == mems_n) {
-    alloc = 1;
-    mems[idx].idx0 = idx0;
-    mems[idx].idx1 = idx1;
-    mems[idx].usize = usize;
-    mems[idx].hptr = ptr;
+  unsigned int idx = idx_if_mapped(ptr);
+  if (idx == mems_n) {
+    if (direction == GNOMP_H2D) {
+      alloc = 1;
+      mems[idx].idx0 = idx0;
+      mems[idx].idx1 = idx1;
+      mems[idx].usize = usize;
+      mems[idx].hptr = ptr;
+    } else
+      return GNOMP_INVALID_MAP_PTR;
   }
 
-  check_handle(handle, backends_n);
   int err = 0;
   if (backends[handle].backend == GNOMP_OCL)
     err = opencl_map(&backends[handle], &mems[idx], direction, alloc);
@@ -95,28 +98,35 @@ static int progs_max = 0;
 static int get_mem_ptr(union gnomp_arg *arg, size_t *size, int handle,
                        void *ptr) {
   unsigned int idx = idx_if_mapped(ptr);
+  int err = GNOMP_INVALID_MAP_PTR;
   if (idx < mems_n) {
     if (backends[handle].backend == GNOMP_OCL)
-      opencl_get_mem_ptr(arg, size, &mems[idx]);
+      err = opencl_get_mem_ptr(arg, size, &mems[idx]);
     else
-      return GNOMP_INVALID_BACKEND;
-  } else
-    return GNOMP_INVALID_MAP_PTR;
+      err = GNOMP_INVALID_BACKEND;
+  }
+
+  return err;
 }
 
 int gnomp_run(int *id, const char *source, const char *name, const int handle,
               const int ndim, const size_t *global, const size_t *local,
               const int nargs, ...) {
+  if (check_handle(handle, backends_n) != 0)
+    return GNOMP_INVALID_HANDLE;
+
   if (progs_n == progs_max) {
     progs_max += progs_max / 2 + 1;
     progs = (struct prog *)realloc(progs, sizeof(struct prog) * progs_max);
   }
 
-  check_handle(handle, backends_n);
   int err = 0;
   if (*id == -1) {
     if (backends[handle].backend == GNOMP_OCL)
       err = opencl_build_knl(&backends[handle], &progs[progs_n], source, name);
+    else
+      err = GNOMP_INVALID_BACKEND;
+
     if (err == 0)
       *id = progs_n++;
     else
@@ -167,15 +177,23 @@ int gnomp_run(int *id, const char *source, const char *name, const int handle,
         size = sizeof(double);
         break;
       case GNOMP_PTR:
-        get_mem_ptr(&arg, &size, handle, va_arg(args, void *));
+        err = get_mem_ptr(&arg, &size, handle, va_arg(args, void *));
         break;
       default:
-        return GNOMP_INVALID_TYPE;
+        err = GNOMP_INVALID_TYPE;
         break;
       }
 
-      if (backends[handle].backend == GNOMP_OCL)
-        opencl_set_knl_arg(&progs[*id], i, size, &arg);
+      if (err != 0)
+        return err;
+
+      if (backends[handle].backend == GNOMP_OCL) {
+        err = opencl_set_knl_arg(&progs[*id], i, size, &arg);
+      } else
+        err = GNOMP_INVALID_BACKEND;
+
+      if (err != 0)
+        return err;
     }
 
     va_end(args);
@@ -183,7 +201,7 @@ int gnomp_run(int *id, const char *source, const char *name, const int handle,
     if (backends[handle].backend == GNOMP_OCL)
       err = opencl_run_knl(&backends[handle], &progs[*id], ndim, global, local);
     else
-      return GNOMP_INVALID_BACKEND;
+      err = GNOMP_INVALID_BACKEND;
   }
 
   return err;
@@ -210,6 +228,7 @@ int gnomp_err_str(int err_id, char *buf, int buf_size) {
     strncpy(buf, "gnomp malloc error", buf_size);
     break;
   default:
+    return GNOMP_INVALID_ERROR;
     break;
   }
 
@@ -217,16 +236,21 @@ int gnomp_err_str(int err_id, char *buf, int buf_size) {
 }
 
 int gnomp_finalize(int *handle) {
-  check_handle(*handle, backends_n);
+  if (check_handle(*handle, backends_n) != 0)
+    return GNOMP_INVALID_HANDLE;
 
   int err = 0;
   if (backends[*handle].backend == GNOMP_OCL)
     err = opencl_finalize(&backends[*handle]);
   else
-    return GNOMP_INVALID_BACKEND;
+    err = GNOMP_INVALID_BACKEND;
 
-  if (err == 0)
+  if (err == 0) {
+    backends_n--;
     *handle = -1;
+    if (backends_n == 0)
+      free(backends);
+  }
   return err;
 }
 
