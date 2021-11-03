@@ -33,8 +33,8 @@ int main(int argc, char *argv[]) {
   int err = gnomp_init(&handle, "opencl", 0, 0);
   print_err("gnomp_init failed: %s\n");
 
-  err = gnomp_map(a, 0, 10, sizeof(double), GNOMP_H2D, handle);
-  print_err("gnomp_map failed: %s\n");
+  err = gnomp_alloc(a, 0, 10, sizeof(double), handle);
+  print_err("gnomp_alloc failed: %s\n");
 
   const size_t global[3] = {10, 1, 1};
   const size_t local[3] = {1, 1, 1};
