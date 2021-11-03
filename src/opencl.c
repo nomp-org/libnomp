@@ -56,18 +56,19 @@ struct opencl_mem {
   cl_mem mem;
 };
 
-int opencl_map(struct backend *bnd, struct mem *m, const int direction,
-               const int alloc) {
+int opencl_alloc(struct backend *bnd, struct mem *m) {
+  struct opencl_backend *ocl = bnd->bptr;
+  struct opencl_mem *ocl_mem = m->bptr = calloc(1, sizeof(struct opencl_mem));
+  cl_int err;
+  ocl_mem->mem = clCreateBuffer(ocl->ctx, CL_MEM_READ_WRITE,
+                                (m->idx1 - m->idx0) * m->usize, NULL, &err);
+  if (err != CL_SUCCESS)
+    return 1;
+}
+
+int opencl_map(struct backend *bnd, struct mem *m, const int direction) {
   struct opencl_backend *ocl = bnd->bptr;
   cl_int err;
-  if (alloc) {
-    struct opencl_mem *ocl_mem = m->bptr = calloc(1, sizeof(struct opencl_mem));
-    ocl_mem->mem = clCreateBuffer(ocl->ctx, CL_MEM_READ_WRITE,
-                                  (m->idx1 - m->idx0) * m->usize, NULL, &err);
-    if (err != CL_SUCCESS)
-      return 1;
-  }
-
   struct opencl_mem *ocl_mem = m->bptr;
   if (direction == GNOMP_H2D)
     err = clEnqueueWriteBuffer(ocl->queue, ocl_mem->mem, CL_TRUE, 0,

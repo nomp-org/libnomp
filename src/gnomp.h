@@ -15,6 +15,7 @@
 #define GNOMP_INVALID_MAP_PTR -16
 #define GNOMP_INVALID_HANDLE -32
 #define GNOMP_MALLOC_ERROR -64
+#define GNOMP_INVALID_MAP_DIRECTION -128
 #define GNOMP_INVALID_ERROR -1024
 
 /* Types */
@@ -35,6 +36,9 @@ extern "C" {
 
 int gnomp_init(int *handle, const char *backend, const int platform,
                const int device);
+
+int gnomp_alloc(void *ptr, const size_t start_idx, const size_t end_idx,
+                const size_t unit_size, const int handle);
 
 int gnomp_map(void *ptr, const size_t start_idx, const size_t end_idx,
               const size_t unit_size, const int direction, const int handle);
