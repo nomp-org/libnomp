@@ -48,6 +48,8 @@ static int mems_n = 0;
 static int mems_max = 0;
 
 static int idx_if_mapped(void *p) {
+  // FIXME: This is O(N) in number of allocations.
+  // Needs to go. Must store a hashmap.
   int i;
   for (i = 0; i < mems_n; i++)
     if (mems[i].hptr == p)
