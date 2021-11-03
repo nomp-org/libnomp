@@ -47,6 +47,8 @@ static struct mem *mems = NULL;
 static int mems_n = 0;
 static int mems_max = 0;
 
+/// Returns the pointer to the allocated memory corresponding to 'p'.
+/// If no buffer has been allocated for 'p' returns *mems_n*.
 static int idx_if_mapped(void *p) {
   // FIXME: This is O(N) in number of allocations.
   // Needs to go. Must store a hashmap.
@@ -57,8 +59,8 @@ static int idx_if_mapped(void *p) {
   return i;
 }
 
-int gnomp_map(void *ptr, const size_t idx0, const size_t idx1,
-              const size_t usize, const int direction, const int handle) {
+int gnomp_alloc(void *ptr, const size_t idx0, const size_t idx1,
+                const size_t usize, const int handle) {
   if (check_handle(handle, backends_n) != 0)
     return GNOMP_INVALID_HANDLE;
 
@@ -68,27 +70,54 @@ int gnomp_map(void *ptr, const size_t idx0, const size_t idx1,
   }
 
   // See if we mapped this ptr already
-  int alloc = 0;
   unsigned int idx = idx_if_mapped(ptr);
   if (idx == mems_n) {
-    if (direction == GNOMP_H2D) {
-      alloc = 1;
-      mems[idx].idx0 = idx0;
-      mems[idx].idx1 = idx1;
-      mems[idx].usize = usize;
-      mems[idx].hptr = ptr;
+    // didn't find already allocated buffer => allocate
+    mems[idx].idx0 = idx0;
+    mems[idx].idx1 = idx1;
+    mems[idx].usize = usize;
+    mems[idx].hptr = ptr;
+
+    if (backends[handle].backend == GNOMP_OCL) {
+      int err = opencl_alloc(&backends[handle], &mems[idx]);
+      if (!err)
+        ++mems_n;
+      else
+        return err;
     } else
-      return GNOMP_INVALID_MAP_PTR;
+      return GNOMP_INVALID_BACKEND;
   }
 
-  int err = 0;
-  if (backends[handle].backend == GNOMP_OCL)
-    err = opencl_map(&backends[handle], &mems[idx], direction, alloc);
-  else
-    err = GNOMP_INVALID_BACKEND;
+  return 0;
+}
 
-  if (err == 0 && alloc == 1)
-    mems_n++;
+int gnomp_map(void *ptr, const size_t idx0, const size_t idx1,
+              const size_t usize, const int direction, const int handle) {
+  if (check_handle(handle, backends_n) != 0)
+    return GNOMP_INVALID_HANDLE;
+
+  // {{{ Allocate device buffer
+
+  if (direction == GNOMP_D2H) {
+    if (idx_if_mapped(ptr) == mems_n)
+      // if doing D2H mem should have been allocated
+      // => exit with GNOMP_INVALID_MAP_PTR
+      return GNOMP_INVALID_MAP_PTR;
+  } else if (direction == GNOMP_H2D)
+    gnomp_alloc(ptr, idx0, idx1, usize, handle);
+  else {
+    return GNOMP_INVALID_MAP_DIRECTION;
+  }
+
+  // }}}
+
+  int err = 0;
+  if (backends[handle].backend == GNOMP_OCL) {
+    // TODO (caution): 'idx_if_mapped' invoked multiple times: if starts
+    // getting costly, inline gnomp_alloc.
+    err = opencl_map(&backends[handle], &mems[idx_if_mapped(ptr)], direction);
+  } else
+    err = GNOMP_INVALID_BACKEND;
 
   return err;
 }
