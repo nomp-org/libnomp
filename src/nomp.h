@@ -1,34 +1,34 @@
-#if !defined(_LIB_GNOMP_H_)
-#define _LIB_GNOMP_H_
+#if !defined(_LIB_NOMP_H_)
+#define _LIB_NOMP_H_
 
 #include <stddef.h>
 
 /* Map Direction */
-#define GNOMP_H2D 1
-#define GNOMP_D2H 2
-#define GNOMP_ALLOC 4
+#define NOMP_H2D 1
+#define NOMP_D2H 2
+#define NOMP_ALLOC 4
 
 /* Errors */
-#define GNOMP_INVALID_BACKEND -1
-#define GNOMP_INVALID_PLATFORM -2
-#define GNOMP_INVALID_DEVICE -4
-#define GNOMP_INVALID_TYPE -8
-#define GNOMP_INVALID_MAP_PTR -16
-#define GNOMP_INVALID_HANDLE -32
-#define GNOMP_MALLOC_ERROR -64
-#define GNOMP_INVALID_MAP_DIRECTION -128
-#define GNOMP_INVALID_ERROR -1024
+#define NOMP_INVALID_BACKEND -1
+#define NOMP_INVALID_PLATFORM -2
+#define NOMP_INVALID_DEVICE -4
+#define NOMP_INVALID_TYPE -8
+#define NOMP_INVALID_MAP_PTR -16
+#define NOMP_INVALID_HANDLE -32
+#define NOMP_MALLOC_ERROR -64
+#define NOMP_INVALID_MAP_OP -128
+#define NOMP_INVALID_ERROR -1024
 
 /* Types */
-#define GNOMP_SHORT 0
-#define GNOMP_USHORT 1
-#define GNOMP_INT 10
-#define GNOMP_UINT 11
-#define GNOMP_LONG 20
-#define GNOMP_ULONG 21
-#define GNOMP_FLOAT 30
-#define GNOMP_DOUBLE 31
-#define GNOMP_PTR 50
+#define NOMP_SHORT 0
+#define NOMP_USHORT 1
+#define NOMP_INT 10
+#define NOMP_UINT 11
+#define NOMP_LONG 20
+#define NOMP_ULONG 21
+#define NOMP_FLOAT 30
+#define NOMP_DOUBLE 31
+#define NOMP_PTR 50
 
 /* Functions */
 #ifdef __cplusplus
@@ -53,4 +53,4 @@ int nomp_finalize(int *handle);
 }
 #endif
 
-#endif // _LIB_GNOMP_H_
+#endif // _LIB_NOMP_H_

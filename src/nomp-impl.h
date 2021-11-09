@@ -1,5 +1,5 @@
-#if !defined(_LIB_GNOMP_IMPL_H_)
-#define _LIB_GNOMP_IMPL_H_
+#if !defined(_LIB_NOMP_IMPL_H_)
+#define _LIB_NOMP_IMPL_H_
 
 #include <nomp.h>
 
@@ -10,9 +10,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define GNOMP_OCL 0
-#define GNOMP_CUDA 1
-#define GNOMP_HIP 2
+#define NOMP_OCL 0
+#define NOMP_CUDA 1
+#define NOMP_HIP 2
 
 struct backend {
   int backend;
@@ -61,4 +61,4 @@ int opencl_run_knl(struct backend *ocl, struct prog *prg, const int ndim,
 
 int opencl_finalize(struct backend *ocl);
 
-#endif // _LIB_GNOMP_IMPL_H_
+#endif // _LIB_NOMP_IMPL_H_
