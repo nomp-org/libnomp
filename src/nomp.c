@@ -1,4 +1,4 @@
-#include <gnomp-impl.h>
+#include <nomp-impl.h>
 
 static int check_handle(int handle, int max) {
   if (handle < 0 || handle >= max)
@@ -11,8 +11,8 @@ static struct backend *backends = NULL;
 static int backends_n = 0;
 static int backends_max = 0;
 
-int gnomp_init(int *handle, const char *backend, const int platform,
-               const int device) {
+int nomp_init(int *handle, const char *backend, const int platform,
+              const int device) {
   size_t n = strnlen(backend, 32);
   if (n == 32)
     return GNOMP_INVALID_BACKEND;
@@ -59,8 +59,8 @@ static int idx_if_mapped(void *p) {
   return i;
 }
 
-int gnomp_alloc(void *ptr, const size_t idx0, const size_t idx1,
-                const size_t usize, const int handle) {
+int nomp_alloc(void *ptr, const size_t idx0, const size_t idx1,
+               const size_t usize, const int handle) {
   if (check_handle(handle, backends_n) != 0)
     return GNOMP_INVALID_HANDLE;
 
@@ -91,8 +91,8 @@ int gnomp_alloc(void *ptr, const size_t idx0, const size_t idx1,
   return 0;
 }
 
-int gnomp_map(void *ptr, const size_t idx0, const size_t idx1,
-              const size_t usize, const int direction, const int handle) {
+int nomp_map(void *ptr, const size_t idx0, const size_t idx1,
+             const size_t usize, const int direction, const int handle) {
   if (check_handle(handle, backends_n) != 0)
     return GNOMP_INVALID_HANDLE;
 
@@ -104,7 +104,7 @@ int gnomp_map(void *ptr, const size_t idx0, const size_t idx1,
       // => exit with GNOMP_INVALID_MAP_PTR
       return GNOMP_INVALID_MAP_PTR;
   } else if (direction == GNOMP_H2D)
-    gnomp_alloc(ptr, idx0, idx1, usize, handle);
+    nomp_alloc(ptr, idx0, idx1, usize, handle);
   else {
     return GNOMP_INVALID_MAP_DIRECTION;
   }
@@ -114,7 +114,7 @@ int gnomp_map(void *ptr, const size_t idx0, const size_t idx1,
   int err = 0;
   if (backends[handle].backend == GNOMP_OCL) {
     // TODO (caution): 'idx_if_mapped' invoked multiple times: if starts
-    // getting costly, inline gnomp_alloc.
+    // getting costly, inline nomp_alloc.
     err = opencl_map(&backends[handle], &mems[idx_if_mapped(ptr)], direction);
   } else
     err = GNOMP_INVALID_BACKEND;
@@ -126,7 +126,7 @@ static struct prog *progs = NULL;
 static int progs_n = 0;
 static int progs_max = 0;
 
-static int get_mem_ptr(union gnomp_arg *arg, size_t *size, int handle,
+static int get_mem_ptr(union nomp_arg *arg, size_t *size, int handle,
                        void *ptr) {
   unsigned int idx = idx_if_mapped(ptr);
   int err = GNOMP_INVALID_MAP_PTR;
@@ -140,9 +140,9 @@ static int get_mem_ptr(union gnomp_arg *arg, size_t *size, int handle,
   return err;
 }
 
-int gnomp_run(int *id, const char *source, const char *name, const int handle,
-              const int ndim, const size_t *global, const size_t *local,
-              const int nargs, ...) {
+int nomp_run(int *id, const char *source, const char *name, const int handle,
+             const int ndim, const size_t *global, const size_t *local,
+             const int nargs, ...) {
   if (check_handle(handle, backends_n) != 0)
     return GNOMP_INVALID_HANDLE;
 
@@ -173,7 +173,7 @@ int gnomp_run(int *id, const char *source, const char *name, const int handle,
       /* short, int, long, double, float or pointer */
       int type = va_arg(args, int);
       size_t size;
-      union gnomp_arg arg;
+      union nomp_arg arg;
       switch (type) {
       case GNOMP_SHORT:
         arg.s = va_arg(args, int);
@@ -238,25 +238,25 @@ int gnomp_run(int *id, const char *source, const char *name, const int handle,
   return err;
 }
 
-int gnomp_err_str(int err_id, char *buf, int buf_size) {
+int nomp_err_str(int err_id, char *buf, int buf_size) {
   switch (err_id) {
   case GNOMP_INVALID_BACKEND:
-    strncpy(buf, "Invalid gnomp backend", buf_size);
+    strncpy(buf, "Invalid nomp backend", buf_size);
     break;
   case GNOMP_INVALID_PLATFORM:
-    strncpy(buf, "Invalid gnomp platform", buf_size);
+    strncpy(buf, "Invalid nomp platform", buf_size);
     break;
   case GNOMP_INVALID_DEVICE:
-    strncpy(buf, "Invalid gnomp device", buf_size);
+    strncpy(buf, "Invalid nomp device", buf_size);
     break;
   case GNOMP_INVALID_TYPE:
-    strncpy(buf, "Invalid gnomp type", buf_size);
+    strncpy(buf, "Invalid nomp type", buf_size);
     break;
   case GNOMP_INVALID_MAP_PTR:
-    strncpy(buf, "Invalid gnomp map pointer", buf_size);
+    strncpy(buf, "Invalid nomp map pointer", buf_size);
     break;
   case GNOMP_MALLOC_ERROR:
-    strncpy(buf, "gnomp malloc error", buf_size);
+    strncpy(buf, "nomp malloc error", buf_size);
     break;
   default:
     return GNOMP_INVALID_ERROR;
@@ -266,7 +266,7 @@ int gnomp_err_str(int err_id, char *buf, int buf_size) {
   return 0;
 }
 
-int gnomp_finalize(int *handle) {
+int nomp_finalize(int *handle) {
   if (check_handle(*handle, backends_n) != 0)
     return GNOMP_INVALID_HANDLE;
 

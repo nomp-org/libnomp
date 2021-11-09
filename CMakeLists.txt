@@ -1,26 +1,26 @@
 cmake_minimum_required(VERSION 3.9)
 
-project(libgnomp VERSION 0.0.1 DESCRIPTION "gnomp runtime library" LANGUAGES C)
+project(libnomp VERSION 0.0.1 DESCRIPTION "nomp runtime library" LANGUAGES C)
 
 include(GNUInstallDirs)
 
-add_library(gnomp SHARED src/opencl.c src/gnomp.c)
-set_target_properties(gnomp PROPERTIES
+add_library(nomp SHARED src/opencl.c src/nomp.c)
+set_target_properties(nomp PROPERTIES
   VERSION ${PROJECT_VERSION}
   SOVERSION 1
-  PUBLIC_HEADER src/gnomp.h)
-target_include_directories(gnomp PRIVATE src)
-configure_file(gnomp.pc.in gnomp.pc @ONLY)
+  PUBLIC_HEADER src/nomp.h)
+target_include_directories(nomp PRIVATE src)
+configure_file(nomp.pc.in nomp.pc @ONLY)
 
 find_package(OpenCL REQUIRED)
-target_link_libraries(gnomp OpenCL::OpenCL)
+target_link_libraries(nomp OpenCL::OpenCL)
 
 add_executable(vec_init tests/vec_init.c)
-target_link_libraries(vec_init gnomp)
+target_link_libraries(vec_init nomp)
 target_include_directories(vec_init PUBLIC src)
 
-install(TARGETS gnomp
+install(TARGETS nomp
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   PUBLIC_HEADER DESTINATION ${CMAKE_PUBLIC_INCLUDEDIR})
-install(FILES ${CMAKE_BINARY_DIR}/gnomp.pc
+install(FILES ${CMAKE_BINARY_DIR}/nomp.pc
   DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
