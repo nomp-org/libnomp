@@ -59,8 +59,8 @@ static int idx_if_mapped(void *p) {
   return i;
 }
 
-int nomp_alloc(void *ptr, const size_t idx0, const size_t idx1,
-               const size_t usize, const int handle) {
+int nomp_map(void *ptr, const size_t idx0, const size_t idx1,
+             const size_t usize, const int op_, const int handle) {
   if (check_handle(handle, backends_n) != 0)
     return GNOMP_INVALID_HANDLE;
 
@@ -69,55 +69,28 @@ int nomp_alloc(void *ptr, const size_t idx0, const size_t idx1,
     mems = (struct mem *)realloc(mems, sizeof(struct mem) * mems_max);
   }
 
-  // See if we mapped this ptr already
-  unsigned int idx = idx_if_mapped(ptr);
+  int idx = idx_if_mapped(ptr);
+  int op = op_;
   if (idx == mems_n) {
-    // didn't find already allocated buffer => allocate
+    if (op == GNOMP_D2H)
+      return GNOMP_INVALID_MAP_PTR;
+    else if (op == GNOMP_H2D)
+      op |= GNOMP_ALLOC;
+
     mems[idx].idx0 = idx0;
     mems[idx].idx1 = idx1;
     mems[idx].usize = usize;
     mems[idx].hptr = ptr;
-
-    if (backends[handle].backend == GNOMP_OCL) {
-      int err = opencl_alloc(&backends[handle], &mems[idx]);
-      if (!err)
-        ++mems_n;
-      else
-        return err;
-    } else
-      return GNOMP_INVALID_BACKEND;
   }
-
-  return 0;
-}
-
-int nomp_map(void *ptr, const size_t idx0, const size_t idx1,
-             const size_t usize, const int direction, const int handle) {
-  if (check_handle(handle, backends_n) != 0)
-    return GNOMP_INVALID_HANDLE;
-
-  // {{{ Allocate device buffer
-
-  if (direction == GNOMP_D2H) {
-    if (idx_if_mapped(ptr) == mems_n)
-      // if doing D2H mem should have been allocated
-      // => exit with GNOMP_INVALID_MAP_PTR
-      return GNOMP_INVALID_MAP_PTR;
-  } else if (direction == GNOMP_H2D)
-    nomp_alloc(ptr, idx0, idx1, usize, handle);
-  else {
-    return GNOMP_INVALID_MAP_DIRECTION;
-  }
-
-  // }}}
 
   int err = 0;
-  if (backends[handle].backend == GNOMP_OCL) {
-    // TODO (caution): 'idx_if_mapped' invoked multiple times: if starts
-    // getting costly, inline nomp_alloc.
-    err = opencl_map(&backends[handle], &mems[idx_if_mapped(ptr)], direction);
-  } else
+  if (backends[handle].backend == GNOMP_OCL)
+    err = opencl_map(&backends[handle], &mems[idx], op);
+  else
     err = GNOMP_INVALID_BACKEND;
+
+  if (err == 0 && idx == mems_n)
+    ++mems_n;
 
   return err;
 }

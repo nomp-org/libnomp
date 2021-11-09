@@ -46,7 +46,6 @@ union nomp_arg {
 int opencl_init(struct backend *ocl, const int platform_id,
                 const int device_id);
 
-int opencl_alloc(struct backend *ocl, struct mem *m);
 int opencl_map(struct backend *ocl, struct mem *m, const int direction);
 
 int opencl_get_mem_ptr(union nomp_arg *arg, size_t *size, struct mem *m);
