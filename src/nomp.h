@@ -34,22 +34,22 @@
 extern "C" {
 #endif
 
-int gnomp_init(int *handle, const char *backend, const int platform,
-               const int device);
+int nomp_init(int *handle, const char *backend, const int platform,
+              const int device);
 
-int gnomp_alloc(void *ptr, const size_t start_idx, const size_t end_idx,
-                const size_t unit_size, const int handle);
+int nomp_alloc(void *ptr, const size_t start_idx, const size_t end_idx,
+               const size_t unit_size, const int handle);
 
-int gnomp_map(void *ptr, const size_t start_idx, const size_t end_idx,
-              const size_t unit_size, const int direction, const int handle);
+int nomp_map(void *ptr, const size_t start_idx, const size_t end_idx,
+             const size_t unit_size, const int direction, const int handle);
 
-int gnomp_run(int *id, const char *source, const char *name, const int handle,
-              const int ndim, const size_t *global, const size_t *local,
-              const int nargs, ...);
+int nomp_run(int *id, const char *source, const char *name, const int handle,
+             const int ndim, const size_t *global, const size_t *local,
+             const int nargs, ...);
 
-int gnomp_err_str(int err_id, char *buf, int buf_size);
+int nomp_err_str(int err_id, char *buf, int buf_size);
 
-int gnomp_finalize(int *handle);
+int nomp_finalize(int *handle);
 
 #ifdef __cplusplus
 }

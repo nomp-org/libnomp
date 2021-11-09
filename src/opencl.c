@@ -1,4 +1,4 @@
-#include <gnomp-impl.h>
+#include <nomp-impl.h>
 
 #define CL_TARGET_OPENCL_VERSION 220
 #ifdef __APPLE__
@@ -85,7 +85,7 @@ int opencl_map(struct backend *bnd, struct mem *m, const int direction) {
   return 0;
 }
 
-int opencl_get_mem_ptr(union gnomp_arg *arg, size_t *size, struct mem *m) {
+int opencl_get_mem_ptr(union nomp_arg *arg, size_t *size, struct mem *m) {
   struct opencl_mem *mem = m->bptr;
   arg->p = mem->mem;
   *size = sizeof(cl_mem);

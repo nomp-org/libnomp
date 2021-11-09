@@ -1,7 +1,7 @@
 #if !defined(_LIB_GNOMP_IMPL_H_)
 #define _LIB_GNOMP_IMPL_H_
 
-#include <gnomp.h>
+#include <nomp.h>
 
 #include <ctype.h>
 #include <math.h>
@@ -31,7 +31,7 @@ struct mem {
   void *bptr;
 };
 
-union gnomp_arg {
+union nomp_arg {
   short s;
   unsigned short us;
   int i;
@@ -49,7 +49,7 @@ int opencl_init(struct backend *ocl, const int platform_id,
 int opencl_alloc(struct backend *ocl, struct mem *m);
 int opencl_map(struct backend *ocl, struct mem *m, const int direction);
 
-int opencl_get_mem_ptr(union gnomp_arg *arg, size_t *size, struct mem *m);
+int opencl_get_mem_ptr(union nomp_arg *arg, size_t *size, struct mem *m);
 
 int opencl_build_knl(struct backend *ocl, struct prog *prg, const char *source,
                      const char *name);
