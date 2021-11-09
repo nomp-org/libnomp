@@ -56,38 +56,42 @@ struct opencl_mem {
   cl_mem mem;
 };
 
-int opencl_alloc(struct backend *bnd, struct mem *m) {
+int opencl_map(struct backend *bnd, struct mem *m, const int op) {
   struct opencl_backend *ocl = bnd->bptr;
-  struct opencl_mem *ocl_mem = m->bptr = calloc(1, sizeof(struct opencl_mem));
-  cl_int err;
-  ocl_mem->mem = clCreateBuffer(ocl->ctx, CL_MEM_READ_WRITE,
-                                (m->idx1 - m->idx0) * m->usize, NULL, &err);
-  if (err != CL_SUCCESS)
-    return 1;
-}
 
-int opencl_map(struct backend *bnd, struct mem *m, const int direction) {
-  struct opencl_backend *ocl = bnd->bptr;
   cl_int err;
+  if (op & GNOMP_ALLOC) {
+    struct opencl_mem *ocl_mem = m->bptr = calloc(1, sizeof(struct opencl_mem));
+    ocl_mem->mem = clCreateBuffer(ocl->ctx, CL_MEM_READ_WRITE,
+                                  (m->idx1 - m->idx0) * m->usize, NULL, &err);
+    if (err != CL_SUCCESS)
+      return 1;
+  }
+
   struct opencl_mem *ocl_mem = m->bptr;
-  if (direction == GNOMP_H2D)
+  if (op & GNOMP_H2D) {
     err = clEnqueueWriteBuffer(ocl->queue, ocl_mem->mem, CL_TRUE, 0,
                                (m->idx1 - m->idx0) * m->usize, m->hptr, 0, NULL,
                                NULL);
-  else if (direction == GNOMP_D2H)
+    if (err != CL_SUCCESS)
+      return 1;
+  }
+
+  if (op == GNOMP_D2H) {
     err = clEnqueueReadBuffer(ocl->queue, ocl_mem->mem, CL_TRUE, 0,
                               (m->idx1 - m->idx0) * m->usize, m->hptr, 0, NULL,
                               NULL);
 
-  if (err != CL_SUCCESS)
-    return 1;
+    if (err != CL_SUCCESS)
+      return 1;
+  }
 
   return 0;
 }
 
 int opencl_get_mem_ptr(union nomp_arg *arg, size_t *size, struct mem *m) {
-  struct opencl_mem *mem = m->bptr;
-  arg->p = mem->mem;
+  struct opencl_mem *ocl_mem = m->bptr;
+  arg->p = ocl_mem->mem;
   *size = sizeof(cl_mem);
   return 0;
 }

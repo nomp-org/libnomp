@@ -4,8 +4,9 @@
 #include <stddef.h>
 
 /* Map Direction */
-#define GNOMP_H2D 0
-#define GNOMP_D2H 1
+#define GNOMP_H2D 1
+#define GNOMP_D2H 2
+#define GNOMP_ALLOC 4
 
 /* Errors */
 #define GNOMP_INVALID_BACKEND -1
@@ -37,11 +38,8 @@ extern "C" {
 int nomp_init(int *handle, const char *backend, const int platform,
               const int device);
 
-int nomp_alloc(void *ptr, const size_t start_idx, const size_t end_idx,
-               const size_t unit_size, const int handle);
-
 int nomp_map(void *ptr, const size_t start_idx, const size_t end_idx,
-             const size_t unit_size, const int direction, const int handle);
+             const size_t unit_size, const int op, const int handle);
 
 int nomp_run(int *id, const char *source, const char *name, const int handle,
              const int ndim, const size_t *global, const size_t *local,
