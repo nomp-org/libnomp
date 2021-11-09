@@ -5,7 +5,7 @@
 
 #define print_err(str)                                                         \
   do {                                                                         \
-    if (err > 0) {                                                             \
+    if (err != 0) {                                                            \
       nomp_err_str(err, buf, BUFSIZ);                                          \
       printf(str, buf);                                                        \
       return 1;                                                                \
@@ -22,7 +22,7 @@ const char *knl_str =
     "vec_init(__global double *__restrict__ a)\n"
     "{\n"
     "for (int i = 0; i <= 9; ++i)\n"
-    "a[i] = 1.0;\n"
+    "a[i] = 42.0;\n"
     "}";
 
 int main(int argc, char *argv[]) {
@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
   int err = nomp_init(&handle, "opencl", 0, 0);
   print_err("nomp_init failed: %s\n");
 
-  err = nomp_alloc(a, 0, 10, sizeof(double), handle);
+  err = nomp_map(a, 0, 10, sizeof(double), GNOMP_ALLOC, handle);
   print_err("nomp_alloc failed: %s\n");
 
   const size_t global[3] = {10, 1, 1};
@@ -48,8 +48,8 @@ int main(int argc, char *argv[]) {
 
   int i, ret_val = 0;
   for (i = 0; i < 10; i++)
-    if (fabs(a[i] - 1.0) > 1e-10) {
-      printf("err: a[%d] != 1.0\n", i);
+    if (fabs(a[i] - 42.0) > 1e-10) {
+      printf("err: (a[%d] = %lf) != 42.0\n", i, a[i]);
       ret_val = 1;
       break;
     }
