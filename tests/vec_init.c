@@ -33,17 +33,17 @@ int main(int argc, char *argv[]) {
   int err = nomp_init(&handle, "opencl", 0, 0);
   print_err("nomp_init failed: %s\n");
 
-  err = nomp_map(a, 0, 10, sizeof(double), GNOMP_ALLOC, handle);
+  err = nomp_map(a, 0, 10, sizeof(double), NOMP_ALLOC, handle);
   print_err("nomp_alloc failed: %s\n");
 
   const size_t global[3] = {10, 1, 1};
   const size_t local[3] = {1, 1, 1};
   int kernel = -1;
   err = nomp_run(&kernel, knl_str, "vec_init", handle, 3, global, local, 1,
-                 GNOMP_PTR, a);
+                 NOMP_PTR, a);
   print_err("nomp_run failed: %s\n");
 
-  err = nomp_map(a, 0, 10, sizeof(double), GNOMP_D2H, handle);
+  err = nomp_map(a, 0, 10, sizeof(double), NOMP_D2H, handle);
   print_err("nomp_map failed: %s\n");
 
   int i, ret_val = 0;

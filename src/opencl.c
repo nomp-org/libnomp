@@ -18,11 +18,11 @@ int opencl_init(struct backend *bnd, const int platform_id,
   cl_int err = clGetPlatformIDs(0, NULL, &num_platforms);
   // TODO: check err
   if (platform_id < 0 | platform_id >= num_platforms)
-    return GNOMP_INVALID_PLATFORM;
+    return NOMP_INVALID_PLATFORM;
 
   cl_platform_id *cl_platforms = calloc(num_platforms, sizeof(cl_platform_id));
   if (cl_platforms == NULL)
-    return GNOMP_MALLOC_ERROR;
+    return NOMP_MALLOC_ERROR;
 
   err = clGetPlatformIDs(num_platforms, cl_platforms, &num_platforms);
   cl_platform_id platform = cl_platforms[platform_id];
@@ -30,17 +30,17 @@ int opencl_init(struct backend *bnd, const int platform_id,
   cl_uint num_devices;
   err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 0, NULL, &num_devices);
   if (device_id < 0 || device_id >= num_devices)
-    return GNOMP_INVALID_DEVICE;
+    return NOMP_INVALID_DEVICE;
 
   cl_device_id *cl_devices = calloc(num_devices, sizeof(cl_device_id));
   if (cl_devices == NULL)
-    return GNOMP_MALLOC_ERROR;
+    return NOMP_MALLOC_ERROR;
 
   err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, num_devices, cl_devices,
                        &num_devices);
   cl_device_id device = cl_devices[device_id];
 
-  bnd->backend = GNOMP_OCL;
+  bnd->backend = NOMP_OCL;
   struct opencl_backend *ocl = bnd->bptr =
       calloc(1, sizeof(struct opencl_backend));
   ocl->ctx = clCreateContext(NULL, 1, &device, NULL, NULL, &err);
@@ -60,7 +60,7 @@ int opencl_map(struct backend *bnd, struct mem *m, const int op) {
   struct opencl_backend *ocl = bnd->bptr;
 
   cl_int err;
-  if (op & GNOMP_ALLOC) {
+  if (op & NOMP_ALLOC) {
     struct opencl_mem *ocl_mem = m->bptr = calloc(1, sizeof(struct opencl_mem));
     ocl_mem->mem = clCreateBuffer(ocl->ctx, CL_MEM_READ_WRITE,
                                   (m->idx1 - m->idx0) * m->usize, NULL, &err);
@@ -69,7 +69,7 @@ int opencl_map(struct backend *bnd, struct mem *m, const int op) {
   }
 
   struct opencl_mem *ocl_mem = m->bptr;
-  if (op & GNOMP_H2D) {
+  if (op & NOMP_H2D) {
     err = clEnqueueWriteBuffer(ocl->queue, ocl_mem->mem, CL_TRUE, 0,
                                (m->idx1 - m->idx0) * m->usize, m->hptr, 0, NULL,
                                NULL);
@@ -77,7 +77,7 @@ int opencl_map(struct backend *bnd, struct mem *m, const int op) {
       return 1;
   }
 
-  if (op == GNOMP_D2H) {
+  if (op == NOMP_D2H) {
     err = clEnqueueReadBuffer(ocl->queue, ocl_mem->mem, CL_TRUE, 0,
                               (m->idx1 - m->idx0) * m->usize, m->hptr, 0, NULL,
                               NULL);
