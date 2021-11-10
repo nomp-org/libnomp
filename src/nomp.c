@@ -1,5 +1,7 @@
 #include <nomp-impl.h>
 
+#define BESIZE 1024
+
 static int check_handle(int handle, int max) {
   if (handle < 0 || handle >= max)
     return 1;
@@ -13,11 +15,11 @@ static int backends_max = 0;
 
 int nomp_init(int *handle, const char *backend, const int platform,
               const int device) {
-  size_t n = strnlen(backend, 32);
-  if (n == 32)
+  size_t n = strnlen(backend, BESIZE);
+  if (n == BESIZE)
     return NOMP_INVALID_BACKEND;
 
-  char be[BUFSIZ];
+  char be[BESIZE];
   int i;
   for (i = 0; i < n; i++)
     be[i] = tolower(backend[i]);
@@ -259,3 +261,4 @@ int nomp_finalize(int *handle) {
 }
 
 #undef check_handle
+#undef BESIZE
