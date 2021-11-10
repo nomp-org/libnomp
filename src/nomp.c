@@ -2,12 +2,11 @@
 
 #define BESIZE 1024
 
-static int check_handle(int handle, int max) {
-  if (handle < 0 || handle >= max)
-    return 1;
-  else
-    return 0;
-}
+#define check_handle(handle, max)                                              \
+  do {                                                                         \
+    if (handle < 0 || handle >= max)                                           \
+      return NOMP_INVALID_HANDLE;                                              \
+  } while (0)
 
 static struct backend *backends = NULL;
 static int backends_n = 0;
@@ -63,8 +62,7 @@ static int idx_if_mapped(void *p) {
 
 int nomp_map(void *ptr, const size_t idx0, const size_t idx1,
              const size_t usize, const int op_, const int handle) {
-  if (check_handle(handle, backends_n) != 0)
-    return NOMP_INVALID_HANDLE;
+  check_handle(handle, backends_n);
 
   if (mems_n == mems_max) {
     mems_max += mems_max / 2 + 1;
@@ -118,8 +116,7 @@ static int get_mem_ptr(union nomp_arg *arg, size_t *size, int handle,
 int nomp_run(int *id, const char *source, const char *name, const int handle,
              const int ndim, const size_t *global, const size_t *local,
              const int nargs, ...) {
-  if (check_handle(handle, backends_n) != 0)
-    return NOMP_INVALID_HANDLE;
+  check_handle(handle, backends_n);
 
   if (progs_n == progs_max) {
     progs_max += progs_max / 2 + 1;
@@ -242,8 +239,7 @@ int nomp_err_str(int err_id, char *buf, int buf_size) {
 }
 
 int nomp_finalize(int *handle) {
-  if (check_handle(*handle, backends_n) != 0)
-    return NOMP_INVALID_HANDLE;
+  check_handle(*handle, backends_n);
 
   int err = 0;
   if (backends[*handle].backend == NOMP_OCL)
