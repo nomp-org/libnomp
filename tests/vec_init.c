@@ -54,6 +54,9 @@ int main(int argc, char *argv[]) {
       break;
     }
 
+  err = nomp_map(a, 0, 10, sizeof(double), NOMP_FREE, handle);
+  print_err("nomp_map failed: %s\n");
+
   err = nomp_finalize(&handle);
   print_err("nomp_finalize failed: %s\n");
 

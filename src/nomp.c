@@ -34,9 +34,7 @@ int nomp_init(int *handle, const char *backend, const int platform,
   if (strncmp(be, "opencl", 32) == 0)
     err = opencl_init(&backends[backends_n], platform, device);
 
-  *handle = -1;
-  if (err == 0)
-    *handle = backends_n++;
+  *handle = err == 0 ? backends_n++ : -1;
 
   return err;
 }
@@ -52,7 +50,7 @@ static int idx_if_mapped(void *p) {
   // Needs to go. Must store a hashmap.
   int i;
   for (i = 0; i < mems_n; i++)
-    if (mems[i].hptr == p)
+    if (mems[i].hptr != NULL && mems[i].hptr == p)
       break;
   return i;
 }
@@ -70,7 +68,7 @@ int nomp_map(void *ptr, const size_t idx0, const size_t idx1,
 
   int idx = idx_if_mapped(ptr);
   if (idx == mems_n) {
-    if (op == NOMP_D2H)
+    if (op == NOMP_D2H || op == NOMP_FREE)
       return NOMP_INVALID_MAP_PTR;
     else if (op == NOMP_H2D)
       op |= NOMP_ALLOC;
@@ -85,8 +83,16 @@ int nomp_map(void *ptr, const size_t idx0, const size_t idx1,
   if (backends[handle].backend == NOMP_OCL)
     err = opencl_map(&backends[handle], &mems[idx], op);
 
-  if (err == 0 && idx == mems_n)
-    ++mems_n;
+  if (err == 0) {
+    if (idx == mems_n)
+      mems_n++;
+    else if (op == NOMP_FREE) {
+      mems[idx].hptr = NULL;
+      mems_n--;
+      if (mems_n == 0)
+        free(mems);
+    }
+  }
 
   return err;
 }
