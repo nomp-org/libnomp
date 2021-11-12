@@ -68,8 +68,8 @@ int opencl_map(struct backend *bnd, struct mem *m, const int op) {
       return 1;
   }
 
-  struct opencl_mem *ocl_mem = m->bptr;
   if (op & NOMP_H2D) {
+    struct opencl_mem *ocl_mem = m->bptr;
     err = clEnqueueWriteBuffer(ocl->queue, ocl_mem->mem, CL_TRUE, 0,
                                (m->idx1 - m->idx0) * m->usize, m->hptr, 0, NULL,
                                NULL);
@@ -77,6 +77,7 @@ int opencl_map(struct backend *bnd, struct mem *m, const int op) {
       return 1;
   }
 
+  struct opencl_mem *ocl_mem = m->bptr;
   if (op == NOMP_D2H) {
     err = clEnqueueReadBuffer(ocl->queue, ocl_mem->mem, CL_TRUE, 0,
                               (m->idx1 - m->idx0) * m->usize, m->hptr, 0, NULL,
@@ -84,6 +85,10 @@ int opencl_map(struct backend *bnd, struct mem *m, const int op) {
 
     if (err != CL_SUCCESS)
       return 1;
+  } else if (op == NOMP_FREE) {
+    clReleaseMemObject(ocl_mem->mem);
+    free(m->bptr);
+    m->bptr = NULL;
   }
 
   return 0;

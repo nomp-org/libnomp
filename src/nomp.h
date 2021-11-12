@@ -4,9 +4,10 @@
 #include <stddef.h>
 
 /* Map Direction */
-#define NOMP_H2D 1
-#define NOMP_D2H 2
-#define NOMP_ALLOC 4
+#define NOMP_ALLOC 1
+#define NOMP_H2D 2
+#define NOMP_D2H 4
+#define NOMP_FREE 8
 
 /* Errors */
 #define NOMP_INVALID_BACKEND -1
