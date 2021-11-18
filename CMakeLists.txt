@@ -15,9 +15,9 @@ configure_file(nomp.pc.in nomp.pc @ONLY)
 find_package(OpenCL REQUIRED)
 target_link_libraries(nomp OpenCL::OpenCL)
 
-add_executable(vec_init tests/vec_init.c)
-target_link_libraries(vec_init nomp)
-target_include_directories(vec_init PUBLIC src)
+add_executable(vec-init tests/vec-init.c)
+target_link_libraries(vec-init nomp)
+target_include_directories(vec-init PUBLIC src)
 
 install(TARGETS nomp
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
