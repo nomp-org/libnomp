@@ -65,7 +65,6 @@ int nomp_map(void *ptr, const size_t idx0, const size_t idx1,
   }
 
   int op = op_;
-
   int idx = idx_if_mapped(ptr);
   if (idx == mems_n) {
     if (op == NOMP_D2H || op == NOMP_FREE)
