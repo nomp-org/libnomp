@@ -1,16 +1,18 @@
-#include <assert.h>
 #include <math.h>
 #include <nomp.h>
 #include <stdio.h>
 
-#define print_err(str)                                                         \
+#define check_err_(err, file, line)                                            \
   do {                                                                         \
     if (err != 0) {                                                            \
+      char buf[BUFSIZ];                                                        \
       nomp_err_str(err, buf, BUFSIZ);                                          \
-      printf(str, buf);                                                        \
+      printf("%s:%d %s\n", file, line, buf);                                   \
       return 1;                                                                \
     }                                                                          \
   } while (0)
+
+#define check_err(err) check_err_(err, __FILE__, __LINE__)
 
 const char *knl_str =
     "#define lid(N) ((int) get_local_id(N))\n"
@@ -26,41 +28,41 @@ const char *knl_str =
     "}";
 
 int main(int argc, char *argv[]) {
-  double a[10] = {0};
-  char buf[BUFSIZ];
-
   int handle;
   int err = nomp_init(&handle, "opencl", 0, 0);
-  print_err("nomp_init failed: %s\n");
+  check_err(err);
 
+  double a[10] = {0};
   err = nomp_map(a, 0, 10, sizeof(double), NOMP_ALLOC, handle);
-  print_err("nomp_alloc failed: %s\n");
+  check_err(err);
 
   const size_t global[3] = {10, 1, 1};
   const size_t local[3] = {1, 1, 1};
   int kernel = -1;
   err = nomp_run(&kernel, knl_str, "vec_init", handle, 3, global, local, 1,
                  NOMP_PTR, a);
-  print_err("nomp_run failed: %s\n");
+  check_err(err);
 
   err = nomp_map(a, 0, 10, sizeof(double), NOMP_D2H, handle);
-  print_err("nomp_map failed: %s\n");
+  check_err(err);
 
-  int i, ret_val = 0;
+  err = 0;
+  int i;
   for (i = 0; i < 10; i++)
     if (fabs(a[i] - 42.0) > 1e-10) {
       printf("err: (a[%d] = %lf) != 42.0\n", i, a[i]);
-      ret_val = 1;
+      err = 1;
       break;
     }
 
   err = nomp_map(a, 0, 10, sizeof(double), NOMP_FREE, handle);
-  print_err("nomp_map failed: %s\n");
+  check_err(err);
 
   err = nomp_finalize(&handle);
-  print_err("nomp_finalize failed: %s\n");
+  check_err(err);
 
-  return ret_val;
+  return err;
 }
 
-#undef print_err
+#undef check_err_
+#undef check_err
