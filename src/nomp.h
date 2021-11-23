@@ -15,10 +15,10 @@
 #define NOMP_INVALID_DEVICE -4
 #define NOMP_INVALID_TYPE -8
 #define NOMP_INVALID_MAP_PTR -16
-#define NOMP_INVALID_HANDLE -32
-#define NOMP_MALLOC_ERROR -64
-#define NOMP_INVALID_MAP_OP -128
-#define NOMP_INVALID_ERROR -1024
+#define NOMP_MALLOC_ERROR -32
+#define NOMP_INVALID_MAP_OP -64
+#define NOMP_INVALID_ERROR -128
+#define NOMP_INITIALIZED_ERROR -256
 
 /* Types */
 #define NOMP_SHORT 0
@@ -36,19 +36,17 @@
 extern "C" {
 #endif
 
-int nomp_init(int *handle, const char *backend, const int platform,
-              const int device);
+int nomp_init(const char *backend, const int platform, const int device);
 
 int nomp_map(void *ptr, const size_t start_idx, const size_t end_idx,
-             const size_t unit_size, const int op, const int handle);
+             const size_t unit_size, const int op);
 
-int nomp_run(int *id, const char *source, const char *name, const int handle,
-             const int ndim, const size_t *global, const size_t *local,
-             const int nargs, ...);
+int nomp_run(int *id, const char *source, const char *name, const int ndim,
+             const size_t *global, const size_t *local, const int nargs, ...);
 
 int nomp_err_str(int err_id, char *buf, int buf_size);
 
-int nomp_finalize(int *handle);
+int nomp_finalize(void);
 
 #ifdef __cplusplus
 }

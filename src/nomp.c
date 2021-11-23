@@ -2,39 +2,26 @@
 
 #define BESIZE 1024
 
-#define check_handle(handle, max)                                              \
-  do {                                                                         \
-    if (handle < 0 || handle >= max)                                           \
-      return NOMP_INVALID_HANDLE;                                              \
-  } while (0)
+static struct backend nomp;
+static int initialized = 0;
 
-static struct backend *backends = NULL;
-static int backends_n = 0;
-static int backends_max = 0;
-
-int nomp_init(int *handle, const char *backend, const int platform,
-              const int device) {
-  size_t n = strnlen(backend, BESIZE);
-  if (n == BESIZE)
-    return NOMP_INVALID_BACKEND;
+int nomp_init(const char *backend, const int platform, const int device) {
+  if (initialized > 0)
+    return NOMP_INITIALIZED_ERROR;
 
   char be[BESIZE];
+  size_t n = strnlen(backend, BESIZE);
   int i;
   for (i = 0; i < n; i++)
     be[i] = tolower(backend[i]);
   be[n] = '\0';
 
-  if (backends_n == backends_max) {
-    backends_max += backends_max / 2 + 1;
-    backends = (struct backend *)realloc(backends,
-                                         sizeof(struct backend) * backends_max);
-  }
-
   int err = NOMP_INVALID_BACKEND;
   if (strncmp(be, "opencl", 32) == 0)
-    err = opencl_init(&backends[backends_n], platform, device);
+    err = opencl_init(&nomp, platform, device);
 
-  *handle = err == 0 ? backends_n++ : -1;
+  if (err == 0)
+    initialized = 1;
 
   return err;
 }
@@ -56,9 +43,7 @@ static int idx_if_mapped(void *p) {
 }
 
 int nomp_map(void *ptr, const size_t idx0, const size_t idx1,
-             const size_t usize, const int op_, const int handle) {
-  check_handle(handle, backends_n);
-
+             const size_t usize, const int op_) {
   if (mems_n == mems_max) {
     mems_max += mems_max / 2 + 1;
     mems = (struct mem *)realloc(mems, sizeof(struct mem) * mems_max);
@@ -79,8 +64,8 @@ int nomp_map(void *ptr, const size_t idx0, const size_t idx1,
   }
 
   int err = NOMP_INVALID_BACKEND;
-  if (backends[handle].backend == NOMP_OCL)
-    err = opencl_map(&backends[handle], &mems[idx], op);
+  if (nomp.backend == NOMP_OCL)
+    err = opencl_map(&nomp, &mems[idx], op);
 
   if (err == 0) {
     if (idx == mems_n)
@@ -100,24 +85,20 @@ static struct prog *progs = NULL;
 static int progs_n = 0;
 static int progs_max = 0;
 
-static int get_mem_ptr(union nomp_arg *arg, size_t *size, int handle,
-                       void *ptr) {
+static int get_mem_ptr(union nomp_arg *arg, size_t *size, void *ptr) {
   int err = NOMP_INVALID_MAP_PTR;
   int idx = idx_if_mapped(ptr);
   if (idx < mems_n) {
     err = NOMP_INVALID_BACKEND;
-    if (backends[handle].backend == NOMP_OCL)
+    if (nomp.backend == NOMP_OCL)
       err = opencl_get_mem_ptr(arg, size, &mems[idx]);
   }
 
   return err;
 }
 
-int nomp_run(int *id, const char *source, const char *name, const int handle,
-             const int ndim, const size_t *global, const size_t *local,
-             const int nargs, ...) {
-  check_handle(handle, backends_n);
-
+int nomp_run(int *id, const char *source, const char *name, const int ndim,
+             const size_t *global, const size_t *local, const int nargs, ...) {
   if (progs_n == progs_max) {
     progs_max += progs_max / 2 + 1;
     progs = (struct prog *)realloc(progs, sizeof(struct prog) * progs_max);
@@ -126,8 +107,8 @@ int nomp_run(int *id, const char *source, const char *name, const int handle,
   int err = 0;
   if (*id == -1) {
     err = NOMP_INVALID_BACKEND;
-    if (backends[handle].backend == NOMP_OCL)
-      err = opencl_build_knl(&backends[handle], &progs[progs_n], source, name);
+    if (nomp.backend == NOMP_OCL)
+      err = opencl_build_knl(&nomp, &progs[progs_n], source, name);
 
     if (err == 0)
       *id = progs_n++;
@@ -176,7 +157,7 @@ int nomp_run(int *id, const char *source, const char *name, const int handle,
         size = sizeof(double);
         break;
       case NOMP_PTR:
-        err = get_mem_ptr(&arg, &size, handle, va_arg(args, void *));
+        err = get_mem_ptr(&arg, &size, va_arg(args, void *));
         break;
       default:
         err = NOMP_INVALID_TYPE;
@@ -185,7 +166,7 @@ int nomp_run(int *id, const char *source, const char *name, const int handle,
 
       if (err == 0) {
         err = NOMP_INVALID_BACKEND;
-        if (backends[handle].backend == NOMP_OCL)
+        if (nomp.backend == NOMP_OCL)
           err = opencl_set_knl_arg(&progs[*id], i, size, &arg);
       } else
         break;
@@ -195,9 +176,8 @@ int nomp_run(int *id, const char *source, const char *name, const int handle,
 
     if (err == 0) {
       err = NOMP_INVALID_BACKEND;
-      if (backends[handle].backend == NOMP_OCL)
-        err =
-            opencl_run_knl(&backends[handle], &progs[*id], ndim, global, local);
+      if (nomp.backend == NOMP_OCL)
+        err = opencl_run_knl(&nomp, &progs[*id], ndim, global, local);
     }
   }
 
@@ -224,6 +204,9 @@ int nomp_err_str(int err_id, char *buf, int buf_size) {
   case NOMP_MALLOC_ERROR:
     strncpy(buf, "nomp malloc error", buf_size);
     break;
+  case NOMP_INITIALIZED_ERROR:
+    strncpy(buf, "Nomp is already initialized", buf_size);
+    break;
   default:
     return NOMP_INVALID_ERROR;
     break;
@@ -232,21 +215,16 @@ int nomp_err_str(int err_id, char *buf, int buf_size) {
   return 0;
 }
 
-int nomp_finalize(int *handle) {
-  check_handle(*handle, backends_n);
-
+int nomp_finalize(void) {
   int err = NOMP_INVALID_BACKEND;
-  if (backends[*handle].backend == NOMP_OCL)
-    err = opencl_finalize(&backends[*handle]);
+  if (nomp.backend == NOMP_OCL)
+    err = opencl_finalize(&nomp);
 
+  // TODO: Free memory, prog, kernels
   if (err == 0) {
-    backends_n--;
-    *handle = -1;
-    if (backends_n == 0)
-      free(backends);
   }
+
   return err;
 }
 
-#undef check_handle
 #undef BESIZE
