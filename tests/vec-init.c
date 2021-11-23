@@ -28,22 +28,21 @@ const char *knl_str =
     "}";
 
 int main(int argc, char *argv[]) {
-  int handle;
-  int err = nomp_init(&handle, "opencl", 0, 0);
+  int err = nomp_init("opencl", 0, 0);
   check_err(err);
 
   double a[10] = {0};
-  err = nomp_map(a, 0, 10, sizeof(double), NOMP_ALLOC, handle);
+  err = nomp_map(a, 0, 10, sizeof(double), NOMP_ALLOC);
   check_err(err);
 
   const size_t global[3] = {10, 1, 1};
   const size_t local[3] = {1, 1, 1};
   int kernel = -1;
-  err = nomp_run(&kernel, knl_str, "vec_init", handle, 3, global, local, 1,
-                 NOMP_PTR, a);
+  err =
+      nomp_run(&kernel, knl_str, "vec_init", 3, global, local, 1, NOMP_PTR, a);
   check_err(err);
 
-  err = nomp_map(a, 0, 10, sizeof(double), NOMP_D2H, handle);
+  err = nomp_map(a, 0, 10, sizeof(double), NOMP_D2H);
   check_err(err);
 
   err = 0;
@@ -55,10 +54,10 @@ int main(int argc, char *argv[]) {
       break;
     }
 
-  err = nomp_map(a, 0, 10, sizeof(double), NOMP_FREE, handle);
+  err = nomp_map(a, 0, 10, sizeof(double), NOMP_FREE);
   check_err(err);
 
-  err = nomp_finalize(&handle);
+  err = nomp_finalize();
   check_err(err);
 
   return err;
