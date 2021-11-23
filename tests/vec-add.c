@@ -2,18 +2,6 @@
 #include <nomp.h>
 #include <stdio.h>
 
-#define check_err_(err, file, line)                                            \
-  do {                                                                         \
-    if (err != 0) {                                                            \
-      char buf[BUFSIZ];                                                        \
-      nomp_err_str(err, buf, BUFSIZ);                                          \
-      printf("%s:%d %s\n", file, line, buf);                                   \
-      return 1;                                                                \
-    }                                                                          \
-  } while (0)
-
-#define check_err(err) check_err_(err, __FILE__, __LINE__)
-
 const char *vec_add_src =
     "#define lid(N) ((int) get_local_id(N))\n"
     "#define gid(N) ((int) get_group_id(N))\n\n"
@@ -37,45 +25,45 @@ const char *vec_init_src =
 
 int vec_add(float *x, float *y, float *z) {
   int err = nomp_map(x, 0, 10, sizeof(float), NOMP_H2D);
-  check_err(err);
+  nomp_check_err(err);
   err = nomp_map(y, 0, 10, sizeof(float), NOMP_H2D);
-  check_err(err);
+  nomp_check_err(err);
   err = nomp_map(z, 0, 10, sizeof(float), NOMP_ALLOC);
-  check_err(err);
+  nomp_check_err(err);
 
   size_t gsize[1] = {1};
   size_t lsize[1] = {1};
   static int vec_add_hndl = -1;
   err = nomp_run(&vec_add_hndl, vec_add_src, "vec_add", 1, gsize, lsize, 3,
                  NOMP_PTR, x, NOMP_PTR, y, NOMP_PTR, z);
-  check_err(err);
+  nomp_check_err(err);
 
   err = nomp_map(z, 0, 10, sizeof(float), NOMP_D2H);
-  check_err(err);
+  nomp_check_err(err);
 
   return err;
 }
 
 int vec_init(float *a) {
   int err = nomp_map(a, 0, 10, sizeof(float), NOMP_ALLOC);
-  check_err(err);
+  nomp_check_err(err);
 
   size_t lpy_knl_gsize[1] = {1};
   size_t lpy_knl_lsize[1] = {1};
   static int vec_init_hndl = -1;
   err = nomp_run(&vec_init_hndl, vec_init_src, "vec_init", 1, lpy_knl_gsize,
                  lpy_knl_lsize, 1, NOMP_PTR, a);
-  check_err(err);
+  nomp_check_err(err);
 
   err = nomp_map(a, 0, 10, sizeof(float), NOMP_D2H);
-  check_err(err);
+  nomp_check_err(err);
 
   return err;
 }
 
 int main() {
   int err = nomp_init("opencl", 0, 0);
-  check_err(err);
+  nomp_check_err(err);
 
   float a[10];
   vec_init(a);
@@ -99,6 +87,3 @@ int main() {
 
   return 0;
 }
-
-#undef check_err_
-#undef check_err
