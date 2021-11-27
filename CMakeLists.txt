@@ -15,14 +15,14 @@ configure_file(nomp.pc.in nomp.pc @ONLY)
 find_package(OpenCL REQUIRED)
 target_link_libraries(nomp OpenCL::OpenCL)
 
-file(GLOB TESTS tests/*.c)
-foreach(test ${TESTS})
-  string(REPLACE "${CMAKE_SOURCE_DIR}/tests/" "" temp ${test})
-  string(REPLACE ".c" "" test_exe ${temp})
-  add_executable(${test_exe} ${test})
-  target_link_libraries(${test_exe} nomp)
-  target_include_directories(${test_exe} PUBLIC src)
-endforeach(test ${TESTS})
+# file(GLOB TESTS tests/*.c)
+# foreach(test ${TESTS})
+#   string(REPLACE "${CMAKE_SOURCE_DIR}/tests/" "" temp ${test})
+#   string(REPLACE ".c" "" test_exe ${temp})
+#   add_executable(${test_exe} ${test})
+#   target_link_libraries(${test_exe} nomp)
+#   target_include_directories(${test_exe} PUBLIC src)
+# endforeach(test ${TESTS})
 
 install(TARGETS nomp
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
