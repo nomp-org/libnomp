@@ -86,7 +86,9 @@ int opencl_map(struct backend *bnd, struct mem *m, const int op) {
     if (err != CL_SUCCESS)
       return 1;
   } else if (op == NOMP_FREE && m->bptr != NULL) {
-    clReleaseMemObject(ocl_mem->mem);
+    err = clReleaseMemObject(ocl_mem->mem);
+    if (err != CL_SUCCESS)
+      return 1;
     free(m->bptr);
     m->bptr = NULL;
   }
@@ -155,10 +157,14 @@ int opencl_knl_run(struct backend *bnd, struct prog *prg, const int ndim,
 }
 
 int opencl_knl_free(struct prog *prg) {
-  struct opencl_prog *ocl_prg = prg->bptr;
-  if (ocl_prg != NULL) {
-    clReleaseKernel(ocl_prg->knl);
-    clReleaseProgram(ocl_prg->prg);
+  if (prg->bptr != NULL) {
+    struct opencl_prog *ocl_prg = prg->bptr;
+    cl_int err = clReleaseKernel(ocl_prg->knl);
+    if (err != CL_SUCCESS)
+      return 1;
+    err = clReleaseProgram(ocl_prg->prg);
+    if (err != CL_SUCCESS)
+      return 1;
     free(prg->bptr);
     prg->bptr = NULL;
   }
