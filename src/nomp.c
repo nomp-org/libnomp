@@ -67,14 +67,11 @@ int nomp_map(void *ptr, const size_t idx0, const size_t idx1,
   if (nomp.backend == NOMP_OCL)
     err = opencl_map(&nomp, &mems[idx], op);
 
-  if (err == 0) {
+  if (err == 0)
     if (idx == mems_n)
       mems_n++;
-    else if (op == NOMP_FREE) {
+    else if (op == NOMP_FREE)
       mems[idx].hptr = NULL;
-      mems_n--;
-    }
-  }
 
   return err;
 }
