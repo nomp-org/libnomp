@@ -73,8 +73,6 @@ int nomp_map(void *ptr, const size_t idx0, const size_t idx1,
     else if (op == NOMP_FREE) {
       mems[idx].hptr = NULL;
       mems_n--;
-      if (mems_n == 0)
-        free(mems);
     }
   }
 
@@ -108,7 +106,7 @@ int nomp_run(int *id, const char *source, const char *name, const int ndim,
   if (*id == -1) {
     err = NOMP_INVALID_BACKEND;
     if (nomp.backend == NOMP_OCL)
-      err = opencl_build_knl(&nomp, &progs[progs_n], source, name);
+      err = opencl_knl_build(&nomp, &progs[progs_n], source, name);
 
     if (err == 0)
       *id = progs_n++;
@@ -167,7 +165,7 @@ int nomp_run(int *id, const char *source, const char *name, const int ndim,
       if (err == 0) {
         err = NOMP_INVALID_BACKEND;
         if (nomp.backend == NOMP_OCL)
-          err = opencl_set_knl_arg(&progs[*id], i, size, &arg);
+          err = opencl_knl_set(&progs[*id], i, size, &arg);
       } else
         break;
     }
@@ -177,7 +175,7 @@ int nomp_run(int *id, const char *source, const char *name, const int ndim,
     if (err == 0) {
       err = NOMP_INVALID_BACKEND;
       if (nomp.backend == NOMP_OCL)
-        err = opencl_run_knl(&nomp, &progs[*id], ndim, global, local);
+        err = opencl_knl_run(&nomp, &progs[*id], ndim, global, local);
     }
   }
 
@@ -226,18 +224,15 @@ int nomp_finalize(void) {
   if (err == 0)
     free(mems);
 
-#if 0
-  // TODO: prog, kernels
   for (i = 0; err == 0 && i < progs_n; i++)
     if (nomp.backend == NOMP_OCL)
-      err = opencl_knl_free(&nomp, &progs[i], NOMP_FREE);
+      err = opencl_knl_free(&progs[i]);
     else
       err = NOMP_INVALID_BACKEND;
   if (err == 0)
     free(progs);
-#endif
 
-  if (err != 0)
+  if (err == 0)
     if (nomp.backend == NOMP_OCL)
       err = opencl_finalize(&nomp);
 

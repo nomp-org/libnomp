@@ -49,12 +49,13 @@ int opencl_init(struct backend *ocl, const int platform_id,
 int opencl_map(struct backend *ocl, struct mem *m, const int direction);
 int opencl_map_ptr(union nomp_arg *arg, size_t *size, struct mem *m);
 
-int opencl_build_knl(struct backend *ocl, struct prog *prg, const char *source,
+int opencl_knl_build(struct backend *ocl, struct prog *prg, const char *source,
                      const char *name);
-int opencl_set_knl_arg(struct prog *prg, const int index, const size_t size,
-                       void *arg);
-int opencl_run_knl(struct backend *ocl, struct prog *prg, const int ndim,
+int opencl_knl_set(struct prog *prg, const int index, const size_t size,
+                   void *arg);
+int opencl_knl_run(struct backend *ocl, struct prog *prg, const int ndim,
                    const size_t *global, const size_t *local);
+int opencl_knl_free(struct prog *prg);
 
 int opencl_finalize(struct backend *ocl);
 
