@@ -85,13 +85,13 @@ static struct prog *progs = NULL;
 static int progs_n = 0;
 static int progs_max = 0;
 
-static int get_mem_ptr(union nomp_arg *arg, size_t *size, void *ptr) {
+static int map_ptr(union nomp_arg *arg, size_t *size, void *ptr) {
   int err = NOMP_INVALID_MAP_PTR;
   int idx = idx_if_mapped(ptr);
   if (idx < mems_n) {
     err = NOMP_INVALID_BACKEND;
     if (nomp.backend == NOMP_OCL)
-      err = opencl_get_mem_ptr(arg, size, &mems[idx]);
+      err = opencl_map_ptr(arg, size, &mems[idx]);
   }
 
   return err;
@@ -157,7 +157,7 @@ int nomp_run(int *id, const char *source, const char *name, const int ndim,
         size = sizeof(double);
         break;
       case NOMP_PTR:
-        err = get_mem_ptr(&arg, &size, va_arg(args, void *));
+        err = map_ptr(&arg, &size, va_arg(args, void *));
         break;
       default:
         err = NOMP_INVALID_TYPE;
@@ -216,13 +216,33 @@ int nomp_err_str(int err_id, char *buf, int buf_size) {
 }
 
 int nomp_finalize(void) {
-  int err = NOMP_INVALID_BACKEND;
-  if (nomp.backend == NOMP_OCL)
-    err = opencl_finalize(&nomp);
+  int err = 0;
+  int i;
+  for (i = 0; err == 0 && i < mems_n; i++)
+    if (nomp.backend == NOMP_OCL)
+      err = opencl_map(&nomp, &mems[i], NOMP_FREE);
+    else
+      err = NOMP_INVALID_BACKEND;
+  if (err == 0)
+    free(mems);
 
-  // TODO: Free memory, prog, kernels
-  if (err == 0) {
-  }
+#if 0
+  // TODO: prog, kernels
+  for (i = 0; err == 0 && i < progs_n; i++)
+    if (nomp.backend == NOMP_OCL)
+      err = opencl_knl_free(&nomp, &progs[i], NOMP_FREE);
+    else
+      err = NOMP_INVALID_BACKEND;
+  if (err == 0)
+    free(progs);
+#endif
+
+  if (err != 0)
+    if (nomp.backend == NOMP_OCL)
+      err = opencl_finalize(&nomp);
+
+  if (err == 0)
+    initialized = 0;
 
   return err;
 }

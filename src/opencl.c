@@ -85,7 +85,7 @@ int opencl_map(struct backend *bnd, struct mem *m, const int op) {
 
     if (err != CL_SUCCESS)
       return 1;
-  } else if (op == NOMP_FREE) {
+  } else if (op == NOMP_FREE && ocl_mem != NULL) {
     clReleaseMemObject(ocl_mem->mem);
     free(m->bptr);
     m->bptr = NULL;
@@ -94,7 +94,7 @@ int opencl_map(struct backend *bnd, struct mem *m, const int op) {
   return 0;
 }
 
-int opencl_get_mem_ptr(union nomp_arg *arg, size_t *size, struct mem *m) {
+int opencl_map_ptr(union nomp_arg *arg, size_t *size, struct mem *m) {
   struct opencl_mem *ocl_mem = m->bptr;
   arg->p = ocl_mem->mem;
   *size = sizeof(cl_mem);
