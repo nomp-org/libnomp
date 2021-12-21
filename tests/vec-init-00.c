@@ -28,6 +28,8 @@ const int foo(int N, double *a) {
 
   err = nomp_map(a, 0, 10, sizeof(double), NOMP_FREE);
   nomp_check_err(err);
+
+  return 0;
 }
 
 int main(int argc, char *argv[]) {

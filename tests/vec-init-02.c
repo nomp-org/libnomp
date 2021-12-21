@@ -16,7 +16,7 @@ const char *_nomp_lpy_knl_src =
 const int foo(int N, float *a, float *b) {
   int err = nomp_map(a, 0, N, sizeof(float), NOMP_ALLOC);
   nomp_check_err(err);
-  err = nomp_map(b, 0, 6, sizeof(int), NOMP_H2D);
+  err = nomp_map(b, 0, N, sizeof(float), NOMP_H2D);
   nomp_check_err(err);
 
   size_t _nomp_lpy_knl_gsize[1] = {1};
@@ -29,8 +29,9 @@ const int foo(int N, float *a, float *b) {
 
   err = nomp_map(a, 0, N, sizeof(int), NOMP_D2H);
   nomp_check_err(err);
-
-  err = nomp_map(a, 0, 6, sizeof(double), NOMP_FREE);
+  err = nomp_map(a, 0, N, sizeof(double), NOMP_FREE);
+  nomp_check_err(err);
+  err = nomp_map(b, 0, N, sizeof(double), NOMP_FREE);
   nomp_check_err(err);
 
   return 0;
@@ -40,7 +41,7 @@ int main(int argc, char *argv[]) {
   int err = nomp_init("opencl", 0, 0);
   nomp_check_err(err);
 
-  float a[10] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0};
+  float a[10] = {0.0};
   float b[6] = {5.0, 4.0, 3.0, 2.0, 1.0, 0.0};
 
   foo(6, a, b);
