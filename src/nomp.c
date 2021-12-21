@@ -202,6 +202,9 @@ int nomp_err_str(int err_id, char *buf, int buf_size) {
   case NOMP_INITIALIZED_ERROR:
     strncpy(buf, "Nomp is already initialized", buf_size);
     break;
+  case NOMP_NOT_INITIALIZED_ERROR:
+    strncpy(buf, "Nomp is not initialized", buf_size);
+    break;
   default:
     return NOMP_INVALID_ERROR;
     break;
@@ -211,21 +214,23 @@ int nomp_err_str(int err_id, char *buf, int buf_size) {
 }
 
 int nomp_finalize(void) {
-  int err = 0;
-  int i;
-  for (i = 0; err == 0 && i < mems_n; i++)
-    if (nomp.backend == NOMP_OCL)
+  if (!initialized)
+    return NOMP_NOT_INITIALIZED_ERROR;
+
+  int i, err;
+  if (nomp.backend == NOMP_OCL)
+    for (i = err = 0; err == 0 && i < mems_n; i++)
       err = opencl_map(&nomp, &mems[i], NOMP_FREE);
-    else
-      err = NOMP_INVALID_BACKEND;
+  else
+    err = NOMP_INVALID_BACKEND;
   if (err == 0)
     free(mems);
 
-  for (i = 0; err == 0 && i < progs_n; i++)
-    if (nomp.backend == NOMP_OCL)
+  if (nomp.backend == NOMP_OCL)
+    for (i = 0; err == 0 && i < progs_n; i++)
       err = opencl_knl_free(&progs[i]);
-    else
-      err = NOMP_INVALID_BACKEND;
+  else
+    err = NOMP_INVALID_BACKEND;
   if (err == 0)
     free(progs);
 
