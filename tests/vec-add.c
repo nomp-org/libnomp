@@ -77,13 +77,9 @@ int main() {
   float z[10];
   vec_add(x, y, z);
 
-  err = 0;
-  for (int i = 0; i < 10; ++i)
-    if (fabs(z[i] - 1732) > 1e-10) {
+  for (i = err = 0; err == 0 && i < 10; ++i)
+    if (err = (fabs(z[i] - 1732) > 1e-10))
       printf("z[%d] = %.2f\n", i, z[i]);
-      err = 1;
-      break;
-    }
 
   return 0;
 }

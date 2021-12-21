@@ -40,15 +40,10 @@ int main(int argc, char *argv[]) {
 
   foo(10, a);
 
-  err = 0;
   int i;
-  for (i = 0; i < 10; i++) {
-    if (fabs(a[i] - 42.0) > 1e-10) {
+  for (i = err = 0; err == 0 && i < 10; i++)
+    if (err = (fabs(a[i] - 42.0) > 1e-10))
       printf("err: (a[%d] = %lf) != 42.0\n", i, a[i]);
-      err = 1;
-      break;
-    }
-  }
 
   err = nomp_finalize();
   nomp_check_err(err);
