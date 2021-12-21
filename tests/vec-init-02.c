@@ -46,15 +46,10 @@ int main(int argc, char *argv[]) {
 
   foo(6, a, b);
 
-  err = 0;
   int i;
-  for (i = 0; i < 6; i++) {
-    if (fabs(a[i] - b[i]) > 1e-10) {
+  for (i = err = 0; err == 0 && i < 6; i++)
+    if (err = (fabs(a[i] - b[i]) > 1e-10))
       printf("err: (a[%d] = %lf) != %lf (= b[%d])\n", i, a[i], b[i], i);
-      err = 1;
-      break;
-    }
-  }
 
   err = nomp_finalize();
   nomp_check_err(err);

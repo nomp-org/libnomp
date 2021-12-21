@@ -48,14 +48,10 @@ int main(int argc, char *argv[]) {
   foo(3, 1, 2, a, b);
 
   int i;
-  for (i = err = 0; i < 3; i++) {
-    if (fabs(a[1 + i] - b[2 + i]) > 1e-10) {
+  for (i = err = 0; err == 0 && i < 3; i++)
+    if (err = (fabs(a[1 + i] - b[2 + i]) > 1e-10))
       printf("err: (a[%d] = %lf) != %lf (= b[%d])\n", 3 + i, a[1 + i], b[2 + i],
              i);
-      err = 1;
-      break;
-    }
-  }
 
   err = nomp_finalize();
   nomp_check_err(err);
