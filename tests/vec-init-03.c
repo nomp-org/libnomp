@@ -13,7 +13,7 @@ const char *_nomp_lpy_knl_src =
     "    a[off + i] = b[i];\n"
     "}";
 
-const int foo(int N, int off, double *a, double *b) {
+const int vec_init(int N, int off, double *a, double *b) {
   int err = nomp_map(a, 0, N + off, sizeof(double), NOMP_ALLOC);
   nomp_check_err(err);
   err = nomp_map(b, 0, N, sizeof(double), NOMP_H2D);
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
   double a[9] = {0.0};
   double b[6] = {5.0, 4.0, 3.0, 2.0, 1.0, 0.0};
 
-  foo(6, 3, a, b);
+  vec_init(6, 3, a, b);
 
   int i;
   for (i = err = 0; err == 0 && i < 6; i++)
