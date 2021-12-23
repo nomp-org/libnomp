@@ -12,7 +12,7 @@ const char *_nomp_lpy_knl_src =
     "a[i] = 42.0;\n"
     "}";
 
-const int foo(int N, double *a) {
+const int vec_init(int N, double *a) {
   int err = nomp_map(a, 0, 10, sizeof(double), NOMP_ALLOC);
   nomp_check_err(err);
 
@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
 
   double a[10] = {0};
 
-  foo(10, a);
+  vec_init(10, a);
 
   int i;
   for (i = err = 0; err == 0 && i < 10; i++)
