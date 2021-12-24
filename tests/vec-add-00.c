@@ -40,8 +40,12 @@ int vec_add(float *x, float *y, float *z) {
   return err;
 }
 
-int main() {
-  int err = nomp_init("opencl", 0, 0);
+int main(int argc, char *argv[]) {
+  char *backend = argc > 1 ? argv[1] : "opencl";
+  int device_id = argc > 2 ? atoi(argv[2]) : 0;
+  int platform_id = argc > 3 ? atoi(argv[3]) : 0;
+
+  int err = nomp_init(backend, device_id, platform_id);
   nomp_check_err(err);
 
   float x[10] = {1729, 1729, 1729, 1729, 1729, 1729, 1729, 1729, 1729, 1729};
