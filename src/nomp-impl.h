@@ -31,23 +31,11 @@ struct mem {
   void *bptr;
 };
 
-union nomp_arg {
-  short s;
-  unsigned short us;
-  int i;
-  unsigned int ui;
-  long l;
-  unsigned long ul;
-  float f;
-  double d;
-  void *p;
-};
-
 int opencl_init(struct backend *ocl, const int platform_id,
                 const int device_id);
 
 int opencl_map(struct backend *ocl, struct mem *m, const int direction);
-int opencl_map_ptr(union nomp_arg *arg, size_t *size, struct mem *m);
+void opencl_map_ptr(void **p, size_t *size, struct mem *m);
 
 int opencl_knl_build(struct backend *ocl, struct prog *prg, const char *source,
                      const char *name);

@@ -19,20 +19,16 @@
 #define NOMP_INVALID_MAP_PTR -16
 #define NOMP_MALLOC_ERROR -32
 #define NOMP_INVALID_MAP_OP -64
-#define NOMP_INVALID_ERROR -128
-#define NOMP_INITIALIZED_ERROR -256
-#define NOMP_NOT_INITIALIZED_ERROR -512
+#define NOMP_INITIALIZED_ERROR -128
+#define NOMP_NOT_INITIALIZED_ERROR -256
+#define NOMP_KNL_BUILD_ERROR -512
+#define NOMP_KNL_ARG_TYPE_ERROR -1024
+#define NOMP_KNL_ARG_SET_ERROR -2048
+#define NOMP_KNL_RUN_ERROR -4096
 
 /* Types */
-#define NOMP_SHORT 0
-#define NOMP_USHORT 1
-#define NOMP_INT 10
-#define NOMP_UINT 11
-#define NOMP_LONG 20
-#define NOMP_ULONG 21
-#define NOMP_FLOAT 30
-#define NOMP_DOUBLE 31
-#define NOMP_PTR 50
+#define NOMP_SCALAR 1
+#define NOMP_PTR 2
 
 /* Functions */
 #ifdef __cplusplus
@@ -54,8 +50,8 @@ int nomp_finalize(void);
 #define nomp_check_err_(err, file, line)                                       \
   {                                                                            \
     if (err != 0) {                                                            \
-      char buf[BUFSIZ];                                                        \
-      nomp_err_str(err, buf, BUFSIZ);                                          \
+      char buf[2 * BUFSIZ];                                                    \
+      nomp_err_str(err, buf, 2 * BUFSIZ);                                      \
       printf("%s:%d %s\n", file, line, buf);                                   \
       exit(1);                                                                 \
     }                                                                          \
