@@ -5,6 +5,9 @@
 static struct backend nomp;
 static int initialized = 0;
 
+//=============================================================================
+// nomp_init
+//
 int nomp_init(const char *backend, const int platform, const int device) {
   if (initialized > 0)
     return NOMP_INITIALIZED_ERROR;
@@ -26,6 +29,9 @@ int nomp_init(const char *backend, const int platform, const int device) {
   return err;
 }
 
+//=============================================================================
+// nomp_map
+//
 static struct mem *mems = NULL;
 static int mems_n = 0;
 static int mems_max = 0;
@@ -76,20 +82,22 @@ int nomp_map(void *ptr, const size_t idx0, const size_t idx1,
   return err;
 }
 
+//=============================================================================
+// nomp_run
+//
 static struct prog *progs = NULL;
 static int progs_n = 0;
 static int progs_max = 0;
 
-static int map_ptr(union nomp_arg *arg, size_t *size, void *ptr) {
-  int err = NOMP_INVALID_MAP_PTR;
-  int idx = idx_if_mapped(ptr);
+static int map_ptr(void **p, size_t *size) {
+  int idx = idx_if_mapped(*p);
   if (idx < mems_n) {
-    err = NOMP_INVALID_BACKEND;
-    if (nomp.backend == NOMP_OCL)
-      err = opencl_map_ptr(arg, size, &mems[idx]);
-  }
-
-  return err;
+    if (nomp.backend == NOMP_OCL) {
+      opencl_map_ptr(p, size, &mems[idx]);
+      return 0;
+    }
+  } else
+    return NOMP_INVALID_MAP_PTR;
 }
 
 int nomp_run(int *id, const char *source, const char *name, const int ndim,
@@ -101,12 +109,13 @@ int nomp_run(int *id, const char *source, const char *name, const int ndim,
 
   int err = 0;
   if (*id == -1) {
-    err = NOMP_INVALID_BACKEND;
     if (nomp.backend == NOMP_OCL)
       err = opencl_knl_build(&nomp, &progs[progs_n], source, name);
 
     if (err == 0)
       *id = progs_n++;
+    else
+      return NOMP_KNL_BUILD_ERROR;
   }
 
   if (*id >= 0) { // if id < 0, then there is an error
@@ -116,69 +125,41 @@ int nomp_run(int *id, const char *source, const char *name, const int ndim,
     int i;
     for (i = 0; i < nargs; i++) {
       int type = va_arg(args, int);
+      void *p = va_arg(args, void *);
       size_t size;
-      union nomp_arg arg;
       switch (type) {
-      case NOMP_SHORT:
-        arg.s = va_arg(args, int);
-        size = sizeof(short);
-        break;
-      case NOMP_USHORT:
-        arg.us = va_arg(args, unsigned int);
-        size = sizeof(unsigned short);
-        break;
-      case NOMP_INT:
-        arg.i = va_arg(args, int);
-        size = sizeof(int);
-        break;
-      case NOMP_UINT:
-        arg.ui = va_arg(args, unsigned int);
-        size = sizeof(unsigned int);
-        break;
-      case NOMP_LONG:
-        arg.l = va_arg(args, long);
-        size = sizeof(long);
-        break;
-      case NOMP_ULONG:
-        arg.ul = va_arg(args, unsigned long);
-        size = sizeof(unsigned long);
-        break;
-      case NOMP_FLOAT:
-        arg.f = va_arg(args, double);
-        size = sizeof(float);
-        break;
-      case NOMP_DOUBLE:
-        arg.d = va_arg(args, double);
-        size = sizeof(double);
+      case NOMP_SCALAR:
+        size = va_arg(args, size_t);
         break;
       case NOMP_PTR:
-        err = map_ptr(&arg, &size, va_arg(args, void *));
+        err = map_ptr(&p, &size);
+        if (err)
+          return err;
         break;
       default:
-        err = NOMP_INVALID_TYPE;
+        return NOMP_KNL_ARG_TYPE_ERROR;
         break;
       }
 
-      if (err == 0) {
-        err = NOMP_INVALID_BACKEND;
-        if (nomp.backend == NOMP_OCL)
-          err = opencl_knl_set(&progs[*id], i, size, &arg);
-      } else
-        break;
+      err = opencl_knl_set(&progs[*id], i, size, p);
+      if (err)
+        return NOMP_KNL_ARG_SET_ERROR;
     }
 
     va_end(args);
 
-    if (err == 0) {
-      err = NOMP_INVALID_BACKEND;
-      if (nomp.backend == NOMP_OCL)
-        err = opencl_knl_run(&nomp, &progs[*id], ndim, global, local);
-    }
+    if (nomp.backend == NOMP_OCL)
+      err = opencl_knl_run(&nomp, &progs[*id], ndim, global, local);
+    if (err != 0)
+      return NOMP_KNL_RUN_ERROR;
   }
 
-  return err;
+  return 0;
 }
 
+//=============================================================================
+// nomp_err
+//
 int nomp_err_str(int err_id, char *buf, int buf_size) {
   switch (err_id) {
   case NOMP_INVALID_BACKEND:
@@ -197,7 +178,10 @@ int nomp_err_str(int err_id, char *buf, int buf_size) {
     strncpy(buf, "Invalid nomp map pointer", buf_size);
     break;
   case NOMP_MALLOC_ERROR:
-    strncpy(buf, "nomp malloc error", buf_size);
+    strncpy(buf, "Nomp malloc error", buf_size);
+    break;
+  case NOMP_INVALID_MAP_OP:
+    strncpy(buf, "Invalid map operation", buf_size);
     break;
   case NOMP_INITIALIZED_ERROR:
     strncpy(buf, "Nomp is already initialized", buf_size);
@@ -205,14 +189,29 @@ int nomp_err_str(int err_id, char *buf, int buf_size) {
   case NOMP_NOT_INITIALIZED_ERROR:
     strncpy(buf, "Nomp is not initialized", buf_size);
     break;
+  case NOMP_KNL_BUILD_ERROR:
+    strncpy(buf, "Nomp kernel build failed", buf_size);
+    break;
+  case NOMP_KNL_ARG_TYPE_ERROR:
+    strncpy(buf, "Invalid nomp kernel argument type", buf_size);
+    break;
+  case NOMP_KNL_ARG_SET_ERROR:
+    strncpy(buf, "Nomp kernel argument set failed", buf_size);
+    break;
+  case NOMP_KNL_RUN_ERROR:
+    strncpy(buf, "Nomp kernel run failed", buf_size);
+    break;
   default:
-    return NOMP_INVALID_ERROR;
+    printf("OOPs !\n");
     break;
   }
 
   return 0;
 }
 
+//=============================================================================
+// nomp_finalize
+//
 int nomp_finalize(void) {
   if (!initialized)
     return NOMP_NOT_INITIALIZED_ERROR;

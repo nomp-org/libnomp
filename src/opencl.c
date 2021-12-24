@@ -96,11 +96,10 @@ int opencl_map(struct backend *bnd, struct mem *m, const int op) {
   return 0;
 }
 
-int opencl_map_ptr(union nomp_arg *arg, size_t *size, struct mem *m) {
+void opencl_map_ptr(void **p, size_t *size, struct mem *m) {
   struct opencl_mem *ocl_mem = m->bptr;
-  arg->p = ocl_mem->mem;
+  *p = (void *)&ocl_mem->mem;
   *size = sizeof(cl_mem);
-  return 0;
 }
 
 struct opencl_prog {
