@@ -8,8 +8,8 @@ if [ ! -d ${TESTDIR} ]; then
   exit 1
 fi
 
-TESTGROUPS=vec-init,vec-add
-BACKEND=OpenCL
+TESTGROUPS=nomp-api,vec-init,vec-add
+BACKEND=opencl
 
 function print_help() {
   echo "./run-tests.sh [-h|--help] [-g|--group <list of test groups>] [-b|--backend <backend>]"

@@ -26,6 +26,12 @@ jobs:
           mkdir -p ${BUILDDIR}; cd ${BUILDDIR}
           cmake -DOpenCL_LIBRARY=/lib/x86_64-linux-gnu/libOpenCL.so.1 ..; make
 
+      - name: nomp-api
+        shell: bash
+        run: |
+          cd ${TESTDIR}; chmod +x ./run-tests.sh
+          ./run-tests.sh -g nomp-api
+
       - name: vec-init
         shell: bash
         run: |
