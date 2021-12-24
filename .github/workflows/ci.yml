@@ -1,0 +1,39 @@
+name: libnomp CI Tests
+on: [push]
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        compiler: [gcc-9, gcc-10, clang-10, clang-11, clang-12]
+      fail-fast: false
+    name: "${{ matrix.compiler }}"
+    env:
+      CC: ${{ matrix.compiler }}
+      TESTDIR: tests
+      BUILDDIR: build
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install apt dependencies
+        shell: bash
+        run: |
+          sudo apt -y update
+          sudo apt install -y pocl-opencl-icd opencl-headers clinfo
+
+      - name: Build libnomp
+        shell: bash
+        run: |
+          mkdir -p ${BUILDDIR}; cd ${BUILDDIR}
+          cmake -DOpenCL_LIBRARY=/lib/x86_64-linux-gnu/libOpenCL.so.1 ..; make
+
+      - name: vec-init
+        shell: bash
+        run: |
+          cd ${TESTDIR}; chmod +x ./run-tests.sh
+          ./run-tests.sh -g vec-init
+
+      - name: vec-add
+        shell: bash
+        run: |
+          cd ${TESTDIR}; chmod +x ./run-tests.sh
+          ./run-tests.sh -g vec-add
