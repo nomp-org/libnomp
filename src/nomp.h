@@ -2,6 +2,8 @@
 #define _LIB_NOMP_H_
 
 #include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 /* Map Direction */
 #define NOMP_ALLOC 1
@@ -50,14 +52,14 @@ int nomp_err_str(int err_id, char *buf, int buf_size);
 int nomp_finalize(void);
 
 #define nomp_check_err_(err, file, line)                                       \
-  do {                                                                         \
+  {                                                                            \
     if (err != 0) {                                                            \
       char buf[BUFSIZ];                                                        \
       nomp_err_str(err, buf, BUFSIZ);                                          \
       printf("%s:%d %s\n", file, line, buf);                                   \
-      return 1;                                                                \
+      exit(1);                                                                 \
     }                                                                          \
-  } while (0)
+  }
 
 #define nomp_check_err(err) nomp_check_err_(err, __FILE__, __LINE__)
 
