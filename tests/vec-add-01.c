@@ -7,13 +7,14 @@ const char *vec_add_src =
     "#define gid(N) ((int) get_group_id(N))\n\n"
     "__kernel void __attribute__ ((reqd_work_group_size(1, 1, 1))) "
     "vec_add(__global float const *__restrict__ x,"
-    "__global float const *__restrict__ y, __global float *__restrict__ z)\n"
+    "__global float const *__restrict__ y, float const alpha, "
+    "__global float *__restrict__ z)\n"
     "{\n"
     " for (int i = 0; i <= 9; ++i)\n"
-    "    z[i] = y[i] + x[i];\n"
+    "    z[i] = x[i] + alpha * y[i];\n"
     "}";
 
-int vec_add(float *x, float *y, float *z) {
+int vec_add(float *x, float *y, float alpha, float *z) {
   int err = nomp_map(x, 0, 10, sizeof(float), NOMP_H2D);
   nomp_check_err(err);
   err = nomp_map(y, 0, 10, sizeof(float), NOMP_H2D);
@@ -24,8 +25,8 @@ int vec_add(float *x, float *y, float *z) {
   size_t gsize[1] = {1};
   size_t lsize[1] = {1};
   static int vec_add_hndl = -1;
-  err = nomp_run(&vec_add_hndl, vec_add_src, "vec_add", 1, gsize, lsize, 3,
-                 NOMP_PTR, x, NOMP_PTR, y, NOMP_PTR, z);
+  err = nomp_run(&vec_add_hndl, vec_add_src, "vec_add", 1, gsize, lsize, 4,
+                 NOMP_PTR, x, NOMP_PTR, y, NOMP_FLOAT, alpha, NOMP_PTR, z);
   nomp_check_err(err);
 
   err = nomp_map(z, 0, 10, sizeof(float), NOMP_D2H);
@@ -48,15 +49,18 @@ int main(int argc, char *argv[]) {
   int err = nomp_init(backend, device_id, platform_id);
   nomp_check_err(err);
 
-  float x[10] = {1729, 1729, 1729, 1729, 1729, 1729, 1729, 1729, 1729, 1729};
+  float x[10];
+  int i;
+  for (i = 0; i < 10; i++)
+    x[i] = i + 1.0;
+
   float y[10] = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
   float z[10];
-  vec_add(x, y, z);
+  vec_add(x, y, 0.5, z);
 
-  int i;
   for (i = err = 0; err == 0 && i < 10; ++i)
-    if (err = (fabs(z[i] - 1732) > 1e-10))
-      printf("z[%d] = %f ! 1732\n", i, z[i]);
+    if (err = (fabs(z[i] - x[i] - 0.5 * y[i]) > 1e-10))
+      printf("z[%d] = %f ! %f\n", i, z[i], x[i] + 0.5 * y[i]);
 
   return err;
 }
