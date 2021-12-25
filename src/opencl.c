@@ -7,6 +7,17 @@
 #include <CL/cl.h>
 #endif
 
+int opencl_map(struct backend *bnd, struct mem *m, const int op);
+void opencl_map_ptr(void **p, size_t *size, struct mem *m);
+int opencl_knl_build(struct backend *bnd, struct prog *prg, const char *source,
+                     const char *name);
+int opencl_knl_set(struct prog *prg, const int index, const size_t size,
+                   void *arg);
+int opencl_knl_run(struct backend *bnd, struct prog *prg, const int ndim,
+                   const size_t *global, const size_t *local);
+int opencl_knl_free(struct prog *prg);
+int opencl_finalize(struct backend *bnd);
+
 struct opencl_backend {
   cl_command_queue queue;
   cl_context ctx;
@@ -40,7 +51,6 @@ int opencl_init(struct backend *bnd, const int platform_id,
                        &num_devices);
   cl_device_id device = cl_devices[device_id];
 
-  bnd->backend = NOMP_OCL;
   struct opencl_backend *ocl = bnd->bptr =
       calloc(1, sizeof(struct opencl_backend));
   ocl->ctx = clCreateContext(NULL, 1, &device, NULL, NULL, &err);
@@ -48,6 +58,14 @@ int opencl_init(struct backend *bnd, const int platform_id,
 
   free(cl_devices);
   free(cl_platforms);
+
+  bnd->map = opencl_map;
+  bnd->map_ptr = opencl_map_ptr;
+  bnd->knl_build = opencl_knl_build;
+  bnd->knl_set = opencl_knl_set;
+  bnd->knl_run = opencl_knl_run;
+  bnd->knl_free = opencl_knl_free;
+  bnd->finalize = opencl_finalize;
 
   return 0;
 }

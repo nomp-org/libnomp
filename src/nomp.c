@@ -19,9 +19,11 @@ int nomp_init(const char *backend, const int platform, const int device) {
     be[i] = tolower(backend[i]);
   be[n] = '\0';
 
-  int err = NOMP_INVALID_BACKEND;
+  int err = 0;
   if (strncmp(be, "opencl", 32) == 0)
     err = opencl_init(&nomp, platform, device);
+  else
+    err = NOMP_INVALID_BACKEND;
 
   if (err == 0)
     initialized = 1;
@@ -69,15 +71,13 @@ int nomp_map(void *ptr, const size_t idx0, const size_t idx1,
     mems[idx].hptr = ptr;
   }
 
-  int err = NOMP_INVALID_BACKEND;
-  if (nomp.backend == NOMP_OCL)
-    err = opencl_map(&nomp, &mems[idx], op);
-
-  if (err == 0)
+  int err = nomp.map(&nomp, &mems[idx], op);
+  if (err == 0) {
     if (idx == mems_n)
       mems_n++;
     else if (op == NOMP_FREE)
       mems[idx].hptr = NULL;
+  }
 
   return err;
 }
@@ -89,17 +89,6 @@ static struct prog *progs = NULL;
 static int progs_n = 0;
 static int progs_max = 0;
 
-static int map_ptr(void **p, size_t *size) {
-  int idx = idx_if_mapped(*p);
-  if (idx < mems_n) {
-    if (nomp.backend == NOMP_OCL) {
-      opencl_map_ptr(p, size, &mems[idx]);
-      return 0;
-    }
-  } else
-    return NOMP_INVALID_MAP_PTR;
-}
-
 int nomp_run(int *id, const char *source, const char *name, const int ndim,
              const size_t *global, const size_t *local, const int nargs, ...) {
   if (progs_n == progs_max) {
@@ -107,12 +96,8 @@ int nomp_run(int *id, const char *source, const char *name, const int ndim,
     progs = (struct prog *)realloc(progs, sizeof(struct prog) * progs_max);
   }
 
-  int err = 0;
   if (*id == -1) {
-    if (nomp.backend == NOMP_OCL)
-      err = opencl_knl_build(&nomp, &progs[progs_n], source, name);
-
-    if (err == 0)
+    if (nomp.knl_build(&nomp, &progs[progs_n], source, name) == 0)
       *id = progs_n++;
     else
       return NOMP_KNL_BUILD_ERROR;
@@ -122,7 +107,7 @@ int nomp_run(int *id, const char *source, const char *name, const int ndim,
     va_list args;
     va_start(args, nargs);
 
-    int i;
+    int i, idx;
     for (i = 0; i < nargs; i++) {
       int type = va_arg(args, int);
       void *p = va_arg(args, void *);
@@ -132,25 +117,23 @@ int nomp_run(int *id, const char *source, const char *name, const int ndim,
         size = va_arg(args, size_t);
         break;
       case NOMP_PTR:
-        err = map_ptr(&p, &size);
-        if (err)
-          return err;
+        if ((idx = idx_if_mapped(p)) < mems_n)
+          nomp.map_ptr(&p, &size, &mems[idx]);
+        else
+          return NOMP_INVALID_MAP_PTR;
         break;
       default:
         return NOMP_KNL_ARG_TYPE_ERROR;
         break;
       }
 
-      err = opencl_knl_set(&progs[*id], i, size, p);
-      if (err)
+      if (nomp.knl_set(&progs[*id], i, size, p) != 0)
         return NOMP_KNL_ARG_SET_ERROR;
     }
 
     va_end(args);
 
-    if (nomp.backend == NOMP_OCL)
-      err = opencl_knl_run(&nomp, &progs[*id], ndim, global, local);
-    if (err != 0)
+    if (nomp.knl_run(&nomp, &progs[*id], ndim, global, local) != 0)
       return NOMP_KNL_RUN_ERROR;
   }
 
@@ -202,7 +185,6 @@ int nomp_err_str(int err_id, char *buf, int buf_size) {
     strncpy(buf, "Nomp kernel run failed", buf_size);
     break;
   default:
-    printf("OOPs !\n");
     break;
   }
 
@@ -216,31 +198,27 @@ int nomp_finalize(void) {
   if (!initialized)
     return NOMP_NOT_INITIALIZED_ERROR;
 
-  int i, err;
-  if (nomp.backend == NOMP_OCL)
-    for (i = err = 0; err == 0 && i < mems_n; i++)
-      err = opencl_map(&nomp, &mems[i], NOMP_FREE);
-  else
-    err = NOMP_INVALID_BACKEND;
-  if (err == 0)
+  int i;
+  for (i = 0; i < mems_n && nomp.map(&nomp, &mems[i], NOMP_FREE) == 0; i++)
+    ;
+  if (i == mems_n)
     free(mems);
-
-  if (nomp.backend == NOMP_OCL)
-    for (i = 0; err == 0 && i < progs_n; i++)
-      err = opencl_knl_free(&progs[i]);
   else
-    err = NOMP_INVALID_BACKEND;
-  if (err == 0)
+    return NOMP_INVALID_MAP_PTR;
+
+  for (i = 0; i < progs_n && nomp.knl_free(&progs[i]) == 0; i++)
+    ;
+  if (i == progs_n)
     free(progs);
+  else
+    return NOMP_INVALID_KNL;
 
-  if (err == 0)
-    if (nomp.backend == NOMP_OCL)
-      err = opencl_finalize(&nomp);
-
-  if (err == 0)
+  if (nomp.finalize(&nomp) == 0)
     initialized = 0;
+  else
+    return NOMP_FINALIZE_FAILURE;
 
-  return err;
+  return 0;
 }
 
 #undef BESIZE
