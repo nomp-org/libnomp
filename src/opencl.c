@@ -7,16 +7,16 @@
 #include <CL/cl.h>
 #endif
 
-int opencl_map(struct backend *bnd, struct mem *m, const int op);
-void opencl_map_ptr(void **p, size_t *size, struct mem *m);
-int opencl_knl_build(struct backend *bnd, struct prog *prg, const char *source,
-                     const char *name);
-int opencl_knl_set(struct prog *prg, const int index, const size_t size,
-                   void *arg);
-int opencl_knl_run(struct backend *bnd, struct prog *prg, const int ndim,
-                   const size_t *global, const size_t *local);
-int opencl_knl_free(struct prog *prg);
-int opencl_finalize(struct backend *bnd);
+static int opencl_map(struct backend *bnd, struct mem *m, const int op);
+static void opencl_map_ptr(void **p, size_t *size, struct mem *m);
+static int opencl_knl_build(struct backend *bnd, struct prog *prg,
+                            const char *source, const char *name);
+static int opencl_knl_set(struct prog *prg, const int index, const size_t size,
+                          void *arg);
+static int opencl_knl_run(struct backend *bnd, struct prog *prg, const int ndim,
+                          const size_t *global, const size_t *local);
+static int opencl_knl_free(struct prog *prg);
+static int opencl_finalize(struct backend *bnd);
 
 struct opencl_backend {
   cl_command_queue queue;
@@ -74,7 +74,7 @@ struct opencl_mem {
   cl_mem mem;
 };
 
-int opencl_map(struct backend *bnd, struct mem *m, const int op) {
+static int opencl_map(struct backend *bnd, struct mem *m, const int op) {
   struct opencl_backend *ocl = bnd->bptr;
 
   cl_int err;
@@ -114,7 +114,7 @@ int opencl_map(struct backend *bnd, struct mem *m, const int op) {
   return 0;
 }
 
-void opencl_map_ptr(void **p, size_t *size, struct mem *m) {
+static void opencl_map_ptr(void **p, size_t *size, struct mem *m) {
   struct opencl_mem *ocl_mem = m->bptr;
   *p = (void *)&ocl_mem->mem;
   *size = sizeof(cl_mem);
@@ -125,8 +125,8 @@ struct opencl_prog {
   cl_kernel knl;
 };
 
-int opencl_knl_build(struct backend *bnd, struct prog *prg, const char *source,
-                     const char *name) {
+static int opencl_knl_build(struct backend *bnd, struct prog *prg,
+                            const char *source, const char *name) {
   struct opencl_backend *ocl = bnd->bptr;
   struct opencl_prog *ocl_prg = prg->bptr =
       calloc(1, sizeof(struct opencl_prog));
@@ -153,8 +153,8 @@ int opencl_knl_build(struct backend *bnd, struct prog *prg, const char *source,
   return 0;
 }
 
-int opencl_knl_set(struct prog *prg, const int index, const size_t size,
-                   void *arg) {
+static int opencl_knl_set(struct prog *prg, const int index, const size_t size,
+                          void *arg) {
   struct opencl_prog *ocl_prg = prg->bptr;
   cl_int err = clSetKernelArg(ocl_prg->knl, index, size, arg);
   if (err != CL_SUCCESS)
@@ -162,8 +162,8 @@ int opencl_knl_set(struct prog *prg, const int index, const size_t size,
   return 0;
 }
 
-int opencl_knl_run(struct backend *bnd, struct prog *prg, const int ndim,
-                   const size_t *global, const size_t *local) {
+static int opencl_knl_run(struct backend *bnd, struct prog *prg, const int ndim,
+                          const size_t *global, const size_t *local) {
   struct opencl_backend *ocl = bnd->bptr;
   struct opencl_prog *ocl_prg = prg->bptr;
   cl_int err = clEnqueueNDRangeKernel(ocl->queue, ocl_prg->knl, ndim, NULL,
@@ -173,7 +173,7 @@ int opencl_knl_run(struct backend *bnd, struct prog *prg, const int ndim,
   return 0;
 }
 
-int opencl_knl_free(struct prog *prg) {
+static int opencl_knl_free(struct prog *prg) {
   if (prg->bptr != NULL) {
     struct opencl_prog *ocl_prg = prg->bptr;
     cl_int err = clReleaseKernel(ocl_prg->knl);
@@ -189,7 +189,7 @@ int opencl_knl_free(struct prog *prg) {
   return 0;
 }
 
-int opencl_finalize(struct backend *bnd) {
+static int opencl_finalize(struct backend *bnd) {
   if (bnd->bptr != NULL) {
     struct opencl_backend *ocl = bnd->bptr;
     cl_int err = clReleaseCommandQueue(ocl->queue);
