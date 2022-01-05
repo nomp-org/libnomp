@@ -1,16 +1,22 @@
 #include <nomp-impl.h>
+#include <pthread.h>
 
 #define BESIZE 1024
 
 static struct backend nomp;
 static int initialized = 0;
+static pthread_mutex_t m;
 
 //=============================================================================
 // nomp_init
 //
 int nomp_init(const char *backend, const int platform, const int device) {
-  if (initialized > 0)
+  pthread_mutex_lock(&m);
+
+  if (initialized > 0) {
+    pthread_mutex_unlock(&m);
     return NOMP_INITIALIZED_ERROR;
+  }
 
   char be[BESIZE];
   size_t n = strnlen(backend, BESIZE);
@@ -27,6 +33,8 @@ int nomp_init(const char *backend, const int platform, const int device) {
 
   if (err == 0)
     initialized = 1;
+
+  pthread_mutex_unlock(&m);
 
   return err;
 }
@@ -195,29 +203,40 @@ int nomp_err_str(int err_id, char *buf, int buf_size) {
 // nomp_finalize
 //
 int nomp_finalize(void) {
-  if (!initialized)
+  pthread_mutex_lock(&m);
+
+  if (!initialized) {
+    pthread_mutex_unlock(&m);
     return NOMP_NOT_INITIALIZED_ERROR;
+  }
 
   int i;
   for (i = 0; i < mems_n && nomp.map(&nomp, &mems[i], NOMP_FREE) == 0; i++)
     ;
   if (i == mems_n)
     free(mems);
-  else
+  else {
+    pthread_mutex_unlock(&m);
     return NOMP_INVALID_MAP_PTR;
+  }
 
   for (i = 0; i < progs_n && nomp.knl_free(&progs[i]) == 0; i++)
     ;
   if (i == progs_n)
     free(progs);
-  else
+  else {
+    pthread_mutex_unlock(&m);
     return NOMP_INVALID_KNL;
+  }
 
   if (nomp.finalize(&nomp) == 0)
     initialized = 0;
-  else
+  else {
+    pthread_mutex_unlock(&m);
     return NOMP_FINALIZE_FAILURE;
+  }
 
+  pthread_mutex_unlock(&m);
   return 0;
 }
 
