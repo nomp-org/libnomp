@@ -53,7 +53,7 @@ static int idx_if_mapped(void *p) {
   // Needs to go. Must store a hashmap.
   int i;
   for (i = 0; i < mems_n; i++)
-    if (mems[i].hptr != NULL && mems[i].hptr == p)
+    if (mems[i].bptr != NULL && mems[i].hptr == p)
       break;
   return i;
 }
@@ -77,15 +77,18 @@ int nomp_map(void *ptr, const size_t idx0, const size_t idx1,
     mems[idx].idx1 = idx1;
     mems[idx].usize = usize;
     mems[idx].hptr = ptr;
+    mems[idx].bptr = NULL;
+  } else if (idx < mems_n) {
+    if (mems[idx].bptr == NULL && !(op & NOMP_ALLOC))
+      return NOMP_INVALID_MAP_PTR;
+    if ((op & NOMP_ALLOC) && mems[idx].bptr != NULL)
+      return NOMP_INVALID_MAP_PTR;
   }
 
   int err = nomp.map(&nomp, &mems[idx], op);
-  if (err == 0) {
+  if (err == 0)
     if (idx == mems_n)
       mems_n++;
-    else if (op == NOMP_FREE)
-      mems[idx].hptr = NULL;
-  }
 
   return err;
 }
@@ -211,23 +214,15 @@ int nomp_finalize(void) {
   }
 
   int i;
-  for (i = 0; i < mems_n && nomp.map(&nomp, &mems[i], NOMP_FREE) == 0; i++)
-    ;
-  if (i == mems_n)
-    free(mems);
-  else {
-    pthread_mutex_unlock(&m);
-    return NOMP_INVALID_MAP_PTR;
-  }
+  for (i = 0; i < mems_n; i++)
+    if (mems[i].bptr != NULL)
+      nomp.map(&nomp, &mems[i], NOMP_FREE);
+  free(mems), mems = NULL, mems_n = mems_max = 0;
 
-  for (i = 0; i < progs_n && nomp.knl_free(&progs[i]) == 0; i++)
-    ;
-  if (i == progs_n)
-    free(progs);
-  else {
-    pthread_mutex_unlock(&m);
-    return NOMP_INVALID_KNL;
-  }
+  for (i = 0; i < progs_n; i++)
+    if (progs[i].bptr != NULL)
+      nomp.knl_free(&progs[i]);
+  free(progs), progs = NULL, progs_n = progs_max = 0;
 
   if (nomp.finalize(&nomp) == 0)
     initialized = 0;

@@ -101,14 +101,12 @@ static int opencl_map(struct backend *bnd, struct mem *m, const int op) {
                               (m->idx1 - m->idx0) * m->usize, m->hptr, 0, NULL,
                               NULL);
 
-    if (err != CL_SUCCESS)
-      return 1;
-  } else if (op == NOMP_FREE && m->bptr != NULL) {
+    return err == CL_SUCCESS;
+  } else if (op == NOMP_FREE) {
     err = clReleaseMemObject(ocl_mem->mem);
     if (err != CL_SUCCESS)
       return 1;
-    free(m->bptr);
-    m->bptr = NULL;
+    free(m->bptr), m->bptr = NULL;
   }
 
   return 0;
@@ -174,33 +172,29 @@ static int opencl_knl_run(struct backend *bnd, struct prog *prg, const int ndim,
 }
 
 static int opencl_knl_free(struct prog *prg) {
-  if (prg->bptr != NULL) {
-    struct opencl_prog *ocl_prg = prg->bptr;
-    cl_int err = clReleaseKernel(ocl_prg->knl);
-    if (err != CL_SUCCESS)
-      return 1;
-    err = clReleaseProgram(ocl_prg->prg);
-    if (err != CL_SUCCESS)
-      return 1;
-    free(prg->bptr);
-    prg->bptr = NULL;
-  }
+  struct opencl_prog *ocl_prg = prg->bptr;
+  cl_int err = clReleaseKernel(ocl_prg->knl);
+  if (err != CL_SUCCESS)
+    return 1;
+  err = clReleaseProgram(ocl_prg->prg);
+  if (err != CL_SUCCESS)
+    return 1;
+  free(prg->bptr);
+  prg->bptr = NULL;
 
   return 0;
 }
 
 static int opencl_finalize(struct backend *bnd) {
-  if (bnd->bptr != NULL) {
-    struct opencl_backend *ocl = bnd->bptr;
-    cl_int err = clReleaseCommandQueue(ocl->queue);
-    if (err != CL_SUCCESS)
-      return 1;
-    err = clReleaseContext(ocl->ctx);
-    if (err != CL_SUCCESS)
-      return 1;
-    free(bnd->bptr);
-    bnd->bptr = NULL;
-  }
+  struct opencl_backend *ocl = bnd->bptr;
+  cl_int err = clReleaseCommandQueue(ocl->queue);
+  if (err != CL_SUCCESS)
+    return 1;
+  err = clReleaseContext(ocl->ctx);
+  if (err != CL_SUCCESS)
+    return 1;
+  free(bnd->bptr);
+  bnd->bptr = NULL;
 
   return 0;
 }
