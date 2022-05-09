@@ -15,10 +15,8 @@ struct prog {
 };
 
 struct mem {
-  size_t idx0, idx1;
-  size_t usize;
-  void *hptr;
-  void *bptr;
+  size_t idx0, idx1, usize;
+  void *hptr, *bptr;
 };
 
 struct backend {
