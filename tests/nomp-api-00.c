@@ -1,6 +1,5 @@
+#include "nomp.h"
 #include <assert.h>
-#include <math.h>
-#include <nomp.h>
 #include <stdio.h>
 
 int main(int argc, char *argv[]) {
@@ -10,12 +9,12 @@ int main(int argc, char *argv[]) {
 
   // Calling `nomp_init` twice must return an error, but must not segfault
   int err = nomp_init(backend, device_id, platform_id);
-  nomp_check_err(err);
+  nomp_chk(err);
   err = nomp_init(backend, device_id, platform_id);
   assert(err != 0);
 
   err = nomp_finalize();
-  nomp_check_err(err);
+  nomp_chk(err);
 
   return err;
 }

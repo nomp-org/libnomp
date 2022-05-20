@@ -1,5 +1,5 @@
+#include "nomp.h"
 #include <math.h>
-#include <nomp.h>
 #include <stdio.h>
 
 const char *vec_add_src =
@@ -16,28 +16,30 @@ const char *vec_add_src =
 
 int vec_add(float *x, float *y, float alpha, float *z) {
   int err = nomp_map(x, 0, 10, sizeof(float), NOMP_H2D);
-  nomp_check_err(err);
+  nomp_chk(err);
   err = nomp_map(y, 0, 10, sizeof(float), NOMP_H2D);
-  nomp_check_err(err);
+  nomp_chk(err);
   err = nomp_map(z, 0, 10, sizeof(float), NOMP_ALLOC);
-  nomp_check_err(err);
+  nomp_chk(err);
+
+  static int vec_add_hndl = -1;
+  err = nomp_jit(&vec_add_hndl, vec_add_src, "vec_add");
+  nomp_chk(err);
 
   size_t gsize[1] = {1};
   size_t lsize[1] = {1};
-  static int vec_add_hndl = -1;
-  err = nomp_run(&vec_add_hndl, vec_add_src, "vec_add", 1, gsize, lsize, 4,
-                 NOMP_PTR, x, NOMP_PTR, y, NOMP_SCALAR, &alpha, sizeof(alpha),
-                 NOMP_PTR, z);
-  nomp_check_err(err);
+  err = nomp_run(vec_add_hndl, 1, gsize, lsize, 4, NOMP_PTR, x, NOMP_PTR, y,
+                 NOMP_SCALAR, &alpha, sizeof(alpha), NOMP_PTR, z);
+  nomp_chk(err);
 
   err = nomp_map(z, 0, 10, sizeof(float), NOMP_D2H);
-  nomp_check_err(err);
+  nomp_chk(err);
   err = nomp_map(z, 0, 10, sizeof(float), NOMP_FREE);
-  nomp_check_err(err);
+  nomp_chk(err);
   err = nomp_map(y, 0, 10, sizeof(float), NOMP_FREE);
-  nomp_check_err(err);
+  nomp_chk(err);
   err = nomp_map(x, 0, 10, sizeof(float), NOMP_FREE);
-  nomp_check_err(err);
+  nomp_chk(err);
 
   return err;
 }
@@ -48,7 +50,7 @@ int main(int argc, char *argv[]) {
   int platform_id = argc > 3 ? atoi(argv[3]) : 0;
 
   int err = nomp_init(backend, device_id, platform_id);
-  nomp_check_err(err);
+  nomp_chk(err);
 
   float x[10];
   int i;
