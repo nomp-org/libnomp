@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.22)
 
 project(libnomp VERSION 0.0.1 DESCRIPTION "nomp runtime library" LANGUAGES C)
 
 include(GNUInstallDirs)
 
-add_library(nomp SHARED src/opencl.c src/nomp.c)
+add_library(nomp SHARED src/opencl.c src/nomp.c src/loopy.c)
 set_target_properties(nomp PROPERTIES
   VERSION ${PROJECT_VERSION}
   SOVERSION 1
@@ -18,6 +18,9 @@ target_link_libraries(nomp PRIVATE Threads::Threads)
 
 find_package(OpenCL REQUIRED)
 target_link_libraries(nomp PRIVATE OpenCL::OpenCL)
+
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
+target_link_libraries(nomp PRIVATE Python3::Python)
 
 file(GLOB TESTS tests/*.c)
 foreach(test ${TESTS})
