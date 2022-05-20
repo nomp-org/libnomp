@@ -1,4 +1,4 @@
-#include <nomp-impl.h>
+#include "nomp-impl.h"
 
 #define CL_TARGET_OPENCL_VERSION 220
 #ifdef __APPLE__

@@ -1,6 +1,5 @@
+#include "nomp.h"
 #include <assert.h>
-#include <math.h>
-#include <nomp.h>
 #include <stdio.h>
 
 int main(int argc, char *argv[]) {
@@ -9,11 +8,11 @@ int main(int argc, char *argv[]) {
   int platform_id = argc > 3 ? atoi(argv[3]) : 0;
 
   int err = nomp_init(backend, device_id, platform_id);
-  nomp_check_err(err);
+  nomp_chk(err);
 
   // Calling `nomp_finalize` twice must return an error, but must not segfault
   err = nomp_finalize();
-  nomp_check_err(err);
+  nomp_chk(err);
   err = nomp_finalize();
   assert(err != 0);
 
