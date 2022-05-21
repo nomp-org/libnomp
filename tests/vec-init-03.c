@@ -2,7 +2,7 @@
 #include <math.h>
 #include <stdio.h>
 
-const char *_nomp_lpy_knl_src =
+static const char *_nomp_lpy_knl_src =
     "#define lid(N) ((int) get_local_id(N))\n"
     "#define gid(N) ((int) get_group_id(N))\n\n"
     "__kernel void __attribute__ ((reqd_work_group_size(1, 1, 1))) "
@@ -13,7 +13,7 @@ const char *_nomp_lpy_knl_src =
     "    a[off + i] = b[i];\n"
     "}";
 
-const int vec_init(int N, int off, double *a, double *b) {
+static int vec_init(int N, int off, double *a, double *b) {
   int err = nomp_map(a, 0, N + off, sizeof(double), NOMP_ALLOC);
   nomp_chk(err);
   err = nomp_map(b, 0, N, sizeof(double), NOMP_H2D);

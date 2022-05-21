@@ -10,6 +10,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+struct knl {
+  char *src, *name;
+  int ndim;
+  size_t gsize[3], lsize[3];
+};
+
 struct prog {
   void *bptr;
 };
@@ -31,7 +37,15 @@ struct backend {
   void *bptr;
 };
 
+//==============================================================================
+// OpenCL helper functions
+//
 int opencl_init(struct backend *ocl, const int platform_id,
                 const int device_id);
+
+//==============================================================================
+// Python helper functions
+//
+int py_user_callback(struct knl *knl, const char *c_str, const char *file);
 
 #endif // _LIB_NOMP_IMPL_H_

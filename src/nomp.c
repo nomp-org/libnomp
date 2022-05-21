@@ -1,8 +1,6 @@
 #include "nomp-impl.h"
 #include <pthread.h>
 
-#define BESIZE 1024
-
 static struct backend nomp;
 static int initialized = 0;
 static pthread_mutex_t m;
@@ -12,28 +10,22 @@ static pthread_mutex_t m;
 //
 int nomp_init(const char *backend, const int platform, const int device) {
   pthread_mutex_lock(&m);
-
-  if (initialized > 0) {
+  if (initialized) {
     pthread_mutex_unlock(&m);
     return NOMP_INITIALIZED_ERROR;
   }
 
-  char be[BESIZE];
-  size_t n = strnlen(backend, BESIZE);
-  int i;
-  for (i = 0; i < n; i++)
+  char be[BUFSIZ];
+  size_t n = strnlen(backend, BUFSIZ);
+  for (int i = 0; i < n; i++)
     be[i] = tolower(backend[i]);
   be[n] = '\0';
 
-  int err = 0;
+  int err = NOMP_INVALID_BACKEND;
   if (strncmp(be, "opencl", 32) == 0)
     err = opencl_init(&nomp, platform, device);
-  else
-    err = NOMP_INVALID_BACKEND;
 
-  if (err == 0)
-    initialized = 1;
-
+  initialized = !err;
   pthread_mutex_unlock(&m);
 
   return err;
@@ -95,18 +87,30 @@ static struct prog *progs = NULL;
 static int progs_n = 0;
 static int progs_max = 0;
 
-int nomp_jit(int *id, const char *source, const char *name) {
+int nomp_jit(int *id, int *ndim, size_t *gz, size_t *lz, const char *c_src) {
   if (*id == -1) {
     if (progs_n == progs_max) {
       progs_max += progs_max / 2 + 1;
       progs = (struct prog *)realloc(progs, sizeof(struct prog) * progs_max);
     }
 
-    if (nomp.knl_build(&nomp, &progs[progs_n], source, name) == 0)
+    struct knl knl = {.src = NULL,
+                      .name = NULL,
+                      .ndim = 0,
+                      .gsize = {0, 0, 0},
+                      .lsize = {0, 0, 0}};
+    py_user_callback(&knl, c_src, NULL);
+
+    for (int i = 0; i < knl.ndim; i++)
+      gz[i] = knl.gsize[i], lz[i] = knl.lsize[i];
+    *ndim = knl.ndim;
+
+    if (nomp.knl_build(&nomp, &progs[progs_n], knl.src, knl.name) == 0)
       *id = progs_n++;
     else
       return NOMP_KNL_BUILD_ERROR;
   }
+
   return 0;
 }
 
@@ -241,5 +245,3 @@ int nomp_finalize(void) {
   pthread_mutex_unlock(&m);
   return 0;
 }
-
-#undef BESIZE
