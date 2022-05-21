@@ -2,7 +2,7 @@
 #include <math.h>
 #include <stdio.h>
 
-const char *vec_add_src =
+static const char *vec_add_src =
     "#define lid(N) ((int) get_local_id(N))\n"
     "#define gid(N) ((int) get_group_id(N))\n\n"
     "__kernel void __attribute__ ((reqd_work_group_size(1, 1, 1))) "
@@ -14,7 +14,7 @@ const char *vec_add_src =
     "    z[i] = x[i] + alpha * y[i];\n"
     "}";
 
-int vec_add(float *x, float *y, float alpha, float *z) {
+static int vec_add(float *x, float *y, float alpha, float *z) {
   int err = nomp_map(x, 0, 10, sizeof(float), NOMP_H2D);
   nomp_chk(err);
   err = nomp_map(y, 0, 10, sizeof(float), NOMP_H2D);
@@ -61,9 +61,15 @@ int main(int argc, char *argv[]) {
   float z[10];
   vec_add(x, y, 0.5, z);
 
-  for (i = err = 0; err == 0 && i < 10; ++i)
-    if (err = (fabs(z[i] - x[i] - 0.5 * y[i]) > 1e-10))
+  for (i = 0; i < 10; ++i) {
+    if (fabs(z[i] - x[i] - 0.5 * y[i]) > 1e-10) {
       printf("z[%d] = %f ! %f\n", i, z[i], x[i] + 0.5 * y[i]);
+      break;
+    }
+  }
 
-  return err;
+  err = nomp_finalize();
+  nomp_chk(err);
+
+  return (i < 10);
 }

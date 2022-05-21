@@ -44,7 +44,8 @@ int nomp_init(const char *backend, const int platform, const int device);
 int nomp_map(void *ptr, const size_t start_idx, const size_t end_idx,
              const size_t unit_size, const int op);
 
-int nomp_jit(int *id, const char *source, const char *name);
+int nomp_jit(int *id, int *ndim, size_t *global, size_t *local,
+             const char *c_src);
 
 int nomp_run(const int id, const int ndim, const size_t *global,
              const size_t *local, const int nargs, ...);
