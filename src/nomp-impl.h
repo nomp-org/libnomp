@@ -1,8 +1,8 @@
 #if !defined(_LIB_NOMP_IMPL_H_)
 #define _LIB_NOMP_IMPL_H_
 
-#include <nomp.h>
-
+#include "nomp.h"
+#include <assert.h>
 #include <ctype.h>
 #include <math.h>
 #include <stdarg.h>

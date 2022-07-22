@@ -22,7 +22,7 @@ target_link_libraries(nomp PRIVATE OpenCL::OpenCL)
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 target_link_libraries(nomp PRIVATE Python3::Python)
 
-file(GLOB TESTS tests/*.c)
+file(GLOB TESTS tests/nomp-api-*.c)
 foreach(test ${TESTS})
   string(REPLACE "${CMAKE_SOURCE_DIR}/tests/" "" temp ${test})
   string(REPLACE ".c" "" test_exe ${temp})

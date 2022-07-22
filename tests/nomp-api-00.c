@@ -1,6 +1,5 @@
 #include "nomp.h"
-#include <assert.h>
-#include <stdio.h>
+#include <stdlib.h>
 
 int main(int argc, char *argv[]) {
   char *backend = argc > 1 ? argv[1] : "opencl";
@@ -11,10 +10,10 @@ int main(int argc, char *argv[]) {
   int err = nomp_init(backend, device_id, platform_id);
   nomp_chk(err);
   err = nomp_init(backend, device_id, platform_id);
-  assert(err != 0);
+  nomp_assert(err != 0);
 
   err = nomp_finalize();
   nomp_chk(err);
 
-  return err;
+  return 0;
 }

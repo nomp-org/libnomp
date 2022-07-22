@@ -8,7 +8,7 @@ static pthread_mutex_t m;
 //=============================================================================
 // nomp_init
 //
-int nomp_init(const char *backend, const int platform, const int device) {
+int nomp_init(const char *backend, int platform, int device) {
   pthread_mutex_lock(&m);
   if (initialized) {
     pthread_mutex_unlock(&m);
@@ -49,9 +49,8 @@ static int idx_if_mapped(void *p) {
   return mems_n;
 }
 
-int nomp_map(void *ptr, const size_t idx0, const size_t idx1,
-             const size_t usize, const int op_) {
-  int idx = idx_if_mapped(ptr), op = op_;
+int nomp_map(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
+  int idx = idx_if_mapped(ptr);
   if (idx == mems_n || mems[idx].bptr == NULL) {
     if (op == NOMP_D2H || op == NOMP_FREE)
       return NOMP_INVALID_MAP_PTR;
@@ -87,7 +86,8 @@ static struct prog *progs = NULL;
 static int progs_n = 0;
 static int progs_max = 0;
 
-int nomp_jit(int *id, int *ndim, size_t *gz, size_t *lz, const char *c_src) {
+int nomp_jit(int *id, int *ndim, size_t *global, size_t *local,
+             const char *c_src, const char *callback) {
   if (*id == -1) {
     if (progs_n == progs_max) {
       progs_max += progs_max / 2 + 1;
@@ -101,8 +101,10 @@ int nomp_jit(int *id, int *ndim, size_t *gz, size_t *lz, const char *c_src) {
                       .lsize = {0, 0, 0}};
     py_user_callback(&knl, c_src, NULL);
 
-    for (int i = 0; i < knl.ndim; i++)
-      gz[i] = knl.gsize[i], lz[i] = knl.lsize[i];
+    for (int i = 0; i < knl.ndim; i++) {
+      global[i] = knl.gsize[i];
+      local[i] = knl.lsize[i];
+    }
     *ndim = knl.ndim;
 
     if (nomp.knl_build(&nomp, &progs[progs_n], knl.src, knl.name) == 0)
@@ -117,8 +119,8 @@ int nomp_jit(int *id, int *ndim, size_t *gz, size_t *lz, const char *c_src) {
 //=============================================================================
 // nomp_run
 //
-int nomp_run(const int id, const int ndim, const size_t *global,
-             const size_t *local, const int nargs, ...) {
+int nomp_run(int id, int ndim, const size_t *global, const size_t *local,
+             int nargs, ...) {
   if (id >= 0) {
     va_list args;
     va_start(args, nargs);
@@ -156,7 +158,7 @@ int nomp_run(const int id, const int ndim, const size_t *global,
 //=============================================================================
 // nomp_err
 //
-int nomp_err(char *buf, const int err, const int buf_size) {
+int nomp_err(char *buf, int err, size_t buf_size) {
   switch (err) {
   case NOMP_INVALID_BACKEND:
     strncpy(buf, "Invalid NOMP backend", buf_size);
@@ -244,4 +246,23 @@ int nomp_finalize(void) {
 
   pthread_mutex_unlock(&m);
   return 0;
+}
+
+//=============================================================================
+// Helper functions: nomp_err & nomp_assert
+//
+void nomp_chk_(int err, const char *file, unsigned line) {
+  if (err) {
+    char buf[2 * BUFSIZ];
+    nomp_err(buf, err, 2 * BUFSIZ);
+    printf("%s:%d %s\n", file, line, buf);
+    exit(1);
+  }
+}
+
+void nomp_assert_(int cond, const char *file, unsigned line) {
+  if (!cond) {
+    printf("nomp_assert failure at %s:%d\n", file, line);
+    exit(1);
+  }
 }
