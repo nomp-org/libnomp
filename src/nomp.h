@@ -42,7 +42,7 @@ int nomp_map(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
              int op);
 
 int nomp_jit(int *id, int *ndim, size_t *global, size_t *local,
-             const char *c_src, const char *callback);
+             const char *c_src, const char *annotations, const char *callback);
 
 int nomp_run(int id, int ndim, const size_t *global, const size_t *local,
              int nargs, ...);

@@ -87,19 +87,29 @@ static int progs_n = 0;
 static int progs_max = 0;
 
 int nomp_jit(int *id, int *ndim, size_t *global, size_t *local,
-             const char *c_src, const char *callback) {
+             const char *c_src, const char *annotations, const char *callback) {
   if (*id == -1) {
     if (progs_n == progs_max) {
       progs_max += progs_max / 2 + 1;
       progs = (struct prog *)realloc(progs, sizeof(struct prog) * progs_max);
     }
 
+    size_t len = strlen(callback) + 1;
+    char *callback_ = (char *)calloc(len, sizeof(char));
+    strncpy(callback_, callback, len);
+
+    const char colon[2] = ":";
+    char *py_file = strtok(callback_, colon), *py_func;
+    if (py_file != NULL)
+      py_func = strtok(NULL, colon);
+
     struct knl knl = {.src = NULL,
                       .name = NULL,
                       .ndim = 0,
                       .gsize = {0, 0, 0},
                       .lsize = {0, 0, 0}};
-    py_user_callback(&knl, c_src, NULL);
+    py_user_callback(&knl, c_src, py_file, py_func);
+    free(callback_);
 
     for (int i = 0; i < knl.ndim; i++) {
       global[i] = knl.gsize[i];
