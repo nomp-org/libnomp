@@ -8,7 +8,7 @@ if [ ! -d ${TESTDIR} ]; then
   exit 1
 fi
 
-TESTGROUPS=nomp-api,vec-init,vec-add
+TESTGROUPS=nomp-api, #vec-init,vec-add
 BACKEND=opencl
 
 function print_help() {

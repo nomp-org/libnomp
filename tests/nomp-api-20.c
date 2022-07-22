@@ -9,11 +9,16 @@ int main(int argc, char *argv[]) {
   int err = nomp_init(backend, device_id, platform_id);
   nomp_chk(err);
 
-  // Calling `nomp_finalize` twice must return an error, but must not segfault
+  const char *knl = "double *a;\n"
+                    "for (int i = 0; i < 10; i++)\n"
+                    "  a[i] = i;\n";
+  int id = -1, ndim = -1;
+  size_t global[3], local[3];
+  err = nomp_jit(&id, &ndim, global, local, knl, NULL,
+                 "nomp-api-20.py:transform");
+
   err = nomp_finalize();
   nomp_chk(err);
-  err = nomp_finalize();
-  nomp_assert(err != 0);
 
   return 0;
 }
