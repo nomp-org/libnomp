@@ -108,8 +108,10 @@ int nomp_jit(int *id, int *ndim, size_t *global, size_t *local,
                       .ndim = 0,
                       .gsize = {0, 0, 0},
                       .lsize = {0, 0, 0}};
-    py_user_callback(&knl, c_src, py_file, py_func);
+    int err = py_user_callback(&knl, c_src, py_file, py_func);
     free(callback_);
+    if (err)
+      return err;
 
     for (int i = 0; i < knl.ndim; i++) {
       global[i] = knl.gsize[i];
@@ -179,9 +181,6 @@ int nomp_err(char *buf, int err, size_t buf_size) {
   case NOMP_INVALID_DEVICE:
     strncpy(buf, "Invalid NOMP device", buf_size);
     break;
-  case NOMP_INVALID_TYPE:
-    strncpy(buf, "Invalid NOMP type", buf_size);
-    break;
   case NOMP_INVALID_MAP_PTR:
     strncpy(buf, "Invalid NOMP map pointer", buf_size);
     break;
@@ -236,15 +235,16 @@ int nomp_finalize(void) {
     return NOMP_NOT_INITIALIZED_ERROR;
   }
 
-  int i;
-  for (i = 0; i < mems_n; i++)
+  for (unsigned i = 0; i < mems_n; i++) {
     if (mems[i].bptr != NULL)
       nomp.map(&nomp, &mems[i], NOMP_FREE);
+  }
   free(mems), mems = NULL, mems_n = mems_max = 0;
 
-  for (i = 0; i < progs_n; i++)
+  for (unsigned i = 0; i < progs_n; i++) {
     if (progs[i].bptr != NULL)
       nomp.knl_free(&progs[i]);
+  }
   free(progs), progs = NULL, progs_n = progs_max = 0;
 
   if (nomp.finalize(&nomp) == 0)

@@ -15,7 +15,8 @@ int main(int argc, char *argv[]) {
   int id = -1, ndim = -1;
   size_t global[3], local[3];
   err = nomp_jit(&id, &ndim, global, local, knl, NULL,
-                 "nomp-api-20.py:transform");
+                 "invalid-file.py:invalid_func");
+  nomp_assert(err == NOMP_USER_CALLBACK_NOT_FOUND);
 
   err = nomp_finalize();
   nomp_chk(err);
