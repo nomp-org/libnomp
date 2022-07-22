@@ -2,16 +2,18 @@
 #define _LIB_NOMP_H_
 
 #include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
 
-/* Map Direction */
+// Map Direction: Probably should be an enum
 #define NOMP_ALLOC 1
 #define NOMP_H2D 2
 #define NOMP_D2H 4
 #define NOMP_FREE 8
 
-/* Errors */
+// Types: Probably these should be an enum
+#define NOMP_SCALAR 1
+#define NOMP_PTR 2
+
+// Errors
 #define NOMP_INVALID_BACKEND -32
 #define NOMP_INVALID_PLATFORM -33
 #define NOMP_INVALID_DEVICE -34
@@ -30,41 +32,30 @@
 #define NOMP_KNL_ARG_SET_ERROR -130
 #define NOMP_KNL_RUN_ERROR -131
 
-/* Types */
-#define NOMP_SCALAR 1
-#define NOMP_PTR 2
-
-/* Functions */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int nomp_init(const char *backend, const int platform, const int device);
+int nomp_init(const char *backend, int platform, int device);
 
-int nomp_map(void *ptr, const size_t start_idx, const size_t end_idx,
-             const size_t unit_size, const int op);
+int nomp_map(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
+             int op);
 
 int nomp_jit(int *id, int *ndim, size_t *global, size_t *local,
-             const char *c_src);
+             const char *c_src, const char *callback);
 
-int nomp_run(const int id, const int ndim, const size_t *global,
-             const size_t *local, const int nargs, ...);
+int nomp_run(int id, int ndim, const size_t *global, const size_t *local,
+             int nargs, ...);
 
-int nomp_err(char *buf, const int err, const int buf_size);
+int nomp_err(char *buf, int err, size_t buf_size);
 
 int nomp_finalize(void);
 
-#define nomp_chk_(err, file, line)                                             \
-  {                                                                            \
-    if (err != 0) {                                                            \
-      char buf[2 * BUFSIZ];                                                    \
-      nomp_err(buf, err, 2 * BUFSIZ);                                          \
-      printf("%s:%d %s\n", file, line, buf);                                   \
-      exit(1);                                                                 \
-    }                                                                          \
-  }
-
+void nomp_chk_(int err, const char *file, unsigned line);
 #define nomp_chk(err) nomp_chk_(err, __FILE__, __LINE__)
+
+void nomp_assert_(int cond, const char *file, unsigned line);
+#define nomp_assert(cond) nomp_assert_(cond, __FILE__, __LINE__)
 
 #ifdef __cplusplus
 }

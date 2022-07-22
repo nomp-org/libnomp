@@ -63,7 +63,6 @@ int py_user_callback(struct knl *knl, const char *c_src, const char *file) {
     }
     Py_DECREF(pEntrypts);
   }
-  // FIXME: Should I free knlName?
   const char *knlName = PyUnicode_AsUTF8(pKnlName);
 
   // Call the user callback
