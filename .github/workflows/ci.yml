@@ -31,7 +31,6 @@ jobs:
       - name: Set environment
         shell: bash
         run: |
-          chmod +x ${TESTDIR}/run-tests.sh
           echo "NOMP_INSTALL_DIR=${PWD}/install" >> $GITHUB_ENV
 
       - name: nomp-api
