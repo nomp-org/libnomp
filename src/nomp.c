@@ -99,7 +99,7 @@ int nomp_jit(int *id, int *ndim, size_t *global, size_t *local,
     strncpy(callback_, callback, len);
 
     const char colon[2] = ":";
-    char *py_file = strtok(callback_, colon), *py_func;
+    char *py_file = strtok(callback_, colon), *py_func = NULL;
     if (py_file != NULL)
       py_func = strtok(NULL, colon);
 
