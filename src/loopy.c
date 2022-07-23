@@ -172,9 +172,8 @@ int py_user_callback(struct knl *knl, const char *c_src, const char *file,
       }
       Py_DECREF(pLoopy);
     }
+    Py_DECREF(pKnl);
   }
-
-  Py_XDECREF(pKnl);
 
   return 0;
 }

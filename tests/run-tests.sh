@@ -1,21 +1,16 @@
 #!/bin/bash
 
-TESTDIR=`cd ..; pwd`/build
-
 ########################## Don't touch what follows ############################
-if [ ! -d ${TESTDIR} ]; then
-  echo "Test directory '${TESTDIR}' not found."
-  exit 1
-fi
-
-TESTGROUPS=nomp-api, #vec-init,vec-add
+TESTDIR=`cd ..; pwd`/build
+TESTGROUPS=nomp-api,vec-init,vec-add
 BACKEND=opencl
 
 function print_help() {
   echo "./run-tests.sh [-h|--help] [-g|--group <list of test groups>] [-b|--backend <backend>]"
-  echo "--help: Print this help and exit."
-  echo "--group: Comm separated list of test groups, case sensitive (Default: ${TESTGROUPS})."
-  echo "--backend: Backend to run the tests, case insensitive (Default: ${BACKEND})."
+  echo "-h/--help: Print this help and exit."
+  echo "-t/--testdir: Location of test binaries, case sensitive (Default: ${TESTDIR})."
+  echo "-g/--group: Comma separated list of test groups, case sensitive (Default: ${TESTGROUPS})."
+  echo "-b/--backend: Backend to run the tests, case insensitive (Default: ${BACKEND})."
 }
 
 while [[ $# -gt 0 ]]; do
@@ -26,6 +21,11 @@ while [[ $# -gt 0 ]]; do
       shift
       print_help
       exit 0
+      ;;
+    -t|--testdir)
+      shift
+      TESTDIR=$1
+      shift
       ;;
     -g|--group)
       shift
@@ -40,11 +40,6 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if [[ -z ${TESTGROUPS} ]] || [[ -z ${BACKEND} ]]; then
-  echo "Error parsing command line arguments. Run './run-tests.sh --help' for help."
-  exit 1
-fi
-
 IFS=','; group_array=(${TESTGROUPS}); unset IFS;
 err=0
 for g in ${group_array[@]}; do
@@ -54,7 +49,7 @@ for g in ${group_array[@]}; do
       echo "$t: Pass";
     else
       echo "$t: Fail";
-      err=$((err+1))
+      err=$((err + 1))
     fi
   done
 done
