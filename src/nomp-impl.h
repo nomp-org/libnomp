@@ -46,6 +46,7 @@ int opencl_init(struct backend *ocl, const int platform_id,
 //==============================================================================
 // Python helper functions
 //
+int py_append_to_sys_path(const char *path);
 int py_user_callback(struct knl *knl, const char *c_str, const char *file,
                      const char *func);
 
