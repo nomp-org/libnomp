@@ -1,3 +1,6 @@
+#define PY_SSIZE_T_CLEAN
+#include <Python.h>
+
 #include "nomp-impl.h"
 #include <pthread.h>
 
@@ -24,6 +27,27 @@ int nomp_init(const char *backend, int platform, int device) {
   int err = NOMP_INVALID_BACKEND;
   if (strncmp(be, "opencl", 32) == 0)
     err = opencl_init(&nomp, platform, device);
+
+  if (!Py_IsInitialized()) {
+    Py_Initialize();
+    // Append current working dir
+    py_append_to_sys_path(".");
+    // There should be a better way to figure the installation
+    // path based on the shared library path
+    err = NOMP_INSTALL_DIR_NOT_FOUND;
+    char *val = getenv("NOMP_INSTALL_DIR");
+    if (val) {
+      const char *python_dir = "python", *py_module = "c_to_loopy";
+      size_t len0 = strlen(val), len1 = strlen(python_dir);
+      char *abs_dir = (char *)calloc(len0 + len1 + 2, sizeof(char));
+      strncpy(abs_dir, val, len0), strncpy(abs_dir + len0, "/", 1);
+      strncpy(abs_dir + len0 + 1, python_dir, len1);
+      py_append_to_sys_path(abs_dir);
+      free(abs_dir), err = 0;
+    }
+  }
+  if (err)
+    return err;
 
   initialized = !err;
   pthread_mutex_unlock(&m);

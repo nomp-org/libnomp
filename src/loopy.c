@@ -3,9 +3,9 @@
 
 #include "nomp-impl.h"
 
-static char *get_loopy_knl_name(PyObject *pKnl) {
+static int get_loopy_knl_name(char **name, PyObject *pKnl) {
   // Get the kernel name from loopy kernel
-  PyObject *pKnlName = NULL;
+  int err = 1;
   PyObject *pEntrypts = PyObject_GetAttrString(pKnl, "entrypoints");
   if (pEntrypts && PyFrozenSet_Check(pEntrypts)) {
     Py_ssize_t len = PySet_Size(pEntrypts);
@@ -15,26 +15,23 @@ static char *get_loopy_knl_name(PyObject *pKnl) {
     PyObject *pIter = PyObject_GetIter(pEntrypts);
     if (pIter) {
       PyObject *pEntry = PyIter_Next(pIter);
-      pKnlName = PyObject_Str(pEntry);
-      Py_XDECREF(pEntry);
-      Py_DECREF(pIter);
+      PyObject *pKnlName = PyObject_Str(pEntry);
+      if (pKnlName) {
+        size_t size;
+        const char *name_ = PyUnicode_AsUTF8AndSize(pKnlName, &size);
+        *name = (char *)calloc(size + 1, sizeof(char));
+        strncpy(*name, name_, size);
+        Py_DECREF(pKnlName), err = 0;
+      }
+      Py_XDECREF(pEntry), Py_DECREF(pIter);
     }
     Py_DECREF(pEntrypts);
   }
 
-  char *name = NULL;
-  if (pKnlName) {
-    const char *name_ = PyUnicode_AsUTF8(pKnlName);
-    size_t len = strlen(name_) + 1;
-    name = (char *)calloc(len, sizeof(char));
-    strncpy(name, name_, len);
-    Py_XDECREF(pKnlName);
-  }
-
-  return name;
+  return err;
 }
 
-static int append_to_sys_path(const char *path) {
+int py_append_to_sys_path(const char *path) {
   PyObject *pSys = PyImport_ImportModule("sys");
   if (pSys) {
     PyObject *pPath = PyObject_GetAttrString(pSys, "path");
@@ -51,43 +48,22 @@ static int append_to_sys_path(const char *path) {
 
 int py_user_callback(struct knl *knl, const char *c_src, const char *file,
                      const char *func) {
-  if (!Py_IsInitialized()) {
-    Py_Initialize();
-    append_to_sys_path(".");
-  }
-
-  // Create the loop kernel based on `c_src`.
+  // Create the loopy kernel based on `c_src`.
+  const char *py_module = "c_to_loopy";
+  int err = NOMP_C_TO_LOOPY_CONVERSION_ERROR;
+  PyObject *pFile = PyUnicode_DecodeFSDefault(py_module),
+           *pModule = PyImport_Import(pFile);
+  Py_XDECREF(pFile);
   PyObject *pKnl = NULL;
-
-  // There should be a better way to figure the installation
-  // path based on the shared library path
-  int err = NOMP_INSTALL_DIR_NOT_FOUND;
-  char *val = getenv("NOMP_INSTALL_DIR");
-  if (val) {
-    const char *python_dir = "python", *py_module = "c_to_loopy";
-    size_t len0 = strlen(val), len1 = strlen(python_dir);
-
-    char *scripts_path = (char *)calloc(len0 + len1 + 2, sizeof(char));
-    strncpy(scripts_path, val, len0), strncpy(scripts_path + len0, "/", 1);
-    strncpy(scripts_path + len0 + 1, python_dir, len1);
-
-    append_to_sys_path(scripts_path);
-    free(scripts_path);
-
-    err = NOMP_C_TO_LOOPY_CONVERSION_ERROR;
-    PyObject *pFile = PyUnicode_DecodeFSDefault(py_module),
-             *pModule = PyImport_Import(pFile);
-    Py_XDECREF(pFile);
-    if (pModule) {
-      PyObject *pFunc = PyObject_GetAttrString(pModule, py_module);
-      if (pFunc && PyCallable_Check(pFunc)) {
-        PyObject *pArgs = PyTuple_New(1), *pStr = PyUnicode_FromString(c_src);
-        PyTuple_SetItem(pArgs, 0, pStr);
-        pKnl = PyObject_CallObject(pFunc, pArgs);
-        Py_XDECREF(pStr), Py_XDECREF(pArgs), Py_DECREF(pFunc), err = 0;
-      }
-      Py_DECREF(pModule);
+  if (pModule) {
+    PyObject *pFunc = PyObject_GetAttrString(pModule, py_module);
+    if (pFunc && PyCallable_Check(pFunc)) {
+      PyObject *pArgs = PyTuple_New(1), *pStr = PyUnicode_FromString(c_src);
+      PyTuple_SetItem(pArgs, 0, pStr);
+      pKnl = PyObject_CallObject(pFunc, pArgs);
+      Py_XDECREF(pStr), Py_XDECREF(pArgs), Py_DECREF(pFunc), err = 0;
     }
+    Py_DECREF(pModule);
   }
   if (err)
     return err;
@@ -122,6 +98,8 @@ int py_user_callback(struct knl *knl, const char *c_src, const char *file,
   // Get grid size, OpenCL source, etc from transformed kernel
   if (pKnl) {
     err = NOMP_CODEGEN_FAILED;
+    if (get_loopy_knl_name(&knl->name, pKnl))
+      return err;
     // FIXME: This should only be done once
     PyObject *pLoopy = PyImport_ImportModule("loopy");
     if (pLoopy) {
