@@ -16,6 +16,4 @@ def transform(knl):
         (g, l, s) = inames
         (g, l, s) = sorted((g, l, s))
         knl = lp.tag_inames(knl, [(g, "g.0"), (l, "l.0"), (s, "for")])
-    # code = lp.generate_code_v2(knl)
-    print(knl)
     return knl

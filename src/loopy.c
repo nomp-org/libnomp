@@ -3,39 +3,6 @@
 
 #include "nomp-impl.h"
 
-static PyObject *call_pickle_loads(PyObject *pDecodedBinStr) {
-  PyObject *pPickle = PyImport_ImportModule("pickle"), *pLpyKnl = NULL;
-  if (pPickle) {
-    PyObject *pLoads = PyObject_GetAttrString(pPickle, "loads");
-    if (pLoads && PyCallable_Check(pLoads)) {
-      PyObject *pArgs = PyTuple_New(1);
-      PyTuple_SetItem(pArgs, 0, pDecodedBinStr);
-      pLpyKnl = PyObject_CallObject(pLoads, pArgs);
-      Py_DECREF(pArgs);
-      Py_DECREF(pLoads);
-    }
-    Py_DECREF(pPickle);
-  }
-  return pLpyKnl;
-}
-
-static PyObject *call_base64_decode(PyObject *pBinStr) {
-  PyObject *pBase64 = PyImport_ImportModule("base64"), *pDecodedBinStr = NULL;
-  if (pBase64) {
-    PyObject *pDecode = PyObject_GetAttrString(pBase64, "b64decode");
-    if (pDecode && PyCallable_Check(pDecode)) {
-      PyObject *pArgs = PyTuple_New(1);
-      PyTuple_SetItem(pArgs, 0, pBinStr);
-      pDecodedBinStr = PyObject_CallObject(pDecode, pArgs);
-      Py_DECREF(pArgs);
-      Py_DECREF(pDecode);
-    }
-    Py_DECREF(pBase64);
-  }
-
-  return pDecodedBinStr;
-}
-
 static char *get_loopy_knl_name(PyObject *pKnl) {
   // Get the kernel name from loopy kernel
   PyObject *pKnlName = NULL;
@@ -163,15 +130,22 @@ int py_user_callback(struct knl *knl, const char *c_src, const char *file,
         PyObject *pArgs = PyTuple_New(1);
         PyTuple_SetItem(pArgs, 0, pKnl);
         PyObject *pCode = PyObject_CallObject(pGenerateCodeV2, pArgs);
-        PyObject *pDeviceCode =
-            PyObject_GetAttrString(pCode, "device_code");
-        PyObject *pDevCode = PyObject_CallObject(pDeviceCode, PyTuple_New(0));
         if (pCode) {
-          PyObject_Print(pDevCode, stdout, Py_PRINT_RAW);
-          Py_XDECREF(pCode);
+          PyObject *pDeviceCode = PyObject_GetAttrString(pCode, "device_code");
+          if (pDeviceCode) {
+            PyObject *pSrc = PyObject_CallObject(pDeviceCode, PyTuple_New(0));
+            if (pSrc) {
+              size_t size;
+              const char *src = PyUnicode_AsUTF8AndSize(pSrc, &size);
+              knl->src = (char *)calloc(size + 1, sizeof(char));
+              memcpy(knl->src, src, sizeof(char) * size);
+              Py_DECREF(pSrc);
+            }
+            Py_DECREF(pDeviceCode);
+          }
+          Py_DECREF(pCode);
         }
-        Py_DECREF(pArgs);
-        Py_DECREF(pGenerateCodeV2);
+        Py_XDECREF(pArgs), Py_DECREF(pGenerateCodeV2);
       }
       Py_DECREF(pLoopy);
     }
