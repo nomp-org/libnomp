@@ -14,14 +14,15 @@ Use `cmake` to build the repo:
 ```bash
 mkdir build
 cd build
-cmake ..
-make
+cmake .. -DCMAKE_INSTALL_DIR=${HOME}/.nomp
+make install
 ```
 
 ## Run tests
 
-After building, you can run tests in tests/ directory.
+After building, you can run tests in `tests/` directory.
 ```bash
+export NOMP_INSTALL_DIR=${HOME}/.nomp
 cd tests
-./run-tests.sh
+./run-tests.sh -g nomp-api
 ```
