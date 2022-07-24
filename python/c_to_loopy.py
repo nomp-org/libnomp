@@ -3,7 +3,6 @@ from typing import Dict, FrozenSet, List, Optional, Union
 
 import islpy as isl
 import loopy as lp
-import numpy as np
 import pycparser.c_ast as c_ast
 import pymbolic.primitives as prim
 from loopy.isl_helpers import make_slab
@@ -70,7 +69,7 @@ class IdentityMapper:
 # so we use it here instead of general @cache.
 @memoize
 def dtype_to_ctype_registry():
-    from .compyte.dtypes import DTypeRegistry, fill_registry_with_c_types
+    from compyte.dtypes import DTypeRegistry, fill_registry_with_c_types
 
     dtype_reg = DTypeRegistry()
     fill_registry_with_c_types(dtype_reg, True)
@@ -190,9 +189,6 @@ def check_and_parse_for(expr: c_ast.For, context: CToLoopyMapperContext):
         raise NotImplementedError(
             "More than one initialization" " declarations not yet supported."
         )
-
-    if not isinstance(expr.stmt, c_ast.Compound):
-        raise NotImplementedError("For should have a compound statement")
 
     if not (
         isinstance(expr.cond, c_ast.BinaryOp)
@@ -375,11 +371,9 @@ class CToLoopyMapper(IdentityMapper):
 
 
 @dataclass
-class NompRunInserterContext:
-    should_translate: bool
-    domains: List[isl.BasicSet]
+class ExternalContext:
     function_name: Optional[str]
-    var_to_decl: Dict[str, int]
+    var_to_decl: Dict[str, c_ast.Decl]
 
     def copy(self, **kwargs):
         updated_kwargs = kwargs.copy()
@@ -387,7 +381,7 @@ class NompRunInserterContext:
             if field.name not in updated_kwargs:
                 updated_kwargs[field.name] = getattr(self, field.name)
 
-        return NompRunInserterContext(**updated_kwargs)
+        return ExternalContext(**updated_kwargs)
 
     def add_decl(self, var_name: str, decl: c_ast.Decl) -> None:
         new_var_to_decl = self.var_to_decl.copy()
@@ -405,22 +399,17 @@ class NompRunInserterContext:
         }
 
 
-def foo(c_str: str):
+def c_to_loopy(c_str: str):
     # Parse the function
     parser = c_parser.CParser()
     ast = parser.parse(c_str)
     node = ast.ext[0]
 
     # Init `var_to_decl` based on function parameters
-    context = NompRunInserterContext(
-        False, [], function_name=None, var_to_decl={}
-    )
-    context = context.copy(function_name=node.decl.name)
+    context = ExternalContext(function_name=node.decl.name, var_to_decl={})
     for arg in node.decl.type.args.params:
         if isinstance(arg, c_ast.Decl):
-            context = context.add_decl(
-                arg.name, arg.coord.line, _get_dtype_from_decl_type(arg.type),
-            )
+            context = context.add_decl(arg.name, arg)
 
     # Map C for loop to loopy kernel
     acc = CToLoopyMapper()(
@@ -453,7 +442,7 @@ def foo(c_str: str):
         acc.statements,
         acc.kernel_data + [...],
         lang_version=LOOPY_LANG_VERSION,
-        name=node.name if node.name else "loopy_kernel",
+        name=node.decl.name,
         seq_dependencies=True,
     )
 
@@ -464,9 +453,14 @@ def foo(c_str: str):
             for arg in knl.default_entrypoint.args
         },
     )
+    return knl
 
 
 if __name__ == "__main__":
+    import os
+    import sys
+
+    sys.path.append(os.path.dirname(os.path.abspath(__file__)))
     knl = """
           void foo(double *a, int N) {
             for (int i = 0; i < N; i++)
