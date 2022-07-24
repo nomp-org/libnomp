@@ -121,6 +121,7 @@ int py_user_callback(struct knl *knl, const char *c_src, const char *file,
 
   // Get grid size, OpenCL source, etc from transformed kernel
   if (pKnl) {
+    err = NOMP_CODEGEN_FAILED;
     // FIXME: This should only be done once
     PyObject *pLoopy = PyImport_ImportModule("loopy");
     if (pLoopy) {
@@ -139,7 +140,7 @@ int py_user_callback(struct knl *knl, const char *c_src, const char *file,
               const char *src = PyUnicode_AsUTF8AndSize(pSrc, &size);
               knl->src = (char *)calloc(size + 1, sizeof(char));
               memcpy(knl->src, src, sizeof(char) * size);
-              Py_DECREF(pSrc);
+              Py_DECREF(pSrc), err = 0;
             }
             Py_DECREF(pDeviceCode);
           }
@@ -152,5 +153,5 @@ int py_user_callback(struct knl *knl, const char *c_src, const char *file,
     Py_DECREF(pKnl);
   }
 
-  return 0;
+  return err;
 }
