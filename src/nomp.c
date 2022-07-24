@@ -204,6 +204,22 @@ int nomp_err(char *buf, int err, size_t buf_size) {
     strncpy(buf, "NOMP malloc error", buf_size);
     break;
 
+  case NOMP_INSTALL_DIR_NOT_FOUND:
+    strncpy(buf, "NOMP_INSTALL_DIR env. variable is not set", buf_size);
+    break;
+  case NOMP_USER_CALLBACK_NOT_FOUND:
+    strncpy(buf, "Specified user callback function not found", buf_size);
+    break;
+  case NOMP_USER_CALLBACK_FAILURE:
+    strncpy(buf, "User callback function failed", buf_size);
+    break;
+  case NOMP_C_TO_LOOPY_CONVERSION_ERROR:
+    strncpy(buf, "C to Loopy conversion failed", buf_size);
+    break;
+  case NOMP_CODEGEN_FAILED:
+    strncpy(buf, "Code generation from loopy kernel failed", buf_size);
+    break;
+
   case NOMP_KNL_BUILD_ERROR:
     strncpy(buf, "NOMP kernel build failed", buf_size);
     break;
