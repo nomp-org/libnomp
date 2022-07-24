@@ -163,8 +163,11 @@ int py_user_callback(struct knl *knl, const char *c_src, const char *file,
         PyObject *pArgs = PyTuple_New(1);
         PyTuple_SetItem(pArgs, 0, pKnl);
         PyObject *pCode = PyObject_CallObject(pGenerateCodeV2, pArgs);
+        PyObject *pDeviceCode =
+            PyObject_GetAttrString(pCode, "device_code");
+        PyObject *pDevCode = PyObject_CallObject(pDeviceCode, PyTuple_New(0));
         if (pCode) {
-          PyObject_Print(pCode, stdout, Py_PRINT_RAW);
+          PyObject_Print(pDevCode, stdout, Py_PRINT_RAW);
           Py_XDECREF(pCode);
         }
         Py_DECREF(pArgs);
