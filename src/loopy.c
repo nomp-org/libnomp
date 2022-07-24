@@ -97,22 +97,22 @@ int py_user_callback(struct knl *knl, const char *c_src, const char *file,
   int err = NOMP_INSTALL_DIR_NOT_FOUND;
   char *val = getenv("NOMP_INSTALL_DIR");
   if (val) {
-    const char *scripts_dir = "scripts", *py_func = "foo";
-    size_t len0 = strlen(val), len1 = strlen(scripts_dir);
+    const char *python_dir = "python", *py_module = "c_to_loopy";
+    size_t len0 = strlen(val), len1 = strlen(python_dir);
 
     char *scripts_path = (char *)calloc(len0 + len1 + 2, sizeof(char));
     strncpy(scripts_path, val, len0), strncpy(scripts_path + len0, "/", 1);
-    strncpy(scripts_path + len0 + 1, scripts_dir, len1);
+    strncpy(scripts_path + len0 + 1, python_dir, len1);
 
     append_to_sys_path(scripts_path);
     free(scripts_path);
 
     err = NOMP_C_TO_LOOPY_CONVERSION_ERROR;
-    PyObject *pFile = PyUnicode_DecodeFSDefault("c_to_loopy"),
+    PyObject *pFile = PyUnicode_DecodeFSDefault(py_module),
              *pModule = PyImport_Import(pFile);
     Py_XDECREF(pFile);
     if (pModule) {
-      PyObject *pFunc = PyObject_GetAttrString(pModule, py_func);
+      PyObject *pFunc = PyObject_GetAttrString(pModule, py_module);
       if (pFunc && PyCallable_Check(pFunc)) {
         PyObject *pArgs = PyTuple_New(1), *pStr = PyUnicode_FromString(c_src);
         PyTuple_SetItem(pArgs, 0, pStr);
@@ -140,8 +140,8 @@ int py_user_callback(struct knl *knl, const char *c_src, const char *file,
         PyTuple_SetItem(pArgs, 0, pKnl);
         pTransformedKnl = PyObject_CallObject(pFunc, pArgs);
         if (pTransformedKnl) {
-          pKnl = pTransformedKnl;
           Py_DECREF(pKnl), err = 0;
+          pKnl = pTransformedKnl;
         }
         Py_DECREF(pArgs), Py_DECREF(pFunc);
       }

@@ -15,11 +15,13 @@ int main(int argc, char *argv[]) {
                     "}";
   int id = -1, ndim = -1;
   size_t global[3], local[3];
+
+  // Calling nomp_jit with invalid functions should return an error.
   err = nomp_jit(&id, &ndim, global, local, knl, NULL,
-                 "invalid-file.py:invalid_func");
+                 "invalid-file:invalid_func");
   nomp_assert(err == NOMP_USER_CALLBACK_NOT_FOUND);
 
-  err = nomp_jit(&id, &ndim, global, local, knl, NULL, NULL);
+  err = nomp_jit(&id, &ndim, global, local, knl, NULL, "nomp-api-20:transform");
   nomp_chk(err);
 
   err = nomp_finalize();
