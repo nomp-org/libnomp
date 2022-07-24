@@ -467,4 +467,4 @@ if __name__ == "__main__":
               a[i] = i;
           }
           """
-    foo(knl)
+    c_to_loopy(knl)

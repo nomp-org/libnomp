@@ -18,7 +18,10 @@ jobs:
         shell: bash
         run: |
           sudo apt -y update
-          sudo apt install -y pocl-opencl-icd opencl-headers clinfo
+          sudo apt install -y pocl-opencl-icd opencl-headers
+          conda install -c anaconda cmake
+          pip3 install git+https://github.com/inducer/loopy
+          pip3 install pycparser pyopencl
 
       - name: Build libnomp
         shell: bash
@@ -36,14 +39,17 @@ jobs:
       - name: nomp-api
         shell: bash
         run: |
-          ${TESTDIR}/run-tests.sh -g nomp-api -t ${BUILDDIR}
+          cd ${TESTDIR}
+          ./run-tests.sh -g nomp-api -t ${BUILDDIR}
 
       - name: vec-init
         shell: bash
         run: |
-          ${TESTDIR}/run-tests.sh -g vec-init -t ${BUILDDIR}
+          cd ${TESTDIR}
+          ./run-tests.sh -g vec-init -t ${BUILDDIR}
 
       - name: vec-add
         shell: bash
         run: |
-          ${TESTDIR}/run-tests.sh -g vec-add -t ${BUILDDIR}
+          cd ${TESTDIR}
+          ./run-tests.sh -g vec-add -t ${BUILDDIR}
