@@ -139,10 +139,15 @@ int nomp_jit(int *id, int *ndim, size_t *global, size_t *local,
     }
     *ndim = knl.ndim;
 
-    if (nomp.knl_build(&nomp, &progs[progs_n], knl.src, knl.name) == 0)
-      *id = progs_n++;
-    else
+    err = nomp.knl_build(&nomp, &progs[progs_n], knl.src, knl.name);
+    if (knl.src)
+      free(knl.src);
+    if (knl.name)
+      free(knl.name);
+
+    if (err)
       return NOMP_KNL_BUILD_ERROR;
+    *id = progs_n++;
   }
 
   return 0;

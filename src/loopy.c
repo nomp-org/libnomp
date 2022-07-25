@@ -17,7 +17,7 @@ static int get_loopy_knl_name(char **name, PyObject *pKnl) {
       PyObject *pEntry = PyIter_Next(pIter);
       PyObject *pKnlName = PyObject_Str(pEntry);
       if (pKnlName) {
-        size_t size;
+        Py_ssize_t size;
         const char *name_ = PyUnicode_AsUTF8AndSize(pKnlName, &size);
         *name = (char *)calloc(size + 1, sizeof(char));
         strncpy(*name, name_, size);
@@ -114,7 +114,7 @@ int py_user_callback(struct knl *knl, const char *c_src, const char *file,
           if (pDeviceCode) {
             PyObject *pSrc = PyObject_CallObject(pDeviceCode, PyTuple_New(0));
             if (pSrc) {
-              size_t size;
+              Py_ssize_t size;
               const char *src = PyUnicode_AsUTF8AndSize(pSrc, &size);
               knl->src = (char *)calloc(size + 1, sizeof(char));
               memcpy(knl->src, src, sizeof(char) * size);
