@@ -284,9 +284,12 @@ int nomp_finalize(void) {
   }
   free(progs), progs = NULL, progs_n = progs_max = 0;
 
-  initialized = (nomp.finalize(&nomp) != 0);
+  initialized = nomp.finalize(&nomp);
   if (initialized)
     return NOMP_FINALIZE_ERROR;
+
+  if (Py_IsInitialized())
+    Py_Finalize();
 
   return 0;
 }
