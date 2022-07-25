@@ -110,13 +110,12 @@ int py_user_callback(struct knl *knl, const char *c_src, const char *file,
       PyObject *pGenerateCodeV2 =
           PyObject_GetAttrString(pLoopy, "generate_code_v2");
       if (pGenerateCodeV2) {
-        PyObject *pArgs = PyTuple_New(1);
-        PyTuple_SetItem(pArgs, 0, pKnl);
-        PyObject *pCode = PyObject_CallObject(pGenerateCodeV2, pArgs);
+        PyObject *pCode =
+            PyObject_CallFunctionObjArgs(pGenerateCodeV2, pKnl, NULL);
         if (pCode) {
           PyObject *pDeviceCode = PyObject_GetAttrString(pCode, "device_code");
           if (pDeviceCode) {
-            PyObject *pSrc = PyObject_CallObject(pDeviceCode, PyTuple_New(0));
+            PyObject *pSrc = PyObject_CallFunctionObjArgs(pDeviceCode, NULL);
             if (pSrc) {
               Py_ssize_t size;
               const char *src = PyUnicode_AsUTF8AndSize(pSrc, &size);
@@ -128,7 +127,6 @@ int py_user_callback(struct knl *knl, const char *c_src, const char *file,
           }
           Py_DECREF(pCode);
         }
-        Py_XDECREF(pArgs);
         Py_DECREF(pGenerateCodeV2);
       }
       Py_DECREF(pLoopy);
