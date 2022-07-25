@@ -2,21 +2,16 @@
 #include <Python.h>
 
 #include "nomp-impl.h"
-#include <pthread.h>
 
 static struct backend nomp;
 static int initialized = 0;
-static pthread_mutex_t m;
 
 //=============================================================================
 // nomp_init
 //
 int nomp_init(const char *backend, int platform, int device) {
-  pthread_mutex_lock(&m);
-  if (initialized) {
-    pthread_mutex_unlock(&m);
+  if (initialized)
     return NOMP_INITIALIZED_ERROR;
-  }
 
   char be[BUFSIZ];
   size_t n = strnlen(backend, BUFSIZ);
@@ -27,7 +22,10 @@ int nomp_init(const char *backend, int platform, int device) {
   int err = NOMP_INVALID_BACKEND;
   if (strncmp(be, "opencl", 32) == 0)
     err = opencl_init(&nomp, platform, device);
+  if (err)
+    return err;
 
+  err = NOMP_PY_INITIALIZE_ERROR;
   if (!Py_IsInitialized()) {
     Py_Initialize();
     // Append current working dir
@@ -49,10 +47,8 @@ int nomp_init(const char *backend, int platform, int device) {
   if (err)
     return err;
 
-  initialized = !err;
-  pthread_mutex_unlock(&m);
-
-  return err;
+  initialized = 1;
+  return 0;
 }
 
 //=============================================================================
@@ -268,12 +264,8 @@ int nomp_err(char *buf, int err, size_t buf_size) {
 // nomp_finalize
 //
 int nomp_finalize(void) {
-  pthread_mutex_lock(&m);
-
-  if (!initialized) {
-    pthread_mutex_unlock(&m);
+  if (!initialized)
     return NOMP_NOT_INITIALIZED_ERROR;
-  }
 
   for (unsigned i = 0; i < mems_n; i++) {
     if (mems[i].bptr != NULL)
@@ -287,14 +279,10 @@ int nomp_finalize(void) {
   }
   free(progs), progs = NULL, progs_n = progs_max = 0;
 
-  if (nomp.finalize(&nomp) == 0)
-    initialized = 0;
-  else {
-    pthread_mutex_unlock(&m);
+  initialized = (nomp.finalize(&nomp) != 0);
+  if (initialized)
     return NOMP_FINALIZE_ERROR;
-  }
 
-  pthread_mutex_unlock(&m);
   return 0;
 }
 

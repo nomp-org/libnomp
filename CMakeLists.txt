@@ -12,10 +12,6 @@ set_target_properties(nomp PROPERTIES
 target_include_directories(nomp PRIVATE src)
 configure_file(nomp.pc.in nomp.pc @ONLY)
 
-set(THREADS_PREFER_PTHREAD_FLAG ON)
-find_package(Threads REQUIRED)
-target_link_libraries(nomp PRIVATE Threads::Threads)
-
 find_package(OpenCL REQUIRED)
 target_link_libraries(nomp PRIVATE OpenCL::OpenCL)
 
