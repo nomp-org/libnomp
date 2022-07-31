@@ -1,35 +1,4 @@
-#define PY_SSIZE_T_CLEAN
-#include <Python.h>
-
 #include "nomp-impl.h"
-
-static int get_loopy_knl_name(char **name, PyObject *pKnl) {
-  // Get the kernel name from loopy kernel
-  int err = 1;
-  PyObject *pEntrypts = PyObject_GetAttrString(pKnl, "entrypoints");
-  if (pEntrypts) {
-    Py_ssize_t len = PySet_Size(pEntrypts);
-    // Iterator C API: https://docs.python.org/3/c-api/iter.html
-    PyObject *pIter = PyObject_GetIter(pEntrypts);
-    if (pIter) {
-      PyObject *pEntry = PyIter_Next(pIter);
-      PyObject *pKnlName = PyObject_Str(pEntry);
-      if (pKnlName) {
-        Py_ssize_t size;
-        const char *name_ = PyUnicode_AsUTF8AndSize(pKnlName, &size);
-        *name = (char *)calloc(size + 1, sizeof(char));
-        strncpy(*name, name_, size);
-        Py_DECREF(pKnlName), err = 0;
-      }
-      Py_XDECREF(pEntry), Py_DECREF(pIter);
-    }
-    Py_DECREF(pEntrypts);
-  }
-
-  if (err)
-    PyErr_Print();
-  return err;
-}
 
 int py_append_to_sys_path(const char *path) {
   PyObject *pSys = PyImport_ImportModule("sys");
@@ -43,26 +12,26 @@ int py_append_to_sys_path(const char *path) {
       Py_DECREF(pPath), Py_XDECREF(pStr), err = 0;
     }
   }
-
-  if (err)
+  if (err) {
     PyErr_Print();
-  return err;
+    return err;
+  }
+  return 0;
 }
 
-int py_user_callback(struct knl *knl, const char *c_src, const char *file,
-                     const char *func) {
+int py_convert_from_c_to_loopy(PyObject **pKnl, const char *c_src) {
   // Create the loopy kernel based on `c_src`.
   const char *py_module = "c_to_loopy";
-  int err = NOMP_C_TO_LOOPY_CONVERSION_ERROR;
+  int err = NOMP_LOOPY_CONVERSION_ERROR;
   PyObject *pFile = PyUnicode_FromString(py_module),
-           *pModule = PyImport_Import(pFile), *pKnl = NULL;
+           *pModule = PyImport_Import(pFile);
   Py_XDECREF(pFile);
   if (pModule) {
     PyObject *pFunc = PyObject_GetAttrString(pModule, py_module);
-    if (pFunc && PyCallable_Check(pFunc)) {
+    if (pFunc) {
       PyObject *pStr = PyUnicode_FromString(c_src);
-      pKnl = PyObject_CallFunctionObjArgs(pFunc, pStr, NULL);
-      err = (pKnl == NULL);
+      if ((*pKnl = PyObject_CallFunctionObjArgs(pFunc, pStr, NULL)))
+        err = 0;
       Py_XDECREF(pStr), Py_DECREF(pFunc);
     }
     Py_DECREF(pModule);
@@ -72,20 +41,22 @@ int py_user_callback(struct knl *knl, const char *c_src, const char *file,
     return err;
   }
 
-  // TODO: Apply Domain specific transformations
+  return 0;
+}
 
+int py_user_callback(PyObject **pKnl, const char *file, const char *func) {
   // Call the user callback if present
-  if (pKnl && file && func) {
-    err = NOMP_USER_CALLBACK_NOT_FOUND;
+  int err = NOMP_USER_CALLBACK_NOT_FOUND;
+  if (*pKnl && file && func) {
     PyObject *pFile = PyUnicode_FromString(file),
              *pModule = PyImport_Import(pFile), *pTransformedKnl = NULL;
     if (pModule) {
       PyObject *pFunc = PyObject_GetAttrString(pModule, func);
       if (pFunc && PyCallable_Check(pFunc)) {
         err = NOMP_USER_CALLBACK_FAILURE;
-        pTransformedKnl = PyObject_CallFunctionObjArgs(pFunc, pKnl, NULL);
+        pTransformedKnl = PyObject_CallFunctionObjArgs(pFunc, *pKnl, NULL);
         if (pTransformedKnl) {
-          Py_DECREF(pKnl), pKnl = pTransformedKnl;
+          Py_DECREF(*pKnl), *pKnl = pTransformedKnl;
           pTransformedKnl = NULL, err = 0;
         }
         Py_DECREF(pFunc);
@@ -99,12 +70,39 @@ int py_user_callback(struct knl *knl, const char *c_src, const char *file,
     return err;
   }
 
-  // Get grid size, OpenCL source, etc from transformed kernel
+  return 0;
+}
+
+int py_get_knl_name_and_src(char **name, char **src, PyObject *pKnl) {
   if (pKnl) {
-    err = NOMP_CODEGEN_FAILED;
-    if (get_loopy_knl_name(&knl->name, pKnl))
+    // Get the kernel name from loopy kernel
+    int err = NOMP_LOOPY_KNL_NAME_NOT_FOUND;
+    PyObject *pEntrypts = PyObject_GetAttrString(pKnl, "entrypoints");
+    if (pEntrypts) {
+      Py_ssize_t len = PySet_Size(pEntrypts);
+      // Iterator C API: https://docs.python.org/3/c-api/iter.html
+      PyObject *pIter = PyObject_GetIter(pEntrypts);
+      if (pIter) {
+        PyObject *pEntry = PyIter_Next(pIter);
+        PyObject *pKnlName = PyObject_Str(pEntry);
+        if (pKnlName) {
+          Py_ssize_t size;
+          const char *name_ = PyUnicode_AsUTF8AndSize(pKnlName, &size);
+          *name = (char *)calloc(size + 1, sizeof(char));
+          strncpy(*name, name_, size + 1);
+          Py_DECREF(pKnlName), err = 0;
+        }
+        Py_XDECREF(pEntry), Py_DECREF(pIter);
+      }
+      Py_DECREF(pEntrypts);
+    }
+    if (err) {
+      PyErr_Print();
       return err;
-    // FIXME: This should only be done once
+    }
+
+    // Get the kernel source
+    err = NOMP_LOOPY_CODEGEN_FAILED;
     PyObject *pLoopy = PyImport_ImportModule("loopy");
     if (pLoopy) {
       PyObject *pGenerateCodeV2 =
@@ -118,9 +116,9 @@ int py_user_callback(struct knl *knl, const char *c_src, const char *file,
             PyObject *pSrc = PyObject_CallFunctionObjArgs(pDeviceCode, NULL);
             if (pSrc) {
               Py_ssize_t size;
-              const char *src = PyUnicode_AsUTF8AndSize(pSrc, &size);
-              knl->src = (char *)calloc(size + 1, sizeof(char));
-              memcpy(knl->src, src, sizeof(char) * size);
+              const char *src_ = PyUnicode_AsUTF8AndSize(pSrc, &size);
+              *src = (char *)calloc(size + 1, sizeof(char));
+              strncpy(*src, src_, size + 1);
               Py_DECREF(pSrc), err = 0;
             }
             Py_DECREF(pDeviceCode);
@@ -131,10 +129,61 @@ int py_user_callback(struct knl *knl, const char *c_src, const char *file,
       }
       Py_DECREF(pLoopy);
     }
-    Py_DECREF(pKnl);
+    if (err) {
+      PyErr_Print();
+      return err;
+    }
   }
+  return 0;
+}
 
-  if (err)
-    PyErr_Print();
-  return err;
+int py_get_grid_size(size_t *global, size_t *local, PyObject *pKnl,
+                     PyObject *pDict) {
+  if (pKnl) {
+    // Get global and local grid size as experssions from loopy
+    int err = NOMP_LOOPY_GRIDSIZE_FAILED;
+    PyObject *pGridSize = NULL;
+    // knl.callables_table
+    PyObject *pCallablesTable = PyObject_GetAttrString(pKnl, "callables_table");
+    if (pCallablesTable) {
+      // knl.default_entrypoint.get_grid_size_upper_bounds_as_exprs
+      PyObject *pDefaultEntryPoint =
+          PyObject_GetAttrString(pKnl, "default_entrypoint");
+      if (pDefaultEntryPoint) {
+        PyObject *pGridSizeUboundAsExpr = PyObject_GetAttrString(
+            pDefaultEntryPoint, "get_grid_size_upper_bounds_as_exprs");
+        if (pGridSizeUboundAsExpr) {
+          pGridSize = PyObject_CallFunctionObjArgs(pGridSizeUboundAsExpr,
+                                                   pCallablesTable, NULL);
+          Py_DECREF(pGridSizeUboundAsExpr), err = 0;
+        }
+        Py_DECREF(pDefaultEntryPoint);
+      }
+      Py_DECREF(pCallablesTable);
+    }
+    if (err) {
+      PyErr_Print();
+      return err;
+    }
+
+    // If the expressions are not NULL, evaluate them with pymbolic
+    err = NOMP_GRIDSIZE_CALCULATION_FAILED;
+    if (pGridSize) {
+      PyObject *pEvaluator = PyImport_ImportModule("pymbolic.mapper.evaluator");
+      if (pEvaluator) {
+        PyObject *pEvaluate = PyObject_GetAttrString(pEvaluator, "evaluate");
+        if (pEvaluate) {
+          // TODO Evaluate here
+          Py_DECREF(pEvaluate), err = 0;
+        }
+        Py_DECREF(pEvaluator);
+      }
+      Py_DECREF(pGridSize);
+    }
+    if (err) {
+      PyErr_Print();
+      return err;
+    }
+  }
+  return 0;
 }

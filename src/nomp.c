@@ -1,10 +1,13 @@
-#define PY_SSIZE_T_CLEAN
-#include <Python.h>
-
 #include "nomp-impl.h"
 
 static struct backend nomp;
 static int initialized = 0;
+
+#define FREE(x)                                                                \
+  do {                                                                         \
+    if (x)                                                                     \
+      free(x);                                                                 \
+  } while (0)
 
 //=============================================================================
 // nomp_init
@@ -38,10 +41,12 @@ int nomp_init(const char *backend, int platform, int device) {
       const char *python_dir = "python", *py_module = "c_to_loopy";
       size_t len0 = strlen(val), len1 = strlen(python_dir);
       char *abs_dir = (char *)calloc(len0 + len1 + 2, sizeof(char));
-      strncpy(abs_dir, val, len0), strncpy(abs_dir + len0, "/", 1);
+      strncpy(abs_dir, val, len0);
+      strncpy(abs_dir + len0, "/", 1);
       strncpy(abs_dir + len0 + 1, python_dir, len1);
       py_append_to_sys_path(abs_dir);
-      free(abs_dir), err = 0;
+      FREE(abs_dir);
+      err = 0;
     }
   }
   if (err)
@@ -106,44 +111,73 @@ static struct prog *progs = NULL;
 static int progs_n = 0;
 static int progs_max = 0;
 
+static inline char *allocate_and_copy(const char *in) {
+  size_t len = strlen(in) + 1;
+  char *out = (char *)calloc(len, sizeof(char));
+  strncpy(out, in, len);
+  return out;
+}
+
 int nomp_jit(int *id, int *ndim, size_t *global, size_t *local,
-             const char *c_src, const char *annotations, const char *callback) {
+             const char *c_src, const char *annotations, const char *callback,
+             int nargs, const char *args, ...) {
   if (*id == -1) {
     if (progs_n == progs_max) {
       progs_max += progs_max / 2 + 1;
       progs = (struct prog *)realloc(progs, sizeof(struct prog) * progs_max);
     }
 
-    size_t len = strlen(callback) + 1;
-    char *callback_ = (char *)calloc(len, sizeof(char));
-    strncpy(callback_, callback, len);
-
-    const char colon[2] = ":";
-    char *py_file = strtok(callback_, colon), *py_func = NULL;
-    if (py_file != NULL)
-      py_func = strtok(NULL, colon);
-
-    struct knl knl = {.src = NULL,
-                      .name = NULL,
-                      .ndim = 0,
-                      .gsize = {0, 0, 0},
-                      .lsize = {0, 0, 0}};
-    int err = py_user_callback(&knl, c_src, py_file, py_func);
-    free(callback_);
+    // Create loopy kernel from C source
+    PyObject *pKnl = NULL;
+    int err = py_convert_from_c_to_loopy(&pKnl, c_src);
     if (err)
       return err;
 
-    for (int i = 0; i < knl.ndim; i++) {
-      global[i] = knl.gsize[i];
-      local[i] = knl.lsize[i];
-    }
-    *ndim = knl.ndim;
+    // Call the User callback function
+    char *callback_ = allocate_and_copy(callback),
+         *py_file = strtok(callback_, ":"), *py_func = NULL;
+    if (py_file)
+      py_func = strtok(NULL, ":");
+    err = py_user_callback(&pKnl, py_file, py_func);
+    FREE(callback_);
+    if (err)
+      return err;
 
-    err = nomp.knl_build(&nomp, &progs[progs_n], knl.src, knl.name);
-    if (knl.src)
-      free(knl.src);
-    if (knl.name)
-      free(knl.name);
+    // Get OpenCL, CUDA, etc. source and and name from the loopy kernel and
+    // then build it
+    char *name, *src;
+    err = py_get_knl_name_and_src(&name, &src, pKnl);
+    if (err)
+      return err;
+    err = nomp.knl_build(&nomp, &progs[progs_n], src, name);
+    FREE(src);
+    FREE(name);
+    if (err)
+      return err;
+
+    // Get grid size of the loopy kernel after transformations. We will create a
+    // dictionary with variable name as keys, variable value as value and then
+    // pass it to the function
+    char *args_ = allocate_and_copy(args), *arg = strtok(args_, ",");
+    PyObject *pDict = PyDict_New();
+    va_list vargs;
+    va_start(vargs, args);
+    for (int i = 0; i < nargs; i++) {
+      // FIXME: `type` should be able to distinguish between integer types,
+      // floating point types, boolean type or a pointer type. We are assuming
+      // it is an integer type for now.
+      int type = va_arg(vargs, int);
+      size_t size = va_arg(vargs, size_t);
+      int *p = (int *)va_arg(vargs, void *);
+      PyObject *pKey = PyUnicode_FromStringAndSize(arg, strlen(arg));
+      PyObject *pValue = PyLong_FromLong(*p);
+      PyDict_SetItem(pDict, pKey, pValue);
+    }
+    va_end(vargs);
+
+    py_get_grid_size(global, local, pKnl, pDict);
+    FREE(args_);
+    Py_DECREF(pDict), Py_XDECREF(pKnl);
 
     if (err)
       return NOMP_KNL_BUILD_ERROR;
@@ -238,10 +272,10 @@ int nomp_err(char *buf, int err, size_t buf_size) {
   case NOMP_USER_CALLBACK_FAILURE:
     strncpy(buf, "User callback function failed", buf_size);
     break;
-  case NOMP_C_TO_LOOPY_CONVERSION_ERROR:
+  case NOMP_LOOPY_CONVERSION_ERROR:
     strncpy(buf, "C to Loopy conversion failed", buf_size);
     break;
-  case NOMP_CODEGEN_FAILED:
+  case NOMP_LOOPY_CODEGEN_FAILED:
     strncpy(buf, "Code generation from loopy kernel failed", buf_size);
     break;
 
@@ -276,7 +310,8 @@ int nomp_finalize(void) {
     if (mems[i].bptr != NULL)
       nomp.map(&nomp, &mems[i], NOMP_FREE);
   }
-  free(mems), mems = NULL, mems_n = mems_max = 0;
+  FREE(mems);
+  mems = NULL, mems_n = mems_max = 0;
 
   for (unsigned i = 0; i < progs_n; i++) {
     if (progs[i].bptr != NULL)
