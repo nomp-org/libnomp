@@ -10,8 +10,8 @@
 #define NOMP_FREE 8
 
 // Types: Probably these should be an enum
-#define NOMP_SCALAR 1
-#define NOMP_PTR 2
+#define NOMP_SCALAR 0
+#define NOMP_PTR 1
 
 // Errors
 #define NOMP_INVALID_BACKEND -32
@@ -30,8 +30,12 @@
 #define NOMP_INSTALL_DIR_NOT_FOUND -97
 #define NOMP_USER_CALLBACK_NOT_FOUND -98
 #define NOMP_USER_CALLBACK_FAILURE -99
-#define NOMP_C_TO_LOOPY_CONVERSION_ERROR -100
-#define NOMP_CODEGEN_FAILED -101
+
+#define NOMP_LOOPY_CONVERSION_ERROR -100
+#define NOMP_LOOPY_KNL_NAME_NOT_FOUND -101
+#define NOMP_LOOPY_CODEGEN_FAILED -102
+#define NOMP_LOOPY_GRIDSIZE_FAILED -103
+#define NOMP_GRIDSIZE_CALCULATION_FAILED -103
 
 #define NOMP_KNL_BUILD_ERROR -128
 #define NOMP_KNL_ARG_TYPE_ERROR -129
@@ -48,7 +52,8 @@ int nomp_map(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
              int op);
 
 int nomp_jit(int *id, int *ndim, size_t *global, size_t *local,
-             const char *c_src, const char *annotations, const char *callback);
+             const char *c_src, const char *annotations, const char *callback,
+             int nargs, const char *args, ...);
 
 int nomp_run(int id, int ndim, const size_t *global, const size_t *local,
              int nargs, ...);

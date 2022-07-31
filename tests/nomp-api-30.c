@@ -16,15 +16,9 @@ int main(int argc, char *argv[]) {
                     "    a[i] = i;\n"
                     "}";
 
-  // Calling nomp_jit with invalid functions should return an error.
   int id = -1, ndim = -1;
   size_t global[3], local[3];
-  err = nomp_jit(&id, &ndim, global, local, knl, NULL,
-                 "invalid-file:invalid_func", 2, "a,N", 1, sizeof(double), a, 0,
-                 sizeof(int), &N);
-  nomp_assert(err == NOMP_USER_CALLBACK_NOT_FOUND);
-
-  err = nomp_jit(&id, &ndim, global, local, knl, NULL, "nomp-api-20:transform",
+  err = nomp_jit(&id, &ndim, global, local, knl, NULL, "nomp-api-30:transform",
                  2, "a,N", 1, sizeof(double), a, 0, sizeof(int), &N);
   nomp_chk(err);
 

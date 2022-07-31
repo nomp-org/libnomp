@@ -1,6 +1,9 @@
 #if !defined(_LIB_NOMP_IMPL_H_)
 #define _LIB_NOMP_IMPL_H_
 
+#define PY_SSIZE_T_CLEAN
+#include <Python.h>
+
 #include "nomp.h"
 #include <assert.h>
 #include <ctype.h>
@@ -9,12 +12,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-struct knl {
-  char *src, *name;
-  int ndim;
-  size_t gsize[3], lsize[3];
-};
 
 struct prog {
   void *bptr;
@@ -47,7 +44,10 @@ int opencl_init(struct backend *ocl, const int platform_id,
 // Python helper functions
 //
 int py_append_to_sys_path(const char *path);
-int py_user_callback(struct knl *knl, const char *c_str, const char *file,
-                     const char *func);
+int py_convert_from_c_to_loopy(PyObject **pKnl, const char *c_src);
+int py_user_callback(PyObject **pKnl, const char *file, const char *func);
+int py_get_knl_name_and_src(char **name, char **src, PyObject *pKnl);
+int py_get_grid_size(size_t *global, size_t *local, PyObject *pKnl,
+                     PyObject *pDict);
 
 #endif // _LIB_NOMP_IMPL_H_
