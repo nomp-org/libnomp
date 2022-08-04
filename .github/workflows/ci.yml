@@ -42,15 +42,3 @@ jobs:
         run: |
           cd ${TESTDIR}
           ./run-tests.sh -g nomp-api
-
-      - name: vec-init
-        shell: bash
-        run: |
-          cd ${TESTDIR}
-          ./run-tests.sh -g vec-init
-
-      - name: vec-add
-        shell: bash
-        run: |
-          cd ${TESTDIR}
-          ./run-tests.sh -g vec-add

@@ -47,7 +47,7 @@ int py_append_to_sys_path(const char *path);
 int py_convert_from_c_to_loopy(PyObject **pKnl, const char *c_src);
 int py_user_callback(PyObject **pKnl, const char *file, const char *func);
 int py_get_knl_name_and_src(char **name, char **src, PyObject *pKnl);
-int py_get_grid_size(size_t *global, size_t *local, PyObject *pKnl,
+int py_get_grid_size(int *ndim, size_t *global, size_t *local, PyObject *pKnl,
                      PyObject *pDict);
 
 #endif // _LIB_NOMP_IMPL_H_

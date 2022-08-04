@@ -20,13 +20,15 @@ int main(int argc, char *argv[]) {
   int id = -1, ndim = -1;
   size_t global[3], local[3];
   err = nomp_jit(&id, &ndim, global, local, knl, NULL,
-                 "invalid-file:invalid_func", 2, "a,N", 1, sizeof(double), a, 0,
-                 sizeof(int), &N);
+                 "invalid-file:invalid_func", 2, "a,N", NOMP_PTR,
+                 sizeof(double), a, NOMP_INTEGER, sizeof(int), &N);
   nomp_assert(err == NOMP_USER_CALLBACK_NOT_FOUND);
 
-  err = nomp_jit(&id, &ndim, global, local, knl, NULL, "nomp-api-20:transform",
-                 2, "a,N", 1, sizeof(double), a, 0, sizeof(int), &N);
+  err = nomp_jit(&id, &ndim, global, local, knl, NULL, "nomp-api-200:transform",
+                 2, "a,N", NOMP_PTR, sizeof(double), a, NOMP_INTEGER,
+                 sizeof(int), &N);
   nomp_chk(err);
+  nomp_assert(global[0] == 10);
 
   err = nomp_finalize();
   nomp_chk(err);
