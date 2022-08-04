@@ -10,8 +10,9 @@
 #define NOMP_FREE 8
 
 // Types: Probably these should be an enum
-#define NOMP_SCALAR 0
-#define NOMP_PTR 1
+#define NOMP_INTEGER 1
+#define NOMP_FLOAT 2
+#define NOMP_PTR 4
 
 // Errors
 #define NOMP_INVALID_BACKEND -32

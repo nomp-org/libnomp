@@ -65,7 +65,7 @@ static int mems_max = 0;
 
 /// Returns the pointer to the allocated memory corresponding to 'p'.
 /// If no buffer has been allocated for 'p' returns *mems_n*.
-static int idx_if_mapped(void *p) {
+static size_t idx_if_mapped(void *p) {
   // FIXME: This is O(N) in number of allocations.
   // Needs to go. Must store a hashmap.
   for (int i = 0; i < mems_n; i++)
@@ -75,7 +75,7 @@ static int idx_if_mapped(void *p) {
 }
 
 int nomp_map(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
-  int idx = idx_if_mapped(ptr);
+  size_t idx = idx_if_mapped(ptr);
   if (idx == mems_n || mems[idx].bptr == NULL) {
     if (op == NOMP_D2H || op == NOMP_FREE)
       return NOMP_INVALID_MAP_PTR;
@@ -172,6 +172,7 @@ int nomp_jit(int *id, int *ndim, size_t *global, size_t *local,
       PyObject *pKey = PyUnicode_FromStringAndSize(arg, strlen(arg));
       PyObject *pValue = PyLong_FromLong(*p);
       PyDict_SetItem(pDict, pKey, pValue);
+      arg = strtok(NULL, ",");
     }
     va_end(vargs);
 
@@ -196,15 +197,17 @@ int nomp_run(int id, int ndim, const size_t *global, const size_t *local,
     va_list args;
     va_start(args, nargs);
     for (int i = 0; i < nargs; i++) {
-      int type = va_arg(args, int), idx;
+      int type = va_arg(args, int);
       void *p = va_arg(args, void *);
-      size_t size;
+      size_t size, idx;
       switch (type) {
-      case NOMP_SCALAR:
+      case NOMP_INTEGER:
+      case NOMP_FLOAT:
         size = va_arg(args, size_t);
         break;
       case NOMP_PTR:
-        if ((idx = idx_if_mapped(p)) < mems_n)
+        idx = idx_if_mapped(p);
+        if (idx < mems_n)
           nomp.map_ptr(&p, &size, &mems[idx]);
         else
           return NOMP_INVALID_MAP_PTR;
