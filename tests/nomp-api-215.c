@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
 
   int id = -1, ndim = -1;
   size_t global[3], local[3];
-  err = nomp_jit(&id, &ndim, global, local, knl, NULL, "nomp-api-205:transform",
+  err = nomp_jit(&id, &ndim, global, local, knl, NULL, "nomp-api-200:transform",
                  3, "a,b,N", NOMP_PTR, sizeof(int), a, NOMP_PTR, sizeof(int), b,
                  NOMP_INTEGER, sizeof(int), &N);
   nomp_chk(err);
