@@ -139,6 +139,10 @@ int py_get_knl_name_and_src(char **name, char **src, PyObject *pKnl) {
 
 int py_get_grid_size(size_t *global, size_t *local, PyObject *pKnl,
                      PyObject *pDict) {
+  // Intiialize global and local sizes to 1
+  global[0] = global[1] = global[2] = 1;
+  local[0] = local[1] = local[2] = 1;
+
   if (pKnl) {
     // Get global and local grid size as experssions from loopy
     int err = NOMP_LOOPY_GRIDSIZE_FAILED;
@@ -166,14 +170,37 @@ int py_get_grid_size(size_t *global, size_t *local, PyObject *pKnl,
       return err;
     }
 
-    // If the expressions are not NULL, evaluate them with pymbolic
+    // If the expressions are not NULL, iterate through them and evaluate with
+    // pymbolic
     err = NOMP_GRIDSIZE_CALCULATION_FAILED;
     if (pGridSize) {
+      assert(PyTuple_Check(pGridSize));
+      assert(PyTuple_Size(pGridSize) == 2);
       PyObject *pEvaluator = PyImport_ImportModule("pymbolic.mapper.evaluator");
       if (pEvaluator) {
         PyObject *pEvaluate = PyObject_GetAttrString(pEvaluator, "evaluate");
         if (pEvaluate) {
-          // TODO Evaluate here
+          // Iterate through grid sizes, evaluate and set `global` and `local`
+          // sizes respectively.
+          PyObject *pGlobal = PyTuple_GetItem(pGridSize, 0);
+          assert(PyTuple_Check(pGlobal));
+          for (int i = 0; i < PyTuple_Size(pGlobal); i++) {
+            PyObject *pDim = PyTuple_GetItem(pGlobal, i);
+            PyObject *pResult =
+                PyObject_CallFunctionObjArgs(pEvaluate, pDim, pDict, NULL);
+            if (pResult)
+              global[i] = PyLong_AsLong(pResult);
+          }
+
+          PyObject *pLocal = PyTuple_GetItem(pGridSize, 1);
+          assert(PyTuple_Check(pLocal));
+          for (int i = 0; i < PyTuple_Size(pLocal); i++) {
+            PyObject *pDim = PyTuple_GetItem(pLocal, i);
+            PyObject *pResult =
+                PyObject_CallFunctionObjArgs(pEvaluate, pDim, pDict, NULL);
+            if (pResult)
+              local[i] = PyLong_AsLong(pResult);
+          }
           Py_DECREF(pEvaluate), err = 0;
         }
         Py_DECREF(pEvaluator);
@@ -185,5 +212,6 @@ int py_get_grid_size(size_t *global, size_t *local, PyObject *pKnl,
       return err;
     }
   }
+
   return 0;
 }
