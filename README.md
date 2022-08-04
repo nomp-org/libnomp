@@ -30,5 +30,6 @@ After building, you can run tests in `tests/` directory.
 ```bash
 export NOMP_INSTALL_DIR=${HOME}/.nomp
 cd tests
-./run-tests.sh -g nomp-api
+./run-tests.sh
+cd -
 ```
