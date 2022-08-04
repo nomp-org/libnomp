@@ -25,18 +25,19 @@ int main(int argc, char *argv[]) {
   err = nomp_map(b, 0, 10, sizeof(int), NOMP_H2D);
   nomp_chk(err);
 
-  // Free'ing before mapping should return an error
-  err = nomp_map(a, 0, 10, sizeof(int), NOMP_FREE);
-  nomp_assert(err == NOMP_INVALID_MAP_PTR);
-
-  // D2H before mapping should return an error
-  err = nomp_map(a, 0, 10, sizeof(int), NOMP_D2H);
-  nomp_assert(err == NOMP_INVALID_MAP_PTR);
+  err = nomp_map(a, 0, 10, sizeof(int), NOMP_H2D);
+  nomp_chk(err);
 
   // Mapping D2H multiple times is not an error
-  err = nomp_map(b, 0, 10, sizeof(int), NOMP_H2D);
+  err = nomp_map(a, 0, 10, sizeof(int), NOMP_D2H);
   nomp_chk(err);
-  err = nomp_map(b, 0, 10, sizeof(int), NOMP_H2D);
+  err = nomp_map(a, 0, 10, sizeof(int), NOMP_D2H);
+  nomp_chk(err);
+
+  // Free'ing after mapping is not an error
+  err = nomp_map(a, 0, 10, sizeof(int), NOMP_FREE);
+  nomp_chk(err);
+  err = nomp_map(b, 0, 10, sizeof(int), NOMP_FREE);
   nomp_chk(err);
 
   err = nomp_finalize();

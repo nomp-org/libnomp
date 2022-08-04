@@ -176,7 +176,7 @@ int nomp_jit(int *id, int *ndim, size_t *global, size_t *local,
     }
     va_end(vargs);
 
-    py_get_grid_size(global, local, pKnl, pDict);
+    py_get_grid_size(ndim, global, local, pKnl, pDict);
     FREE(args_);
     Py_DECREF(pDict), Py_XDECREF(pKnl);
 
