@@ -4,7 +4,6 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
-#include "nomp.h"
 #include <assert.h>
 #include <ctype.h>
 #include <math.h>
@@ -12,6 +11,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "nomp.h"
 
 struct prog {
   void *bptr;
@@ -49,5 +50,10 @@ int py_user_callback(PyObject **pKnl, const char *file, const char *func);
 int py_get_knl_name_and_src(char **name, char **src, PyObject *pKnl);
 int py_get_grid_size(int *ndim, size_t *global, size_t *local, PyObject *pKnl,
                      PyObject *pDict);
+
+//==============================================================================
+// Other helper functions
+//
+char *strcatn(int nstr, ...);
 
 #endif // _LIB_NOMP_IMPL_H_

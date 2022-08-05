@@ -29,22 +29,22 @@ int nomp_init(const char *backend, int platform, int device) {
     return err;
 
   err = NOMP_PY_INITIALIZE_ERROR;
+  const char *python_dir = "python", *py_module = "c_to_loopy";
   if (!Py_IsInitialized()) {
+    // May be we need the isolated configuration listed here:
+    // https://docs.python.org/3/c-api/init_config.html#init-config
+    // But for now, we do the simplest thing possible.
     Py_Initialize();
     // Append current working dir
     py_append_to_sys_path(".");
     // There should be a better way to figure the installation
     // path based on the shared library path
     err = NOMP_INSTALL_DIR_NOT_FOUND;
-    char *val = getenv("NOMP_INSTALL_DIR");
-    if (val) {
-      const char *python_dir = "python", *py_module = "c_to_loopy";
-      size_t len0 = strlen(val), len1 = strlen(python_dir);
-      char *abs_dir = (char *)calloc(len0 + len1 + 2, sizeof(char));
-      strncpy(abs_dir, val, len0);
-      strncpy(abs_dir + len0, "/", 1);
-      strncpy(abs_dir + len0 + 1, python_dir, len1);
+    char *install_dir = getenv("NOMP_INSTALL_DIR");
+    if (install_dir) {
+      char *abs_dir = strcatn(3, install_dir, "/", python_dir);
       py_append_to_sys_path(abs_dir);
+      printf("abs_dir = %s\n", abs_dir);
       FREE(abs_dir);
       err = 0;
     }
@@ -111,13 +111,6 @@ static struct prog *progs = NULL;
 static int progs_n = 0;
 static int progs_max = 0;
 
-static inline char *allocate_and_copy(const char *in) {
-  size_t len = strlen(in) + 1;
-  char *out = (char *)calloc(len, sizeof(char));
-  strncpy(out, in, len);
-  return out;
-}
-
 int nomp_jit(int *id, int *ndim, size_t *global, size_t *local,
              const char *c_src, const char *annotations, const char *callback,
              int nargs, const char *args, ...) {
@@ -134,7 +127,7 @@ int nomp_jit(int *id, int *ndim, size_t *global, size_t *local,
       return err;
 
     // Call the User callback function
-    char *callback_ = allocate_and_copy(callback),
+    char *callback_ = strndup(callback, BUFSIZ),
          *py_file = strtok(callback_, ":"), *py_func = NULL;
     if (py_file)
       py_func = strtok(NULL, ":");
@@ -158,7 +151,7 @@ int nomp_jit(int *id, int *ndim, size_t *global, size_t *local,
     // Get grid size of the loopy kernel after transformations. We will create a
     // dictionary with variable name as keys, variable value as value and then
     // pass it to the function
-    char *args_ = allocate_and_copy(args), *arg = strtok(args_, ",");
+    char *args_ = strndup(args, BUFSIZ), *arg = strtok(args_, ",");
     PyObject *pDict = PyDict_New();
     va_list vargs;
     va_start(vargs, args);
@@ -252,7 +245,6 @@ int nomp_err(char *buf, int err, size_t buf_size) {
   case NOMP_INVALID_KNL:
     strncpy(buf, "Invalid NOMP kernel", buf_size);
     break;
-
   case NOMP_INITIALIZED_ERROR:
     strncpy(buf, "NOMP is already initialized", buf_size);
     break;
@@ -265,7 +257,6 @@ int nomp_err(char *buf, int err, size_t buf_size) {
   case NOMP_MALLOC_ERROR:
     strncpy(buf, "NOMP malloc error", buf_size);
     break;
-
   case NOMP_INSTALL_DIR_NOT_FOUND:
     strncpy(buf, "NOMP_INSTALL_DIR env. variable is not set", buf_size);
     break;
@@ -281,7 +272,6 @@ int nomp_err(char *buf, int err, size_t buf_size) {
   case NOMP_LOOPY_CODEGEN_FAILED:
     strncpy(buf, "Code generation from loopy kernel failed", buf_size);
     break;
-
   case NOMP_KNL_BUILD_ERROR:
     strncpy(buf, "NOMP kernel build failed", buf_size);
     break;
@@ -294,7 +284,6 @@ int nomp_err(char *buf, int err, size_t buf_size) {
   case NOMP_KNL_RUN_ERROR:
     strncpy(buf, "NOMP kernel run failed", buf_size);
     break;
-
   default:
     break;
   }

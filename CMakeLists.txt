@@ -4,7 +4,7 @@ project(libnomp VERSION 0.0.1 DESCRIPTION "nomp runtime library" LANGUAGES C)
 
 include(GNUInstallDirs)
 
-add_library(nomp SHARED src/opencl.c src/nomp.c src/loopy.c)
+add_library(nomp SHARED src/opencl.c src/nomp.c src/loopy.c src/auxiliary.c)
 set_target_properties(nomp PROPERTIES
   VERSION ${PROJECT_VERSION}
   SOVERSION 1
