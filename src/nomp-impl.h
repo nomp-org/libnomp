@@ -25,21 +25,21 @@ struct mem {
 
 struct backend {
   int (*map)(struct backend *, struct mem *, const int);
-  void (*map_ptr)(void **, size_t *, struct mem *);
   int (*knl_build)(struct backend *, struct prog *, const char *, const char *);
-  int (*knl_set)(struct prog *, const int, const size_t, void *);
   int (*knl_run)(struct backend *, struct prog *, const int, const size_t *,
-                 const size_t *);
+                 const size_t *, int, va_list);
   int (*knl_free)(struct prog *);
   int (*finalize)(struct backend *);
   void *bptr;
 };
 
 //==============================================================================
-// OpenCL helper functions
+// Backend init functions
 //
-int opencl_init(struct backend *ocl, const int platform_id,
+int opencl_init(struct backend *backend, const int platform_id,
                 const int device_id);
+int cuda_init(struct backend *backend, const int platform_id,
+              const int device_id);
 
 //==============================================================================
 // Python helper functions

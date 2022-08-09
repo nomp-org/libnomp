@@ -8,13 +8,13 @@
 #endif
 
 static int opencl_map(struct backend *bnd, struct mem *m, const int op);
-static void opencl_map_ptr(void **p, size_t *size, struct mem *m);
 static int opencl_knl_build(struct backend *bnd, struct prog *prg,
                             const char *source, const char *name);
 static int opencl_knl_set(struct prog *prg, const int index, const size_t size,
                           void *arg);
 static int opencl_knl_run(struct backend *bnd, struct prog *prg, const int ndim,
-                          const size_t *global, const size_t *local);
+                          const size_t *global, const size_t *local, int nargs,
+                          va_list args);
 static int opencl_knl_free(struct prog *prg);
 static int opencl_finalize(struct backend *bnd);
 
@@ -107,11 +107,6 @@ static int opencl_map(struct backend *bnd, struct mem *m, const int op) {
   return 0;
 }
 
-static void opencl_map_ptr(void **p, size_t *size, struct mem *m) {
-  *p = m->bptr;
-  *size = sizeof(cl_mem);
-}
-
 struct opencl_prog {
   cl_program prg;
   cl_kernel knl;
@@ -145,6 +140,12 @@ static int opencl_knl_build(struct backend *bnd, struct prog *prg,
   return 0;
 }
 
+static void opencl_map_ptr(void **p, size_t *size, struct mem *m) {
+  struct opencl_mem *ocl_mem = m->bptr;
+  *p = (void *)&ocl_mem->mem;
+  *size = sizeof(cl_mem);
+}
+
 static int opencl_knl_set(struct prog *prg, const int index, const size_t size,
                           void *arg) {
   struct opencl_prog *ocl_prg = prg->bptr;
@@ -153,9 +154,35 @@ static int opencl_knl_set(struct prog *prg, const int index, const size_t size,
 }
 
 static int opencl_knl_run(struct backend *bnd, struct prog *prg, const int ndim,
-                          const size_t *global, const size_t *local) {
+                          const size_t *global, const size_t *local, int nargs,
+                          va_list args) {
   struct opencl_backend *ocl = bnd->bptr;
   struct opencl_prog *ocl_prg = prg->bptr;
+
+  for (int i = 0; i < nargs; i++) {
+    int type = va_arg(args, int);
+    void *p = va_arg(args, void *);
+    size_t size, idx;
+    switch (type) {
+    case NOMP_INTEGER:
+    case NOMP_FLOAT:
+      size = va_arg(args, size_t);
+      break;
+    case NOMP_PTR:
+      idx = idx_if_mapped(p);
+      if (idx < mems_n)
+        opencl_map_ptr(&p, &size, &mems[idx]);
+      else
+        return NOMP_INVALID_MAP_PTR;
+      break;
+    default:
+      return NOMP_KNL_ARG_TYPE_ERROR;
+      break;
+    }
+
+    if (opencl_knl_set(&progs[id], i, size, p) != 0)
+      return NOMP_KNL_ARG_SET_ERROR;
+  }
   cl_int err = clEnqueueNDRangeKernel(ocl->queue, ocl_prg->knl, ndim, NULL,
                                       global, local, 0, NULL, NULL);
   return err != CL_SUCCESS;
