@@ -23,8 +23,15 @@ int nomp_init(const char *backend, int platform, int device) {
   be[n] = '\0';
 
   int err = NOMP_INVALID_BACKEND;
+  // FIXME: This is ugly -- should be fixed
+#if defined(OPENCL_ENABLED)
   if (strncmp(be, "opencl", 32) == 0)
     err = opencl_init(&nomp, platform, device);
+#endif
+#if defined(CUDA_ENABLED)
+  if (strncmp(be, "cuda", 32) == 0)
+    err = cuda_init(&nomp, platform, device);
+#endif
   if (err)
     return err;
 
@@ -189,35 +196,12 @@ int nomp_run(int id, int ndim, const size_t *global, const size_t *local,
   if (id >= 0) {
     va_list args;
     va_start(args, nargs);
-    for (int i = 0; i < nargs; i++) {
-      int type = va_arg(args, int);
-      void *p = va_arg(args, void *);
-      size_t size, idx;
-      switch (type) {
-      case NOMP_INTEGER:
-      case NOMP_FLOAT:
-        size = va_arg(args, size_t);
-        break;
-      case NOMP_PTR:
-        idx = idx_if_mapped(p);
-        if (idx < mems_n)
-          nomp.map_ptr(&p, &size, &mems[idx]);
-        else
-          return NOMP_INVALID_MAP_PTR;
-        break;
-      default:
-        return NOMP_KNL_ARG_TYPE_ERROR;
-        break;
-      }
-
-      if (nomp.knl_set(&progs[id], i, size, p) != 0)
-        return NOMP_KNL_ARG_SET_ERROR;
-    }
+    int err = nomp.knl_run(&nomp, &progs[id], ndim, global, local, nargs, args);
     va_end(args);
-
-    if (nomp.knl_run(&nomp, &progs[id], ndim, global, local) != 0)
+    if (err)
       return NOMP_KNL_RUN_ERROR;
-    return 0;
+    else
+      return 0;
   }
   return NOMP_INVALID_KNL;
 }
