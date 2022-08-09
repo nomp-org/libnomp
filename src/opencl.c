@@ -88,11 +88,10 @@ static int opencl_map(struct backend *bnd, struct mem *m, const int op) {
 
   if (op & NOMP_H2D) {
     struct opencl_mem *ocl_mem = m->bptr;
-    err = clEnqueueWriteBuffer(ocl->queue, ocl_mem->mem, CL_TRUE, 0,
-                               (m->idx1 - m->idx0) * m->usize, m->hptr, 0, NULL,
-                               NULL);
-    if (err != CL_SUCCESS)
-      return 1;
+    err = clEnqueueWriteBuffer(
+        ocl->queue, ocl_mem->mem, CL_TRUE, m->idx0 * m->usize,
+        (m->idx1 - m->idx0) * m->usize, m->hptr, 0, NULL, NULL);
+    return err != CL_SUCCESS;
   }
 
   struct opencl_mem *ocl_mem = m->bptr;
