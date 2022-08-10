@@ -51,7 +51,6 @@ int nomp_init(const char *backend, int platform, int device) {
     if (install_dir) {
       char *abs_dir = strcatn(3, install_dir, "/", py_dir);
       py_append_to_sys_path(abs_dir);
-      printf("abs_dir = %s\n", abs_dir);
       FREE(abs_dir);
       err = 0;
     }
@@ -196,8 +195,7 @@ int nomp_run(int id, int ndim, const size_t *global, const size_t *local,
     va_end(args);
     if (err)
       return NOMP_KNL_RUN_ERROR;
-    else
-      return 0;
+    return 0;
   }
   return NOMP_INVALID_KNL;
 }

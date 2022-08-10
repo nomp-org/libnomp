@@ -35,7 +35,7 @@ done
 
 err=0
 for t in `ls ${TESTDIR}/nomp-api-*`; do
-  $t
+  $t ${BACKEND}
   if [ $? -eq 0 ]; then
     echo "$t: Pass";
   else

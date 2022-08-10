@@ -15,7 +15,7 @@
 #include "nomp.h"
 
 #define py_dir "python"
-#define py_module "loopy"
+#define py_module "loopy_api"
 #define py_func "c_to_loopy"
 
 struct prog {
