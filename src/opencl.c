@@ -7,66 +7,16 @@
 #include <CL/cl.h>
 #endif
 
-static int opencl_map(struct backend *bnd, struct mem *m, const int op);
-static int opencl_knl_build(struct backend *bnd, struct prog *prg,
-                            const char *source, const char *name);
-static int opencl_knl_set(struct prog *prg, const int index, const size_t size,
-                          void *arg);
-static int opencl_knl_run(struct backend *bnd, struct prog *prg, const int ndim,
-                          const size_t *global, const size_t *local, int nargs,
-                          va_list args);
-static int opencl_knl_free(struct prog *prg);
-static int opencl_finalize(struct backend *bnd);
-
+// TODO: Handle errors properly in OpenCL backend
 struct opencl_backend {
   cl_command_queue queue;
   cl_context ctx;
 };
 
-int opencl_init(struct backend *bnd, const int platform_id,
-                const int device_id) {
-  cl_uint num_platforms;
-  cl_int err = clGetPlatformIDs(0, NULL, &num_platforms);
-  // TODO: check err
-  if (platform_id < 0 | platform_id >= num_platforms)
-    return NOMP_INVALID_PLATFORM;
-
-  cl_platform_id *cl_platforms = calloc(num_platforms, sizeof(cl_platform_id));
-  if (cl_platforms == NULL)
-    return NOMP_MALLOC_ERROR;
-
-  err = clGetPlatformIDs(num_platforms, cl_platforms, &num_platforms);
-  cl_platform_id platform = cl_platforms[platform_id];
-
-  cl_uint num_devices;
-  err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 0, NULL, &num_devices);
-  if (device_id < 0 || device_id >= num_devices)
-    return NOMP_INVALID_DEVICE;
-
-  cl_device_id *cl_devices = calloc(num_devices, sizeof(cl_device_id));
-  if (cl_devices == NULL)
-    return NOMP_MALLOC_ERROR;
-
-  err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, num_devices, cl_devices,
-                       &num_devices);
-  cl_device_id device = cl_devices[device_id];
-
-  struct opencl_backend *ocl = bnd->bptr =
-      calloc(1, sizeof(struct opencl_backend));
-  ocl->ctx = clCreateContext(NULL, 1, &device, NULL, NULL, &err);
-  ocl->queue = clCreateCommandQueueWithProperties(ocl->ctx, device, NULL, &err);
-
-  free(cl_devices);
-  free(cl_platforms);
-
-  bnd->map = opencl_map;
-  bnd->knl_build = opencl_knl_build;
-  bnd->knl_run = opencl_knl_run;
-  bnd->knl_free = opencl_knl_free;
-  bnd->finalize = opencl_finalize;
-
-  return 0;
-}
+struct opencl_prog {
+  cl_program prg;
+  cl_kernel knl;
+};
 
 static int opencl_map(struct backend *bnd, struct mem *m, const int op) {
   struct opencl_backend *ocl = bnd->bptr;
@@ -105,11 +55,6 @@ static int opencl_map(struct backend *bnd, struct mem *m, const int op) {
   return 0;
 }
 
-struct opencl_prog {
-  cl_program prg;
-  cl_kernel knl;
-};
-
 static int opencl_knl_build(struct backend *bnd, struct prog *prg,
                             const char *source, const char *name) {
   struct opencl_backend *ocl = bnd->bptr;
@@ -142,7 +87,6 @@ static int opencl_knl_run(struct backend *bnd, struct prog *prg, const int ndim,
                           const size_t *global, const size_t *local, int nargs,
                           va_list args) {
   struct opencl_prog *ocl_prg = (struct opencl_prog *)prg->bptr;
-
   size_t size;
   struct mem *m;
   for (int i = 0; i < nargs; i++) {
@@ -198,6 +142,50 @@ static int opencl_finalize(struct backend *bnd) {
   if (err != CL_SUCCESS)
     return 1;
   free(bnd->bptr), bnd->bptr = NULL;
+
+  return 0;
+}
+
+int opencl_init(struct backend *bnd, const int platform_id,
+                const int device_id) {
+  cl_uint num_platforms;
+  cl_int err = clGetPlatformIDs(0, NULL, &num_platforms);
+  if (platform_id < 0 | platform_id >= num_platforms)
+    return NOMP_INVALID_PLATFORM;
+
+  cl_platform_id *cl_platforms = calloc(num_platforms, sizeof(cl_platform_id));
+  if (cl_platforms == NULL)
+    return NOMP_MALLOC_ERROR;
+
+  err = clGetPlatformIDs(num_platforms, cl_platforms, &num_platforms);
+  cl_platform_id platform = cl_platforms[platform_id];
+
+  cl_uint num_devices;
+  err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 0, NULL, &num_devices);
+  if (device_id < 0 || device_id >= num_devices)
+    return NOMP_INVALID_DEVICE;
+
+  cl_device_id *cl_devices = calloc(num_devices, sizeof(cl_device_id));
+  if (cl_devices == NULL)
+    return NOMP_MALLOC_ERROR;
+
+  err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, num_devices, cl_devices,
+                       &num_devices);
+  cl_device_id device = cl_devices[device_id];
+
+  struct opencl_backend *ocl = bnd->bptr =
+      calloc(1, sizeof(struct opencl_backend));
+  ocl->ctx = clCreateContext(NULL, 1, &device, NULL, NULL, &err);
+  ocl->queue = clCreateCommandQueueWithProperties(ocl->ctx, device, NULL, &err);
+
+  free(cl_devices);
+  free(cl_platforms);
+
+  bnd->map = opencl_map;
+  bnd->knl_build = opencl_knl_build;
+  bnd->knl_run = opencl_knl_run;
+  bnd->knl_free = opencl_knl_free;
+  bnd->finalize = opencl_finalize;
 
   return 0;
 }
