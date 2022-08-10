@@ -60,9 +60,7 @@ int opencl_init(struct backend *bnd, const int platform_id,
   free(cl_platforms);
 
   bnd->map = opencl_map;
-  bnd->map_ptr = opencl_map_ptr;
   bnd->knl_build = opencl_knl_build;
-  bnd->knl_set = opencl_knl_set;
   bnd->knl_run = opencl_knl_run;
   bnd->knl_free = opencl_knl_free;
   bnd->finalize = opencl_finalize;
@@ -140,49 +138,39 @@ static int opencl_knl_build(struct backend *bnd, struct prog *prg,
   return 0;
 }
 
-static void opencl_map_ptr(void **p, size_t *size, struct mem *m) {
-  struct opencl_mem *ocl_mem = m->bptr;
-  *p = (void *)&ocl_mem->mem;
-  *size = sizeof(cl_mem);
-}
-
-static int opencl_knl_set(struct prog *prg, const int index, const size_t size,
-                          void *arg) {
-  struct opencl_prog *ocl_prg = prg->bptr;
-  cl_int err = clSetKernelArg(ocl_prg->knl, index, size, arg);
-  return err != CL_SUCCESS;
-}
-
 static int opencl_knl_run(struct backend *bnd, struct prog *prg, const int ndim,
                           const size_t *global, const size_t *local, int nargs,
                           va_list args) {
-  struct opencl_backend *ocl = bnd->bptr;
-  struct opencl_prog *ocl_prg = prg->bptr;
+  struct opencl_prog *ocl_prg = (struct opencl_prog *)prg->bptr;
 
+  size_t size;
+  struct mem *m;
   for (int i = 0; i < nargs; i++) {
     int type = va_arg(args, int);
     void *p = va_arg(args, void *);
-    size_t size, idx;
     switch (type) {
     case NOMP_INTEGER:
     case NOMP_FLOAT:
       size = va_arg(args, size_t);
       break;
     case NOMP_PTR:
-      idx = idx_if_mapped(p);
-      if (idx < mems_n)
-        opencl_map_ptr(&p, &size, &mems[idx]);
-      else
+      m = mem_if_mapped(p);
+      if (m == NULL)
         return NOMP_INVALID_MAP_PTR;
+      p = m->bptr;
+      size = sizeof(cl_mem);
       break;
     default:
       return NOMP_KNL_ARG_TYPE_ERROR;
       break;
     }
 
-    if (opencl_knl_set(&progs[id], i, size, p) != 0)
+    cl_int err = clSetKernelArg(ocl_prg->knl, i, size, p);
+    if (err != CL_SUCCESS)
       return NOMP_KNL_ARG_SET_ERROR;
   }
+
+  struct opencl_backend *ocl = (struct opencl_backend *)bnd->bptr;
   cl_int err = clEnqueueNDRangeKernel(ocl->queue, ocl_prg->knl, ndim, NULL,
                                       global, local, 0, NULL, NULL);
   return err != CL_SUCCESS;

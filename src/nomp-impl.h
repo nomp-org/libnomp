@@ -33,6 +33,8 @@ struct backend {
   void *bptr;
 };
 
+struct mem *mem_if_mapped(void *p);
+
 //==============================================================================
 // Backend init functions
 //
