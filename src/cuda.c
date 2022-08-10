@@ -3,6 +3,8 @@
 #include <cuda_runtime.h>
 #include <nvrtc.h>
 
+#define NARGS_MAX 64
+
 static int cuda_map(struct backend *bnd, struct mem *m, const int op);
 static int cuda_knl_build(struct backend *bnd, struct prog *prg,
                           const char *source, const char *name);
@@ -28,9 +30,9 @@ int cuda_init(struct backend *bnd, const int platform_id, const int device_id) {
 
   bnd->map = cuda_map;
   bnd->knl_build = cuda_knl_build;
-  // bnd->knl_run = cuda_knl_run;
-  // bnd->knl_free = cuda_knl_free;
-  // bnd->finalize = cuda_finalize;
+  bnd->knl_run = cuda_knl_run;
+  bnd->knl_free = cuda_knl_free;
+  bnd->finalize = cuda_finalize;
 
   return 0;
 }
@@ -116,5 +118,49 @@ static int cuda_knl_build(struct backend *bnd, struct prog *prg,
     free(ptx);
   err = cuModuleGetFunction(&cprg->kernel, cprg->module, name);
 
+  return 0;
+}
+
+static int cuda_knl_run(struct backend *bnd, struct prog *prg, const int ndim,
+                        const size_t *global, const size_t *local, int nargs,
+                        va_list args) {
+  size_t size;
+  struct mem *m;
+  void *vargs[NARGS_MAX];
+  for (int i = 0; i < nargs; i++) {
+    int type = va_arg(args, int);
+    void *p = va_arg(args, void *);
+    switch (type) {
+    case NOMP_INTEGER:
+    case NOMP_FLOAT:
+      size = va_arg(args, size_t);
+      break;
+    case NOMP_PTR:
+      m = mem_if_mapped(p);
+      if (m == NULL)
+        return NOMP_INVALID_MAP_PTR;
+      p = m->bptr;
+      break;
+    default:
+      return NOMP_KNL_ARG_TYPE_ERROR;
+      break;
+    }
+    vargs[i] = p;
+  }
+
+  struct cuda_prog *cprg = (struct cuda_prog *)prg->bptr;
+  int err = cuLaunchKernel(cprg->kernel, global[0], global[1], global[2],
+                           local[0], local[1], local[2], 0, NULL, vargs, NULL);
+  return err != CUDA_SUCCESS;
+}
+
+static int cuda_knl_free(struct prog *prg) {
+  struct cuda_prog *cprg = (struct cuda_prog *)prg->bptr;
+  int err = cuModuleUnload(cprg->module);
+  return 0;
+}
+
+static int cuda_finalize(struct backend *bnd) {
+  // Nothing to do
   return 0;
 }
