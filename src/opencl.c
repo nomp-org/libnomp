@@ -70,39 +70,35 @@ int opencl_init(struct backend *bnd, const int platform_id,
   return 0;
 }
 
-struct opencl_mem {
-  cl_mem mem;
-};
-
 static int opencl_map(struct backend *bnd, struct mem *m, const int op) {
   struct opencl_backend *ocl = bnd->bptr;
 
   cl_int err;
   if (op & NOMP_ALLOC) {
-    struct opencl_mem *ocl_mem = m->bptr = calloc(1, sizeof(struct opencl_mem));
-    ocl_mem->mem = clCreateBuffer(ocl->ctx, CL_MEM_READ_WRITE,
-                                  (m->idx1 - m->idx0) * m->usize, NULL, &err);
+    cl_mem *clm = m->bptr = calloc(1, sizeof(cl_mem));
+    *clm = clCreateBuffer(ocl->ctx, CL_MEM_READ_WRITE,
+                          (m->idx1 - m->idx0) * m->usize, NULL, &err);
     if (err != CL_SUCCESS)
       return 1;
   }
 
   if (op & NOMP_H2D) {
-    struct opencl_mem *ocl_mem = m->bptr;
-    err = clEnqueueWriteBuffer(
-        ocl->queue, ocl_mem->mem, CL_TRUE, m->idx0 * m->usize,
-        (m->idx1 - m->idx0) * m->usize, m->hptr, 0, NULL, NULL);
+    cl_mem *clm = (cl_mem *)m->bptr;
+    err = clEnqueueWriteBuffer(ocl->queue, *clm, CL_TRUE, m->idx0 * m->usize,
+                               (m->idx1 - m->idx0) * m->usize, m->hptr, 0, NULL,
+                               NULL);
     return err != CL_SUCCESS;
   }
 
-  struct opencl_mem *ocl_mem = m->bptr;
+  cl_mem *clm = (cl_mem *)m->bptr;
   if (op == NOMP_D2H) {
-    err = clEnqueueReadBuffer(ocl->queue, ocl_mem->mem, CL_TRUE, 0,
+    err = clEnqueueReadBuffer(ocl->queue, *clm, CL_TRUE, 0,
                               (m->idx1 - m->idx0) * m->usize, m->hptr, 0, NULL,
                               NULL);
 
     return err != CL_SUCCESS;
   } else if (op == NOMP_FREE) {
-    err = clReleaseMemObject(ocl_mem->mem);
+    err = clReleaseMemObject(*clm);
     if (err != CL_SUCCESS)
       return 1;
     free(m->bptr), m->bptr = NULL;
@@ -112,8 +108,7 @@ static int opencl_map(struct backend *bnd, struct mem *m, const int op) {
 }
 
 static void opencl_map_ptr(void **p, size_t *size, struct mem *m) {
-  struct opencl_mem *ocl_mem = m->bptr;
-  *p = (void *)&ocl_mem->mem;
+  *p = m->bptr;
   *size = sizeof(cl_mem);
 }
 
