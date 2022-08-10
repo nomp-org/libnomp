@@ -5,37 +5,16 @@
 
 #define NARGS_MAX 64
 
-static int cuda_map(struct backend *bnd, struct mem *m, const int op);
-static int cuda_knl_build(struct backend *bnd, struct prog *prg,
-                          const char *source, const char *name);
-static int cuda_knl_run(struct backend *bnd, struct prog *prg, const int ndim,
-                        const size_t *global, const size_t *local, int nargs,
-                        va_list args);
-static int cuda_knl_free(struct prog *prg);
-static int cuda_finalize(struct backend *bnd);
-
+// TODO: Handle errors properly in CUDA backend
 struct cuda_backend {
   int device_id;
   struct cudaDeviceProp prop;
 };
 
-int cuda_init(struct backend *bnd, const int platform_id, const int device_id) {
-  int num_devices;
-  int ierr = cudaGetDeviceCount(&num_devices);
-  if (device_id < 0 || device_id >= num_devices)
-    return NOMP_INVALID_DEVICE;
-
-  struct cuda_backend *cuda = bnd->bptr =
-      calloc(1, sizeof(struct cuda_backend));
-
-  bnd->map = cuda_map;
-  bnd->knl_build = cuda_knl_build;
-  bnd->knl_run = cuda_knl_run;
-  bnd->knl_free = cuda_knl_free;
-  bnd->finalize = cuda_finalize;
-
-  return 0;
-}
+struct cuda_prog {
+  CUmodule module;
+  CUfunction kernel;
+};
 
 static int cuda_map(struct backend *bnd, struct mem *m, const int op) {
   struct cuda_backend *ocl = bnd->bptr;
@@ -73,11 +52,6 @@ static void cuda_map_ptr(void **p, size_t *size, struct mem *m) {
   *p = (void *)m->bptr;
   *size = sizeof(m->bptr);
 }
-
-struct cuda_prog {
-  CUmodule module;
-  CUfunction kernel;
-};
 
 static int cuda_knl_build(struct backend *bnd, struct prog *prg,
                           const char *source, const char *name) {
@@ -162,5 +136,32 @@ static int cuda_knl_free(struct prog *prg) {
 
 static int cuda_finalize(struct backend *bnd) {
   // Nothing to do
+  return 0;
+}
+
+int cuda_init(struct backend *bnd, const int platform_id, const int device_id) {
+  int num_devices;
+  int err = cudaGetDeviceCount(&num_devices);
+  if (err != CUDA_SUCCESS)
+    return 1;
+  if (device_id < 0 || device_id >= num_devices)
+    return NOMP_INVALID_DEVICE;
+  err = cudaSetDevice(device_id);
+  if (err != CUDA_SUCCESS)
+    return 1;
+
+  struct cuda_backend *cbnd = bnd->bptr =
+      calloc(1, sizeof(struct cuda_backend));
+  cbnd->device_id = device_id;
+  err = cudaGetDeviceProperties(&cbnd->prop, device_id);
+  if (err != CUDA_SUCCESS)
+    return 1;
+
+  bnd->map = cuda_map;
+  bnd->knl_build = cuda_knl_build;
+  bnd->knl_run = cuda_knl_run;
+  bnd->knl_free = cuda_knl_free;
+  bnd->finalize = cuda_finalize;
+
   return 0;
 }
