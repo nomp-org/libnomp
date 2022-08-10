@@ -72,43 +72,39 @@ static int mems_max = 0;
 
 /// Returns the pointer to the allocated memory corresponding to 'p'.
 /// If no buffer has been allocated for 'p' returns *mems_n*.
-static size_t idx_if_mapped(void *p) {
+struct mem *mem_if_mapped(void *p) {
   // FIXME: This is O(N) in number of allocations.
   // Needs to go. Must store a hashmap.
   for (int i = 0; i < mems_n; i++)
     if (mems[i].bptr != NULL && mems[i].hptr == p)
-      return i;
-  return mems_n;
+      return &mems[i];
+  return NULL;
 }
 
 int nomp_map(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
-  size_t idx = idx_if_mapped(ptr);
-  if (idx == mems_n || mems[idx].bptr == NULL) {
+  struct mem *m = mem_if_mapped(ptr);
+  if (m == NULL) {
     if (op == NOMP_D2H || op == NOMP_FREE)
       return NOMP_INVALID_MAP_PTR;
     op |= NOMP_ALLOC;
   }
 
-  if (idx == mems_n) {
+  if (m == NULL) {
     if (mems_n == mems_max) {
       mems_max += mems_max / 2 + 1;
       mems = (struct mem *)realloc(mems, sizeof(struct mem) * mems_max);
     }
-    mems[idx].idx0 = idx0, mems[idx].idx1 = idx1, mems[idx].usize = usize;
-    mems[idx].hptr = ptr, mems[idx].bptr = NULL;
+    m = &mems[mems_n], mems_n++;
+    m->idx0 = idx0, m->idx1 = idx1, m->usize = usize;
+    m->hptr = ptr, m->bptr = NULL;
   }
 
-  if ((op & NOMP_ALLOC) && mems[idx].bptr != NULL)
+  if (m->idx0 != idx0 || m->idx1 != idx1 || m->usize != usize)
     return NOMP_INVALID_MAP_PTR;
+  if ((op & NOMP_ALLOC) && m->bptr != NULL)
+    return NOMP_PTR_ALREADY_MAPPED;
 
-  if (mems[idx].idx0 != idx0 || mems[idx].idx1 != idx1 ||
-      mems[idx].usize != usize)
-    return NOMP_INVALID_MAP_PTR;
-
-  int err = nomp.map(&nomp, &mems[idx], op);
-  mems_n += (idx == mems_n) && (err == 0);
-
-  return err;
+  return nomp.map(&nomp, m, op);
 }
 
 //=============================================================================
