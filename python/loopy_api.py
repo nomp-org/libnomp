@@ -28,7 +28,7 @@ _C_BIN_OPS_TO_PYMBOLIC_OPS = {
     "!=": lambda l, r: prim.Comparison(l, "!=", r),
 }
 
-_BACKEND_TO_TAEGET = {"opencl": lp.OpenCLTarget(), "cuda": lp.CudaTarget()}
+_BACKEND_TO_TARGET = {"opencl": lp.OpenCLTarget(), "cuda": lp.CudaTarget()}
 
 
 class IdentityMapper:
@@ -470,4 +470,5 @@ if __name__ == "__main__":
               a[i] = i;
           }
           """
-    c_to_loopy(knl)
+    lp_knl = c_to_loopy(knl, "cuda")
+    print(lp.generate_code_v2(lp_knl).device_code())
