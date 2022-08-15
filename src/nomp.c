@@ -16,27 +16,27 @@ int nomp_init(const char *backend, int platform, int device) {
   if (initialized)
     return NOMP_INITIALIZED_ERROR;
 
-  char be[BUFSIZ];
+  char name[BUFSIZ];
   size_t n = strnlen(backend, BUFSIZ);
   for (int i = 0; i < n; i++)
-    be[i] = tolower(backend[i]);
-  be[n] = '\0';
+    name[i] = tolower(backend[i]);
+  name[n] = '\0';
 
   int err = NOMP_INVALID_BACKEND;
   // FIXME: This is ugly -- should be fixed
 #if defined(OPENCL_ENABLED)
-  if (strncmp(be, "opencl", 32) == 0)
+  if (strncmp(name, "opencl", 32) == 0)
     err = opencl_init(&nomp, platform, device);
 #endif
 #if defined(CUDA_ENABLED)
-  if (strncmp(be, "cuda", 32) == 0)
+  if (strncmp(name, "cuda", 32) == 0)
     err = cuda_init(&nomp, platform, device);
 #endif
   if (err)
     return err;
+  strncpy(nomp.name, name, BUFSIZ);
 
   err = NOMP_PY_INITIALIZE_ERROR;
-  const char *python_dir = "python", *py_module = "c_to_loopy";
   if (!Py_IsInitialized()) {
     // May be we need the isolated configuration listed here:
     // https://docs.python.org/3/c-api/init_config.html#init-config
@@ -49,7 +49,7 @@ int nomp_init(const char *backend, int platform, int device) {
     err = NOMP_INSTALL_DIR_NOT_FOUND;
     char *install_dir = getenv("NOMP_INSTALL_DIR");
     if (install_dir) {
-      char *abs_dir = strcatn(3, install_dir, "/", python_dir);
+      char *abs_dir = strcatn(3, install_dir, "/", py_dir);
       py_append_to_sys_path(abs_dir);
       printf("abs_dir = %s\n", abs_dir);
       FREE(abs_dir);
@@ -125,16 +125,16 @@ int nomp_jit(int *id, int *ndim, size_t *global, size_t *local,
 
     // Create loopy kernel from C source
     PyObject *pKnl = NULL;
-    int err = py_convert_from_c_to_loopy(&pKnl, c_src);
+    int err = py_c_to_loopy(&pKnl, c_src, nomp.name);
     if (err)
       return err;
 
     // Call the User callback function
     char *callback_ = strndup(callback, BUFSIZ),
-         *py_file = strtok(callback_, ":"), *py_func = NULL;
-    if (py_file)
-      py_func = strtok(NULL, ":");
-    err = py_user_callback(&pKnl, py_file, py_func);
+         *user_file = strtok(callback_, ":"), *user_func = NULL;
+    if (user_file)
+      user_func = strtok(NULL, ":");
+    err = py_user_callback(&pKnl, user_file, user_func);
     FREE(callback_);
     if (err)
       return err;
