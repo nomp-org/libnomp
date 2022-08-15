@@ -14,6 +14,10 @@
 
 #include "nomp.h"
 
+#define py_dir "python"
+#define py_module "loopy"
+#define py_func "c_to_loopy"
+
 struct prog {
   void *bptr;
 };
@@ -24,6 +28,7 @@ struct mem {
 };
 
 struct backend {
+  char name[BUFSIZ];
   int (*map)(struct backend *, struct mem *, const int);
   int (*knl_build)(struct backend *, struct prog *, const char *, const char *);
   int (*knl_run)(struct backend *, struct prog *, const int, const size_t *,
@@ -47,7 +52,7 @@ int cuda_init(struct backend *backend, const int platform_id,
 // Python helper functions
 //
 int py_append_to_sys_path(const char *path);
-int py_convert_from_c_to_loopy(PyObject **pKnl, const char *c_src);
+int py_c_to_loopy(PyObject **pKnl, const char *c_src, const char *backend);
 int py_user_callback(PyObject **pKnl, const char *file, const char *func);
 int py_get_knl_name_and_src(char **name, char **src, PyObject *pKnl);
 int py_get_grid_size(int *ndim, size_t *global, size_t *local, PyObject *pKnl,

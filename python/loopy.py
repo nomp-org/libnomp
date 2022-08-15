@@ -28,6 +28,8 @@ _C_BIN_OPS_TO_PYMBOLIC_OPS = {
     "!=": lambda l, r: prim.Comparison(l, "!=", r),
 }
 
+_BACKEND_TO_TAEGET = {"opencl": lp.OpenCLTarget(), "cuda": lp.CudaTarget()}
+
 
 class IdentityMapper:
     def rec(self, node, *args, **kwargs):
@@ -399,7 +401,7 @@ class ExternalContext:
         }
 
 
-def c_to_loopy(c_str: str):
+def c_to_loopy(c_str: str, backend: str):
     # Parse the function
     parser = c_parser.CParser()
     ast = parser.parse(c_str)
@@ -444,6 +446,7 @@ def c_to_loopy(c_str: str):
         lang_version=LOOPY_LANG_VERSION,
         name=node.decl.name,
         seq_dependencies=True,
+        target=_BACKEND_TO_TARGET[backend],
     )
 
     knl = lp.add_dtypes(

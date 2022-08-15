@@ -2,6 +2,7 @@
 
 int py_append_to_sys_path(const char *path) {
   PyObject *pSys = PyImport_ImportModule("sys");
+  // FIXME: Err should be an nomp error defined in `nomp.h`
   int err = 1;
   if (pSys) {
     PyObject *pPath = PyObject_GetAttrString(pSys, "path");
@@ -19,29 +20,24 @@ int py_append_to_sys_path(const char *path) {
   return 0;
 }
 
-int py_convert_from_c_to_loopy(PyObject **pKnl, const char *c_src) {
+int py_c_to_loopy(PyObject **pKnl, const char *c_src, const char *backend) {
   // Create the loopy kernel based on `c_src`.
-  const char *py_module = "c_to_loopy";
   int err = NOMP_LOOPY_CONVERSION_ERROR;
-  PyObject *pFile = PyUnicode_FromString(py_module),
-           *pModule = PyImport_Import(pFile);
-  Py_XDECREF(pFile);
+  PyObject *pModuleStr = PyUnicode_FromString(py_module),
+           *pModule = PyImport_Import(pModuleStr);
+  Py_XDECREF(pModuleStr);
   if (pModule) {
-    PyObject *pFunc = PyObject_GetAttrString(pModule, py_module);
+    PyObject *pFunc = PyObject_GetAttrString(pModule, py_func);
     if (pFunc) {
       PyObject *pStr = PyUnicode_FromString(c_src);
-      if ((*pKnl = PyObject_CallFunctionObjArgs(pFunc, pStr, NULL)))
+      PyObject *pBackend = PyUnicode_FromString(backend);
+      if ((*pKnl = PyObject_CallFunctionObjArgs(pFunc, pStr, pBackend, NULL)))
         err = 0;
-      Py_XDECREF(pStr), Py_DECREF(pFunc);
+      Py_XDECREF(pStr), Py_XDECREF(pBackend), Py_DECREF(pFunc);
     }
     Py_DECREF(pModule);
   }
-  if (err) {
-    PyErr_Print();
-    return err;
-  }
-
-  return 0;
+  return err;
 }
 
 int py_user_callback(PyObject **pKnl, const char *file, const char *func) {
@@ -65,12 +61,7 @@ int py_user_callback(PyObject **pKnl, const char *file, const char *func) {
     }
     Py_XDECREF(pFile);
   }
-  if (err) {
-    PyErr_Print();
-    return err;
-  }
-
-  return 0;
+  return err;
 }
 
 int py_get_knl_name_and_src(char **name, char **src, PyObject *pKnl) {
