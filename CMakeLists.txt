@@ -27,6 +27,9 @@ foreach(test ${TESTS})
   target_include_directories(${test_exe} PUBLIC src)
 endforeach(test ${TESTS})
 
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+add_subdirectory ("docs")
+
 install(TARGETS nomp
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   PUBLIC_HEADER DESTINATION ${CMAKE_PUBLIC_INCLUDEDIR})
