@@ -8,7 +8,7 @@
 
 project = 'libnomp'
 copyright = '2022, nomp'
-author = 'nomp'
+author = 'nomp-org'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
