@@ -82,7 +82,7 @@ static int cuda_knl_build(struct backend *bnd, struct prog *prg,
                           const char *source, const char *name) {
   nvrtcProgram prog;
   nvrtcResult nvrtc_err =
-      nvrtcCreateProgram(&prog, source, "foo.cu", 0, NULL, NULL);
+      nvrtcCreateProgram(&prog, source, NULL, 0, NULL, NULL);
   chk_nvrtc(nvrtc_err);
 
   struct cuda_backend *cbnd = (struct cuda_backend *)bnd->bptr;
@@ -143,7 +143,7 @@ static int cuda_knl_run(struct backend *bnd, struct prog *prg, const int ndim,
       m = mem_if_mapped(p);
       if (m == NULL)
         return NOMP_INVALID_MAP_PTR;
-      p = (void *)m->bptr;
+      p = &m->bptr;
       break;
     default:
       return NOMP_KNL_ARG_TYPE_ERROR;
@@ -179,8 +179,8 @@ int cuda_init(struct backend *bnd, const int platform_id, const int device_id) {
   result = cudaSetDevice(device_id);
   chk_cu(result);
 
-  struct cuda_backend *cbnd = bnd->bptr =
-      calloc(1, sizeof(struct cuda_backend));
+  bnd->bptr = calloc(1, sizeof(struct cuda_backend));
+  struct cuda_backend *cbnd = (struct cuda_backend *)bnd->bptr;
   cbnd->device_id = device_id;
   result = cudaGetDeviceProperties(&cbnd->prop, device_id);
   chk_cu(result);
