@@ -28,6 +28,8 @@ _C_BIN_OPS_TO_PYMBOLIC_OPS = {
     "!=": lambda l, r: prim.Comparison(l, "!=", r),
 }
 
+_BACKEND_TO_TARGET = {"opencl": lp.OpenCLTarget(), "cuda": lp.CudaTarget()}
+
 
 class IdentityMapper:
     def rec(self, node, *args, **kwargs):
@@ -399,7 +401,7 @@ class ExternalContext:
         }
 
 
-def c_to_loopy(c_str: str):
+def c_to_loopy(c_str: str, backend: str):
     # Parse the function
     parser = c_parser.CParser()
     ast = parser.parse(c_str)
@@ -444,6 +446,7 @@ def c_to_loopy(c_str: str):
         lang_version=LOOPY_LANG_VERSION,
         name=node.decl.name,
         seq_dependencies=True,
+        target=_BACKEND_TO_TARGET[backend],
     )
 
     knl = lp.add_dtypes(
@@ -467,4 +470,5 @@ if __name__ == "__main__":
               a[i] = i;
           }
           """
-    c_to_loopy(knl)
+    lp_knl = c_to_loopy(knl, "cuda")
+    print(lp.generate_code_v2(lp_knl).device_code())

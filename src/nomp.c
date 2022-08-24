@@ -16,20 +16,27 @@ int nomp_init(const char *backend, int platform, int device) {
   if (initialized)
     return NOMP_INITIALIZED_ERROR;
 
-  char be[BUFSIZ];
+  char name[BUFSIZ];
   size_t n = strnlen(backend, BUFSIZ);
   for (int i = 0; i < n; i++)
-    be[i] = tolower(backend[i]);
-  be[n] = '\0';
+    name[i] = tolower(backend[i]);
+  name[n] = '\0';
 
   int err = NOMP_INVALID_BACKEND;
-  if (strncmp(be, "opencl", 32) == 0)
+  // FIXME: This is ugly -- should be fixed
+#if defined(OPENCL_ENABLED)
+  if (strncmp(name, "opencl", 32) == 0)
     err = opencl_init(&nomp, platform, device);
+#endif
+#if defined(CUDA_ENABLED)
+  if (strncmp(name, "cuda", 32) == 0)
+    err = cuda_init(&nomp, platform, device);
+#endif
   if (err)
     return err;
+  strncpy(nomp.name, name, BUFSIZ);
 
   err = NOMP_PY_INITIALIZE_ERROR;
-  const char *python_dir = "python", *py_module = "c_to_loopy";
   if (!Py_IsInitialized()) {
     // May be we need the isolated configuration listed here:
     // https://docs.python.org/3/c-api/init_config.html#init-config
@@ -42,9 +49,8 @@ int nomp_init(const char *backend, int platform, int device) {
     err = NOMP_INSTALL_DIR_NOT_FOUND;
     char *install_dir = getenv("NOMP_INSTALL_DIR");
     if (install_dir) {
-      char *abs_dir = strcatn(3, install_dir, "/", python_dir);
+      char *abs_dir = strcatn(3, install_dir, "/", py_dir);
       py_append_to_sys_path(abs_dir);
-      printf("abs_dir = %s\n", abs_dir);
       FREE(abs_dir);
       err = 0;
     }
@@ -65,43 +71,39 @@ static int mems_max = 0;
 
 /// Returns the pointer to the allocated memory corresponding to 'p'.
 /// If no buffer has been allocated for 'p' returns *mems_n*.
-static size_t idx_if_mapped(void *p) {
+struct mem *mem_if_mapped(void *p) {
   // FIXME: This is O(N) in number of allocations.
   // Needs to go. Must store a hashmap.
   for (int i = 0; i < mems_n; i++)
     if (mems[i].bptr != NULL && mems[i].hptr == p)
-      return i;
-  return mems_n;
+      return &mems[i];
+  return NULL;
 }
 
 int nomp_map(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
-  size_t idx = idx_if_mapped(ptr);
-  if (idx == mems_n || mems[idx].bptr == NULL) {
+  struct mem *m = mem_if_mapped(ptr);
+  if (m == NULL) {
     if (op == NOMP_D2H || op == NOMP_FREE)
       return NOMP_INVALID_MAP_PTR;
     op |= NOMP_ALLOC;
   }
 
-  if (idx == mems_n) {
+  if (m == NULL) {
     if (mems_n == mems_max) {
       mems_max += mems_max / 2 + 1;
       mems = (struct mem *)realloc(mems, sizeof(struct mem) * mems_max);
     }
-    mems[idx].idx0 = idx0, mems[idx].idx1 = idx1, mems[idx].usize = usize;
-    mems[idx].hptr = ptr, mems[idx].bptr = NULL;
+    m = &mems[mems_n], mems_n++;
+    m->idx0 = idx0, m->idx1 = idx1, m->usize = usize;
+    m->hptr = ptr, m->bptr = NULL;
   }
 
-  if ((op & NOMP_ALLOC) && mems[idx].bptr != NULL)
+  if (m->idx0 != idx0 || m->idx1 != idx1 || m->usize != usize)
     return NOMP_INVALID_MAP_PTR;
+  if ((op & NOMP_ALLOC) && m->bptr != NULL)
+    return NOMP_PTR_ALREADY_MAPPED;
 
-  if (mems[idx].idx0 != idx0 || mems[idx].idx1 != idx1 ||
-      mems[idx].usize != usize)
-    return NOMP_INVALID_MAP_PTR;
-
-  int err = nomp.map(&nomp, &mems[idx], op);
-  mems_n += (idx == mems_n) && (err == 0);
-
-  return err;
+  return nomp.map(&nomp, m, op);
 }
 
 //=============================================================================
@@ -122,16 +124,16 @@ int nomp_jit(int *id, int *ndim, size_t *global, size_t *local,
 
     // Create loopy kernel from C source
     PyObject *pKnl = NULL;
-    int err = py_convert_from_c_to_loopy(&pKnl, c_src);
+    int err = py_c_to_loopy(&pKnl, c_src, nomp.name);
     if (err)
       return err;
 
     // Call the User callback function
     char *callback_ = strndup(callback, BUFSIZ),
-         *py_file = strtok(callback_, ":"), *py_func = NULL;
-    if (py_file)
-      py_func = strtok(NULL, ":");
-    err = py_user_callback(&pKnl, py_file, py_func);
+         *user_file = strtok(callback_, ":"), *user_func = NULL;
+    if (user_file)
+      user_func = strtok(NULL, ":");
+    err = py_user_callback(&pKnl, user_file, user_func);
     FREE(callback_);
     if (err)
       return err;
@@ -189,33 +191,9 @@ int nomp_run(int id, int ndim, const size_t *global, const size_t *local,
   if (id >= 0) {
     va_list args;
     va_start(args, nargs);
-    for (int i = 0; i < nargs; i++) {
-      int type = va_arg(args, int);
-      void *p = va_arg(args, void *);
-      size_t size, idx;
-      switch (type) {
-      case NOMP_INTEGER:
-      case NOMP_FLOAT:
-        size = va_arg(args, size_t);
-        break;
-      case NOMP_PTR:
-        idx = idx_if_mapped(p);
-        if (idx < mems_n)
-          nomp.map_ptr(&p, &size, &mems[idx]);
-        else
-          return NOMP_INVALID_MAP_PTR;
-        break;
-      default:
-        return NOMP_KNL_ARG_TYPE_ERROR;
-        break;
-      }
-
-      if (nomp.knl_set(&progs[id], i, size, p) != 0)
-        return NOMP_KNL_ARG_SET_ERROR;
-    }
+    int err = nomp.knl_run(&nomp, &progs[id], ndim, global, local, nargs, args);
     va_end(args);
-
-    if (nomp.knl_run(&nomp, &progs[id], ndim, global, local) != 0)
+    if (err)
       return NOMP_KNL_RUN_ERROR;
     return 0;
   }
