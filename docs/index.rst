@@ -1,5 +1,5 @@
 .. libnomp documentation master file, created by
-   sphinx-quickstart on Thu Aug 18 18:14:43 2022.
+   sphinx-quickstart on Fri Aug 26 15:00:22 2022.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
@@ -16,5 +16,18 @@ Indices and tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
+
+User API
+========
+
+.. doxygenfile:: nomp.h
+   :project: libnomp
+   :sections: briefdescription detaileddescription func define enum
+
+Internal API
+============
+
+.. doxygenfile:: nomp-impl.h
+   :project: libnomp
+   :sections: briefdescription detaileddescription func define enum
