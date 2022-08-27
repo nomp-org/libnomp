@@ -39,3 +39,19 @@ cd tests
 ./run-tests.sh
 cd -
 ```
+
+## Build documentation
+
+Install required dependencies
+```bash
+apt-get install doxygen python3-sphinx
+pip3 install sphinx_rtd_theme breathe
+```
+
+Build docs
+```bash
+cmake -D ENABLE_DOCS=ON .. -DCMAKE_INSTALL_PREFIX=${HOME}/.nomp
+make install
+```
+
+The output will be in `build/docs/docs/sphinx/index.html`.
