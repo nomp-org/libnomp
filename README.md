@@ -44,14 +44,14 @@ cd -
 
 Install required dependencies
 ```bash
-apt-get install doxygen python3-sphinx
-pip3 install sphinx_rtd_theme breathe
+conda install -c conda-forge doxygen breathe
+conda install sphinx sphinx_rtd_theme
 ```
 
 Build docs
 ```bash
-cmake -D ENABLE_DOCS=ON .. -DCMAKE_INSTALL_PREFIX=${HOME}/.nomp
+cmake .. -DCMAKE_INSTALL_PREFIX=${HOME}/.nomp -DENABLE_DOCS=ON
 make install
 ```
 
-The output will be in `build/docs/docs/sphinx/index.html`.
+The output will be in `build/docs/sphinx/index.html`.
