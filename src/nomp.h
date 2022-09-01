@@ -54,7 +54,6 @@
 
 /**
  * @defgroup nomp_errors Errors
- * Defines the operation direction in `nomp_map`.
  * TODO: Probably these should be an enum.
  */
 
@@ -138,12 +137,28 @@
 
 /**
  * @ingroup nomp_errors
- * @brief Code generation from loopy kernel failed
+ * @brief Loopy conversion failed
  */
 #define NOMP_LOOPY_CONVERSION_ERROR -100
+/**
+ * @ingroup nomp_errors
+ * @brief Failed to find loopy kernal
+ */
 #define NOMP_LOOPY_KNL_NAME_NOT_FOUND -101
+/**
+ * @ingroup nomp_errors
+ * @brief Code generation from loopy kernel failed
+ */
 #define NOMP_LOOPY_CODEGEN_FAILED -102
+/**
+ * @ingroup nomp_errors
+ * @brief Code generation from loopy kernel failed
+ */
 #define NOMP_LOOPY_GRIDSIZE_FAILED -103
+/**
+ * @ingroup nomp_errors
+ * @brief Grid size calculation failed
+ */
 #define NOMP_GRIDSIZE_CALCULATION_FAILED -103
 
 /**
@@ -173,7 +188,6 @@ extern "C" {
 
 /**
  * @defgroup nomp_user_api API 
- * Defines the operation direction in `nomp_map`.
  */
 
 /**
