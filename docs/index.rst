@@ -5,24 +5,17 @@ Welcome to libnomp's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+Table of Contents
+=================
+.. toctree::
+   :maxdepth: 2
 
+   self
+   nomp
+   nomp-impl
 
 Indices and tables
 ==================
 
 * :ref:`genindex`
 * :ref:`search`
-
-User API
-========
-
-.. doxygenfile:: nomp.h
-   :project: libnomp
-   :sections: briefdescription detaileddescription func define enum
-
-Internal API
-============
-
-.. doxygenfile:: nomp-impl.h
-   :project: libnomp
-   :sections: briefdescription detaileddescription func define enum
