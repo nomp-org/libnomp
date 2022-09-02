@@ -192,15 +192,15 @@ extern "C" {
 
 /**
  * @ingroup nomp_user_api
- * @brief Initializes libnomp with the specified backend.
+ * @brief Initializes libnomp with the specified backend, platform and device.
  *
- * Initializes the nomp code generation for the specified backend
- * using the given platform and device. Returns an error if there is
- * any error occured while the initialization otherwise 0. Calling
- * this method twice will also return an error.
- * Currently only supports cuda and opencl backends.
+ * Initializes the nomp code generation for the specified backend (e.g., Cuda,
+ * OpenCL, etc) using the given platform id and device id. Returns a negative
+ * value if an error occurs during the initialization, otherwise returns 0.
+ * Calling this method twice (without nomp_finalize in between) will return an
+ * error as well. Currently only supports Cuda and OpenCL backends.
  *
- * @param backend Targeted backend for code generation.
+ * @param backend Target backend for code generation.
  * @param platform Target platform id to share resources and execute kernals
  *                 in the targeted device.
  * @param device Target device id to execute kernals.
