@@ -42,7 +42,8 @@ cd -
 
 ## Build documentation
 
-Install required dependencies
+We use `Doxygen` for in source documentations and render those with `Sphinx`
+and `breath`. First, install required dependencies:
 ```bash
 conda install -c conda-forge doxygen breathe
 conda install sphinx sphinx_rtd_theme
@@ -54,4 +55,5 @@ cmake .. -DCMAKE_INSTALL_PREFIX=${HOME}/.nomp -DENABLE_DOCS=ON
 make install
 ```
 
-The output will be in `build/docs/sphinx/index.html`.
+Open `build/docs/sphinx/index.html` on the browser to view the documentation
+locally.
