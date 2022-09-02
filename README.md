@@ -57,3 +57,11 @@ make install
 
 Open `build/docs/sphinx/index.html` on the browser to view the documentation
 locally.
+
+## Developer documentation
+
+Please run `clang-format src/*.[ch]` before comitting any changes you make on
+the source files. `clang-format` can also be installed from `conda`.
+```bash
+conda install -c conda-forge clang-format
+```
