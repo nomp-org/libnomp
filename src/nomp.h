@@ -21,7 +21,7 @@
 #define NOMP_H2D 2
 /**
  * @ingroup nomp_map_direction
- * @brief Mapping of deviceto host(D2H) operation.
+ * @brief Mapping of device to host(D2H) operation.
  */
 #define NOMP_D2H 4
 /**
@@ -283,11 +283,11 @@ int nomp_err(char *buf, int err, size_t buf_size);
  * @ingroup nomp_user_api
  * @brief Finalizes libnomp.
  *
- * Frees allocated runtime resources for libnomp. Returns an
- * error if there is any error occured while the finalize
- * process otherwise 0. Calling this method before `nomp_init`
- * will retrun an error. Calling this method twice will also
- * return an error.
+ * Frees allocated runtime resources for libnomp. Returns a
+ * negative value if an error occurs during the finalize
+ * process, otherwise returns 0. Calling this method before
+ * `nomp_init` will retrun an error. Calling this method twice
+ * will also return an error.
  *
  * @return int
  */

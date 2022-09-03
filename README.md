@@ -43,7 +43,7 @@ cd -
 ## Build documentation
 
 We use `Doxygen` for in source documentations and render those with `Sphinx`
-and `breath`. First, install required dependencies:
+and `Breathe`. First, install required dependencies:
 ```bash
 conda install -c conda-forge doxygen breathe
 conda install sphinx sphinx_rtd_theme
