@@ -44,6 +44,9 @@
 #define NOMP_KNL_ARG_SET_ERROR -130
 #define NOMP_KNL_RUN_ERROR -131
 
+#define NOMP_OUT_OF_MEMORY -140
+#define NOMP_INVALID_ERROR_ID -141
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -69,6 +72,12 @@ void nomp_chk_(int err, const char *file, unsigned line);
 
 void nomp_assert_(int cond, const char *file, unsigned line);
 #define nomp_assert(cond) nomp_assert_(cond, __FILE__, __LINE__)
+
+int nomp_set_error_(const char *description, const char *file_name, unsigned line_no); // returns the error id
+#define nomp_set_error(description) nomp_set_error_(description, __FILE__, __LINE__);
+int nomp_get_error(char **error, int error_id);
+int nomp_get_all_errors(char ***error);
+int nomp_check_error(int ret_value);
 
 #ifdef __cplusplus
 }

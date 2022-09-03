@@ -2,7 +2,7 @@
 
 static struct backend nomp;
 static int initialized = 0;
-
+static struct error_stack errs = { .next_error_id = 1 };
 #define FREE(x)                                                                \
   do {                                                                         \
     if (x)                                                                     \
@@ -316,4 +316,63 @@ void nomp_assert_(int cond, const char *file, unsigned line) {
     printf("nomp_assert failure at %s:%d\n", file, line);
     exit(1);
   }
+}
+
+//=============================================================================
+// Error API
+//
+int nomp_set_error_(const char *description, const char *file_name, unsigned line_no) {
+  struct error err;
+  err.description = description;
+  err.file_name = file_name;
+  err.line_no = line_no;
+  void *temp = realloc(errs.stack, sizeof(errs.stack) + sizeof(err));
+  if (temp == NULL) {
+    return NOMP_OUT_OF_MEMORY;
+  }
+  errs.stack = temp;
+  int error_id = errs.next_error_id;
+  errs.stack[error_id - 1] = err;
+  errs.next_error_id += 1;
+  return error_id;
+}
+
+int nomp_get_error(char **error, int error_id) {
+  if (error_id >= errs.next_error_id) {
+    return NOMP_INVALID_ERROR_ID;
+  }
+  struct error err = errs.stack[error_id - 1];
+  // error[0] -> description
+  *error = malloc(sizeof(err.description));
+  *error = (char*)err.description;
+  // error[1] -> file_name
+  error++;
+  *error = malloc(sizeof(err.file_name));
+  *error = (char*)err.file_name;
+  // error[2] -> line_no
+  error++;
+  *error = malloc(sizeof(err.line_no));
+  memcpy(error, (char*)&err.line_no, sizeof(err.line_no));
+  return 0;
+}
+
+int nomp_get_all_errors(char ***error) {
+  for (size_t error_id = 1; error_id < errs.next_error_id; error_id++)
+  {
+    nomp_get_error(*error, error_id);
+    *error++;
+  }
+  return 0;
+}
+
+int nomp_check_error(int ret_value) {
+  if (ret_value) {
+    for (size_t error_id = 1; error_id < errs.next_error_id; error_id++)
+    {
+      struct error cur = errs.stack[error_id - 1];
+      printf("%s:%d %s\n", cur.file_name, cur.line_no, cur.description);
+    }
+    exit(1);
+  }
+  return 0;
 }

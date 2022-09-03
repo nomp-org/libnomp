@@ -27,6 +27,17 @@ struct mem {
   void *hptr, *bptr;
 };
 
+struct error {
+  const char *description;
+  const char *file_name;
+  unsigned line_no;
+};
+
+struct error_stack {
+  struct error *stack;
+  int next_error_id;
+};
+
 struct backend {
   char name[BUFSIZ];
   int (*map)(struct backend *, struct mem *, const int);
