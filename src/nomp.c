@@ -2,7 +2,8 @@
 
 static struct backend nomp;
 static int initialized = 0;
-static struct error_stack errs = { .next_error_id = 1 };
+static struct error *errs = NULL;
+static int errs_n = 0;
 #define FREE(x)                                                                \
   do {                                                                         \
     if (x)                                                                     \
@@ -321,44 +322,37 @@ void nomp_assert_(int cond, const char *file, unsigned line) {
 //=============================================================================
 // Error API
 //
-int nomp_set_error_(const char *description, const char *file_name, unsigned line_no) {
+int nomp_set_error_(const char *description, int type, const char *file_name, unsigned line_no) {
   struct error err;
-  err.description = description;
-  err.file_name = file_name;
+  err.description = (char *)calloc(strnlen(description, BUFSIZ) + 1, sizeof(char));
+  strncpy(err.description, description, BUFSIZ + 1);
+  err.file_name = (char *)calloc(strnlen(file_name, BUFSIZ) + 1, sizeof(char));
+  strncpy(err.file_name, file_name, BUFSIZ + 1);
   err.line_no = line_no;
-  void *temp = realloc(errs.stack, sizeof(errs.stack) + sizeof(err));
-  if (temp == NULL) {
+  err.type = type;
+  errs = (struct error *)realloc(errs, sizeof(errs) + sizeof(err));
+  if (errs == NULL) {
     return NOMP_OUT_OF_MEMORY;
   }
-  errs.stack = temp;
-  int error_id = errs.next_error_id;
-  errs.stack[error_id - 1] = err;
-  errs.next_error_id += 1;
-  return error_id;
+  errs[errs_n] = err;
+  errs_n += 1;
+  return errs_n;
 }
 
 int nomp_get_error(char **error, int error_id) {
-  if (error_id >= errs.next_error_id) {
+  if (error_id > errs_n) {
     return NOMP_INVALID_ERROR_ID;
   }
-  struct error err = errs.stack[error_id - 1];
-  // error[0] -> description
-  *error = malloc(sizeof(err.description));
-  *error = (char*)err.description;
-  // error[1] -> file_name
-  error++;
-  *error = malloc(sizeof(err.file_name));
-  *error = (char*)err.file_name;
-  // error[2] -> line_no
-  error++;
-  *error = malloc(sizeof(err.line_no));
-  memcpy(error, (char*)&err.line_no, sizeof(err.line_no));
+  struct error err = errs[error_id - 1];
+  size_t n_desc = strnlen(err.description, BUFSIZ);
+  size_t n_file = strnlen(err.file_name, BUFSIZ);
+  *error = (char *)calloc(n_desc + n_file + 2*sizeof(int) + 4, sizeof(char));
+  snprintf(*error, BUFSIZ, "%s:%u %s", err.file_name, err.line_no, err.description);
   return 0;
 }
 
 int nomp_get_all_errors(char ***error) {
-  for (size_t error_id = 1; error_id < errs.next_error_id; error_id++)
-  {
+  for (size_t error_id = 1; error_id < errs_n; error_id++) {
     nomp_get_error(*error, error_id);
     *error++;
   }
@@ -367,9 +361,8 @@ int nomp_get_all_errors(char ***error) {
 
 int nomp_check_error(int ret_value) {
   if (ret_value) {
-    for (size_t error_id = 1; error_id < errs.next_error_id; error_id++)
-    {
-      struct error cur = errs.stack[error_id - 1];
+    for (size_t error_id = 0; error_id < errs_n; error_id++) {
+      struct error cur = errs[error_id];
       printf("%s:%d %s\n", cur.file_name, cur.line_no, cur.description);
     }
     exit(1);

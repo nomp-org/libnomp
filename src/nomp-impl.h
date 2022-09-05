@@ -28,14 +28,10 @@ struct mem {
 };
 
 struct error {
-  const char *description;
-  const char *file_name;
+  char *description;
+  char *file_name;
   unsigned line_no;
-};
-
-struct error_stack {
-  struct error *stack;
-  int next_error_id;
+  int type;
 };
 
 struct backend {
