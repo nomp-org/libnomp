@@ -22,7 +22,6 @@
  * @defgroup nomp_structs Nomp structs
  */
 
-
 /**
  * @ingroup nomp_structs
  * @brief prog
@@ -58,12 +57,12 @@ struct backend {
 /**
  * @ingroup nomp_other_utils
  * @brief Returns the pointer to the allocated memory corresponding to 'p'.
- * 
+ *
  * Returns the pointer to the allocated memory corresponding to 'p'.
  * If no buffer has been allocated for 'p' returns *mems_n*
- * 
+ *
  * @param p Value which required the pointer of it
- * @return struct mem* 
+ * @return struct mem*
  */
 struct mem *mem_if_mapped(void *p);
 
@@ -95,7 +94,7 @@ int opencl_init(struct backend *backend, const int platform_id,
  * @ingroup nomp_backend_init
  * @brief Initializes Cuda backend with the specified platform and device
  *
- * Initializes Cuda backend using the given platform id and device id. 
+ * Initializes Cuda backend using the given platform id and device id.
  * Returns a negative value if an error occurs during the initialization,
  * otherwise returns 0.
  *
@@ -127,28 +126,28 @@ int py_append_to_sys_path(const char *path);
 /**
  * @ingroup nomp_py_utils
  * @brief Creates loopy kernel from C source
- * 
+ *
  * @param pKnl Python kernal object
  * @param c_src C kernal source
  * @param backend Backend name
- * @return int 
+ * @return int
  */
 int py_c_to_loopy(PyObject **pKnl, const char *c_src, const char *backend);
 /**
  * @ingroup nomp_py_utils
- * @brief Calls the user callback function specfied by file name and 
+ * @brief Calls the user callback function specfied by file name and
  * function name, on the kernal
- * 
+ *
  * @param pKnl Python kernal object
  * @param file File to the callback function
  * @param func Declared name of the callback function
- * @return int 
+ * @return int
  */
 int py_user_callback(PyObject **pKnl, const char *file, const char *func);
 /**
  * @ingroup nomp_py_utils
  * @brief Get kernal name and source
- * 
+ *
  * @param name Array of pointers to name
  * @param src Array of pointers to kernal source
  * @param pKnl Python kernal object
@@ -157,8 +156,8 @@ int py_user_callback(PyObject **pKnl, const char *file, const char *func);
 int py_get_knl_name_and_src(char **name, char **src, PyObject *pKnl);
 /**
  * @ingroup nomp_py_utils
- * @brief 
- * 
+ * @brief
+ *
  * @param ndim Number of dimensions of the kernel
  * @param global Global grid
  * @param local Local grid
@@ -178,11 +177,11 @@ int py_get_grid_size(int *ndim, size_t *global, size_t *local, PyObject *pKnl,
 
 /**
  * @ingroup nomp_other_utils
- * @brief 
- * 
- * @param nstr 
- * @param ... 
- * @return char* 
+ * @brief
+ *
+ * @param nstr
+ * @param ...
+ * @return char*
  */
 char *strcatn(int nstr, ...);
 
