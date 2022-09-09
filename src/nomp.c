@@ -322,9 +322,11 @@ void nomp_assert_(int cond, const char *file, unsigned line) {
 //=============================================================================
 // Error API
 //
-int nomp_set_error_(const char *description, int type, const char *file_name, unsigned line_no) {
+int nomp_set_error_(const char *description, int type, const char *file_name,
+                    unsigned line_no) {
   struct error err;
-  err.description = (char *)calloc(strnlen(description, BUFSIZ) + 1, sizeof(char));
+  err.description =
+      (char *)calloc(strnlen(description, BUFSIZ) + 1, sizeof(char));
   strncpy(err.description, description, BUFSIZ + 1);
   err.file_name = (char *)calloc(strnlen(file_name, BUFSIZ) + 1, sizeof(char));
   strncpy(err.file_name, file_name, BUFSIZ + 1);
@@ -346,8 +348,9 @@ int nomp_get_error(char **error, int error_id) {
   struct error err = errs[error_id - 1];
   size_t n_desc = strnlen(err.description, BUFSIZ);
   size_t n_file = strnlen(err.file_name, BUFSIZ);
-  *error = (char *)calloc(n_desc + n_file + 2*sizeof(int) + 4, sizeof(char));
-  snprintf(*error, BUFSIZ, "%s:%u %s", err.file_name, err.line_no, err.description);
+  *error = (char *)calloc(n_desc + n_file + 2 * sizeof(int) + 4, sizeof(char));
+  snprintf(*error, BUFSIZ, "%s:%u %s", err.file_name, err.line_no,
+           err.description);
   return 0;
 }
 
