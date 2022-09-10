@@ -1,9 +1,5 @@
-git+https://github.com/inducer/loopy.git#egg=loopy
-islpy==2022.2.1
-pycparser==2.21
-pymbolic==2022.1
-pytools==2022.1.12
-cmake==3.24.1
+-r requirements.txt
 breathe==4.34.0
 Sphinx==5.1.1
 sphinx-rtd-theme==1.0.0 
+clang-format==14.0.6

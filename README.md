@@ -16,7 +16,7 @@ conda activate libnomp
 pip install -r requirements.txt
 ```
 
-Install devDependencies:
+Install Dev Dependencies:
 ```bash
 conda create --name libnomp-dev python=3.10 doxygen
 conda activate libnomp-dev
