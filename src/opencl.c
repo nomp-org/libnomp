@@ -9,6 +9,7 @@
 
 // TODO: Handle errors properly in OpenCL backend
 struct opencl_backend {
+  cl_device_id device_id;
   cl_command_queue queue;
   cl_context ctx;
 };
@@ -175,6 +176,7 @@ int opencl_init(struct backend *bnd, const int platform_id,
 
   struct opencl_backend *ocl = bnd->bptr =
       calloc(1, sizeof(struct opencl_backend));
+  ocl->device_id = device;
   ocl->ctx = clCreateContext(NULL, 1, &device, NULL, NULL, &err);
   ocl->queue = clCreateCommandQueueWithProperties(ocl->ctx, device, NULL, &err);
 
