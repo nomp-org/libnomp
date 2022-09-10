@@ -29,8 +29,6 @@ struct mem {
 
 struct error {
   char *description;
-  char *file_name;
-  unsigned line_no;
   int type;
 };
 
