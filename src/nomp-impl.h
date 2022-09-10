@@ -18,31 +18,15 @@
 #define py_module "loopy_api"
 #define py_func "c_to_loopy"
 
-/**
- * @defgroup nomp_structs Nomp structs
- */
-
-/**
- * @ingroup nomp_structs
- * @brief prog
- */
 struct prog {
   void *bptr;
 };
 
-/**
- * @ingroup nomp_structs
- * @brief mem
- */
 struct mem {
   size_t idx0, idx1, usize;
   void *hptr, *bptr;
 };
 
-/**
- * @ingroup nomp_structs
- * @brief backend
- */
 struct backend {
   char name[BUFSIZ];
   int (*map)(struct backend *, struct mem *, const int);
@@ -156,7 +140,7 @@ int py_user_callback(PyObject **pKnl, const char *file, const char *func);
 int py_get_knl_name_and_src(char **name, char **src, PyObject *pKnl);
 /**
  * @ingroup nomp_py_utils
- * @brief
+ * @brief Get global and local grid sizes
  *
  * @param ndim Number of dimensions of the kernel
  * @param global Global grid
@@ -177,10 +161,13 @@ int py_get_grid_size(int *ndim, size_t *global, size_t *local, PyObject *pKnl,
 
 /**
  * @ingroup nomp_other_utils
- * @brief
+ * @brief Concatenates atmost `nstr` strings.
  *
- * @param nstr
- * @param ...
+ * Concatenates atmost `nstr` strings and returns a pointer to
+ * the destination.
+ *
+ * @param nstr Number of strings to concatenate
+ * @param ... Strings to concatenate
  * @return char*
  */
 char *strcatn(int nstr, ...);

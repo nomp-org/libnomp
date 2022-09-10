@@ -6,12 +6,6 @@
 Internal API
 ============
 
-Structs
-^^^^^^^^^
-.. doxygengroup:: nomp_structs
-   :project: libnomp
-   :content-only:
-
 Functions
 ^^^^^^^^^
 
