@@ -11,14 +11,13 @@ git clone --recurse-submodules https://github.com/nomp-org/libnomp.git
 
 Install dependencies:
 ```bash
-conda create --name libnomp python=3.10
+conda env create -f environment.yml
 conda activate libnomp
-pip install -r requirements.txt
 ```
 
 Install Dev Dependencies:
 ```bash
-conda env create -f environment.yml
+conda env create -f environment-dev.yml
 conda activate libnomp-dev
 ```
 

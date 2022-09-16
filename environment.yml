@@ -1,13 +1,6 @@
-name: libnomp-dev
-channels:
-  - conda-forge
+name: libnomp
 dependencies:
   - python=3.10
-  - doxygen
   - pip
   - pip:
     - -r requirements.txt
-    - breathe==4.34.0
-    - Sphinx==5.1.1
-    - sphinx-rtd-theme==1.0.0 
-    - clang-format==14.0.6
