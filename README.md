@@ -18,9 +18,8 @@ pip install -r requirements.txt
 
 Install Dev Dependencies:
 ```bash
-conda create --name libnomp-dev python=3.10 doxygen
+conda env create -f environment.yml
 conda activate libnomp-dev
-pip install -r requirements-dev.txt
 ```
 
 Use `cmake` to build the repo after installing the dependencies:
