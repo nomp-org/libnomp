@@ -2,9 +2,7 @@
 
 static struct backend nomp;
 static int initialized = 0;
-static struct error *errs = NULL;
-static unsigned errs_n = 0;
-static unsigned errs_max = 0;
+
 #define FREE(x)                                                                \
   do {                                                                         \
     if (x)                                                                     \
@@ -203,7 +201,37 @@ int nomp_run(int id, int ndim, const size_t *global, const size_t *local,
 }
 
 //=============================================================================
-// nomp_err
+// nomp_finalize
+//
+int nomp_finalize(void) {
+  if (!initialized)
+    return NOMP_NOT_INITIALIZED_ERROR;
+
+  for (unsigned i = 0; i < mems_n; i++) {
+    if (mems[i].bptr != NULL)
+      nomp.map(&nomp, &mems[i], NOMP_FREE);
+  }
+  FREE(mems);
+  mems = NULL, mems_n = mems_max = 0;
+
+  for (unsigned i = 0; i < progs_n; i++) {
+    if (progs[i].bptr != NULL)
+      nomp.knl_free(&progs[i]);
+  }
+  free(progs), progs = NULL, progs_n = progs_max = 0;
+
+  initialized = nomp.finalize(&nomp);
+  if (initialized)
+    return NOMP_FINALIZE_ERROR;
+
+  if (Py_IsInitialized())
+    Py_Finalize();
+
+  return 0;
+}
+
+//=============================================================================
+// Helper functions: nomp_err & nomp_assert
 //
 int nomp_err(char *buf, int err, size_t buf_size) {
   switch (err) {
@@ -271,39 +299,6 @@ int nomp_err(char *buf, int err, size_t buf_size) {
   return 0;
 }
 
-//=============================================================================
-// nomp_finalize
-//
-int nomp_finalize(void) {
-  if (!initialized)
-    return NOMP_NOT_INITIALIZED_ERROR;
-
-  for (unsigned i = 0; i < mems_n; i++) {
-    if (mems[i].bptr != NULL)
-      nomp.map(&nomp, &mems[i], NOMP_FREE);
-  }
-  FREE(mems);
-  mems = NULL, mems_n = mems_max = 0;
-
-  for (unsigned i = 0; i < progs_n; i++) {
-    if (progs[i].bptr != NULL)
-      nomp.knl_free(&progs[i]);
-  }
-  free(progs), progs = NULL, progs_n = progs_max = 0;
-
-  initialized = nomp.finalize(&nomp);
-  if (initialized)
-    return NOMP_FINALIZE_ERROR;
-
-  if (Py_IsInitialized())
-    Py_Finalize();
-
-  return 0;
-}
-
-//=============================================================================
-// Helper functions: nomp_err & nomp_assert
-//
 void nomp_chk_(int err, const char *file, unsigned line) {
   if (err) {
     char buf[2 * BUFSIZ];
@@ -323,6 +318,10 @@ void nomp_assert_(int cond, const char *file, unsigned line) {
 //=============================================================================
 // Error API
 //
+static struct error *errs = NULL;
+static unsigned errs_n = 0;
+static unsigned errs_max = 0;
+
 int nomp_set_error_(const char *description, int type, const char *file_name,
                     unsigned line_no) {
   if (errs_max <= errs_n) {
