@@ -70,7 +70,7 @@ static int opencl_knl_build(struct backend *bnd, struct prog *prg,
 
   err = clBuildProgram(ocl_prg->prg, 0, NULL, NULL, NULL, NULL);
   if (err != CL_SUCCESS) {
-    // Determine the size of the log
+    // Determine log size
     size_t log_size;
     clGetProgramBuildInfo(ocl_prg->prg, ocl->device_id, CL_PROGRAM_BUILD_LOG, 0, NULL, &log_size);
 
