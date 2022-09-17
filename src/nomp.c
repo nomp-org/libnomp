@@ -201,39 +201,20 @@ int nomp_run(int id, int ndim, const size_t *global, const size_t *local,
 }
 
 //=============================================================================
-// nomp_finalize
+// Helper functions: nomp_assert & nomp_err
 //
-int nomp_finalize(void) {
-  if (!initialized)
-    return NOMP_NOT_INITIALIZED_ERROR;
-
-  for (unsigned i = 0; i < mems_n; i++) {
-    if (mems[i].bptr != NULL)
-      nomp.map(&nomp, &mems[i], NOMP_FREE);
+void nomp_assert_(int cond, const char *file, unsigned line) {
+  if (!cond) {
+    printf("nomp_assert failure at %s:%d\n", file, line);
+    exit(1);
   }
-  FREE(mems);
-  mems = NULL, mems_n = mems_max = 0;
-
-  for (unsigned i = 0; i < progs_n; i++) {
-    if (progs[i].bptr != NULL)
-      nomp.knl_free(&progs[i]);
-  }
-  free(progs), progs = NULL, progs_n = progs_max = 0;
-
-  initialized = nomp.finalize(&nomp);
-  if (initialized)
-    return NOMP_FINALIZE_ERROR;
-
-  if (Py_IsInitialized())
-    Py_Finalize();
-
-  return 0;
 }
 
-//=============================================================================
-// Helper functions: nomp_err & nomp_assert
-//
-int nomp_err(char *buf, int err, size_t buf_size) {
+static struct error *errs = NULL;
+static unsigned errs_n = 0;
+static unsigned errs_max = 0;
+
+int nomp_err_type_to_str(char *buf, int err, size_t buf_size) {
   switch (err) {
   case NOMP_INVALID_BACKEND:
     strncpy(buf, "Invalid NOMP backend", buf_size);
@@ -299,29 +280,6 @@ int nomp_err(char *buf, int err, size_t buf_size) {
   return 0;
 }
 
-void nomp_chk_(int err, const char *file, unsigned line) {
-  if (err) {
-    char buf[2 * BUFSIZ];
-    nomp_err(buf, err, 2 * BUFSIZ);
-    printf("%s:%d %s\n", file, line, buf);
-    exit(1);
-  }
-}
-
-void nomp_assert_(int cond, const char *file, unsigned line) {
-  if (!cond) {
-    printf("nomp_assert failure at %s:%d\n", file, line);
-    exit(1);
-  }
-}
-
-//=============================================================================
-// Error API
-//
-static struct error *errs = NULL;
-static unsigned errs_n = 0;
-static unsigned errs_max = 0;
-
 int nomp_set_error_(const char *description, int type, const char *file_name,
                     unsigned line_no) {
   if (errs_max <= errs_n) {
@@ -341,30 +299,61 @@ int nomp_set_error_(const char *description, int type, const char *file_name,
   return errs_n;
 }
 
-int nomp_get_error(char **error, int error_id) {
-  if (error_id <= 0 && error_id > errs_n) {
+int nomp_get_error(char **err_str, int err_id) {
+  if (err_id <= 0 && err_id > errs_n) {
+    *err_str = NULL;
     return NOMP_INVALID_ERROR_ID;
   }
-  struct error err = errs[error_id - 1];
-  *error = (char *)calloc(strnlen(err.description, BUFSIZ) + 1, sizeof(char));
-  strncpy(*error, err.description, BUFSIZ + 1);
+  struct error err = errs[err_id - 1];
+  *err_str = (char *)calloc(strnlen(err.description, BUFSIZ) + 1, sizeof(char));
+  strncpy(*err_str, err.description, BUFSIZ + 1);
   return 0;
 }
 
-int nomp_get_all_errors(char ***error) {
-  for (size_t error_id = 1; error_id < errs_n; error_id++) {
-    nomp_get_error(*error, error_id);
-    *error++;
-  }
-  return 0;
-}
-
-int nomp_check_error(int ret_value) {
-  if (ret_value) {
-    for (size_t error_id = 0; error_id < errs_n; error_id++) {
-      printf("%s\n", errs[error_id].description);
-    }
+void nomp_chk_(int err_id, const char *file, unsigned line) {
+  if (err_id == 0)
+    return;
+  char *err_str;
+  int err = nomp_get_error(&err_str, err_id);
+  if (err != NOMP_INVALID_ERROR_ID) {
+    printf("%s:%d %s\n", file, line, err_str);
+    free(err_str);
     exit(1);
   }
+}
+
+//=============================================================================
+// nomp_finalize
+//
+int nomp_finalize(void) {
+  if (!initialized)
+    return NOMP_NOT_INITIALIZED_ERROR;
+
+  for (unsigned i = 0; i < mems_n; i++) {
+    if (mems[i].bptr != NULL)
+      nomp.map(&nomp, &mems[i], NOMP_FREE);
+  }
+  FREE(mems);
+  mems = NULL, mems_n = mems_max = 0;
+
+  for (unsigned i = 0; i < progs_n; i++) {
+    if (progs[i].bptr != NULL)
+      nomp.knl_free(&progs[i]);
+  }
+  FREE(progs);
+  progs = NULL, progs_n = progs_max = 0;
+
+  for (unsigned i = 0; i < errs_n; i++)
+    FREE(errs[i].description);
+  FREE(errs);
+  errs = NULL, errs_n = errs_max = 0;
+
+  initialized = nomp.finalize(&nomp);
+  if (initialized)
+    return NOMP_FINALIZE_ERROR;
+
+  if (Py_IsInitialized())
+    Py_Finalize();
+
   return 0;
 }
