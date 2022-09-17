@@ -70,18 +70,21 @@ static int opencl_knl_build(struct backend *bnd, struct prog *prg,
 
   err = clBuildProgram(ocl_prg->prg, 0, NULL, NULL, NULL, NULL);
   if (err != CL_SUCCESS) {
-    //printf("opencl.c::clBuildProgram error_code:%d device_id:%d\n", err, ocl->device_id);
+    // printf("opencl.c::clBuildProgram error_code:%d device_id:%d\n", err,
+    // ocl->device_id);
 
     // Determine the size of the log
     size_t log_size;
-    clGetProgramBuildInfo(ocl_prg->prg, ocl->device_id, CL_PROGRAM_BUILD_LOG, 0, NULL, &log_size);
+    clGetProgramBuildInfo(ocl_prg->prg, ocl->device_id, CL_PROGRAM_BUILD_LOG, 0,
+                          NULL, &log_size);
     printf("log_size:%d\n", log_size);
 
     // Allocate memory for the log
-    char *log = (char *) malloc(log_size);
+    char *log = (char *)malloc(log_size);
 
     // Get the log
-    clGetProgramBuildInfo(ocl_prg->prg, ocl->device_id, CL_PROGRAM_BUILD_LOG, log_size, log, NULL);
+    clGetProgramBuildInfo(ocl_prg->prg, ocl->device_id, CL_PROGRAM_BUILD_LOG,
+                          log_size, log, NULL);
 
     // Print the log
     printf("log,\n%s\n", log);
