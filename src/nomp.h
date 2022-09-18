@@ -89,7 +89,7 @@
 #define NOMP_PTR_ALREADY_MAPPED -38
 /**
  * @ingroup nomp_errors
- * @brief Invalid NOMP kernal
+ * @brief Invalid NOMP kernel
  */
 #define NOMP_INVALID_KNL -39
 
@@ -142,7 +142,7 @@
 #define NOMP_LOOPY_CONVERSION_ERROR -100
 /**
  * @ingroup nomp_errors
- * @brief Failed to find loopy kernal
+ * @brief Failed to find loopy kernel
  */
 #define NOMP_LOOPY_KNL_NAME_NOT_FOUND -101
 /**
@@ -194,58 +194,100 @@ extern "C" {
  * @ingroup nomp_user_api
  * @brief Initializes libnomp with the specified backend, platform and device.
  *
- * Initializes the nomp code generation for the specified backend (e.g., Cuda,
- * OpenCL, etc) using the given platform id and device id. Returns a negative
- * value if an error occurs during the initialization, otherwise returns 0.
- * Calling this method twice (without nomp_finalize in between) will return an
- * error as well. Currently only supports Cuda and OpenCL backends.
+ * @details Initializes the nomp code generation for the specified backend
+ * (e.g., Cuda, OpenCL, etc) using the given platform id and device id. Returns
+ * a negative value if an error occurs during the initialization, otherwise
+ * returns 0. Calling this method twice (without nomp_finalize in between) will
+ * return an error (but not segfault) as well. Currently only supports Cuda and
+ * OpenCL backends.
  *
- * @param backend Target backend for code generation.
- * @param platform Target platform id to share resources and execute kernals
- *                 in the targeted device.
- * @param device Target device id to execute kernals.
+ * @param[in] backend Target backend for code generation ("Cuda", "OpenCL",
+ * etc.).
+ * @param[in] platform Target platform id to share resources and execute kernels
+ *                 in the targeted device (only used for OpenCL backend).
+ * @param[in] device Target device id to execute kernels.
  * @return int
+ *
+ * <b>Example usage:</b>
+ * @code{.c}
+ * int err = nomp_init("OpenCL", 0, 0);
+ * @endcode
  */
 int nomp_init(const char *backend, int platform, int device);
 
 /**
  * @ingroup nomp_user_api
- * @brief Does D2H/H2D transfers (update) and alloc/free.
+ * @brief Performs device to host (D2H) and host to device (H2D) memory
+ * transfers, allocation and freeing of memory on the device.
  *
- * Does data tramsfers from host to device and device to host, allocations and
- * freeing of memory where the operation is specified by `op`.
- *
- * @param ptr Pointer to the vector
- * @param start_idx Starting index
- * @param end_idx End index
- * @param unit_size Unit size of a vector element
- * @param op Operation to perform
+ * @param[in] ptr Pointer to the host vector.
+ * @param[in] start_idx Start index in the vector.
+ * @param[in] end_idx End index in the vector.
+ * @param[in] unit_size Size of a single vector element.
+ * @param[in] op Operation to perform (One of @ref nomp_map_direction).
  * @return int
+ *
+ * @details Operation op will be performed on the array slice [start_idx,
+ * end_idx), i.e., on array elements start_idx, ... end_idx - 1. This method
+ * returns a non-zero value if there is an error and 0 otherwise.
+ *
+ * <b>Example usage:</b>
+ * @code{.c}
+ * const int N = 10;
+ * double a[10], b[10];
+ * for (unsigned i = 0; i < N; i++) {
+ *   a[i] = i;
+ *   b[i] = N - i;
+ * }
+ * int err = nomp_map(a, 0, N, sizeof(double), NOMP_H2D);
+ * int err = nomp_map(b, 0, N, sizeof(double), NOMP_H2D);
+ * // Code that change array values on the device (e.g., execution of a kernel)
+ * int err = nomp_map(a, 0, N, sizeof(double), NOMP_D2H);
+ * int err = nomp_map(b, 0, N, sizeof(double), NOMP_D2H);
+ * int err = nomp_map(a, 0, N, sizeof(double), NOMP_FREE);
+ * int err = nomp_map(b, 0, N, sizeof(double), NOMP_FREE);
+ * @endcode
  */
 int nomp_map(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
              int op);
 
 /**
  * @ingroup nomp_user_api
- * @brief JIT compile the kernels after applying code transformations.
+ * @brief Generate a kernel for the target backend (OpenCL, Cuda, etc.) from C
+ * source.
  *
- * <b>Example</b>
+ * @details User defined code transformations will be applied based on the
+ * annotations passed to this function. Kernel specific transformations can be
+ * specified in the callback function.
+ *
+ * <b>Example usage:</b>
  * @code{.c}
+ * int N = 10;
+ * double a[10], b[10];
+ * for (unsigned i = 0; i < N; i++) {
+ *   a[i] = i;
+ *   b[i] = 10 -i
+ * }
+ * const char *knl = "for (unsigned i = 0; i < N; i++) a[i] += b[i];"
  * int err = nomp_jit(&id, &ndim, global, local, knl, NULL, "file:function",
  *                    3, "a,b,N", NOMP_PTR, sizeof(double), a, NOMP_PTR,
  *                    sizeof(double), b, NOMP_INTEGER, sizeof(int), &N);
  * @endcode
  *
- * @param id Kernal id
- * @param ndim Number of dimensions of the kernel
- * @param global Global grid
- * @param local Local grid
- * @param c_src Kernal
- * @param annotations Annotations
- * @param callback Callbacks
- * @param nargs Number of arguments
- * @param args Comma separated arguments
- * @param ...
+ * @param[out] id id of the generated kernel.
+ * @param[out] ndim Number of dimensions of the kernel (This param will be
+ * removed).
+ * @param[out] global Global grid (This param will be removed).
+ * @param[out] local Local grid (This param will be removed).
+ * @param[in] c_src Kernel source in C.
+ * @param[in] annotations Annotations to perform user defined (domain specific)
+ * transformations.
+ * @param[in] callback Callback function that is called when generating the
+ * kernel.
+ * @param[in] nargs Number of arguments to the kernel.
+ * @param[in] args Comma separated list of argument names.
+ * @param[in] ... For each argument, we pass the argument type (one of @ref
+ * nomp_types), size of the base type and the pointer to the argument.
  *
  * @return int
  */
@@ -255,39 +297,37 @@ int nomp_jit(int *id, int *ndim, size_t *global, size_t *local,
 
 /**
  * @ingroup nomp_user_api
- * @brief Runs the kernels.
+ * @brief Runs the kernel.
  *
- * @param id Kernal id
- * @param ndim Number of dimensions of the kernel
- * @param global Global grid
- * @param local Local grid
- * @param nargs Number of arguments
- * @param ...
+ * @details Runs the kernel with a given kernel id. Kernel id is followed by the
+ * number of arguments. Then for each argument we pass the argument type (@ref
+ * nomp_type) size of the base type in case of an integer and pointer to the
+ * argument.
+ *
+ * @param[in] id id of the kernel to be run
+ * @param[in] ndim Number of dimensions of the kernel (This param will be
+ * removed)
+ * @param[in] global Global grid (This param will be removed)
+ * @param[in] local Local grid (This param will be removed)
+ * @param[in] nargs Number of arguments
+ * @param[in] ... For each argument, argument type, sizeof base type and pointer
+ * to the argument.
+ *
  * @return int
  */
 int nomp_run(int id, int ndim, const size_t *global, const size_t *local,
              int nargs, ...);
 
-/**
- * @ingroup nomp_user_api
- * @brief Copies nomp error to the specified buffer.
- *
- * @param buf Buffer to copy error description
- * @param err Nomp error
- * @param buf_size Buffer size
- * @return int
- */
 int nomp_err(char *buf, int err, size_t buf_size);
 
 /**
  * @ingroup nomp_user_api
- * @brief Finalizes libnomp.
+ * @brief Finalizes libnomp runtime.
  *
- * Frees allocated runtime resources for libnomp. Returns a
- * negative value if an error occurs during the finalize
- * process, otherwise returns 0. Calling this method before
- * `nomp_init` will retrun an error. Calling this method twice
- * will also return an error.
+ * @details Frees allocated runtime resources for libnomp. Returns a non-zero
+ * value if an error occurs during the finalize process, otherwise returns 0.
+ * Calling this method before `nomp_init` will retrun an error. Calling this
+ * method twice will also return an error.
  *
  * @return int
  */
