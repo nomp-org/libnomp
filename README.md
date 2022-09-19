@@ -11,8 +11,14 @@ git clone --recurse-submodules https://github.com/nomp-org/libnomp.git
 
 Install dependencies:
 ```bash
-pip3 install git+https://github.com/inducer/loopy
-pip3 install pycparser pyopencl
+conda env create -f environment.yml
+conda activate libnomp
+```
+
+Install Dev Dependencies:
+```bash
+conda env create -f environment-dev.yml
+conda activate libnomp-dev
 ```
 
 Use `cmake` to build the repo after installing the dependencies:
