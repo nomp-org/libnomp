@@ -50,7 +50,7 @@ cd -
 ## Build documentation
 
 We use `Doxygen` for in source documentations and render those with `Sphinx` and
-`Breathe`. These packages should be installed if you install the dev dependencies
+`Breathe`. These packages should be available if you install the dev dependencies
 using conda (See build instructions).
 
 Build docs
@@ -65,7 +65,7 @@ locally.
 ## Developer documentation
 
 Please run `clang-format` before comitting any changes you make on the source
-files. `clang-format` will be installed if you install the dev dependencies with
+files. `clang-format` will be available if you install the dev dependencies with
 conda. Below are some examples on how to use `clang-format`:
 ```
 clang-format -i src/*.[ch]
