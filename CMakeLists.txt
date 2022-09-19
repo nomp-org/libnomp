@@ -44,6 +44,12 @@ foreach(test ${TESTS})
   target_include_directories(${test_exe} PUBLIC src)
 endforeach(test ${TESTS})
 
+option(ENABLE_DOCS "Enable Documentation" OFF)
+if (ENABLE_DOCS)
+  set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+  add_subdirectory ("docs")
+endif()
+
 install(TARGETS nomp
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
