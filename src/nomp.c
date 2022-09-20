@@ -13,8 +13,14 @@ static int initialized = 0;
 // nomp_init
 //
 int nomp_init(const char *backend, int platform, int device) {
-  if (initialized)
-    return NOMP_INITIALIZED_ERROR;
+  if (initialized) {
+    char buf[BUFSIZ];
+    snprintf(buf, BUFSIZ,
+             "libnomp is already initialized to use %s. Call "
+             "nomp_finalize() before calling nomp_init() again.",
+             nomp.name);
+    return nomp_set_error(buf, NOMP_INITIALIZED_ERROR);
+  }
 
   char name[BUFSIZ];
   size_t n = strnlen(backend, BUFSIZ);
@@ -22,21 +28,26 @@ int nomp_init(const char *backend, int platform, int device) {
     name[i] = tolower(backend[i]);
   name[n] = '\0';
 
-  int err = NOMP_INVALID_BACKEND;
-  // FIXME: This is ugly -- should be fixed
+  int err = 0;
+  if (strncmp(name, "opencl", 32) == 0) {
 #if defined(OPENCL_ENABLED)
-  if (strncmp(name, "opencl", 32) == 0)
     err = opencl_init(&nomp, platform, device);
 #endif
+  } else if (strncmp(name, "cuda", 32) == 0) {
 #if defined(CUDA_ENABLED)
-  if (strncmp(name, "cuda", 32) == 0)
     err = cuda_init(&nomp, platform, device);
 #endif
+  } else {
+    char buf[BUFSIZ];
+    snprintf(buf, BUFSIZ, "Failed to initialize libnomp. Invalid backend: %s",
+             name);
+    err = nomp_set_error(buf, NOMP_INVALID_BACKEND);
+  }
   if (err)
     return err;
+
   strncpy(nomp.name, name, BUFSIZ);
 
-  err = NOMP_PY_INITIALIZE_ERROR;
   if (!Py_IsInitialized()) {
     // May be we need the isolated configuration listed here:
     // https://docs.python.org/3/c-api/init_config.html#init-config
@@ -46,17 +57,24 @@ int nomp_init(const char *backend, int platform, int device) {
     py_append_to_sys_path(".");
     // There should be a better way to figure the installation
     // path based on the shared library path
-    err = NOMP_INSTALL_DIR_NOT_FOUND;
     char *install_dir = getenv("NOMP_INSTALL_DIR");
     if (install_dir) {
       char *abs_dir = strcatn(3, install_dir, "/", py_dir);
       py_append_to_sys_path(abs_dir);
       FREE(abs_dir);
-      err = 0;
+    } else {
+      char buf[BUFSIZ] =
+          "Environment variable NOMP_INSTALL_DIR, which is required by "
+          "libnomp is not set.";
+      return nomp_set_error(buf, NOMP_INSTALL_DIR_NOT_FOUND);
     }
+  } else {
+    // TODO: Check if we can use initialized python
+    // FIXME: This should be a warning, not an error.
+    return nomp_set_error("Python is already initialized. Using already "
+                          "initialized python version.",
+                          NOMP_PY_INITIALIZE_ERROR);
   }
-  if (err)
-    return err;
 
   initialized = 1;
   return 0;
