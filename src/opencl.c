@@ -9,6 +9,7 @@
 
 // TODO: Handle errors properly in OpenCL backend
 struct opencl_backend {
+  cl_device_id device_id;
   cl_command_queue queue;
   cl_context ctx;
 };
@@ -69,8 +70,26 @@ static int opencl_knl_build(struct backend *bnd, struct prog *prg,
 
   err = clBuildProgram(ocl_prg->prg, 0, NULL, NULL, NULL, NULL);
   if (err != CL_SUCCESS) {
+    // Determine log size
+    size_t log_size;
+    clGetProgramBuildInfo(ocl_prg->prg, ocl->device_id, CL_PROGRAM_BUILD_LOG, 0,
+                          NULL, &log_size);
+
+    // Allocate memory for the log
+    char *log = (char *)calloc(log_size, sizeof(char));
+    // Verify log memory allocation
+    if (!log)
+      return 1;
+
+    // Get the log
+    clGetProgramBuildInfo(ocl_prg->prg, ocl->device_id, CL_PROGRAM_BUILD_LOG,
+                          log_size, log, NULL);
+    // Print the log
+    printf("clBuildProgram error: %s\n", log);
+
     ocl_prg->prg = NULL;
     ocl_prg->knl = NULL;
+
     return 1;
   }
 
@@ -175,6 +194,7 @@ int opencl_init(struct backend *bnd, const int platform_id,
 
   struct opencl_backend *ocl = bnd->bptr =
       calloc(1, sizeof(struct opencl_backend));
+  ocl->device_id = device;
   ocl->ctx = clCreateContext(NULL, 1, &device, NULL, NULL, &err);
   ocl->queue = clCreateCommandQueueWithProperties(ocl->ctx, device, NULL, &err);
 
