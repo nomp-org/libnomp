@@ -304,7 +304,7 @@ int nomp_jit(int *id, int *ndim, size_t *global, size_t *local,
  *
  * @details Runs the kernel with a given kernel id. Kernel id is followed by the
  * number of arguments. Then for each argument we pass the argument type (@ref
- * nomp_type) size of the base type in case of an integer and pointer to the
+ * nomp_types) size of the base type in case of an integer and pointer to the
  * argument.
  *
  * @param[in] id id of the kernel to be run

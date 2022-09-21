@@ -73,9 +73,9 @@ struct mem *mem_if_mapped(void *p);
  * occurs during the initialization, otherwise returns 0.
  *
  * @param backend Target backend for code generation.
- * @param platform Target platform id to share resources and execute kernals
+ * @param platform_id Target platform id to share resources and execute kernals
  *                 in the targeted device.
- * @param device Target device id to execute kernals.
+ * @param device_id Target device id to execute kernals.
  * @return int
  */
 int opencl_init(struct backend *backend, const int platform_id,
@@ -89,9 +89,9 @@ int opencl_init(struct backend *backend, const int platform_id,
  * otherwise returns 0.
  *
  * @param backend Target backend for code generation.
- * @param platform Target platform id to share resources and execute kernals
+ * @param platform_id Target platform id to share resources and execute kernals
  *                 in the targeted device.
- * @param device Target device id to execute kernals.
+ * @param device_id Target device id to execute kernals.
  * @return int
  */
 int cuda_init(struct backend *backend, const int platform_id,
