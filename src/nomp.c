@@ -353,9 +353,7 @@ void nomp_chk_(int err_id, const char *file, unsigned line) {
 int nomp_finalize(void) {
   if (!initialized) {
     char buf[BUFSIZ];
-    snprintf(buf, BUFSIZ,
-             "libnomp is already initialized to use. Call "
-             "nomp_finalize() before calling nomp_init() again.");
+    snprintf(buf, BUFSIZ, "Call nomp_init() before calling nomp_finalize().");
     return nomp_set_error(buf, NOMP_NOT_INITIALIZED_ERROR);
   }
 
