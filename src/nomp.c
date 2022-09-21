@@ -3,12 +3,6 @@
 static struct backend nomp;
 static int initialized = 0;
 
-#define FREE(x)                                                                \
-  do {                                                                         \
-    if (x)                                                                     \
-      free(x);                                                                 \
-  } while (0)
-
 //=============================================================================
 // nomp_init
 //
@@ -113,9 +107,8 @@ static struct prog *progs = NULL;
 static int progs_n = 0;
 static int progs_max = 0;
 
-int nomp_jit(int *id, int *ndim, size_t *global, size_t *local,
-             const char *c_src, const char *annotations, const char *callback,
-             int nargs, const char *args, ...) {
+int nomp_jit(int *id, const char *c_src, const char *annotations,
+             const char *callback, int nargs, const char *args, ...) {
   if (*id == -1) {
     if (progs_n == progs_max) {
       progs_max += progs_max / 2 + 1;
@@ -125,8 +118,7 @@ int nomp_jit(int *id, int *ndim, size_t *global, size_t *local,
     // Create loopy kernel from C source
     PyObject *pKnl = NULL;
     int err = py_c_to_loopy(&pKnl, c_src, nomp.name);
-    if (err)
-      return err;
+    return_on_err(err);
 
     // Call the User callback function
     char *callback_ = strndup(callback, BUFSIZ),
@@ -135,20 +127,18 @@ int nomp_jit(int *id, int *ndim, size_t *global, size_t *local,
       user_func = strtok(NULL, ":");
     err = py_user_callback(&pKnl, user_file, user_func);
     FREE(callback_);
-    if (err)
-      return err;
+    return_on_err(err);
 
     // Get OpenCL, CUDA, etc. source and and name from the loopy kernel and
     // then build it
     char *name, *src;
     err = py_get_knl_name_and_src(&name, &src, pKnl);
-    if (err)
-      return err;
-    err = nomp.knl_build(&nomp, &progs[progs_n], src, name);
+    return_on_err(err);
+    struct prog *prog = &progs[progs_n];
+    err = nomp.knl_build(&nomp, prog, src, name);
     FREE(src);
     FREE(name);
-    if (err)
-      return err;
+    return_on_err(err);
 
     // Get grid size of the loopy kernel after transformations. We will create a
     // dictionary with variable name as keys, variable value as value and then
@@ -171,7 +161,7 @@ int nomp_jit(int *id, int *ndim, size_t *global, size_t *local,
     }
     va_end(vargs);
 
-    py_get_grid_size(ndim, global, local, pKnl, pDict);
+    py_get_grid_size(&prog->ndim, prog->global, prog->local, pKnl, pDict);
     FREE(args_);
     Py_DECREF(pDict), Py_XDECREF(pKnl);
 
@@ -186,12 +176,12 @@ int nomp_jit(int *id, int *ndim, size_t *global, size_t *local,
 //=============================================================================
 // nomp_run
 //
-int nomp_run(int id, int ndim, const size_t *global, const size_t *local,
-             int nargs, ...) {
+int nomp_run(int id, int nargs, ...) {
   if (id >= 0) {
     va_list args;
     va_start(args, nargs);
-    int err = nomp.knl_run(&nomp, &progs[id], ndim, global, local, nargs, args);
+    int err = nomp.knl_run(&nomp, &progs[id], progs[id].ndim, progs[id].global,
+                           progs[id].local, nargs, args);
     va_end(args);
     if (err)
       return NOMP_KNL_RUN_ERROR;

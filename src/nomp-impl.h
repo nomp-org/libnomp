@@ -18,7 +18,21 @@
 #define py_module "loopy_api"
 #define py_func "c_to_loopy"
 
+#define FREE(x)                                                                \
+  do {                                                                         \
+    if (x)                                                                     \
+      free(x);                                                                 \
+  } while (0)
+
+#define return_on_err(err, ...)                                                \
+  do {                                                                         \
+    if (err)                                                                   \
+      return err;                                                              \
+  } while (0)
+
 struct prog {
+  unsigned ndim;
+  size_t local[3], global[3];
   void *bptr;
 };
 
@@ -149,8 +163,8 @@ int py_get_knl_name_and_src(char **name, char **src, PyObject *pKnl);
  * @param pDict Dictionary with variable name as keys, variable values as values
  * @return int
  */
-int py_get_grid_size(int *ndim, size_t *global, size_t *local, PyObject *pKnl,
-                     PyObject *pDict);
+int py_get_grid_size(unsigned *ndim, size_t *global, size_t *local,
+                     PyObject *pKnl, PyObject *pDict);
 
 //==============================================================================
 // Other helper functions

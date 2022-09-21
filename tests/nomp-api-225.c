@@ -23,18 +23,16 @@ int main(int argc, char *argv[]) {
                     "    a[i] = 2 * b[i] + 1;\n"
                     "}";
 
-  int id = -1, ndim = -1;
-  size_t global[3], local[3];
-  err = nomp_jit(&id, &ndim, global, local, knl, NULL, "nomp-api-200:transform",
-                 3, "a,b,N", NOMP_PTR, sizeof(float), a, NOMP_PTR,
-                 sizeof(float), b, NOMP_INTEGER, sizeof(int), &N);
+  int id = -1;
+  err = nomp_jit(&id, knl, NULL, "nomp-api-200:transform", 3, "a,b,N", NOMP_PTR,
+                 sizeof(float), a, NOMP_PTR, sizeof(float), b, NOMP_INTEGER,
+                 sizeof(int), &N);
   nomp_chk(err);
-  nomp_assert(global[0] == 20);
 
   // FIXME: Fix the order of argments to the loopy kernel to match
   // nomp_jit()
-  err = nomp_run(id, ndim, global, local, 3, NOMP_INTEGER, &N, sizeof(int),
-                 NOMP_PTR, a, NOMP_PTR, b);
+  err =
+      nomp_run(id, 3, NOMP_INTEGER, &N, sizeof(int), NOMP_PTR, a, NOMP_PTR, b);
   nomp_chk(err);
 
   err = nomp_map(a, 0, 20, sizeof(float), NOMP_D2H);

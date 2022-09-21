@@ -129,8 +129,8 @@ int py_get_knl_name_and_src(char **name, char **src, PyObject *pKnl) {
   return 0;
 }
 
-int py_get_grid_size(int *ndim, size_t *global, size_t *local, PyObject *pKnl,
-                     PyObject *pDict) {
+int py_get_grid_size(unsigned *ndim, size_t *global, size_t *local,
+                     PyObject *pKnl, PyObject *pDict) {
   // Intiialize global and local sizes to 1
   global[0] = global[1] = global[2] = 1;
   local[0] = local[1] = local[2] = 1;
