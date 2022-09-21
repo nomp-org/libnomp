@@ -332,7 +332,25 @@ int nomp_set_error_(const char *description, int type, const char *file_name,
 #define nomp_set_error(description, type)                                      \
   nomp_set_error_(description, type, __FILE__, __LINE__);
 
+/**
+ * @ingroup nomp_user_api
+ * @brief Return error description.
+ *
+ * @details Returns the error description given the error_id
+ * @param[in] error variable to set the error description
+ * @param[in] error_id id of the error
+ * @return int
+ */
 int nomp_get_error(char **error, int error_id);
+
+/**
+ * @ingroup nomp_user_api
+ * @brief Return error type.
+ *
+ * @details Returns the error_type given the error_id
+ * @param[in] error_id id of the error
+ * @return int
+ */
 int nomp_get_error_type(int error_id);
 
 /**
