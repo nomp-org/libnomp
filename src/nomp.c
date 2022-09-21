@@ -309,8 +309,8 @@ int nomp_set_error_(const char *description, int type, const char *file_name,
   size_t n_desc = strnlen(description, BUFSIZ);
   size_t n_file = strnlen(file_name, BUFSIZ);
   errs[errs_n].description =
-      (char *)calloc(n_desc + n_file + sizeof(unsigned) + 3, sizeof(char));
-  snprintf(errs[errs_n].description, BUFSIZ, "%s:%u %s", file_name, line_no,
+      (char *)calloc(n_desc + n_file + 6 + 3, sizeof(char));
+  snprintf(errs[errs_n].description, BUFSIZ, "%s:%6u %s", file_name, line_no,
            description);
   errs[errs_n].type = type;
   errs_n += 1;
@@ -326,6 +326,13 @@ int nomp_get_error(char **err_str, int err_id) {
   *err_str = (char *)calloc(strnlen(err.description, BUFSIZ) + 1, sizeof(char));
   strncpy(*err_str, err.description, BUFSIZ + 1);
   return 0;
+}
+
+int nomp_get_error_type(int err_id) {
+  if (err_id <= 0 && err_id > errs_n) {
+    return NOMP_INVALID_ERROR_ID;
+  }
+  return errs[err_id - 1].type;
 }
 
 void nomp_chk_(int err_id, const char *file, unsigned line) {
@@ -344,8 +351,13 @@ void nomp_chk_(int err_id, const char *file, unsigned line) {
 // nomp_finalize
 //
 int nomp_finalize(void) {
-  if (!initialized)
-    return NOMP_NOT_INITIALIZED_ERROR;
+  if (!initialized) {
+    char buf[BUFSIZ];
+    snprintf(buf, BUFSIZ,
+             "libnomp is already initialized to use. Call "
+             "nomp_finalize() before calling nomp_init() again.");
+    return nomp_set_error(buf, NOMP_NOT_INITIALIZED_ERROR);
+  }
 
   for (unsigned i = 0; i < mems_n; i++) {
     if (mems[i].bptr != NULL)

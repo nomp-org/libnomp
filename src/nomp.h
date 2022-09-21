@@ -333,6 +333,7 @@ int nomp_set_error_(const char *description, int type, const char *file_name,
   nomp_set_error_(description, type, __FILE__, __LINE__);
 
 int nomp_get_error(char **error, int error_id);
+int nomp_get_error_type(int error_id);
 
 /**
  * @ingroup nomp_user_api

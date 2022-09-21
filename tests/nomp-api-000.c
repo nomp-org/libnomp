@@ -8,19 +8,19 @@ int main(int argc, char *argv[]) {
 
   // Calling `nomp_finalize` before `nomp_init` should retrun an error
   int err = nomp_finalize();
-  nomp_assert(err == NOMP_NOT_INITIALIZED_ERROR);
+  nomp_assert(nomp_get_error_type(err) == NOMP_NOT_INITIALIZED_ERROR);
 
   // Calling `nomp_init` twice must return an error, but must not segfault
   err = nomp_init(backend, device_id, platform_id);
   nomp_chk(err);
   err = nomp_init(backend, device_id, platform_id);
-  nomp_assert(err == NOMP_INITIALIZED_ERROR);
+  nomp_assert(nomp_get_error_type(err) == NOMP_INITIALIZED_ERROR);
 
   // Calling `nomp_finalize` twice must return an error, but must not segfault
   err = nomp_finalize();
   nomp_chk(err);
   err = nomp_finalize();
-  nomp_assert(err == NOMP_NOT_INITIALIZED_ERROR);
+  nomp_assert(nomp_get_error_type(err) == NOMP_NOT_INITIALIZED_ERROR);
 
   return 0;
 }
