@@ -22,18 +22,18 @@ int nomp_init(const char *backend, int platform, int device) {
     return nomp_set_error(buf, NOMP_INITIALIZED_ERROR);
   }
 
-  char name[BUFSIZ];
-  size_t n = strnlen(backend, BUFSIZ);
+  char name[MAX_BACKEND_NAME_SIZE];
+  size_t n = strnlen(backend, MAX_BACKEND_NAME_SIZE);
   for (int i = 0; i < n; i++)
     name[i] = tolower(backend[i]);
   name[n] = '\0';
 
   int err = 0;
-  if (strncmp(name, "opencl", 32) == 0) {
+  if (strncmp(name, "opencl", MAX_BACKEND_NAME_SIZE) == 0) {
 #if defined(OPENCL_ENABLED)
     err = opencl_init(&nomp, platform, device);
 #endif
-  } else if (strncmp(name, "cuda", 32) == 0) {
+  } else if (strncmp(name, "cuda", MAX_BACKEND_NAME_SIZE) == 0) {
 #if defined(CUDA_ENABLED)
     err = cuda_init(&nomp, platform, device);
 #endif
@@ -46,7 +46,7 @@ int nomp_init(const char *backend, int platform, int device) {
   if (err)
     return err;
 
-  strncpy(nomp.name, name, BUFSIZ);
+  strncpy(nomp.name, name, MAX_BACKEND_NAME_SIZE);
 
   if (!Py_IsInitialized()) {
     // May be we need the isolated configuration listed here:

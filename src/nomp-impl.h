@@ -14,6 +14,7 @@
 
 #include "nomp.h"
 
+#define MAX_BACKEND_NAME_SIZE 32
 #define py_dir "python"
 #define py_module "loopy_api"
 #define py_func "c_to_loopy"
@@ -33,7 +34,7 @@ struct error {
 };
 
 struct backend {
-  char name[BUFSIZ];
+  char name[MAX_BACKEND_NAME_SIZE];
   int (*map)(struct backend *, struct mem *, const int);
   int (*knl_build)(struct backend *, struct prog *, const char *, const char *);
   int (*knl_run)(struct backend *, struct prog *, const int, const size_t *,
