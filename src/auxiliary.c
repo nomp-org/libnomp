@@ -1,4 +1,7 @@
-#include "nomp-impl.h"
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 char *strcatn(int nstr, ...) {
   unsigned n = 0, max = BUFSIZ;
