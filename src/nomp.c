@@ -180,8 +180,7 @@ int nomp_run(int id, int nargs, ...) {
   if (id >= 0) {
     va_list args;
     va_start(args, nargs);
-    int err = nomp.knl_run(&nomp, &progs[id], progs[id].ndim, progs[id].global,
-                           progs[id].local, nargs, args);
+    int err = nomp.knl_run(&nomp, &progs[id], nargs, args);
     va_end(args);
     if (err)
       return NOMP_KNL_RUN_ERROR;

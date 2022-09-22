@@ -125,10 +125,11 @@ static int cuda_knl_build(struct backend *bnd, struct prog *prg,
   return 0;
 }
 
-static int cuda_knl_run(struct backend *bnd, struct prog *prg, const int ndim,
-                        const size_t *global, const size_t *local, int nargs,
+static int cuda_knl_run(struct backend *bnd, struct prog *prg, int nargs,
                         va_list args) {
-  size_t size;
+  const int ndim = prg->ndim;
+  const size_t *global = prg->global, *local = prg->local;
+
   struct mem *m;
   void *vargs[NARGS_MAX];
   for (int i = 0; i < nargs; i++) {
@@ -137,7 +138,6 @@ static int cuda_knl_run(struct backend *bnd, struct prog *prg, const int ndim,
     switch (type) {
     case NOMP_INTEGER:
     case NOMP_FLOAT:
-      size = va_arg(args, size_t);
       break;
     case NOMP_PTR:
       m = mem_if_mapped(p);
