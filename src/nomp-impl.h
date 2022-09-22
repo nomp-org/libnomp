@@ -28,9 +28,10 @@ struct mem {
   void *hptr, *bptr;
 };
 
-struct error {
+struct log {
   char *description;
-  int type;
+  int code;
+  LogType log_type;
 };
 
 struct backend {

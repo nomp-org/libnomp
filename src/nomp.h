@@ -30,6 +30,7 @@
  */
 #define NOMP_FREE 8
 
+typedef enum { ERROR = 0, WARNING = 1, INFORMATION = 2 } LogType;
 /**
  * @defgroup nomp_types Types
  * Defines argument type.
@@ -327,10 +328,10 @@ void nomp_assert_(int cond, const char *file, unsigned line);
 void nomp_chk_(int err, const char *file, unsigned line);
 #define nomp_chk(err) nomp_chk_(err, __FILE__, __LINE__)
 
-int nomp_set_error_(const char *description, int type, const char *file_name,
-                    unsigned line_no);
-#define nomp_set_error(description, type)                                      \
-  nomp_set_error_(description, type, __FILE__, __LINE__);
+int nomp_set_log_(const char *description, int code, LogType log_type,
+                  const char *file_name, unsigned line_no);
+#define nomp_set_log(description, code, log_type)                              \
+  nomp_set_log_(description, code, log_type, __FILE__, __LINE__);
 
 /**
  * @ingroup nomp_user_api

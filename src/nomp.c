@@ -19,7 +19,7 @@ int nomp_init(const char *backend, int platform, int device) {
              "libnomp is already initialized to use %s. Call "
              "nomp_finalize() before calling nomp_init() again.",
              nomp.name);
-    return nomp_set_error(buf, NOMP_INITIALIZED_ERROR);
+    return nomp_set_log(buf, NOMP_INITIALIZED_ERROR, ERROR);
   }
 
   char name[MAX_BACKEND_NAME_SIZE];
@@ -41,7 +41,7 @@ int nomp_init(const char *backend, int platform, int device) {
     char buf[BUFSIZ];
     snprintf(buf, BUFSIZ, "Failed to initialize libnomp. Invalid backend: %s",
              name);
-    err = nomp_set_error(buf, NOMP_INVALID_BACKEND);
+    err = nomp_set_log(buf, NOMP_INVALID_BACKEND, ERROR);
   }
   if (err)
     return err;
@@ -66,14 +66,14 @@ int nomp_init(const char *backend, int platform, int device) {
       char buf[BUFSIZ] =
           "Environment variable NOMP_INSTALL_DIR, which is required by "
           "libnomp is not set.";
-      return nomp_set_error(buf, NOMP_INSTALL_DIR_NOT_FOUND);
+      return nomp_set_log(buf, NOMP_INSTALL_DIR_NOT_FOUND, ERROR);
     }
   } else {
     // TODO: Check if we can use initialized python
     // FIXME: This should be a warning, not an error.
-    return nomp_set_error("Python is already initialized. Using already "
-                          "initialized python version.",
-                          NOMP_PY_INITIALIZE_ERROR);
+    return nomp_set_log("Python is already initialized. Using already "
+                        "initialized python version.",
+                        NOMP_PY_INITIALIZE_ERROR, ERROR);
   }
 
   initialized = 1;
@@ -228,9 +228,10 @@ void nomp_assert_(int cond, const char *file, unsigned line) {
   }
 }
 
-static struct error *errs = NULL;
-static unsigned errs_n = 0;
-static unsigned errs_max = 0;
+static struct log *logs = NULL;
+static unsigned logs_n = 0;
+static unsigned logs_max = 0;
+static const char *LOG_TYPE_STRING[] = {"Error", "Warning", "Information"};
 
 int nomp_err_type_to_str(char *buf, int err, size_t buf_size) {
   switch (err) {
@@ -298,41 +299,44 @@ int nomp_err_type_to_str(char *buf, int err, size_t buf_size) {
   return 0;
 }
 
-int nomp_set_error_(const char *description, int type, const char *file_name,
-                    unsigned line_no) {
-  if (errs_max <= errs_n) {
-    errs_max += errs_max / 2 + 1;
-    errs = (struct error *)realloc(errs, sizeof(struct error) * errs_max);
-    if (errs == NULL)
+int nomp_set_log_(const char *description, int code, LogType log_type,
+                  const char *file_name, unsigned line_no) {
+  if (logs_max <= logs_n) {
+    logs_max += logs_max / 2 + 1;
+    logs = (struct log *)realloc(logs, sizeof(struct log) * logs_max);
+    if (logs == NULL)
       return NOMP_OUT_OF_MEMORY;
   }
+  const char *log_type_string = LOG_TYPE_STRING[log_type];
   size_t n_desc = strnlen(description, BUFSIZ);
   size_t n_file = strnlen(file_name, BUFSIZ);
-  errs[errs_n].description =
-      (char *)calloc(n_desc + n_file + 6 + 3, sizeof(char));
-  snprintf(errs[errs_n].description, BUFSIZ, "%s:%6u %s", file_name, line_no,
-           description);
-  errs[errs_n].type = type;
-  errs_n += 1;
-  return errs_n;
+  size_t n_log_type = strnlen(log_type_string, BUFSIZ);
+  logs[logs_n].description =
+      (char *)calloc(n_desc + n_file + n_log_type + 6 + 3, sizeof(char));
+  snprintf(logs[logs_n].description, BUFSIZ, "%s:%s:%6u %s", log_type_string,
+           file_name, line_no, description);
+  logs[logs_n].code = code;
+  logs[logs_n].log_type = log_type;
+  logs_n += 1;
+  return logs_n;
 }
 
 int nomp_get_error(char **err_str, int err_id) {
-  if (err_id <= 0 && err_id > errs_n) {
+  if (err_id <= 0 && err_id > logs_n) {
     *err_str = NULL;
     return NOMP_INVALID_ERROR_ID;
   }
-  struct error err = errs[err_id - 1];
+  struct log err = logs[err_id - 1];
   *err_str = (char *)calloc(strnlen(err.description, BUFSIZ) + 1, sizeof(char));
   strncpy(*err_str, err.description, BUFSIZ + 1);
   return 0;
 }
 
 int nomp_get_error_type(int err_id) {
-  if (err_id <= 0 && err_id > errs_n) {
+  if (err_id <= 0 && err_id > logs_n) {
     return NOMP_INVALID_ERROR_ID;
   }
-  return errs[err_id - 1].type;
+  return logs[err_id - 1].code;
 }
 
 void nomp_chk_(int err_id, const char *file, unsigned line) {
@@ -354,7 +358,7 @@ int nomp_finalize(void) {
   if (!initialized) {
     char buf[BUFSIZ];
     snprintf(buf, BUFSIZ, "Call nomp_init() before calling nomp_finalize().");
-    return nomp_set_error(buf, NOMP_NOT_INITIALIZED_ERROR);
+    return nomp_set_log(buf, NOMP_NOT_INITIALIZED_ERROR, ERROR);
   }
 
   for (unsigned i = 0; i < mems_n; i++) {
@@ -371,10 +375,10 @@ int nomp_finalize(void) {
   FREE(progs);
   progs = NULL, progs_n = progs_max = 0;
 
-  for (unsigned i = 0; i < errs_n; i++)
-    FREE(errs[i].description);
-  FREE(errs);
-  errs = NULL, errs_n = errs_max = 0;
+  for (unsigned i = 0; i < logs_n; i++)
+    FREE(logs[i].description);
+  FREE(logs);
+  logs = NULL, logs_n = logs_max = 0;
 
   initialized = nomp.finalize(&nomp);
   if (initialized)
