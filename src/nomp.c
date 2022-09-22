@@ -321,30 +321,33 @@ int nomp_set_log_(const char *description, int code, LogType log_type,
   return logs_n;
 }
 
-int nomp_get_error(char **err_str, int err_id) {
-  if (err_id <= 0 && err_id > logs_n) {
-    *err_str = NULL;
-    return NOMP_INVALID_ERROR_ID;
+int nomp_get_log(char **log_str, int log_id, LogType log_type) {
+  if (log_id <= 0 && log_id > logs_n) {
+    *log_str = NULL;
+    return NOMP_INVALID_LOG_ID;
   }
-  struct log err = logs[err_id - 1];
-  *err_str = (char *)calloc(strnlen(err.description, BUFSIZ) + 1, sizeof(char));
-  strncpy(*err_str, err.description, BUFSIZ + 1);
+  struct log lg = logs[log_id - 1];
+  if (lg.log_type != log_type) {
+    return NOMP_LOG_TYPE_MISMATCH;
+  }
+  *log_str = (char *)calloc(strnlen(lg.description, BUFSIZ) + 1, sizeof(char));
+  strncpy(*log_str, lg.description, BUFSIZ + 1);
   return 0;
 }
 
-int nomp_get_error_type(int err_id) {
-  if (err_id <= 0 && err_id > logs_n) {
-    return NOMP_INVALID_ERROR_ID;
+int nomp_get_log_code(int log_id) {
+  if (log_id <= 0 && log_id > logs_n) {
+    return NOMP_INVALID_LOG_ID;
   }
-  return logs[err_id - 1].code;
+  return logs[log_id - 1].code;
 }
 
 void nomp_chk_(int err_id, const char *file, unsigned line) {
   if (err_id == 0)
     return;
   char *err_str;
-  int err = nomp_get_error(&err_str, err_id);
-  if (err != NOMP_INVALID_ERROR_ID) {
+  int err = nomp_get_log(&err_str, err_id, ERROR);
+  if (err != NOMP_INVALID_LOG_ID && err != NOMP_LOG_TYPE_MISMATCH) {
     printf("%s:%d %s\n", file, line, err_str);
     free(err_str);
     exit(1);

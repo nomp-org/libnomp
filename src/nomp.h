@@ -184,7 +184,8 @@ typedef enum { ERROR = 0, WARNING = 1, INFORMATION = 2 } LogType;
 #define NOMP_KNL_RUN_ERROR -131
 
 #define NOMP_OUT_OF_MEMORY -140
-#define NOMP_INVALID_ERROR_ID -141
+#define NOMP_INVALID_LOG_ID -141
+#define NOMP_LOG_TYPE_MISMATCH -142
 
 #ifdef __cplusplus
 extern "C" {
@@ -338,21 +339,22 @@ int nomp_set_log_(const char *description, int code, LogType log_type,
  * @brief Return error description.
  *
  * @details Returns the error description given the error_id
- * @param[in] error variable to set the error description
- * @param[in] error_id id of the error
+ * @param[in] log variable to set the error description
+ * @param[in] log_id id of the error
+ * @param[in] log_type either ERROR, WARNING or INFORMATION
  * @return int
  */
-int nomp_get_error(char **error, int error_id);
+int nomp_get_log(char **log, int log_id, LogType log_type);
 
 /**
  * @ingroup nomp_user_api
  * @brief Return error type.
  *
  * @details Returns the error_type given the error_id
- * @param[in] error_id id of the error
+ * @param[in] log_id id of the error
  * @return int
  */
-int nomp_get_error_type(int error_id);
+int nomp_get_log_code(int log_id);
 
 /**
  * @ingroup nomp_user_api
