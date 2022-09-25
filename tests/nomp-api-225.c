@@ -31,8 +31,7 @@ int main(int argc, char *argv[]) {
 
   // FIXME: Fix the order of argments to the loopy kernel to match
   // nomp_jit()
-  err =
-      nomp_run(id, 3, NOMP_INTEGER, &N, sizeof(int), NOMP_PTR, a, NOMP_PTR, b);
+  err = nomp_run(id, NOMP_INTEGER, &N, sizeof(int), NOMP_PTR, a, NOMP_PTR, b);
   nomp_chk(err);
 
   err = nomp_map(a, 0, 20, sizeof(float), NOMP_D2H);
