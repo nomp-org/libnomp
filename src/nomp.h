@@ -289,7 +289,7 @@ int nomp_map(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
  * @return int
  */
 int nomp_jit(int *id, const char *c_src, const char *annotations,
-             const char *callback, int nargs, const char *args, ...);
+             const char *callback, unsigned nargs, const char *args, ...);
 
 /**
  * @ingroup nomp_user_api
@@ -307,7 +307,7 @@ int nomp_jit(int *id, const char *c_src, const char *annotations,
  *
  * @return int
  */
-int nomp_run(int id, int nargs, ...);
+int nomp_run(int id, ...);
 
 int nomp_err(char *buf, int err, size_t buf_size);
 

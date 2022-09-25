@@ -108,7 +108,7 @@ static int progs_n = 0;
 static int progs_max = 0;
 
 int nomp_jit(int *id, const char *c_src, const char *annotations,
-             const char *callback, int nargs, const char *args, ...) {
+             const char *callback, unsigned nargs, const char *args, ...) {
   if (*id == -1) {
     if (progs_n == progs_max) {
       progs_max += progs_max / 2 + 1;
@@ -129,11 +129,12 @@ int nomp_jit(int *id, const char *c_src, const char *annotations,
     FREE(callback_);
     return_on_err(err);
 
-    // Get OpenCL, CUDA, etc. source and and name from the loopy kernel and
-    // then build it
+    // Get OpenCL, CUDA, etc. source and name from the loopy kernel
     char *name, *src;
     err = py_get_knl_name_and_src(&name, &src, pKnl);
     return_on_err(err);
+
+    // Build the kernel
     struct prog *prog = &progs[progs_n];
     err = nomp.knl_build(&nomp, prog, src, name);
     FREE(src);
@@ -161,6 +162,7 @@ int nomp_jit(int *id, const char *c_src, const char *annotations,
     }
     va_end(vargs);
 
+    prog->nargs = nargs;
     py_get_grid_size(&prog->ndim, prog->global, prog->local, pKnl, pDict);
     FREE(args_);
     Py_DECREF(pDict), Py_XDECREF(pKnl);
@@ -176,11 +178,11 @@ int nomp_jit(int *id, const char *c_src, const char *annotations,
 //=============================================================================
 // nomp_run
 //
-int nomp_run(int id, int nargs, ...) {
+int nomp_run(int id, ...) {
   if (id >= 0) {
     va_list args;
-    va_start(args, nargs);
-    int err = nomp.knl_run(&nomp, &progs[id], nargs, args);
+    va_start(args, id);
+    int err = nomp.knl_run(&nomp, &progs[id], args);
     va_end(args);
     if (err)
       return NOMP_KNL_RUN_ERROR;

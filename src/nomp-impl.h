@@ -31,7 +31,7 @@
   } while (0)
 
 struct prog {
-  unsigned ndim;
+  unsigned nargs, ndim;
   size_t local[3], global[3];
   void *bptr;
 };
@@ -45,7 +45,7 @@ struct backend {
   char name[BUFSIZ];
   int (*map)(struct backend *, struct mem *, const int);
   int (*knl_build)(struct backend *, struct prog *, const char *, const char *);
-  int (*knl_run)(struct backend *, struct prog *, int, va_list);
+  int (*knl_run)(struct backend *, struct prog *, va_list);
   int (*knl_free)(struct prog *);
   int (*finalize)(struct backend *);
   void *bptr;

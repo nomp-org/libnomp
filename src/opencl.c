@@ -103,9 +103,8 @@ static int opencl_knl_build(struct backend *bnd, struct prog *prg,
   return 0;
 }
 
-static int opencl_knl_run(struct backend *bnd, struct prog *prg, int nargs,
-                          va_list args) {
-  const int ndim = prg->ndim;
+static int opencl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
+  const int ndim = prg->ndim, nargs = prg->nargs;
   const size_t *global = prg->global, *local = prg->local;
 
   struct opencl_prog *ocl_prg = (struct opencl_prog *)prg->bptr;

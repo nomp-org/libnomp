@@ -125,9 +125,8 @@ static int cuda_knl_build(struct backend *bnd, struct prog *prg,
   return 0;
 }
 
-static int cuda_knl_run(struct backend *bnd, struct prog *prg, int nargs,
-                        va_list args) {
-  const int ndim = prg->ndim;
+static int cuda_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
+  const int ndim = prg->ndim, nargs = prg->nargs;
   const size_t *global = prg->global, *local = prg->local;
 
   struct mem *m;
