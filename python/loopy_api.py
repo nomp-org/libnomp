@@ -155,24 +155,12 @@ class CToLoopyMapperAccumulator:
     domains: List[isl.BasicSet]
     statements: List[lp.InstructionBase]
     kernel_data: List[Union[lp.ValueArg, lp.TemporaryVariable]]
-    arguments: FrozenSet[lp.KernelArgument]
 
-    def copy(
-        self,
-        *,
-        domains=None,
-        statements=None,
-        kernel_data=None,
-        arguments=None,
-    ):
+    def copy(self, *, domains=None, statements=None, kernel_data=None):
         domains = domains or self.domains
         statements = statements or self.statements
         kernel_data = kernel_data or self.kernel_data
-        arguments = arguments or self.arguments
-
-        return CToLoopyMapperAccumulator(
-            domains, statements, kernel_data, arguments
-        )
+        return CToLoopyMapperAccumulator(domains, statements, kernel_data)
 
 
 class CToLoopyLoopBoundMapper(CToLoopyExpressionMapper):
@@ -222,11 +210,8 @@ class CToLoopyMapper(IdentityMapper):
         new_domains = sum((value.domains for value in values), start=[])
         new_statements = sum((value.statements for value in values), start=[])
         new_kernel_data = sum((value.kernel_data for value in values), start=[])
-        new_args = reduce(
-            frozenset.union, (value.arguments for value in values), frozenset()
-        )
         return CToLoopyMapperAccumulator(
-            new_domains, new_statements, new_kernel_data, new_args
+            new_domains, new_statements, new_kernel_data
         )
 
     def map_If(self, expr: c_ast.If, context: CToLoopyMapperContext):
@@ -317,7 +302,6 @@ class CToLoopyMapper(IdentityMapper):
                         shape=shape,
                     )
                 ],
-                frozenset(),
             )
         else:
             return CToLoopyMapperAccumulator(
@@ -330,7 +314,6 @@ class CToLoopyMapper(IdentityMapper):
                         shape=shape,
                     )
                 ],
-                frozenset(),
             )
 
     def map_Compound(
@@ -341,7 +324,7 @@ class CToLoopyMapper(IdentityMapper):
                 [self.rec(child, context) for child in expr.block_items]
             )
         else:
-            return CToLoopyMapperAccumulator([], [], [], frozenset())
+            return CToLoopyMapperAccumulator([], [], [])
 
     def map_Assignment(
         self, expr: c_ast.Assignment, context: CToLoopyMapperContext
@@ -363,7 +346,6 @@ class CToLoopyMapper(IdentityMapper):
                 )
             ],
             [],
-            frozenset(),
         )
 
     def map_InitList(
