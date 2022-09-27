@@ -28,9 +28,9 @@ jobs:
         shell: bash
         run: |
           sudo apt -y update
-          sudo apt install -y pocl-opencl-icd opencl-headers valgrind
+          sudo apt install -y pocl-opencl-icd opencl-headers
           pip3 install git+https://github.com/inducer/loopy
-          pip3 install pycparser pyopencl
+          pip3 install pycparser
           echo "NOMP_INSTALL_DIR=${PWD}/install" >> $GITHUB_ENV
 
       - name: Build libnomp

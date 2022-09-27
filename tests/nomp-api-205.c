@@ -16,13 +16,11 @@ int main(int argc, char *argv[]) {
                     "    a[i] = b[i];\n"
                     "}";
 
-  int id = -1, ndim = -1;
-  size_t global[3], local[3];
-  err = nomp_jit(&id, &ndim, global, local, knl, NULL, "nomp-api-200:transform",
-                 3, "a,b,N", NOMP_PTR, sizeof(double), a, NOMP_PTR,
-                 sizeof(double), b, NOMP_INTEGER, sizeof(int), &N);
+  int id = -1;
+  err = nomp_jit(&id, knl, NULL, "nomp-api-200:transform", 3, "a,b,N", NOMP_PTR,
+                 sizeof(double), a, NOMP_PTR, sizeof(double), b, NOMP_INTEGER,
+                 sizeof(int), &N);
   nomp_chk(err);
-  nomp_assert(global[0] == 20);
 
   err = nomp_finalize();
   nomp_chk(err);

@@ -6,6 +6,7 @@ import loopy as lp
 import pycparser.c_ast as c_ast
 import pymbolic.primitives as prim
 from loopy.isl_helpers import make_slab
+from loopy.kernel.data import AddressSpace
 from loopy.symbolic import aff_from_expr
 from pycparser import c_parser
 from pytools import UniqueNameGenerator, memoize
@@ -71,7 +72,7 @@ class IdentityMapper:
 # so we use it here instead of general @cache.
 @memoize
 def dtype_to_ctype_registry():
-    from compyte.dtypes import DTypeRegistry, fill_registry_with_c_types
+    from loopy.target.c.compyte.dtypes import DTypeRegistry, fill_registry_with_c_types
 
     dtype_reg = DTypeRegistry()
     fill_registry_with_c_types(dtype_reg, True)
@@ -100,7 +101,7 @@ def _get_dtype_from_decl_type(decl_type):
     elif isinstance(decl_type, c_ast.ArrayDecl):
         return _get_dtype_from_decl_type(decl_type.type)
 
-    raise NotImplementedError(decl_type)
+    raise NotImplementedError(f"_get_dtype_from_decl_type: {decl_type}")
 
 
 class CToLoopyExpressionMapper(IdentityMapper):
@@ -155,24 +156,12 @@ class CToLoopyMapperAccumulator:
     domains: List[isl.BasicSet]
     statements: List[lp.InstructionBase]
     kernel_data: List[Union[lp.ValueArg, lp.TemporaryVariable]]
-    arguments: FrozenSet[lp.KernelArgument]
 
-    def copy(
-        self,
-        *,
-        domains=None,
-        statements=None,
-        kernel_data=None,
-        arguments=None,
-    ):
+    def copy(self, *, domains=None, statements=None, kernel_data=None):
         domains = domains or self.domains
         statements = statements or self.statements
         kernel_data = kernel_data or self.kernel_data
-        arguments = arguments or self.arguments
-
-        return CToLoopyMapperAccumulator(
-            domains, statements, kernel_data, arguments
-        )
+        return CToLoopyMapperAccumulator(domains, statements, kernel_data)
 
 
 class CToLoopyLoopBoundMapper(CToLoopyExpressionMapper):
@@ -222,11 +211,8 @@ class CToLoopyMapper(IdentityMapper):
         new_domains = sum((value.domains for value in values), start=[])
         new_statements = sum((value.statements for value in values), start=[])
         new_kernel_data = sum((value.kernel_data for value in values), start=[])
-        new_args = reduce(
-            frozenset.union, (value.arguments for value in values), frozenset()
-        )
         return CToLoopyMapperAccumulator(
-            new_domains, new_statements, new_kernel_data, new_args
+            new_domains, new_statements, new_kernel_data
         )
 
     def map_If(self, expr: c_ast.If, context: CToLoopyMapperContext):
@@ -317,7 +303,6 @@ class CToLoopyMapper(IdentityMapper):
                         shape=shape,
                     )
                 ],
-                frozenset(),
             )
         else:
             return CToLoopyMapperAccumulator(
@@ -330,7 +315,6 @@ class CToLoopyMapper(IdentityMapper):
                         shape=shape,
                     )
                 ],
-                frozenset(),
             )
 
     def map_Compound(
@@ -341,7 +325,7 @@ class CToLoopyMapper(IdentityMapper):
                 [self.rec(child, context) for child in expr.block_items]
             )
         else:
-            return CToLoopyMapperAccumulator([], [], [], frozenset())
+            return CToLoopyMapperAccumulator([], [], [])
 
     def map_Assignment(
         self, expr: c_ast.Assignment, context: CToLoopyMapperContext
@@ -363,7 +347,6 @@ class CToLoopyMapper(IdentityMapper):
                 )
             ],
             [],
-            frozenset(),
         )
 
     def map_InitList(
@@ -401,17 +384,32 @@ class ExternalContext:
         }
 
 
+def decl_to_knl_arg(decl: c_ast.Decl, dtype):
+    decl_type = decl.type
+    if isinstance(decl_type, c_ast.TypeDecl):
+        return lp.ValueArg(decl.name, dtype=dtype)
+    elif isinstance(decl_type, c_ast.PtrDecl):
+        return lp.ArrayArg(
+            decl.name, dtype=dtype, address_space=AddressSpace.GLOBAL
+        )
+    else:
+        raise NotImplementedError(f"decl_to_knl_arg: {decl} is invalid.")
+
+
 def c_to_loopy(c_str: str, backend: str):
     # Parse the function
-    parser = c_parser.CParser()
-    ast = parser.parse(c_str)
+    ast = c_parser.CParser().parse(c_str)
     node = ast.ext[0]
 
     # Init `var_to_decl` based on function parameters
     context = ExternalContext(function_name=node.decl.name, var_to_decl={})
-    for arg in node.decl.type.args.params:
+    knl_args = []
+    for arg in node.decl.type.args:
         if isinstance(arg, c_ast.Decl):
             context = context.add_decl(arg.name, arg)
+            knl_args.append(
+                decl_to_knl_arg(arg, context.var_to_dtype(arg.name))
+            )
 
     # Map C for loop to loopy kernel
     acc = CToLoopyMapper()(
@@ -442,20 +440,13 @@ def c_to_loopy(c_str: str, backend: str):
     knl = lp.make_kernel(
         unique_domains,
         acc.statements,
-        acc.kernel_data + [...],
+        knl_args + acc.kernel_data + [...],
         lang_version=LOOPY_LANG_VERSION,
         name=node.decl.name,
         seq_dependencies=True,
         target=_BACKEND_TO_TARGET[backend],
     )
 
-    knl = lp.add_dtypes(
-        knl,
-        {
-            arg.name: context.var_to_dtype(arg.name)
-            for arg in knl.default_entrypoint.args
-        },
-    )
     return knl
 
 

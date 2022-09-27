@@ -278,16 +278,13 @@ int nomp_map(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
  *   b[i] = 10 -i
  * }
  * const char *knl = "for (unsigned i = 0; i < N; i++) a[i] += b[i];"
- * int err = nomp_jit(&id, &ndim, global, local, knl, NULL, "file:function",
- *                    3, "a,b,N", NOMP_PTR, sizeof(double), a, NOMP_PTR,
- *                    sizeof(double), b, NOMP_INTEGER, sizeof(int), &N);
+ * int id = -1;
+ * int err = nomp_jit(&id, knl, NULL, "file:function", 3, "a,b,N", NOMP_PTR,
+ *                    sizeof(double), a, NOMP_PTR, sizeof(double), b,
+ *                    NOMP_INTEGER, sizeof(int), &N);
  * @endcode
  *
  * @param[out] id id of the generated kernel.
- * @param[out] ndim Number of dimensions of the kernel (This param will be
- * removed).
- * @param[out] global Global grid (This param will be removed).
- * @param[out] local Local grid (This param will be removed).
  * @param[in] c_src Kernel source in C.
  * @param[in] annotations Annotations to perform user defined (domain specific)
  * transformations.
@@ -300,9 +297,8 @@ int nomp_map(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
  *
  * @return int
  */
-int nomp_jit(int *id, int *ndim, size_t *global, size_t *local,
-             const char *c_src, const char *annotations, const char *callback,
-             int nargs, const char *args, ...);
+int nomp_jit(int *id, const char *c_src, const char *annotations,
+             const char *callback, unsigned nargs, const char *args, ...);
 
 /**
  * @ingroup nomp_user_api
@@ -314,18 +310,13 @@ int nomp_jit(int *id, int *ndim, size_t *global, size_t *local,
  * argument.
  *
  * @param[in] id id of the kernel to be run
- * @param[in] ndim Number of dimensions of the kernel (This param will be
- * removed)
- * @param[in] global Global grid (This param will be removed)
- * @param[in] local Local grid (This param will be removed)
  * @param[in] nargs Number of arguments
  * @param[in] ... For each argument, argument type, sizeof base type and pointer
  * to the argument.
  *
  * @return int
  */
-int nomp_run(int id, int ndim, const size_t *global, const size_t *local,
-             int nargs, ...);
+int nomp_run(int id, ...);
 
 void nomp_assert_(int cond, const char *file, unsigned line);
 #define nomp_assert(cond) nomp_assert_(cond, __FILE__, __LINE__)
