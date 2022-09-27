@@ -13,11 +13,11 @@ int main(int argc, char *argv[]) {
 
   // Free'ing before mapping should return an error
   err = nomp_map(a, 0, 10, sizeof(int), NOMP_FREE);
-  nomp_assert(err == NOMP_INVALID_MAP_PTR);
+  nomp_assert(nomp_get_log_code(err) == NOMP_INVALID_MAP_PTR);
 
   // D2H before H2D should return an error
   err = nomp_map(a, 0, 10, sizeof(int), NOMP_D2H);
-  nomp_assert(err == NOMP_INVALID_MAP_PTR);
+  nomp_assert(nomp_get_log_code(err) == NOMP_INVALID_MAP_PTR);
 
   // Mapping H2D multiple times is not an error
   err = nomp_map(b, 0, 10, sizeof(int), NOMP_H2D);

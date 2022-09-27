@@ -119,19 +119,25 @@ static int opencl_knl_run(struct backend *bnd, struct prog *prg, const int ndim,
       break;
     case NOMP_PTR:
       m = mem_if_mapped(p);
-      if (m == NULL)
-        return NOMP_INVALID_MAP_PTR;
+      if (m == NULL) {
+        char buf[BUFSIZ] = "NOMP invalid map pointer";
+        return nomp_set_log(buf, NOMP_INVALID_MAP_PTR, NOMP_ERROR);
+      }
       p = m->bptr;
       size = sizeof(cl_mem);
       break;
-    default:
-      return NOMP_KNL_ARG_TYPE_ERROR;
+    default:;
+      char buf[BUFSIZ];
+      snprintf(buf, BUFSIZ, "Invalid NOMP kernel argument type %d.", type);
+      return nomp_set_log(buf, NOMP_KNL_ARG_TYPE_ERROR, NOMP_ERROR);
       break;
     }
 
     cl_int err = clSetKernelArg(ocl_prg->knl, i, size, p);
-    if (err != CL_SUCCESS)
-      return NOMP_KNL_ARG_SET_ERROR;
+    if (err != CL_SUCCESS) {
+      char buf[BUFSIZ] = "Setting NOMP kernel argument failed";
+      return nomp_set_log(buf, NOMP_KNL_ARG_SET_ERROR, NOMP_ERROR);
+    }
   }
 
   struct opencl_backend *ocl = (struct opencl_backend *)bnd->bptr;
@@ -170,24 +176,32 @@ int opencl_init(struct backend *bnd, const int platform_id,
                 const int device_id) {
   cl_uint num_platforms;
   cl_int err = clGetPlatformIDs(0, NULL, &num_platforms);
-  if (platform_id < 0 | platform_id >= num_platforms)
-    return NOMP_INVALID_PLATFORM;
-
+  if (platform_id < 0 | platform_id >= num_platforms) {
+    char buf[BUFSIZ];
+    snprintf(buf, BUFSIZ, "Invalid NOMP platform id %d.", platform_id);
+    return nomp_set_log(buf, NOMP_INVALID_PLATFORM, NOMP_ERROR);
+  }
   cl_platform_id *cl_platforms = calloc(num_platforms, sizeof(cl_platform_id));
-  if (cl_platforms == NULL)
-    return NOMP_MALLOC_ERROR;
-
+  if (cl_platforms == NULL) {
+    char buf[BUFSIZ] = "NOMP malloc error.";
+    return nomp_set_log(buf, NOMP_MALLOC_ERROR, NOMP_ERROR);
+  }
   err = clGetPlatformIDs(num_platforms, cl_platforms, &num_platforms);
   cl_platform_id platform = cl_platforms[platform_id];
 
   cl_uint num_devices;
   err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 0, NULL, &num_devices);
-  if (device_id < 0 || device_id >= num_devices)
-    return NOMP_INVALID_DEVICE;
+  if (device_id < 0 || device_id >= num_devices) {
+    char buf[BUFSIZ];
+    snprintf(buf, BUFSIZ, "Invalid NOMP device id %d.", device_id);
+    return nomp_set_log(buf, NOMP_INVALID_DEVICE, NOMP_ERROR);
+  }
 
   cl_device_id *cl_devices = calloc(num_devices, sizeof(cl_device_id));
-  if (cl_devices == NULL)
-    return NOMP_MALLOC_ERROR;
+  if (cl_devices == NULL) {
+    char buf[BUFSIZ] = "NOMP malloc error.";
+    return nomp_set_log(buf, NOMP_MALLOC_ERROR, NOMP_ERROR);
+  }
 
   err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, num_devices, cl_devices,
                        &num_devices);

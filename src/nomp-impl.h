@@ -31,7 +31,7 @@ struct mem {
 struct log {
   char *description;
   int code;
-  LogType log_type;
+  nomp_log_type type;
 };
 
 struct backend {

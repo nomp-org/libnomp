@@ -141,12 +141,16 @@ static int cuda_knl_run(struct backend *bnd, struct prog *prg, const int ndim,
       break;
     case NOMP_PTR:
       m = mem_if_mapped(p);
-      if (m == NULL)
-        return NOMP_INVALID_MAP_PTR;
+      if (m == NULL) {
+        char buf[BUFSIZ] = "NOMP invalid map pointer";
+        return nomp_set_log(buf, NOMP_INVALID_MAP_PTR, NOMP_ERROR);
+      }
       p = &m->bptr;
       break;
     default:
-      return NOMP_KNL_ARG_TYPE_ERROR;
+      char buf[BUFSIZ];
+      snprintf(buf, BUFSIZ, "Invalid NOMP kernel argument type %d.", type);
+      return nomp_set_log(buf, NOMP_KNL_ARG_TYPE_ERROR, NOMP_ERROR);
       break;
     }
     vargs[i] = p;
@@ -174,8 +178,11 @@ int cuda_init(struct backend *bnd, const int platform_id, const int device_id) {
   int num_devices;
   CUresult result = cudaGetDeviceCount(&num_devices);
   chk_cu(result);
-  if (device_id < 0 || device_id >= num_devices)
-    return NOMP_INVALID_DEVICE;
+  if (device_id < 0 || device_id >= num_devices) {
+    char buf[BUFSIZ];
+    snprintf(buf, BUFSIZ, "Invalid NOMP device id %d.", device_id);
+    err = nomp_set_log(buf, NOMP_INVALID_DEVICE, NOMP_ERROR);
+  }
   result = cudaSetDevice(device_id);
   chk_cu(result);
 
