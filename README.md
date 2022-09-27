@@ -6,7 +6,7 @@ Runtime for [nomp](https://github.com/nomp-org/nomp)
 
 Clone the repo first:
 ```bash
-git clone --recurse-submodules https://github.com/nomp-org/libnomp.git
+git clone https://github.com/nomp-org/libnomp.git
 ```
 
 Install dependencies using conda to build and run `libnomp`:
@@ -64,11 +64,18 @@ locally.
 
 ## Developer documentation
 
-Please run `clang-format` before comitting any changes you make on the source
+Please run `clang-format` before committing any changes you make on the source
 files. `clang-format` will be available if you install the dev dependencies with
 conda. Below are some examples on how to use `clang-format`:
-```
+```bash
 clang-format -i src/*.[ch]
 clang-format -i tests/*.[ch]
 clang-format -i src/nomp.c
+```
+
+If you change any python files, please use `black` and `isort` to format the python
+code before committing. Both black and isort will be available if you install the
+dev dependencies with conda. Below are some examples on how to use `black` and `isort`:
+```bash
+black -l 80 *.py; isort *.py
 ```
