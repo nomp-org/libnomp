@@ -25,7 +25,7 @@
       free(x);                                                                 \
   } while (0)
 
-#define return_on_err(err, ...)                                                \
+#define return_on_err(err)                                                     \
   do {                                                                         \
     if (err)                                                                   \
       return err;                                                              \

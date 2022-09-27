@@ -324,10 +324,12 @@ void nomp_assert_(int cond, const char *file, unsigned line);
 void nomp_chk_(int err, const char *file, unsigned line);
 #define nomp_chk(err) nomp_chk_(err, __FILE__, __LINE__)
 
-int nomp_set_log_(const char *description, int code, nomp_log_type type,
-                  const char *file_name, unsigned line_no);
-#define nomp_set_log(description, code, type)                                  \
-  nomp_set_log_(description, code, type, __FILE__, __LINE__);
+int nomp_set_log_(const char *desc, int code, nomp_log_type type,
+                  const char *file_name, unsigned line_no, ...);
+#define nomp_set_log(desc, code, type)                                         \
+  nomp_set_log_(desc, code, type, __FILE__, __LINE__);
+#define nomp_set_log1(code, type, desc, ...)                                   \
+  nomp_set_log_(desc, code, type, __FILE__, __LINE__, ##__VA_ARGS__);
 
 /**
  * @ingroup nomp_user_api
