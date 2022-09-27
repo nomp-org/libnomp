@@ -6,6 +6,7 @@ import loopy as lp
 import pycparser.c_ast as c_ast
 import pymbolic.primitives as prim
 from loopy.isl_helpers import make_slab
+from loopy.kernel.data import AddressSpace
 from loopy.symbolic import aff_from_expr
 from pycparser import c_parser
 from pytools import UniqueNameGenerator, memoize
@@ -100,7 +101,7 @@ def _get_dtype_from_decl_type(decl_type):
     elif isinstance(decl_type, c_ast.ArrayDecl):
         return _get_dtype_from_decl_type(decl_type.type)
 
-    raise NotImplementedError(decl_type)
+    raise NotImplementedError(f"_get_dtype_from_decl_type: {decl_type}")
 
 
 class CToLoopyExpressionMapper(IdentityMapper):
@@ -383,17 +384,32 @@ class ExternalContext:
         }
 
 
+def decl_to_knl_arg(decl: c_ast.Decl, dtype):
+    decl_type = decl.type
+    if isinstance(decl_type, c_ast.TypeDecl):
+        return lp.ValueArg(decl.name, dtype=dtype)
+    elif isinstance(decl_type, c_ast.PtrDecl):
+        return lp.ArrayArg(
+            decl.name, dtype=dtype, address_space=AddressSpace.GLOBAL
+        )
+    else:
+        raise NotImplementedError(f"decl_to_knl_arg: {decl} is invalid.")
+
+
 def c_to_loopy(c_str: str, backend: str):
     # Parse the function
-    parser = c_parser.CParser()
-    ast = parser.parse(c_str)
+    ast = c_parser.CParser().parse(c_str)
     node = ast.ext[0]
 
     # Init `var_to_decl` based on function parameters
     context = ExternalContext(function_name=node.decl.name, var_to_decl={})
-    for arg in node.decl.type.args.params:
+    knl_args = []
+    for arg in node.decl.type.args:
         if isinstance(arg, c_ast.Decl):
             context = context.add_decl(arg.name, arg)
+            knl_args.append(
+                decl_to_knl_arg(arg, context.var_to_dtype(arg.name))
+            )
 
     # Map C for loop to loopy kernel
     acc = CToLoopyMapper()(
@@ -424,20 +440,13 @@ def c_to_loopy(c_str: str, backend: str):
     knl = lp.make_kernel(
         unique_domains,
         acc.statements,
-        acc.kernel_data + [...],
+        knl_args + acc.kernel_data + [...],
         lang_version=LOOPY_LANG_VERSION,
         name=node.decl.name,
         seq_dependencies=True,
         target=_BACKEND_TO_TARGET[backend],
     )
 
-    knl = lp.add_dtypes(
-        knl,
-        {
-            arg.name: context.var_to_dtype(arg.name)
-            for arg in knl.default_entrypoint.args
-        },
-    )
     return knl
 
 
