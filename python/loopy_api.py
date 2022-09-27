@@ -72,7 +72,7 @@ class IdentityMapper:
 # so we use it here instead of general @cache.
 @memoize
 def dtype_to_ctype_registry():
-    from compyte.dtypes import DTypeRegistry, fill_registry_with_c_types
+    from loopy.target.c.compyte.dtypes import DTypeRegistry, fill_registry_with_c_types
 
     dtype_reg = DTypeRegistry()
     fill_registry_with_c_types(dtype_reg, True)
