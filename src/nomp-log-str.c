@@ -1,10 +1,9 @@
-#if !defined(_NOMP_LOG_STR_H_)
-#define _NOMP_LOG_STR_H_
+#include "nomp-log-str.h"
 
-const char *const ERR_STR_NOMP_IS_ALREADY_INITIALIZED =
+const char *ERR_STR_NOMP_IS_ALREADY_INITIALIZED =
     "libnomp is already initialized to use %s. Call nomp_finalize() before "
     "calling nomp_init() again.";
-const char *const ERR_STR_FAILED_TO_INITIALIZE_NOMP =
+const char *ERR_STR_FAILED_TO_INITIALIZE_NOMP =
     "Failed to initialize libnomp. Invalid backend: %s";
 const char *ERR_STR_FAILED_TO_FINALIZE_NOMP = "Failed to finalize libnomp.";
 const char *ERR_STR_NOMP_INSTALL_DIR_NOT_SET =
@@ -41,5 +40,3 @@ const char *ERR_STR_INVALID_DEVICE = "Invalid NOMP device id %d.";
 const char *ERR_STR_KNL_ARG_SET_ERROR = "Setting NOMP kernel argument failed.";
 const char *ERR_STR_INVALID_PLATFORM = "Invalid NOMP platform id %d.";
 const char *ERR_STR_MALLOC_ERROR = "NOMP malloc error.";
-
-#endif
