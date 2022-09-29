@@ -38,10 +38,9 @@ int py_c_to_loopy(PyObject **pKnl, const char *c_src, const char *backend) {
     }
     Py_DECREF(pModule);
   }
-  if (err) {
+  if (err)
     return nomp_set_log(NOMP_LOOPY_CONVERSION_ERROR, NOMP_ERROR,
                         ERR_STR_LOOPY_CONVERSION_ERROR);
-  }
   return err;
 }
 
@@ -67,7 +66,6 @@ int py_user_callback(PyObject **pKnl, const char *file, const char *func) {
     Py_XDECREF(pFile);
   }
   if (err) {
-    char buf[BUFSIZ];
     if (err == NOMP_USER_CALLBACK_NOT_FOUND) {
       err =
           nomp_set_log(err, NOMP_ERROR, ERR_STR_USER_CALLBACK_NOT_FOUND, file);
@@ -175,7 +173,6 @@ int py_get_grid_size(unsigned *ndim, size_t *global, size_t *local,
     }
     if (err) {
       PyErr_Print();
-      char buf[BUFSIZ] = "Loopy grid size failure";
       return nomp_set_log(NOMP_LOOPY_GRIDSIZE_FAILED, NOMP_ERROR,
                           ERR_STR_LOOPY_GRIDSIZE_FAILED);
     }
@@ -220,7 +217,6 @@ int py_get_grid_size(unsigned *ndim, size_t *global, size_t *local,
     }
     if (err) {
       PyErr_Print();
-      char buf[BUFSIZ] = "Loopy grid size calculation failure";
       return nomp_set_log(NOMP_GRIDSIZE_CALCULATION_FAILED, NOMP_ERROR,
                           ERR_STR_GRIDSIZE_CALCULATION_FAILED);
     }
