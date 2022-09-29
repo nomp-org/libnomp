@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
   int id = -1;
   err = nomp_jit(&id, knl, NULL, "invalid-file:invalid_func", 2, "a,N",
                  NOMP_PTR, sizeof(double), a, NOMP_INTEGER, sizeof(int), &N);
-  nomp_assert(nomp_get_log_code(err) == NOMP_USER_CALLBACK_NOT_FOUND);
+  nomp_assert(nomp_get_log_no(err) == NOMP_USER_CALLBACK_NOT_FOUND);
 
   err = nomp_jit(&id, knl, NULL, "nomp-api-200:transform", 2, "a,N", NOMP_PTR,
                  sizeof(double), a, NOMP_INTEGER, sizeof(int), &N);

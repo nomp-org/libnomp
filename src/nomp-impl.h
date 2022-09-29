@@ -44,7 +44,7 @@ struct mem {
 
 struct log {
   char *description;
-  int code;
+  int logno;
   nomp_log_type type;
 };
 

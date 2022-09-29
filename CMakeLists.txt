@@ -5,7 +5,7 @@ include(GNUInstallDirs)
 option(ENABLE_OPENCL "Build OpenCL backend" ON)
 option(ENABLE_CUDA "Build Cuda backend" OFF)
 
-set(SOURCES src/nomp.c src/loopy.c src/auxiliary.c)
+set(SOURCES src/nomp.c src/loopy.c src/auxiliary.c src/nomp-log-str.c)
 if (ENABLE_OPENCL)
   list(APPEND SOURCES src/opencl.c)
   add_compile_definitions(OPENCL_ENABLED)

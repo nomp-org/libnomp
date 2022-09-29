@@ -1,4 +1,5 @@
 #include "nomp-impl.h"
+#include "nomp-log-str.h"
 
 int py_append_to_sys_path(const char *path) {
   PyObject *pSys = PyImport_ImportModule("sys");
@@ -38,8 +39,8 @@ int py_c_to_loopy(PyObject **pKnl, const char *c_src, const char *backend) {
     Py_DECREF(pModule);
   }
   if (err) {
-    char buf[BUFSIZ] = "C to Loopy conversion failed";
-    return nomp_set_log(buf, NOMP_LOOPY_CONVERSION_ERROR, NOMP_ERROR);
+    return nomp_set_log(NOMP_LOOPY_CONVERSION_ERROR, NOMP_ERROR,
+                        ERR_STR_LOOPY_CONVERSION_ERROR);
   }
   return err;
 }
@@ -68,12 +69,11 @@ int py_user_callback(PyObject **pKnl, const char *file, const char *func) {
   if (err) {
     char buf[BUFSIZ];
     if (err == NOMP_USER_CALLBACK_NOT_FOUND) {
-      snprintf(buf, BUFSIZ,
-               "Specified user callback function not found in file %s", file);
+      err =
+          nomp_set_log(err, NOMP_ERROR, ERR_STR_USER_CALLBACK_NOT_FOUND, file);
     } else {
-      snprintf(buf, BUFSIZ, "User callback function %s failed", func);
+      err = nomp_set_log(err, NOMP_ERROR, ERR_STR_USER_CALLBACK_FAILURE, func);
     }
-    return nomp_set_log(buf, err, NOMP_ERROR);
   }
   return err;
 }
@@ -104,9 +104,8 @@ int py_get_knl_name_and_src(char **name, char **src, PyObject *pKnl) {
     }
     if (err) {
       PyErr_Print();
-      char buf[BUFSIZ];
-      snprintf(buf, BUFSIZ, "Failed to find loopy kernel %s", *name);
-      return nomp_set_log(buf, NOMP_LOOPY_KNL_NAME_NOT_FOUND, NOMP_ERROR);
+      return nomp_set_log(NOMP_LOOPY_KNL_NAME_NOT_FOUND, NOMP_ERROR,
+                          ERR_STR_LOOPY_KNL_NAME_NOT_FOUND, *name);
     }
 
     // Get the kernel source
@@ -139,10 +138,8 @@ int py_get_knl_name_and_src(char **name, char **src, PyObject *pKnl) {
     }
     if (err) {
       PyErr_Print();
-      char buf[BUFSIZ];
-      snprintf(buf, BUFSIZ, "Code generation from loopy kernel %s failed",
-               *name);
-      return nomp_set_log(buf, NOMP_LOOPY_CODEGEN_FAILED, NOMP_ERROR);
+      return nomp_set_log(NOMP_LOOPY_CODEGEN_FAILED, NOMP_ERROR,
+                          ERR_STR_LOOPY_CODEGEN_FAILED, *name);
     }
   }
   return 0;
@@ -179,7 +176,8 @@ int py_get_grid_size(unsigned *ndim, size_t *global, size_t *local,
     if (err) {
       PyErr_Print();
       char buf[BUFSIZ] = "Loopy grid size failure";
-      return nomp_set_log(buf, NOMP_LOOPY_GRIDSIZE_FAILED, NOMP_ERROR);
+      return nomp_set_log(NOMP_LOOPY_GRIDSIZE_FAILED, NOMP_ERROR,
+                          ERR_STR_LOOPY_GRIDSIZE_FAILED);
     }
 
     // If the expressions are not NULL, iterate through them and evaluate with
@@ -223,7 +221,8 @@ int py_get_grid_size(unsigned *ndim, size_t *global, size_t *local,
     if (err) {
       PyErr_Print();
       char buf[BUFSIZ] = "Loopy grid size calculation failure";
-      return nomp_set_log(buf, NOMP_GRIDSIZE_CALCULATION_FAILED, NOMP_ERROR);
+      return nomp_set_log(NOMP_GRIDSIZE_CALCULATION_FAILED, NOMP_ERROR,
+                          ERR_STR_GRIDSIZE_CALCULATION_FAILED);
     }
   }
 

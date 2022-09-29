@@ -9,8 +9,8 @@ static int initialized = 0;
 //
 int nomp_init(const char *backend, int platform, int device) {
   if (initialized)
-    return nomp_set_log1(NOMP_INITIALIZED_ERROR, NOMP_ERROR,
-                         ERR_STR_NOMP_IS_ALREADY_INITIALIZED, nomp.name);
+    return nomp_set_log(NOMP_INITIALIZED_ERROR, NOMP_ERROR,
+                        ERR_STR_NOMP_IS_ALREADY_INITIALIZED, nomp.name);
 
   char name[MAX_BACKEND_NAME_SIZE];
   size_t n = strnlen(backend, MAX_BACKEND_NAME_SIZE);
@@ -28,8 +28,8 @@ int nomp_init(const char *backend, int platform, int device) {
     err = cuda_init(&nomp, platform, device);
 #endif
   } else {
-    err = nomp_set_log1(NOMP_INVALID_BACKEND, NOMP_ERROR,
-                        ERR_STR_FAILED_TO_INITIALIZE_NOMP, name);
+    err = nomp_set_log(NOMP_INVALID_BACKEND, NOMP_ERROR,
+                       ERR_STR_FAILED_TO_INITIALIZE_NOMP, name);
   }
   return_on_err(err);
 
@@ -50,13 +50,13 @@ int nomp_init(const char *backend, int platform, int device) {
       py_append_to_sys_path(abs_dir);
       FREE(abs_dir);
     } else {
-      return nomp_set_log1(NOMP_INSTALL_DIR_NOT_FOUND, NOMP_ERROR,
-                           ERR_STR_NOMP_INSTALL_DIR_NOT_SET);
+      return nomp_set_log(NOMP_INSTALL_DIR_NOT_FOUND, NOMP_ERROR,
+                          ERR_STR_NOMP_INSTALL_DIR_NOT_SET);
     }
   } else {
     // TODO: Check if we can use initialized python
-    err = nomp_set_log1(NOMP_PY_INITIALIZE_ERROR, NOMP_WARNING,
-                        WARNING_STR_PYTHON_IS_ALREADY_INITIALIZED);
+    err = nomp_set_log(NOMP_PY_INITIALIZE_ERROR, NOMP_WARNING,
+                       WARNING_STR_PYTHON_IS_ALREADY_INITIALIZED);
   }
 
   initialized = 1;
@@ -85,8 +85,8 @@ int nomp_map(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
   struct mem *m = mem_if_mapped(ptr);
   if (m == NULL) {
     if (op == NOMP_D2H || op == NOMP_FREE)
-      return nomp_set_log1(NOMP_INVALID_MAP_PTR, NOMP_ERROR,
-                           ERR_STR_INVALID_MAP_OP, op);
+      return nomp_set_log(NOMP_INVALID_MAP_PTR, NOMP_ERROR,
+                          ERR_STR_INVALID_MAP_OP, op);
     op |= NOMP_ALLOC;
   }
 
@@ -101,11 +101,11 @@ int nomp_map(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
   }
 
   if (m->idx0 != idx0 || m->idx1 != idx1 || m->usize != usize)
-    return nomp_set_log1(NOMP_INVALID_MAP_PTR, NOMP_ERROR,
-                         ERR_STR_INVALID_MAP_PTR, ptr);
+    return nomp_set_log(NOMP_INVALID_MAP_PTR, NOMP_ERROR,
+                        ERR_STR_INVALID_MAP_PTR, ptr);
   if ((op & NOMP_ALLOC) && m->bptr != NULL)
-    return nomp_set_log1(NOMP_PTR_ALREADY_MAPPED, NOMP_ERROR,
-                         ERR_STR_PTR_IS_ALREADY_ALLOCATED, ptr);
+    return nomp_set_log(NOMP_PTR_ALREADY_MAPPED, NOMP_ERROR,
+                        ERR_STR_PTR_IS_ALREADY_ALLOCATED, ptr);
   return nomp.map(&nomp, m, op);
 }
 
@@ -194,12 +194,11 @@ int nomp_run(int id, ...) {
     int err = nomp.knl_run(&nomp, &progs[id], args);
     va_end(args);
     if (err)
-      return nomp_set_log1(NOMP_KNL_RUN_ERROR, NOMP_ERROR,
-                           ERR_STR_KERNEL_RUN_FAILED, id);
+      return nomp_set_log(NOMP_KNL_RUN_ERROR, NOMP_ERROR,
+                          ERR_STR_KERNEL_RUN_FAILED, id);
     return 0;
   }
-  return nomp_set_log1(NOMP_INVALID_KNL, NOMP_ERROR, ERR_STR_INVALID_KERNEL,
-                       id);
+  return nomp_set_log(NOMP_INVALID_KNL, NOMP_ERROR, ERR_STR_INVALID_KERNEL, id);
 }
 
 //=============================================================================
@@ -283,7 +282,7 @@ int nomp_err_type_to_str(char *buf, int err, size_t buf_size) {
   return 0;
 }
 
-int nomp_set_log_(const char *description, int code, nomp_log_type type,
+int nomp_set_log_(const char *description, int logno, nomp_log_type type,
                   const char *fname, unsigned line_no, ...) {
   if (logs_max <= logs_n) {
     logs_max += logs_max / 2 + 1;
@@ -306,7 +305,7 @@ int nomp_set_log_(const char *description, int code, nomp_log_type type,
       (char *)calloc(n_desc + n_file + n_log_type + 6 + 3, sizeof(char));
   snprintf(logs[logs_n].description, BUFSIZ, "%s:%s:%6u %s", log_type_string,
            fname, line_no, description);
-  logs[logs_n].code = code;
+  logs[logs_n].logno = logno;
   logs[logs_n].type = type;
   logs_n += 1;
   return logs_n;
@@ -326,11 +325,11 @@ int nomp_get_log(char **log_str, int log_id, nomp_log_type type) {
   return 0;
 }
 
-int nomp_get_log_code(int log_id) {
+int nomp_get_log_no(int log_id) {
   if (log_id <= 0 && log_id > logs_n) {
     return NOMP_INVALID_LOG_ID;
   }
-  return logs[log_id - 1].code;
+  return logs[log_id - 1].logno;
 }
 
 void nomp_chk_(int err_id, const char *file, unsigned line) {
@@ -350,8 +349,8 @@ void nomp_chk_(int err_id, const char *file, unsigned line) {
 //
 int nomp_finalize(void) {
   if (!initialized)
-    return nomp_set_log1(NOMP_NOT_INITIALIZED_ERROR, NOMP_ERROR,
-                         ERR_STR_NOMP_IS_NOT_INITIALIZED);
+    return nomp_set_log(NOMP_NOT_INITIALIZED_ERROR, NOMP_ERROR,
+                        ERR_STR_NOMP_IS_NOT_INITIALIZED);
 
   for (unsigned i = 0; i < mems_n; i++) {
     if (mems[i].bptr != NULL)
@@ -374,8 +373,8 @@ int nomp_finalize(void) {
 
   initialized = nomp.finalize(&nomp);
   if (initialized)
-    return nomp_set_log1(NOMP_FINALIZE_ERROR, NOMP_ERROR,
-                         ERR_STR_FAILED_TO_FINALIZE_NOMP);
+    return nomp_set_log(NOMP_FINALIZE_ERROR, NOMP_ERROR,
+                        ERR_STR_FAILED_TO_FINALIZE_NOMP);
 
   if (Py_IsInitialized())
     Py_Finalize();
