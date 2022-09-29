@@ -141,11 +141,9 @@ static int cuda_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
       break;
     case NOMP_PTR:
       m = mem_if_mapped(p);
-      if (m == NULL) {
-        char buf[BUFSIZ] = "NOMP invalid map pointer";
+      if (m == NULL)
         return nomp_set_log(NOMP_INVALID_MAP_PTR, NOMP_ERROR,
                             ERR_STR_INVALID_MAP_PTR, p);
-      }
       p = &m->bptr;
       break;
     default:
@@ -178,10 +176,9 @@ int cuda_init(struct backend *bnd, const int platform_id, const int device_id) {
   int num_devices;
   CUresult result = cudaGetDeviceCount(&num_devices);
   chk_cu(result);
-  if (device_id < 0 || device_id >= num_devices) {
+  if (device_id < 0 || device_id >= num_devices)
     err = nomp_set_log(NOMP_INVALID_DEVICE, NOMP_ERROR, ERR_STR_INVALID_DEVICE,
                        device_id);
-  }
   result = cudaSetDevice(device_id);
   chk_cu(result);
 
