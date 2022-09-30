@@ -23,7 +23,7 @@
  * @ingroup nomp_update_direction
  * @brief Mapping of device to host(D2H) operation.
  */
-#define NOMP_D2H 4
+#define NOMP_FROM 4
 /**
  * @ingroup nomp_update_direction
  * @brief NOMP freeing operation.
@@ -242,8 +242,8 @@ int nomp_init(const char *backend, int platform, int device);
  * int err = nomp_update(a, 0, N, sizeof(double), NOMP_TO);
  * int err = nomp_update(b, 0, N, sizeof(double), NOMP_TO);
  * // Code that change array values on the device (e.g., execution of a kernel)
- * int err = nomp_update(a, 0, N, sizeof(double), NOMP_D2H);
- * int err = nomp_update(b, 0, N, sizeof(double), NOMP_D2H);
+ * int err = nomp_update(a, 0, N, sizeof(double), NOMP_FROM);
+ * int err = nomp_update(b, 0, N, sizeof(double), NOMP_FROM);
  * int err = nomp_update(a, 0, N, sizeof(double), NOMP_FREE);
  * int err = nomp_update(b, 0, N, sizeof(double), NOMP_FREE);
  * @endcode

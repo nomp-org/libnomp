@@ -60,7 +60,7 @@ static int cuda_map(struct backend *bnd, struct mem *m, const int op) {
     chk_cuda(err);
   }
 
-  if (op == NOMP_D2H) {
+  if (op == NOMP_FROM) {
     err = cudaMemcpy(m->hptr + m->usize * m->idx0, m->bptr,
                      (m->idx1 - m->idx0) * m->usize, cudaMemcpyDeviceToHost);
     chk_cuda(err);
