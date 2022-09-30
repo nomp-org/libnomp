@@ -41,7 +41,7 @@ static int opencl_map(struct backend *bnd, struct mem *m, const int op) {
   }
 
   cl_mem *clm = (cl_mem *)m->bptr;
-  if (op == NOMP_D2H) {
+  if (op == NOMP_FROM) {
     err = clEnqueueReadBuffer(ocl->queue, *clm, CL_TRUE, 0,
                               (m->idx1 - m->idx0) * m->usize, m->hptr, 0, NULL,
                               NULL);

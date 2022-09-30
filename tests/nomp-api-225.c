@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
   err = nomp_run(id, NOMP_PTR, a, NOMP_PTR, b, NOMP_INTEGER, &N, sizeof(int));
   nomp_chk(err);
 
-  err = nomp_update(a, 0, 20, sizeof(float), NOMP_D2H);
+  err = nomp_update(a, 0, 20, sizeof(float), NOMP_FROM);
   nomp_chk(err);
 
   for (int i = 0; i < N; i++)

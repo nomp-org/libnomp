@@ -77,7 +77,7 @@ struct mem *mem_if_mapped(void *p) {
 int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
   struct mem *m = mem_if_mapped(ptr);
   if (m == NULL) {
-    if (op == NOMP_D2H || op == NOMP_FREE)
+    if (op == NOMP_FROM || op == NOMP_FREE)
       return NOMP_INVALID_MAP_PTR;
     op |= NOMP_ALLOC;
   }
