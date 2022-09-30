@@ -16,6 +16,17 @@ if (ENABLE_CUDA)
 endif()
 add_library(nomp SHARED ${SOURCES})
 
+# https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling
+# Use, i.e. don't skip the full RPATH for the build tree
+set(CMAKE_SKIP_BUILD_RPATH FALSE)
+# When building, don't use the install RPATH already (but later on when
+# installing)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+# Add the automatically determined parts of the RPATH
+# which point to directories outside the build tree to the install RPATH
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 target_link_libraries(nomp PRIVATE Python3::Python)
 if (ENABLE_OPENCL)
