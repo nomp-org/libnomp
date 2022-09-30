@@ -57,7 +57,7 @@ int nomp_init(const char *backend, int platform, int device) {
 }
 
 //=============================================================================
-// nomp_map
+// nomp_update
 //
 static struct mem *mems = NULL;
 static int mems_n = 0;
@@ -74,7 +74,7 @@ struct mem *mem_if_mapped(void *p) {
   return NULL;
 }
 
-int nomp_map(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
+int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
   struct mem *m = mem_if_mapped(ptr);
   if (m == NULL) {
     if (op == NOMP_D2H || op == NOMP_FREE)

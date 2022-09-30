@@ -12,9 +12,9 @@ int main(int argc, char *argv[]) {
   long a[20] = {0}, b[20] = {1, 2, 3, 4, 5};
   int N = 20;
 
-  err = nomp_map(a, 0, 20, sizeof(long), NOMP_H2D);
+  err = nomp_update(a, 0, 20, sizeof(long), NOMP_H2D);
   nomp_chk(err);
-  err = nomp_map(b, 0, 20, sizeof(long), NOMP_H2D);
+  err = nomp_update(b, 0, 20, sizeof(long), NOMP_H2D);
   nomp_chk(err);
 
   const char *knl = "void foo(long *a, long *b, int N) {\n"
@@ -31,15 +31,15 @@ int main(int argc, char *argv[]) {
   err = nomp_run(id, NOMP_PTR, a, NOMP_PTR, b, NOMP_INTEGER, &N, sizeof(int));
   nomp_chk(err);
 
-  err = nomp_map(a, 0, 20, sizeof(long), NOMP_D2H);
+  err = nomp_update(a, 0, 20, sizeof(long), NOMP_D2H);
   nomp_chk(err);
 
   for (int i = 0; i < N; i++)
     nomp_assert(a[i] == 2 * b[i] + 1);
 
-  err = nomp_map(a, 0, 20, sizeof(long), NOMP_FREE);
+  err = nomp_update(a, 0, 20, sizeof(long), NOMP_FREE);
   nomp_chk(err);
-  err = nomp_map(b, 0, 20, sizeof(long), NOMP_FREE);
+  err = nomp_update(b, 0, 20, sizeof(long), NOMP_FREE);
   nomp_chk(err);
 
   err = nomp_finalize();

@@ -14,9 +14,9 @@ Functions
 
 Map Direction
 ^^^^^^^^^^^^^
-Defines the operation direction in `nomp_map`.
+Defines the operation direction in `nomp_update`.
 
-.. doxygengroup:: nomp_map_direction
+.. doxygengroup:: nomp_update_direction
    :project: libnomp
    :content-only:
 
