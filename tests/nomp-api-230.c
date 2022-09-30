@@ -12,9 +12,9 @@ int main(int argc, char *argv[]) {
   long a[20] = {0}, b[20] = {1, 2, 3, 4, 5};
   int N = 20;
 
-  err = nomp_update(a, 0, 20, sizeof(long), NOMP_H2D);
+  err = nomp_update(a, 0, 20, sizeof(long), NOMP_TO);
   nomp_chk(err);
-  err = nomp_update(b, 0, 20, sizeof(long), NOMP_H2D);
+  err = nomp_update(b, 0, 20, sizeof(long), NOMP_TO);
   nomp_chk(err);
 
   const char *knl = "void foo(long *a, long *b, int N) {\n"

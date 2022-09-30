@@ -18,7 +18,7 @@
  * @ingroup nomp_update_direction
  * @brief Mapping of host to device(H2D) operation.
  */
-#define NOMP_H2D 2
+#define NOMP_TO 2
 /**
  * @ingroup nomp_update_direction
  * @brief Mapping of device to host(D2H) operation.
@@ -239,8 +239,8 @@ int nomp_init(const char *backend, int platform, int device);
  *   a[i] = i;
  *   b[i] = N - i;
  * }
- * int err = nomp_update(a, 0, N, sizeof(double), NOMP_H2D);
- * int err = nomp_update(b, 0, N, sizeof(double), NOMP_H2D);
+ * int err = nomp_update(a, 0, N, sizeof(double), NOMP_TO);
+ * int err = nomp_update(b, 0, N, sizeof(double), NOMP_TO);
  * // Code that change array values on the device (e.g., execution of a kernel)
  * int err = nomp_update(a, 0, N, sizeof(double), NOMP_D2H);
  * int err = nomp_update(b, 0, N, sizeof(double), NOMP_D2H);

@@ -20,12 +20,12 @@ int main(int argc, char *argv[]) {
   nomp_assert(err == NOMP_INVALID_MAP_PTR);
 
   // Mapping H2D multiple times is not an error
-  err = nomp_update(b, 0, 10, sizeof(int), NOMP_H2D);
+  err = nomp_update(b, 0, 10, sizeof(int), NOMP_TO);
   nomp_chk(err);
-  err = nomp_update(b, 0, 10, sizeof(int), NOMP_H2D);
+  err = nomp_update(b, 0, 10, sizeof(int), NOMP_TO);
   nomp_chk(err);
 
-  err = nomp_update(a, 0, 10, sizeof(int), NOMP_H2D);
+  err = nomp_update(a, 0, 10, sizeof(int), NOMP_TO);
   nomp_chk(err);
 
   // Mapping D2H multiple times is not an error

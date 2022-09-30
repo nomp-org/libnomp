@@ -54,7 +54,7 @@ static int cuda_map(struct backend *bnd, struct mem *m, const int op) {
     chk_cuda(err);
   }
 
-  if (op & NOMP_H2D) {
+  if (op & NOMP_TO) {
     err = cudaMemcpy(m->bptr, m->hptr + m->usize * m->idx0,
                      (m->idx1 - m->idx0) * m->usize, cudaMemcpyHostToDevice);
     chk_cuda(err);
