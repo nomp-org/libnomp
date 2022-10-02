@@ -92,6 +92,11 @@
  * @brief Invalid NOMP kernel
  */
 #define NOMP_INVALID_KNL -39
+/**
+ * @ingroup nomp_errors
+ * @brief Invalid NOMP for clause
+ */
+#define NOMP_INVALID_CLAUSE -40
 
 /**
  * @ingroup nomp_errors
@@ -269,7 +274,7 @@ int nomp_update(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
  *   b[i] = 10 -i
  * }
  * const char *knl = "for (unsigned i = 0; i < N; i++) a[i] += b[i];"
- * int id = -1;
+ * static int id = -1;
  * int err = nomp_jit(&id, knl, NULL, "file:function", 3, "a,b,N", NOMP_PTR,
  *                    sizeof(double), a, NOMP_PTR, sizeof(double), b,
  *                    NOMP_INTEGER, sizeof(int), &N);
@@ -279,8 +284,7 @@ int nomp_update(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
  * @param[in] c_src Kernel source in C.
  * @param[in] annotations Annotations to perform user defined (domain specific)
  * transformations.
- * @param[in] callback Callback function that is called when generating the
- * kernel.
+ * @param[in] clauses Clauses that tell nomp meta information about the kernel
  * @param[in] nargs Number of arguments to the kernel.
  * @param[in] args Comma separated list of argument names.
  * @param[in] ... For each argument, we pass the argument type (one of @ref
@@ -288,8 +292,8 @@ int nomp_update(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
  *
  * @return int
  */
-int nomp_jit(int *id, const char *c_src, const char *annotations,
-             const char *callback, unsigned nargs, const char *args, ...);
+int nomp_jit(int *id, const char *c_src, const char **annotations,
+             const char **clauses, unsigned nargs, const char *args, ...);
 
 /**
  * @ingroup nomp_user_api
