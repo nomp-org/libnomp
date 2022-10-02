@@ -17,7 +17,9 @@ int main(int argc, char *argv[]) {
                     "}                                                      \n";
 
   int id = -1;
-  err = nomp_jit(&id, knl, NULL, "nomp-api-200:transform", 3, "a,b,N", NOMP_PTR,
+  const char *annotations[1] = {0},
+             *clauses[3] = {"transform", "nomp-api-200:transform", 0};
+  err = nomp_jit(&id, knl, annotations, clauses, 3, "a,b,N", NOMP_PTR,
                  sizeof(double), a, NOMP_PTR, sizeof(double), b, NOMP_INTEGER,
                  sizeof(int), &N);
   nomp_chk(err);

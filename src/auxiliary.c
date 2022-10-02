@@ -20,3 +20,16 @@ char *strcatn(int nstr, ...) {
 
   return out;
 }
+
+int strnlower(char **out, const char *in, size_t max) {
+  unsigned len = strnlen(in, max);
+  if (len == max)
+    return 1;
+
+  char *wrk = *out = (char *)realloc(*out, (len + 1) * sizeof(char));
+  for (unsigned i = 0; i < len; i++)
+    wrk[i] = tolower(in[i]);
+  wrk[len] = '\0';
+
+  return 0;
+}

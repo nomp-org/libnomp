@@ -107,8 +107,35 @@ static struct prog *progs = NULL;
 static int progs_n = 0;
 static int progs_max = 0;
 
-int nomp_jit(int *id, const char *c_src, const char *annotations,
-             const char *callback, unsigned nargs, const char *args, ...) {
+static int parse_clauses(char **usr_file, char **usr_func,
+                         const char **clauses) {
+  // Currently, we only support `transform` and `jit`.
+  unsigned i = 0;
+  char *clause = NULL;
+  while (clauses[i]) {
+    strnlower(&clause, clauses[i], BUFSIZ);
+    if (strncmp(clause, "transform", BUFSIZ) == 0) {
+      char *val = strndup(clauses[i + 1], BUFSIZ);
+      char *tok = strtok(val, ":");
+      if (tok) {
+        *usr_file = strndup(tok, BUFSIZ), tok = strtok(NULL, ":");
+        if (tok)
+          *usr_func = strndup(tok, BUFSIZ);
+      }
+      FREE(val);
+    } else if (strncmp(clause, "jit", BUFSIZ) == 0) {
+    } else {
+      FREE(clause);
+      return NOMP_INVALID_CLAUSE;
+    }
+    i = i + 2;
+  }
+  FREE(clause);
+  return 0;
+}
+
+int nomp_jit(int *id, const char *c_src, const char **annotations,
+             const char **clauses, unsigned nargs, const char *args, ...) {
   if (*id == -1) {
     if (progs_n == progs_max) {
       progs_max += progs_max / 2 + 1;
@@ -121,12 +148,12 @@ int nomp_jit(int *id, const char *c_src, const char *annotations,
     return_on_err(err);
 
     // Call the User callback function
-    char *callback_ = strndup(callback, BUFSIZ),
-         *user_file = strtok(callback_, ":"), *user_func = NULL;
-    if (user_file)
-      user_func = strtok(NULL, ":");
-    err = py_user_callback(&pKnl, user_file, user_func);
-    FREE(callback_);
+    char *usr_file = NULL, *usr_func = NULL;
+    err = parse_clauses(&usr_file, &usr_func, clauses);
+    return_on_err(err);
+    err = py_user_callback(&pKnl, usr_file, usr_func);
+    FREE(usr_file);
+    FREE(usr_func);
     return_on_err(err);
 
     // Get OpenCL, CUDA, etc. source and name from the loopy kernel

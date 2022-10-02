@@ -18,12 +18,15 @@ int main(int argc, char *argv[]) {
       "}                                                                    \n";
 
   // Calling nomp_jit with invalid functions should return an error.
-  int id = -1;
-  err = nomp_jit(&id, knl, NULL, "invalid-file:invalid_func", 2, "a,N",
-                 NOMP_PTR, sizeof(double), a, NOMP_INTEGER, sizeof(int), &N);
+  static int id = -1;
+  const char *annotations[1] = {0},
+             *clauses0[3] = {"transform", "invalid-file:invalid_func", 0};
+  err = nomp_jit(&id, knl, annotations, clauses0, 2, "a,N", NOMP_PTR,
+                 sizeof(double), a, NOMP_INTEGER, sizeof(int), &N);
   nomp_assert(err == NOMP_USER_CALLBACK_NOT_FOUND);
 
-  err = nomp_jit(&id, knl, NULL, "nomp-api-200:transform", 2, "a,N", NOMP_PTR,
+  const char *clauses1[3] = {"transform", "nomp-api-200:transform", 0};
+  err = nomp_jit(&id, knl, annotations, clauses1, 2, "a,N", NOMP_PTR,
                  sizeof(double), a, NOMP_INTEGER, sizeof(int), &N);
   nomp_chk(err);
 
