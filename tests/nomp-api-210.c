@@ -17,10 +17,10 @@ int main(int argc, char *argv[]) {
   err = nomp_update(b, 0, 20, sizeof(int), NOMP_TO);
   nomp_chk(err);
 
-  const char *knl = "void foo(int *a, int *b, int N) {\n"
-                    "  for (int i = 0; i < N; i++)\n"
-                    "    a[i] = b[i];\n"
-                    "}";
+  const char *knl = "void foo(int *a, int *b, int N) {                      \n"
+                    "  for (int i = 0; i < N; i++)                          \n"
+                    "    a[i] = b[i];                                       \n"
+                    "}                                                      \n";
 
   int id = -1;
   err = nomp_jit(&id, knl, NULL, "nomp-api-200:transform", 3, "a,b,N", NOMP_PTR,

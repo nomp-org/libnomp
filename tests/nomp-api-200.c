@@ -11,10 +11,11 @@ int main(int argc, char *argv[]) {
 
   double a[10] = {0};
   int N = 10;
-  const char *knl = "void foo(double *a, int N) {\n"
-                    "  for (int i = 0; i < N; i++)\n"
-                    "    a[i] = i;\n"
-                    "}";
+  const char *knl =
+      "void foo(double *a, int N) {                                         \n"
+      "  for (int i = 0; i < N; i++)                                        \n"
+      "    a[i] = i;                                                        \n"
+      "}                                                                    \n";
 
   // Calling nomp_jit with invalid functions should return an error.
   int id = -1;
