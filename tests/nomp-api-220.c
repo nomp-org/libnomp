@@ -2,6 +2,27 @@
 #include <math.h>
 #include <stdlib.h>
 
+void foo(double *a, int n) {
+  int err = nomp_update(a, 0, n, sizeof(double), NOMP_TO);
+  nomp_chk(err);
+
+  static int id = -1;
+  const char knl[96] = "void loopy_kernel(double *a, int n) {\nfor "
+                       "(unsigned i = 0; i < n; i++)\n    a[i] = i;\n}";
+  const char args[4] = "a,n";
+  const char *annotations[1] = {0},
+             *clauses[3] = {"transform", "nomp-api-200:transform", 0};
+  err = nomp_jit(&id, knl, annotations, clauses, 2, args, NOMP_PTR,
+                 sizeof(double), a, NOMP_INTEGER, sizeof(int), &n);
+  nomp_chk(err);
+
+  err = nomp_run(id, NOMP_PTR, a, NOMP_INTEGER, &n, sizeof(int));
+  nomp_chk(err);
+
+  err = nomp_update(a, 0, n, sizeof(double), NOMP_FROM);
+  nomp_chk(err);
+}
+
 int main(int argc, char *argv[]) {
   char *backend = argc > 1 ? argv[1] : "opencl";
   int device_id = argc > 2 ? atoi(argv[2]) : 0;
@@ -10,40 +31,11 @@ int main(int argc, char *argv[]) {
   int err = nomp_init(backend, device_id, platform_id);
   nomp_chk(err);
 
-  double a[20] = {0}, b[20] = {1, 2, 3, 4, 5};
-  int N = 20;
+  double a[10] = {0};
+  foo(a, 10);
 
-  err = nomp_update(a, 0, 20, sizeof(double), NOMP_TO);
-  nomp_chk(err);
-  err = nomp_update(b, 0, 20, sizeof(double), NOMP_TO);
-  nomp_chk(err);
-
-  const char *knl = "void foo(double *a, double *b, int N) {                \n"
-                    "  for (int i = 0; i < N; i++)                          \n"
-                    "    a[i] = 2 * b[i] + 1;                               \n"
-                    "}                                                      \n";
-
-  static int id = -1;
-  const char *annotations[1] = {0},
-             *clauses[3] = {"transform", "nomp-api-200:transform", 0};
-  err = nomp_jit(&id, knl, annotations, clauses, 3, "a,b,N", NOMP_PTR,
-                 sizeof(double), a, NOMP_PTR, sizeof(double), b, NOMP_INTEGER,
-                 sizeof(int), &N);
-  nomp_chk(err);
-
-  err = nomp_run(id, NOMP_PTR, a, NOMP_PTR, b, NOMP_INTEGER, &N, sizeof(int));
-  nomp_chk(err);
-
-  err = nomp_update(a, 0, 20, sizeof(double), NOMP_FROM);
-  nomp_chk(err);
-
-  for (int i = 0; i < N; i++)
-    nomp_assert(fabs(a[i] - 2 * b[i] - 1) < 1e-12);
-
-  err = nomp_update(a, 0, 20, sizeof(double), NOMP_FREE);
-  nomp_chk(err);
-  err = nomp_update(b, 0, 20, sizeof(double), NOMP_FREE);
-  nomp_chk(err);
+  for (int i = 0; i < 10; i++)
+    nomp_assert(fabs(a[i] - i) < 1e-12);
 
   err = nomp_finalize();
   nomp_chk(err);
