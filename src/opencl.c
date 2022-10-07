@@ -34,7 +34,7 @@ static int opencl_map(struct backend *bnd, struct mem *m, const int op) {
 
   if (op & NOMP_TO) {
     cl_mem *clm = (cl_mem *)m->bptr;
-    err = clEnqueueWriteBuffer(ocl->queue, *clm, CL_TRUE, m->idx0 * m->usize,
+    err = clEnqueueWriteBuffer(ocl->queue, *clm, CL_TRUE, 0,
                                (m->idx1 - m->idx0) * m->usize, m->hptr, 0, NULL,
                                NULL);
     return err != CL_SUCCESS;
@@ -42,9 +42,9 @@ static int opencl_map(struct backend *bnd, struct mem *m, const int op) {
 
   cl_mem *clm = (cl_mem *)m->bptr;
   if (op == NOMP_FROM) {
-    err = clEnqueueReadBuffer(ocl->queue, *clm, CL_TRUE, m->idx0 * m->usize,
-                              (m->idx1 - m->idx0) * m->usize, m->hptr, 0, NULL,
-                              NULL);
+    err = clEnqueueReadBuffer(
+        ocl->queue, *clm, CL_TRUE, 0, (m->idx1 - m->idx0) * m->usize,
+        (char *)m->hptr + m->idx0 * m->usize, 0, NULL, NULL);
 
     return err != CL_SUCCESS;
   } else if (op == NOMP_FREE) {
