@@ -11,13 +11,15 @@ int main(int argc, char *argv[]) {
 
   double a[20] = {0}, b[20] = {1, 2, 3, 4, 5};
   int N = 20;
-  const char *knl = "void foo(double *a, double *b, int N) {\n"
-                    "  for (int i = 0; i < N; i++)\n"
-                    "    a[i] = b[i];\n"
-                    "}";
+  const char *knl = "void foo(double *a, double *b, int N) {                \n"
+                    "  for (int i = 0; i < N; i++)                          \n"
+                    "    a[i] = b[i];                                       \n"
+                    "}                                                      \n";
 
   int id = -1;
-  err = nomp_jit(&id, knl, NULL, "nomp-api-200:transform", 3, "a,b,N", NOMP_PTR,
+  const char *annotations[1] = {0},
+             *clauses[3] = {"transform", "nomp-api-200:transform", 0};
+  err = nomp_jit(&id, knl, annotations, clauses, 3, "a,b,N", NOMP_PTR,
                  sizeof(double), a, NOMP_PTR, sizeof(double), b, NOMP_INTEGER,
                  sizeof(int), &N);
   nomp_chk(err);

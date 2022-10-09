@@ -192,4 +192,19 @@ int py_get_grid_size(unsigned *ndim, size_t *global, size_t *local,
  */
 char *strcatn(int nstr, ...);
 
+/**
+ * @ingroup nomp_other_utils
+ * @brief Convert a C-string to lowercase
+ *
+ * Convert input string `in` to lower case and store in `out`. Maximum size for
+ * input string `in` is specified by `max`. Returns 0 if successful, otherwise
+ * return 1.
+ *
+ * @param[out] out Address of output string
+ * @param[in] in Input string
+ * @param[in] max Maximum allowed size for the input string
+ * @return int
+ */
+int strnlower(char **out, const char *in, size_t max);
+
 #endif // _LIB_NOMP_IMPL_H_

@@ -64,7 +64,7 @@ int nomp_init(const char *backend, int platform, int device) {
 }
 
 //=============================================================================
-// nomp_map
+// nomp_update
 //
 static struct mem *mems = NULL;
 static int mems_n = 0;
@@ -81,10 +81,10 @@ struct mem *mem_if_mapped(void *p) {
   return NULL;
 }
 
-int nomp_map(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
+int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
   struct mem *m = mem_if_mapped(ptr);
   if (m == NULL) {
-    if (op == NOMP_D2H || op == NOMP_FREE)
+    if (op == NOMP_FROM || op == NOMP_FREE)
       return nomp_set_log(NOMP_INVALID_MAP_PTR, NOMP_ERROR,
                           ERR_STR_INVALID_MAP_OP, op);
     op |= NOMP_ALLOC;
@@ -116,8 +116,35 @@ static struct prog *progs = NULL;
 static int progs_n = 0;
 static int progs_max = 0;
 
-int nomp_jit(int *id, const char *c_src, const char *annotations,
-             const char *callback, unsigned nargs, const char *args, ...) {
+static int parse_clauses(char **usr_file, char **usr_func,
+                         const char **clauses) {
+  // Currently, we only support `transform` and `jit`.
+  unsigned i = 0;
+  char *clause = NULL;
+  while (clauses[i]) {
+    strnlower(&clause, clauses[i], BUFSIZ);
+    if (strncmp(clause, "transform", BUFSIZ) == 0) {
+      char *val = strndup(clauses[i + 1], BUFSIZ);
+      char *tok = strtok(val, ":");
+      if (tok) {
+        *usr_file = strndup(tok, BUFSIZ), tok = strtok(NULL, ":");
+        if (tok)
+          *usr_func = strndup(tok, BUFSIZ);
+      }
+      FREE(val);
+    } else if (strncmp(clause, "jit", BUFSIZ) == 0) {
+    } else {
+      FREE(clause);
+      return NOMP_INVALID_CLAUSE;
+    }
+    i = i + 2;
+  }
+  FREE(clause);
+  return 0;
+}
+
+int nomp_jit(int *id, const char *c_src, const char **annotations,
+             const char **clauses, unsigned nargs, const char *args, ...) {
   if (*id == -1) {
     if (progs_n == progs_max) {
       progs_max += progs_max / 2 + 1;
@@ -130,12 +157,12 @@ int nomp_jit(int *id, const char *c_src, const char *annotations,
     return_on_err(err);
 
     // Call the User callback function
-    char *callback_ = strndup(callback, BUFSIZ),
-         *user_file = strtok(callback_, ":"), *user_func = NULL;
-    if (user_file)
-      user_func = strtok(NULL, ":");
-    err = py_user_callback(&pKnl, user_file, user_func);
-    FREE(callback_);
+    char *usr_file = NULL, *usr_func = NULL;
+    err = parse_clauses(&usr_file, &usr_func, clauses);
+    return_on_err(err);
+    err = py_user_callback(&pKnl, usr_file, usr_func);
+    FREE(usr_file);
+    FREE(usr_func);
     return_on_err(err);
 
     // Get OpenCL, CUDA, etc. source and name from the loopy kernel

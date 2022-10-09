@@ -4,28 +4,28 @@
 #include <stddef.h>
 
 /**
- * @defgroup nomp_map_direction Map Direction
- * Defines the operation direction in `nomp_map`.
+ * @defgroup nomp_update_direction Map Direction
+ * Defines the operation direction in `nomp_update`.
  * TODO: Probably these should be an enum.
  */
 
 /**
- * @ingroup nomp_map_direction
+ * @ingroup nomp_update_direction
  * @brief NOMP allocation operation.
  */
 #define NOMP_ALLOC 1
 /**
- * @ingroup nomp_map_direction
+ * @ingroup nomp_update_direction
  * @brief Mapping of host to device(H2D) operation.
  */
-#define NOMP_H2D 2
+#define NOMP_TO 2
 /**
- * @ingroup nomp_map_direction
+ * @ingroup nomp_update_direction
  * @brief Mapping of device to host(D2H) operation.
  */
-#define NOMP_D2H 4
+#define NOMP_FROM 4
 /**
- * @ingroup nomp_map_direction
+ * @ingroup nomp_update_direction
  * @brief NOMP freeing operation.
  */
 #define NOMP_FREE 8
@@ -97,6 +97,11 @@ typedef enum {
  * @brief Invalid NOMP kernel
  */
 #define NOMP_INVALID_KNL -39
+/**
+ * @ingroup nomp_errors
+ * @brief Invalid NOMP for clause
+ */
+#define NOMP_INVALID_CLAUSE -40
 
 /**
  * @ingroup nomp_errors
@@ -233,7 +238,7 @@ int nomp_init(const char *backend, int platform, int device);
  * @param[in] start_idx Start index in the vector.
  * @param[in] end_idx End index in the vector.
  * @param[in] unit_size Size of a single vector element.
- * @param[in] op Operation to perform (One of @ref nomp_map_direction).
+ * @param[in] op Operation to perform (One of @ref nomp_update_direction).
  * @return int
  *
  * @details Operation op will be performed on the array slice [start_idx,
@@ -248,17 +253,17 @@ int nomp_init(const char *backend, int platform, int device);
  *   a[i] = i;
  *   b[i] = N - i;
  * }
- * int err = nomp_map(a, 0, N, sizeof(double), NOMP_H2D);
- * int err = nomp_map(b, 0, N, sizeof(double), NOMP_H2D);
+ * int err = nomp_update(a, 0, N, sizeof(double), NOMP_TO);
+ * int err = nomp_update(b, 0, N, sizeof(double), NOMP_TO);
  * // Code that change array values on the device (e.g., execution of a kernel)
- * int err = nomp_map(a, 0, N, sizeof(double), NOMP_D2H);
- * int err = nomp_map(b, 0, N, sizeof(double), NOMP_D2H);
- * int err = nomp_map(a, 0, N, sizeof(double), NOMP_FREE);
- * int err = nomp_map(b, 0, N, sizeof(double), NOMP_FREE);
+ * int err = nomp_update(a, 0, N, sizeof(double), NOMP_FROM);
+ * int err = nomp_update(b, 0, N, sizeof(double), NOMP_FROM);
+ * int err = nomp_update(a, 0, N, sizeof(double), NOMP_FREE);
+ * int err = nomp_update(b, 0, N, sizeof(double), NOMP_FREE);
  * @endcode
  */
-int nomp_map(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
-             int op);
+int nomp_update(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
+                int op);
 
 /**
  * @ingroup nomp_user_api
@@ -278,7 +283,7 @@ int nomp_map(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
  *   b[i] = 10 -i
  * }
  * const char *knl = "for (unsigned i = 0; i < N; i++) a[i] += b[i];"
- * int id = -1;
+ * static int id = -1;
  * int err = nomp_jit(&id, knl, NULL, "file:function", 3, "a,b,N", NOMP_PTR,
  *                    sizeof(double), a, NOMP_PTR, sizeof(double), b,
  *                    NOMP_INTEGER, sizeof(int), &N);
@@ -288,8 +293,7 @@ int nomp_map(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
  * @param[in] c_src Kernel source in C.
  * @param[in] annotations Annotations to perform user defined (domain specific)
  * transformations.
- * @param[in] callback Callback function that is called when generating the
- * kernel.
+ * @param[in] clauses Clauses that tell nomp meta information about the kernel
  * @param[in] nargs Number of arguments to the kernel.
  * @param[in] args Comma separated list of argument names.
  * @param[in] ... For each argument, we pass the argument type (one of @ref
@@ -297,8 +301,8 @@ int nomp_map(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
  *
  * @return int
  */
-int nomp_jit(int *id, const char *c_src, const char *annotations,
-             const char *callback, unsigned nargs, const char *args, ...);
+int nomp_jit(int *id, const char *c_src, const char **annotations,
+             const char **clauses, unsigned nargs, const char *args, ...);
 
 /**
  * @ingroup nomp_user_api

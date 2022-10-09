@@ -1,9 +1,17 @@
 cmake_minimum_required(VERSION 3.22)
 project(libnomp VERSION 0.0.1 DESCRIPTION "nomp runtime library" LANGUAGES C)
-include(GNUInstallDirs)
 
 option(ENABLE_OPENCL "Build OpenCL backend" ON)
 option(ENABLE_CUDA "Build Cuda backend" OFF)
+
+# https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling
+# Use, i.e. don't skip the full RPATH for the build tree
+set(CMAKE_SKIP_BUILD_RPATH FALSE)
+# When building, don't use the install RPATH
+set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+# Add the automatically determined parts of the RPATH which point to directories
+# outside the build tree to the install RPATH
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 set(SOURCES src/nomp.c src/loopy.c src/auxiliary.c src/nomp-log-str.c)
 if (ENABLE_OPENCL)
@@ -33,8 +41,6 @@ set_target_properties(nomp PROPERTIES
   PUBLIC_HEADER src/nomp.h)
 target_include_directories(nomp PRIVATE src)
 
-configure_file(nomp.pc.in nomp.pc @ONLY)
-
 file(GLOB TESTS tests/nomp-api-*.c)
 foreach(test ${TESTS})
   string(REPLACE "${CMAKE_SOURCE_DIR}/tests/" "" temp ${test})
@@ -50,10 +56,9 @@ if (ENABLE_DOCS)
   add_subdirectory ("docs")
 endif()
 
-install(TARGETS nomp
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-install(FILES ${CMAKE_BINARY_DIR}/nomp.pc
-  DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/python
-  DESTINATION ${CMAKE_INSTALL_PREFIX})
+install(TARGETS nomp LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib PUBLIC_HEADER
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/python DESTINATION ${CMAKE_INSTALL_PREFIX})
+
+configure_file(nomp.pc.in nomp.pc @ONLY)
+install(FILES ${CMAKE_BINARY_DIR}/nomp.pc DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
