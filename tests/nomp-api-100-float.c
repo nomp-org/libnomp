@@ -1,4 +1,5 @@
 #include "nomp.h"
+#include <math.h>
 #include <stdlib.h>
 
 int main(int argc, char *argv[]) {
@@ -41,7 +42,7 @@ int main(int argc, char *argv[]) {
   err = nomp_update(b, 0, 10, sizeof(float), NOMP_FROM);
   nomp_chk(err);
   for (unsigned i = 0; i < 10; i++)
-    nomp_assert(b[i] == 1);
+    nomp_assert(fabs(b[i] - 1) < 1e-8);
 
   // Free'ing after mapping is not an error
   err = nomp_update(a, 0, 10, sizeof(float), NOMP_FREE);
