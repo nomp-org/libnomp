@@ -6,7 +6,7 @@
 
 #define nomp_api_210 TOKEN_PASTE(nomp_api_210, TEST_SUFFIX)
 int nomp_api_210() {
-  TEST_TYPE a[20] = {0}, b[20] = {1, 2, 3, 4, 5};
+  static TEST_TYPE a[20] = {0}, b[20] = {1, 2, 3, 4, 5};
   int N = 20;
 
   int err = nomp_update(a, 0, 20, sizeof(TEST_TYPE), NOMP_TO);

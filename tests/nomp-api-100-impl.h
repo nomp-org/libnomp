@@ -8,7 +8,7 @@
 int nomp_api_100(unsigned s, unsigned e) {
   nomp_assert(e <= 10);
 
-  TEST_TYPE a[10] = {0}, b[10] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+  static TEST_TYPE a[10] = {0}, b[10] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 
   // Free'ing before mapping should return an error
   int err = nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FREE);
