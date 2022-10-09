@@ -294,7 +294,7 @@ int nomp_set_log_(const char *description, int logno, nomp_log_type type,
   va_list vargs;
   char buf[BUFSIZ];
   va_start(vargs, line_no);
-  snprintf(buf, BUFSIZ, description, vargs);
+  vsnprintf(buf, BUFSIZ, description, vargs);
   va_end(vargs);
 
   const char *log_type_string = LOG_TYPE_STRING[type];
@@ -302,9 +302,9 @@ int nomp_set_log_(const char *description, int logno, nomp_log_type type,
   size_t n_file = strnlen(fname, BUFSIZ);
   size_t n_log_type = strnlen(log_type_string, BUFSIZ);
   logs[logs_n].description =
-      (char *)calloc(n_desc + n_file + n_log_type + 6 + 3, sizeof(char));
-  snprintf(logs[logs_n].description, BUFSIZ, "%s:%s:%6u %s", log_type_string,
-           fname, line_no, description);
+      (char *)calloc(n_desc + n_file + n_log_type + 4 + 3, sizeof(char));
+  snprintf(logs[logs_n].description, BUFSIZ + n_file + n_log_type + 4 + 3 + 1,
+           "%s:%s:%u %s", log_type_string, fname, line_no, buf);
   logs[logs_n].logno = logno;
   logs[logs_n].type = type;
   logs_n += 1;
@@ -320,8 +320,9 @@ int nomp_get_log(char **log_str, int log_id, nomp_log_type type) {
   if (lg.type != type) {
     return NOMP_LOG_TYPE_MISMATCH;
   }
-  *log_str = (char *)calloc(strnlen(lg.description, BUFSIZ) + 1, sizeof(char));
-  strncpy(*log_str, lg.description, BUFSIZ + 1);
+  size_t n_desc = strnlen(lg.description, BUFSIZ) + 1;
+  *log_str = (char *)calloc(n_desc, sizeof(char));
+  strncpy(*log_str, lg.description, n_desc + 1);
   return 0;
 }
 
