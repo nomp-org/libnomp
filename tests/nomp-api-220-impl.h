@@ -34,7 +34,7 @@ int nomp_api_220_aux(TEST_TYPE *a, TEST_TYPE *b, int N) {
 #define nomp_api_220 TOKEN_PASTE(nomp_api_220, TEST_SUFFIX)
 int nomp_api_220() {
   int n = 10;
-  TEST_TYPE a[10], b[10];
+  static TEST_TYPE a[10], b[10];
   for (unsigned i = 0; i < n; i++)
     a[i] = n - i, b[i] = i;
 
@@ -68,7 +68,7 @@ int nomp_api_220() {
 #define nomp_api_220_no_free TOKEN_PASTE(nomp_api_220_no_free, TEST_SUFFIX)
 int nomp_api_220_no_free() {
   int n = 10;
-  TEST_TYPE a[10], b[10];
+  static TEST_TYPE a[10], b[10];
   for (unsigned i = 0; i < n; i++)
     a[i] = n - i, b[i] = i;
 
