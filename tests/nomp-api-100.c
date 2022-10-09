@@ -44,11 +44,17 @@ int main(int argc, char *argv[]) {
   int err = nomp_init(backend, device, platform);
   nomp_chk(err);
 
-  nomp_api_100_int();
-  nomp_api_100_long();
-  nomp_api_100_unsigned();
-  nomp_api_100_double();
-  nomp_api_100_float();
+  nomp_api_100_int(0, 10);
+  nomp_api_100_long(0, 10);
+  nomp_api_100_unsigned(0, 10);
+  nomp_api_100_double(0, 10);
+  nomp_api_100_float(0, 10);
+
+  nomp_api_100_int(5, 10);
+  nomp_api_100_long(5, 10);
+  nomp_api_100_unsigned(5, 10);
+  nomp_api_100_double(5, 10);
+  nomp_api_100_float(5, 10);
 
   err = nomp_finalize();
   nomp_chk(err);
