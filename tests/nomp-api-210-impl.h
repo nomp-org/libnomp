@@ -1,5 +1,9 @@
 #include "nomp-test.h"
 
+#if defined(TEST_TOL)
+#include "math.h"
+#endif
+
 #define nomp_api_210 TOKEN_PASTE(nomp_api_210, TEST_SUFFIX)
 int nomp_api_210() {
   TEST_TYPE a[20] = {0}, b[20] = {1, 2, 3, 4, 5};
