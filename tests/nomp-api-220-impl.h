@@ -64,4 +64,34 @@ int nomp_api_220() {
   return 0;
 }
 #undef nomp_api_220
+
+#define nomp_api_220_no_free TOKEN_PASTE(nomp_api_220_no_free, TEST_SUFFIX)
+int nomp_api_220_no_free() {
+  int n = 10;
+  TEST_TYPE a[10], b[10];
+  for (unsigned i = 0; i < n; i++)
+    a[i] = n - i, b[i] = i;
+
+  int err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO);
+  nomp_chk(err);
+  err = nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO);
+  nomp_chk(err);
+
+  nomp_api_220_aux(a, b, n);
+
+  err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM);
+  nomp_chk(err);
+
+#if defined(TEST_TOL)
+  for (unsigned i = 0; i < n; i++)
+    nomp_assert(fabs(a[i] - n) < TEST_TOL);
+#else
+  for (unsigned i = 0; i < n; i++)
+    nomp_assert(a[i] == n);
+#endif
+
+  return 0;
+}
+#undef nomp_api_220_no_free
+
 #undef nomp_api_220_aux

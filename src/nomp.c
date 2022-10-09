@@ -79,10 +79,8 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
   if (m == NULL) {
     if (op == NOMP_FROM || op == NOMP_FREE)
       return NOMP_INVALID_MAP_PTR;
-    op |= NOMP_ALLOC;
-  }
-
-  if (m == NULL) {
+    if (!(op & NOMP_ALLOC))
+      op |= NOMP_ALLOC;
     if (mems_n == mems_max) {
       mems_max += mems_max / 2 + 1;
       mems = (struct mem *)realloc(mems, sizeof(struct mem) * mems_max);
@@ -90,12 +88,12 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
     m = &mems[mems_n], mems_n++;
     m->idx0 = idx0, m->idx1 = idx1, m->usize = usize;
     m->hptr = ptr, m->bptr = NULL;
+  } else {
+    if (m->idx0 != idx0 || m->idx1 != idx1 || m->usize != usize)
+      return NOMP_INVALID_MAP_PARAMS;
+    if ((op & NOMP_ALLOC) && m->bptr != NULL)
+      return NOMP_PTR_ALREADY_MAPPED;
   }
-
-  if (m->idx0 != idx0 || m->idx1 != idx1 || m->usize != usize)
-    return NOMP_INVALID_MAP_PTR;
-  if ((op & NOMP_ALLOC) && m->bptr != NULL)
-    return NOMP_PTR_ALREADY_MAPPED;
 
   return nomp.map(&nomp, m, op);
 }
@@ -234,6 +232,9 @@ int nomp_err(char *buf, int err, size_t buf_size) {
     break;
   case NOMP_INVALID_MAP_PTR:
     strncpy(buf, "Invalid NOMP map pointer", buf_size);
+    break;
+  case NOMP_INVALID_MAP_PARAMS:
+    strncpy(buf, "Invalid NOMP map parameters", buf_size);
     break;
   case NOMP_INVALID_MAP_OP:
     strncpy(buf, "Invalid map operation", buf_size);

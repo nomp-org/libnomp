@@ -42,6 +42,11 @@ int main(int argc, char *argv[]) {
   nomp_api_220_float();
   nomp_api_220_double();
 
+  nomp_api_220_no_free_int();
+  nomp_api_220_no_free_long();
+  nomp_api_220_no_free_float();
+  nomp_api_220_no_free_double();
+
   err = nomp_finalize();
   nomp_chk(err);
 
