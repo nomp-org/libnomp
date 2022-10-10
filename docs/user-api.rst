@@ -20,8 +20,8 @@ Defines the operation direction in `nomp_update`.
    :project: libnomp
    :content-only:
 
-Types
-^^^^^^
+Data Types
+^^^^^^^^^^
 Defines argument type.
 
 .. doxygengroup:: nomp_types
