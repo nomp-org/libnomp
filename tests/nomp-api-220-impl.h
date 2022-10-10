@@ -1,9 +1,5 @@
 #include "nomp-test.h"
 
-#if defined(TEST_TOL)
-#include <math.h>
-#endif
-
 #define nomp_api_220_aux TOKEN_PASTE(nomp_api_220_aux, TEST_SUFFIX)
 int nomp_api_220_aux(TEST_TYPE *a, TEST_TYPE *b, int N) {
   const char *knl_fmt =

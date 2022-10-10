@@ -1,9 +1,5 @@
 #include "nomp-test.h"
 
-#if defined(TEST_TOL)
-#include "math.h"
-#endif
-
 #define nomp_api_210 TOKEN_PASTE(nomp_api_210, TEST_SUFFIX)
 int nomp_api_210() {
   static TEST_TYPE a[20] = {0}, b[20] = {1, 2, 3, 4, 5};
@@ -41,7 +37,7 @@ int nomp_api_210() {
 
 #if defined(TEST_TOL)
   for (int i = 0; i < N; i++)
-    nomp_assert(fabs(a[i] - 2 * b[i] - 1) < 1e-12);
+    nomp_assert(fabs(a[i] - 2 * b[i] - 1) < TEST_TOL);
 #else
   for (int i = 0; i < N; i++)
     nomp_assert(a[i] == 2 * b[i] + 1);

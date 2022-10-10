@@ -1,6 +1,7 @@
 #if !defined(NOMP_TEST_H_)
 #define NOMP_TEST_H_
 
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
 
