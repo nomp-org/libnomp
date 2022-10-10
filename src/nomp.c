@@ -59,7 +59,7 @@ int nomp_init(const char *backend, int platform, int device) {
 //=============================================================================
 // nomp_update
 //
-static struct mem *mems = NULL;
+static struct mem **mems = NULL;
 static int mems_n = 0;
 static int mems_max = 0;
 
@@ -68,34 +68,52 @@ static int mems_max = 0;
 struct mem *mem_if_mapped(void *p) {
   // FIXME: This is O(N) in number of allocations.
   // Needs to go. Must store a hashmap.
-  for (int i = 0; i < mems_n; i++)
-    if (mems[i].bptr != NULL && mems[i].hptr == p)
-      return &mems[i];
+  for (unsigned i = 0; i < mems_n; i++) {
+    if (mems[i] && mems[i]->hptr == p)
+      return mems[i];
+  }
   return NULL;
 }
 
+static unsigned mem_if_exist(void *p, size_t idx0, size_t idx1) {
+  // FIXME: This is O(N) in number of allocations.
+  // Needs to go. Must store a hashmap.
+  for (unsigned i = 0; i < mems_n; i++) {
+    if (mems[i] && mems[i]->hptr == p && mems[i]->idx0 == idx0 &&
+        mems[i]->idx1 == idx1)
+      return i;
+  }
+  return mems_n;
+}
+
 int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
-  struct mem *m = mem_if_mapped(ptr);
-  if (m == NULL) {
+  unsigned idx = mem_if_exist(ptr, idx0, idx1);
+  if (idx == mems_n) {
+    // A new entry can't be created with NOMP_FREE or NOMP_FROM
     if (op == NOMP_FROM || op == NOMP_FREE)
       return NOMP_INVALID_MAP_PTR;
-    if (!(op & NOMP_ALLOC))
-      op |= NOMP_ALLOC;
+    // NOMP_ALLOC is implied since this is a new entry
+    op |= NOMP_ALLOC;
     if (mems_n == mems_max) {
       mems_max += mems_max / 2 + 1;
-      mems = (struct mem *)realloc(mems, sizeof(struct mem) * mems_max);
+      mems = (struct mem **)realloc(mems, sizeof(struct mem *) * mems_max);
     }
-    m = &mems[mems_n], mems_n++;
+    struct mem *m = mems[mems_n] = tcalloc(struct mem, 1);
     m->idx0 = idx0, m->idx1 = idx1, m->usize = usize;
     m->hptr = ptr, m->bptr = NULL;
-  } else {
-    if (m->idx0 != idx0 || m->idx1 != idx1 || m->usize != usize)
-      return NOMP_INVALID_MAP_PARAMS;
-    if ((op & NOMP_ALLOC) && m->bptr != NULL)
-      return NOMP_PTR_ALREADY_MAPPED;
   }
 
-  return nomp.map(&nomp, m, op);
+  int err = nomp.map(&nomp, mems[idx], op);
+
+  // Device memory got free'd
+  if (mems[idx]->bptr == NULL) {
+    free(mems[idx]);
+    mems[idx] = NULL;
+  } else if (idx == mems_n) {
+    mems_n++;
+  }
+
+  return err;
 }
 
 //=============================================================================
@@ -137,7 +155,7 @@ int nomp_jit(int *id, const char *c_src, const char **annotations,
   if (*id == -1) {
     if (progs_n == progs_max) {
       progs_max += progs_max / 2 + 1;
-      progs = (struct prog *)realloc(progs, sizeof(struct prog) * progs_max);
+      progs = trealloc(struct prog, progs, progs_max);
     }
 
     // Create loopy kernel from C source
@@ -296,8 +314,11 @@ int nomp_finalize(void) {
     return NOMP_NOT_INITIALIZED_ERROR;
 
   for (unsigned i = 0; i < mems_n; i++) {
-    if (mems[i].bptr != NULL)
-      nomp.map(&nomp, &mems[i], NOMP_FREE);
+    if (mems[i]) {
+      nomp.map(&nomp, mems[i], NOMP_FREE);
+      free(mems[i]);
+      mems[i] = NULL;
+    }
   }
   FREE(mems);
   mems = NULL, mems_n = mems_max = 0;
