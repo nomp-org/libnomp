@@ -30,6 +30,11 @@
       return err;                                                              \
   } while (0)
 
+#define tmalloc(type, count) ((type *)malloc((count) * sizeof(type)))
+#define tcalloc(type, count) ((type *)calloc((count), sizeof(type)))
+#define trealloc(type, ptr, count)                                             \
+  ((type *)realloc((ptr), (count) * sizeof(type)))
+
 struct prog {
   unsigned nargs, ndim;
   size_t local[3], global[3];
