@@ -1,9 +1,5 @@
 #include "nomp-test.h"
 
-#if defined(TEST_TOL)
-#include <math.h>
-#endif
-
 #define nomp_api_100 TOKEN_PASTE(nomp_api_100, TEST_SUFFIX)
 int nomp_api_100(unsigned s, unsigned e) {
   nomp_assert(e <= 10);
@@ -40,6 +36,7 @@ int nomp_api_100(unsigned s, unsigned e) {
 
   err = nomp_update(b, s, e, sizeof(TEST_TYPE), NOMP_FROM);
   nomp_chk(err);
+
 #if defined(TEST_TOL)
   for (unsigned i = 0; i < s; i++)
     nomp_assert(fabs(b[i]) < TEST_TOL);
