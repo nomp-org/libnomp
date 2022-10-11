@@ -48,6 +48,9 @@ int nomp_init(const char *backend, int platform, int device) {
       FREE(abs_dir);
       err = 0;
     }
+  } else {
+    // Python is already initialized.
+    err = 0;
   }
   if (err)
     return err;
@@ -336,9 +339,6 @@ int nomp_finalize(void) {
   initialized = nomp.finalize(&nomp);
   if (initialized)
     return NOMP_FINALIZE_ERROR;
-
-  if (Py_IsInitialized())
-    Py_Finalize();
 
   return 0;
 }
