@@ -45,7 +45,7 @@ struct cuda_prog {
   CUfunction kernel;
 };
 
-static int cuda_map(struct backend *bnd, struct mem *m, const int op) {
+static int cuda_update(struct backend *bnd, struct mem *m, const int op) {
   struct cuda_backend *ocl = (struct cuda_backend *)bnd->bptr;
 
   cudaError_t err;
@@ -73,7 +73,7 @@ static int cuda_map(struct backend *bnd, struct mem *m, const int op) {
   return 0;
 }
 
-static void cuda_map_ptr(void **p, size_t *size, struct mem *m) {
+static void cuda_update_ptr(void **p, size_t *size, struct mem *m) {
   *p = (void *)m->bptr;
   *size = sizeof(m->bptr);
 }
@@ -184,7 +184,7 @@ int cuda_init(struct backend *bnd, const int platform_id, const int device_id) {
   result = cudaGetDeviceProperties(&cbnd->prop, device_id);
   chk_cu(result);
 
-  bnd->map = cuda_map;
+  bnd->update = cuda_update;
   bnd->knl_build = cuda_knl_build;
   bnd->knl_run = cuda_knl_run;
   bnd->knl_free = cuda_knl_free;

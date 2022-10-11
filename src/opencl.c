@@ -20,7 +20,7 @@ struct opencl_prog {
   cl_kernel knl;
 };
 
-static int opencl_map(struct backend *bnd, struct mem *m, const int op) {
+static int opencl_update(struct backend *bnd, struct mem *m, const int op) {
   struct opencl_backend *ocl = (struct opencl_backend *)bnd->bptr;
 
   cl_int err;
@@ -200,7 +200,7 @@ int opencl_init(struct backend *bnd, const int platform_id,
   free(cl_devices);
   free(cl_platforms);
 
-  bnd->map = opencl_map;
+  bnd->update = opencl_update;
   bnd->knl_build = opencl_knl_build;
   bnd->knl_run = opencl_knl_run;
   bnd->knl_free = opencl_knl_free;

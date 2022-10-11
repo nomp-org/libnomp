@@ -48,7 +48,7 @@ struct mem {
 
 struct backend {
   char name[BUFSIZ];
-  int (*map)(struct backend *, struct mem *, const int);
+  int (*update)(struct backend *, struct mem *, const int);
   int (*knl_build)(struct backend *, struct prog *, const char *, const char *);
   int (*knl_run)(struct backend *, struct prog *, va_list);
   int (*knl_free)(struct prog *);
