@@ -199,6 +199,26 @@
 #define NOMP_KNL_RUN_ERROR -131
 /**
  * @ingroup nomp_errors
+ * @brief NOMP memory free failed
+ */
+#define NOMP_FREE_FAILURE -132
+/**
+ * @ingroup nomp_errors
+ * @brief NOMP calloc failed
+ */
+#define NOMP_CALLOC_FAILURE -133
+/**
+ * @ingroup nomp_errors
+ * @brief NOMP malloc failed
+ */
+#define NOMP_MALLOC_FAILURE -134
+/**
+ * @ingroup nomp_errors
+ * @brief NOMP realloc failed
+ */
+#define NOMP_REALLOC_FAILURE -135
+/**
+ * @ingroup nomp_errors
  * @brief NOMP run out of memory
  */
 #define NOMP_OUT_OF_MEMORY -140
@@ -212,6 +232,7 @@
  * @brief NOMP unknown error
  */
 #define NOMP_UNKNOWN_ERROR -142
+
 
 #ifdef __cplusplus
 extern "C" {
