@@ -102,7 +102,7 @@ def _get_dtype_from_decl_type(decl):
     elif isinstance(decl, c_ast.ArrayDecl):
         return _get_dtype_from_decl_type(decl.type)
 
-    raise NotImplementedError(f"_get_dtype_from_decl_type: {decl_type}")
+    raise NotImplementedError(f"_get_dtype_from_decl: {decl}")
 
 
 class CToLoopyExpressionMapper(IdentityMapper):
@@ -206,8 +206,6 @@ class CToLoopyMapper(IdentityMapper):
         # 1. No domain should have the dim_sets repeated.
         # 2. No arguments should have conflicting infos. like either being an
         #    ArrayArg or a ValueArg.
-
-        from functools import reduce
 
         new_domains = sum((value.domains for value in values), start=[])
         new_statements = sum((value.statements for value in values), start=[])
