@@ -19,6 +19,12 @@
 #undef TEST_TYPE
 #undef TEST_SUFFIX
 
+#define TEST_TYPE unsigned long
+#define TEST_SUFFIX _unsigned_long
+#include "nomp-api-200-impl.h"
+#undef TEST_TYPE
+#undef TEST_SUFFIX
+
 #define TEST_TYPE double
 #define TEST_SUFFIX _double
 #include "nomp-api-200-impl.h"
@@ -42,6 +48,7 @@ int main(int argc, char *argv[]) {
   nomp_api_200_int();
   nomp_api_200_long();
   nomp_api_200_unsigned();
+  nomp_api_200_unsigned_long();
   nomp_api_200_double();
   nomp_api_200_float();
 

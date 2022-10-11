@@ -83,26 +83,24 @@ def dtype_to_ctype_registry():
 
 
 @memoize
-def _get_dtype_from_decl_type(decl_type):
+def _get_dtype_from_decl_type(decl):
     if (
-        isinstance(decl_type, c_ast.PtrDecl)
-        and isinstance(decl_type.type, c_ast.TypeDecl)
-        and isinstance(decl_type.type.type, c_ast.IdentifierType)
-        and isinstance(decl_type.type.type.names, list)
-        and len(decl_type.type.type.names) == 1
+        isinstance(decl, c_ast.PtrDecl)
+        and isinstance(decl.type, c_ast.TypeDecl)
+        and isinstance(decl.type.type, c_ast.IdentifierType)
+        and isinstance(decl.type.type.names, list)
     ):
-        (ctype,) = decl_type.type.type.names
+        ctype = " ".join(decl.type.type.names)
         return dtype_to_ctype_registry().get_or_register_dtype(ctype)
     elif (
-        isinstance(decl_type, c_ast.TypeDecl)
-        and isinstance(decl_type.type, c_ast.IdentifierType)
-        and isinstance(decl_type.type.names, list)
-        and len(decl_type.type.names) == 1
+        isinstance(decl, c_ast.TypeDecl)
+        and isinstance(decl.type, c_ast.IdentifierType)
+        and isinstance(decl.type.names, list)
     ):
-        (ctype,) = decl_type.type.names
+        ctype = " ".join(decl.type.names)
         return dtype_to_ctype_registry().get_or_register_dtype(ctype)
-    elif isinstance(decl_type, c_ast.ArrayDecl):
-        return _get_dtype_from_decl_type(decl_type.type)
+    elif isinstance(decl, c_ast.ArrayDecl):
+        return _get_dtype_from_decl_type(decl.type)
 
     raise NotImplementedError(f"_get_dtype_from_decl_type: {decl_type}")
 
