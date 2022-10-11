@@ -18,22 +18,42 @@
 #define NOMP_BUFSIZ 64
 #define MAX_BACKEND_NAME_SIZE 32
 
-#define FREE(x)                                                                \
-  do {                                                                         \
-    if (x)                                                                     \
-      free(x);                                                                 \
-  } while (0)
-
 #define return_on_err(err)                                                     \
   do {                                                                         \
     if (err)                                                                   \
       return err;                                                              \
   } while (0)
 
-#define tmalloc(type, count) ((type *)malloc((count) * sizeof(type)))
-#define tcalloc(type, count) ((type *)calloc((count), sizeof(type)))
-#define trealloc(type, ptr, count)                                             \
-  ((type *)realloc((ptr), (count) * sizeof(type)))
+static inline int sfree(void *p, const char *file, unsigned line) {
+  if (!p)
+    free(p);
+  return 0;
+}
+
+static inline void *smalloc(size_t size, const char *file, unsigned line) {
+  void *restrict res = malloc(size);
+  return res;
+}
+
+static inline void *scalloc(size_t nmemb, size_t size, const char *file,
+                            unsigned line) {
+  void *restrict res = calloc(nmemb, size);
+  return res;
+}
+
+static inline void *srealloc(void *ptr, size_t size, const char *file,
+                             unsigned line) {
+  void *restrict res = realloc(ptr, size);
+  return res;
+}
+
+#define tfree(x) sfree(x, __FILE__, __LINE__)
+#define tmalloc(type, count)                                                   \
+  ((type *)smalloc((count) * sizeof(type), __FILE__, __LINE__))
+#define tcalloc(type, count)                                                   \
+  ((type *)scalloc((count), sizeof(type), __FILE__, __LINE__))
+#define trealloc(ptr, type, count)                                             \
+  ((type *)srealloc((ptr), (count) * sizeof(type), __FILE__, __LINE__))
 
 struct prog {
   unsigned nargs, ndim;

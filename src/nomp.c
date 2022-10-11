@@ -50,7 +50,7 @@ int nomp_init(const char *backend, int platform, int device) {
     if (install_dir) {
       char *abs_dir = strcatn(3, install_dir, "/", py_dir);
       py_append_to_sys_path(abs_dir);
-      FREE(abs_dir);
+      err = tfree(abs_dir);
     } else {
       return nomp_set_log(NOMP_INSTALL_DIR_NOT_FOUND, NOMP_ERROR,
                           ERR_STR_NOMP_INSTALL_DIR_NOT_SET);
@@ -99,6 +99,7 @@ static unsigned mem_if_exist(void *p, size_t idx0, size_t idx1) {
 
 int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
   unsigned idx = mem_if_exist(ptr, idx0, idx1);
+  int err;
   if (idx == mems_n) {
     // A new entry can't be created with NOMP_FREE or NOMP_FROM
     if (op == NOMP_FROM || op == NOMP_FREE)
@@ -107,14 +108,15 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
     op |= NOMP_ALLOC;
     if (mems_n == mems_max) {
       mems_max += mems_max / 2 + 1;
-      mems = trealloc(struct mem *, mems, mems_max);
+      mems = trealloc(mems, struct mem *, mems_max);
     }
-    struct mem *m = mems[mems_n] = tcalloc(struct mem, 1);
+    mems[mems_n] = tcalloc(struct mem, 1);
+    struct mem *m = mems[mems_n];
     m->idx0 = idx0, m->idx1 = idx1, m->usize = usize;
     m->hptr = ptr, m->bptr = NULL;
   }
 
-  int err = nomp.update(&nomp, mems[idx], op);
+  err = nomp.update(&nomp, mems[idx], op);
 
   // Device memory got free'd
   if (mems[idx]->bptr == NULL) {
@@ -139,6 +141,7 @@ static int parse_clauses(char **usr_file, char **usr_func,
   // Currently, we only support `transform` and `jit`.
   unsigned i = 0;
   char *clause = NULL;
+  int err;
   while (clauses[i]) {
     strnlower(&clause, clauses[i], NOMP_BUFSIZ);
     if (strncmp(clause, "transform", NOMP_BUFSIZ) == 0) {
@@ -149,24 +152,28 @@ static int parse_clauses(char **usr_file, char **usr_func,
         if (tok)
           *usr_func = strndup(tok, NOMP_BUFSIZ);
       }
-      FREE(val);
+      err = tfree(val);
+      return_on_err(err);
     } else if (strncmp(clause, "jit", NOMP_BUFSIZ) == 0) {
     } else {
-      FREE(clause);
+      err = tfree(clause);
+      return_on_err(err);
       return NOMP_INVALID_CLAUSE;
     }
     i = i + 2;
   }
-  FREE(clause);
+  err = tfree(clause);
+  return_on_err(err);
   return 0;
 }
 
 int nomp_jit(int *id, const char *c_src, const char **annotations,
              const char **clauses) {
+  int err;
   if (*id == -1) {
     if (progs_n == progs_max) {
       progs_max += progs_max / 2 + 1;
-      progs = trealloc(struct prog *, progs, progs_max);
+      progs = trealloc(progs, struct prog *, progs_max);
     }
 
     // Create loopy kernel from C source
@@ -179,8 +186,9 @@ int nomp_jit(int *id, const char *c_src, const char **annotations,
     err = parse_clauses(&usr_file, &usr_func, clauses);
     return_on_err(err);
     err = py_user_callback(&py_knl, usr_file, usr_func);
-    FREE(usr_file);
-    FREE(usr_func);
+    return_on_err(err);
+    err = tfree(usr_file);
+    err = tfree(usr_func);
     return_on_err(err);
 
     // Get OpenCL, CUDA, etc. source and name from the loopy kernel
@@ -191,8 +199,8 @@ int nomp_jit(int *id, const char *c_src, const char **annotations,
     // Build the kernel
     struct prog *prg = progs[progs_n] = tcalloc(struct prog, 1);
     err = nomp.knl_build(&nomp, prg, src, name);
-    FREE(src);
-    FREE(name);
+    err = tfree(src);
+    err = tfree(name);
     return_on_err(err);
 
     // Get grid size of the loopy kernel as pymbolic expressions after
@@ -319,6 +327,19 @@ int nomp_err_type_to_str(char *buf, int err, size_t buf_size) {
   case NOMP_KNL_RUN_ERROR:
     strncpy(buf, "NOMP kernel run failed", buf_size);
     break;
+  case NOMP_FREE_FAILURE:
+    strncpy(buf, "Failed to free memory", buf_size);
+    break;
+  case NOMP_CALLOC_FAILURE:
+    strncpy(buf, "Failed to allocate memory", buf_size);
+    break;
+  case NOMP_MALLOC_FAILURE:
+    strncpy(buf, "Failed to allocate memory", buf_size);
+    break;
+  case NOMP_REALLOC_FAILURE:
+    strncpy(buf, "Failed to  re-allocate memory", buf_size);
+    break;
+
   default:
     break;
   }
@@ -353,7 +374,7 @@ int nomp_finalize(void) {
       mems[i] = NULL;
     }
   }
-  FREE(mems);
+  int err = tfree(mems);
   mems = NULL, mems_n = mems_max = 0;
 
   for (unsigned i = 0; i < progs_n; i++) {
@@ -363,7 +384,8 @@ int nomp_finalize(void) {
       progs[i] = NULL;
     }
   }
-  FREE(progs);
+  err = tfree(progs);
+  err = tfree(progs);
   progs = NULL, progs_n = progs_max = 0;
 
   initialized = nomp.finalize(&nomp);
@@ -371,5 +393,5 @@ int nomp_finalize(void) {
     return nomp_set_log(NOMP_FINALIZE_ERROR, NOMP_ERROR,
                         ERR_STR_FAILED_TO_FINALIZE_NOMP);
 
-  return 0;
+  return err;
 }
