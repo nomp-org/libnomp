@@ -106,7 +106,7 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
     m->hptr = ptr, m->bptr = NULL;
   }
 
-  int err = nomp.map(&nomp, mems[idx], op);
+  int err = nomp.update(&nomp, mems[idx], op);
 
   // Device memory got free'd
   if (mems[idx]->bptr == NULL) {
@@ -318,7 +318,7 @@ int nomp_finalize(void) {
 
   for (unsigned i = 0; i < mems_n; i++) {
     if (mems[i]) {
-      nomp.map(&nomp, mems[i], NOMP_FREE);
+      nomp.update(&nomp, mems[i], NOMP_FREE);
       free(mems[i]);
       mems[i] = NULL;
     }
