@@ -64,6 +64,54 @@ locally.
 
 ## Developer documentation
 
+### Variable names
+
+We use `snake_case` for all variables. In addition, for preprocessor constants and
+enum members we use capital letters.
+
+### Braces
+
+We omit the braces for a block if it has only a single statement. For example, `if`
+with a single statement in the body, or `for` with a single statement in the body.
+We keep braces in the following `for` loop even if they can be omitted without any
+change to program logic.
+
+```C
+for (unsigned i = 0; i < 10; i++) {
+  if (i < 5)
+    printf("i < 5");
+}
+```
+
+Also, in an `if-then-else` block, if at least one branch has more than one statement
+in the body, we will use braces for all the branches. So we have the following code:
+
+```C
+if (a < 5) {
+  printf("a < 5");
+} else if (a == 5) {
+  printf("a == 5");
+} else {
+  b = a;
+  printf("a > 5");
+}
+```
+
+instead of:
+
+```C
+if (a < 5)
+  printf("a < 5");
+else if (a == 5)
+  printf("a == 5");
+} else {
+  b = a;
+  printf("a > 5");
+}
+```
+
+### Formatting files before committing
+
 Please run `clang-format` before committing any changes you make on the source
 files. `clang-format` will be available if you install the dev dependencies with
 conda. Below are some examples on how to use `clang-format`:
@@ -74,8 +122,10 @@ clang-format -i src/nomp.c
 ```
 
 If you change any python files, please use `black` and `isort` to format the python
-code before committing. Both black and isort will be available if you install the
-dev dependencies with conda. Below are some examples on how to use `black` and `isort`:
+code before committing. Also check any issues in the code with `flake8`. `black`,
+`isort` and `flake8`  will be available if you install the dev dependencies with
+conda. Below are some examples on how to use `black`, `isort` and `flake8`:
 ```bash
-black -l 80 *.py; isort *.py
+black -l 80 **/*.py; isort **/*.py
+flake8
 ```
