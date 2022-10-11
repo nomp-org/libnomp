@@ -25,18 +25,19 @@ int py_c_to_loopy(PyObject **pKnl, const char *c_src, const char *backend) {
   int err = NOMP_LOOPY_CONVERSION_ERROR;
   PyObject *pModuleStr = PyUnicode_FromString(py_module),
            *pModule = PyImport_Import(pModuleStr);
-  Py_XDECREF(pModuleStr);
   if (pModule) {
     PyObject *pFunc = PyObject_GetAttrString(pModule, py_func);
     if (pFunc) {
       PyObject *pStr = PyUnicode_FromString(c_src);
       PyObject *pBackend = PyUnicode_FromString(backend);
-      if ((*pKnl = PyObject_CallFunctionObjArgs(pFunc, pStr, pBackend, NULL)))
+      *pKnl = PyObject_CallFunctionObjArgs(pFunc, pStr, pBackend, NULL);
+      if (*pKnl)
         err = 0;
       Py_XDECREF(pStr), Py_XDECREF(pBackend), Py_DECREF(pFunc);
     }
     Py_DECREF(pModule);
   }
+  Py_XDECREF(pModuleStr);
   return err;
 }
 
