@@ -1,0 +1,19 @@
+name: pylint-Check
+on: [pull_request]
+jobs:
+  py-formatting-check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8x
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Lint with pylint
+      run: |
+        pip install pylint
+        pylint ./python
