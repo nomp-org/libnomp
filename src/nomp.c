@@ -96,7 +96,7 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
     op |= NOMP_ALLOC;
     if (mems_n == mems_max) {
       mems_max += mems_max / 2 + 1;
-      mems = (struct mem **)realloc(mems, sizeof(struct mem *) * mems_max);
+      mems = trealloc(struct mem *, mems, mems_max);
     }
     struct mem *m = mems[mems_n] = tcalloc(struct mem, 1);
     m->idx0 = idx0, m->idx1 = idx1, m->usize = usize;
@@ -119,7 +119,7 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
 //=============================================================================
 // nomp_jit
 //
-static struct prog *progs = NULL;
+static struct prog **progs = NULL;
 static int progs_n = 0;
 static int progs_max = 0;
 
@@ -155,7 +155,7 @@ int nomp_jit(int *id, const char *c_src, const char **annotations,
   if (*id == -1) {
     if (progs_n == progs_max) {
       progs_max += progs_max / 2 + 1;
-      progs = trealloc(struct prog, progs, progs_max);
+      progs = trealloc(struct prog *, progs, progs_max);
     }
 
     // Create loopy kernel from C source
@@ -178,7 +178,7 @@ int nomp_jit(int *id, const char *c_src, const char **annotations,
     return_on_err(err);
 
     // Build the kernel
-    struct prog *prog = &progs[progs_n];
+    struct prog *prog = progs[progs_n] = tcalloc(struct prog, 1);
     err = nomp.knl_build(&nomp, prog, src, name);
     FREE(src);
     FREE(name);
@@ -225,7 +225,7 @@ int nomp_run(int id, ...) {
   if (id >= 0) {
     va_list args;
     va_start(args, id);
-    int err = nomp.knl_run(&nomp, &progs[id], args);
+    int err = nomp.knl_run(&nomp, progs[id], args);
     va_end(args);
     if (err)
       return NOMP_KNL_RUN_ERROR;
@@ -324,10 +324,14 @@ int nomp_finalize(void) {
   mems = NULL, mems_n = mems_max = 0;
 
   for (unsigned i = 0; i < progs_n; i++) {
-    if (progs[i].bptr != NULL)
-      nomp.knl_free(&progs[i]);
+    if (progs[i]) {
+      nomp.knl_free(progs[i]);
+      free(progs[i]);
+      progs[i] = NULL;
+    }
   }
-  free(progs), progs = NULL, progs_n = progs_max = 0;
+  FREE(progs);
+  progs = NULL, progs_n = progs_max = 0;
 
   initialized = nomp.finalize(&nomp);
   if (initialized)
