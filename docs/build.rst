@@ -78,7 +78,8 @@ this clang binary directory::
     export NOMP_CLANG_DIR=`pwd`/bin
 
 Now you can link libnomp installation to the clang compiler using the following
-script. Make sure both `NOMP_INSTALL_DIR` and `NOMP_CLANG_DIR` are set::
+script (say you saved it as `nompcc`). Make sure both `NOMP_INSTALL_DIR` and
+`NOMP_CLANG_DIR` are set before using it::
 
     #!/bin/bash
     
@@ -95,3 +96,7 @@ script. Make sure both `NOMP_INSTALL_DIR` and `NOMP_CLANG_DIR` are set::
     NOMP_INC_DIR=${NOMP_INSTALL_DIR}/include
     
     ${NOMP_CLANG_DIR}/clang -fnomp -include nomp.h -I${NOMP_INC_DIR} "$@" -Wl,-rpath,${NOMP_LIB_DIR} -L${NOMP_LIB_DIR} -lnomp
+
+Use the above script to compile any file containing `nomp` pragmas as below::
+
+    nompcc foo.c
