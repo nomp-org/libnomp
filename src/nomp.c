@@ -1,7 +1,50 @@
 #include "nomp-impl.h"
 
+struct env {
+  char *install_dir;
+  int verbose;
+};
+
 static struct backend nomp;
+static struct env envs;
 static int initialized = 0;
+
+static char *get_if_env(const char *name) {
+  const char *temp = getenv(name);
+  if (temp) {
+    char *tmp_var = (char *)malloc(strnlen(temp, BUFSIZ));
+    if (tmp_var != NULL) {
+      strncpy(tmp_var, temp, strnlen(temp, BUFSIZ));
+      return tmp_var;
+    }
+  }
+  return NULL;
+}
+
+void nomp_check_env(struct backend *backend) {
+  const char *nomp_backend = get_if_env("NOMP_BACKEND");
+  if (nomp_backend != NULL) {
+    backend->backend =
+        (char *)realloc(backend->backend, strnlen(nomp_backend, NOMP_BUFSIZ));
+    strncpy(backend->backend, nomp_backend, strnlen(nomp_backend, NOMP_BUFSIZ));
+    free((char *)nomp_backend);
+  }
+  int platform_id = strtoui(getenv("NOMP_PLATFORM_ID"), NOMP_BUFSIZ);
+  if (platform_id >= 0)
+    backend->platform_id = platform_id;
+  int device_id = strtoui(getenv("NOMP_DEVICE_ID"), NOMP_BUFSIZ);
+  if (device_id >= 0)
+    backend->device_id = device_id;
+  const char *install_dir = get_if_env("NOMP_INSTALL_DIR");
+  if (install_dir != NULL) {
+    envs.install_dir = (char *)malloc(strnlen(install_dir, NOMP_BUFSIZ));
+    strncpy(envs.install_dir, install_dir,strnlen(install_dir, NOMP_BUFSIZ));
+    free((char *)install_dir);
+  }
+  envs.verbose = strtoui(getenv("NOMP_VERBOSE_LEVEL"), NOMP_BUFSIZ);
+}
+
+static const char *py_dir = "python";
 
 //=============================================================================
 // nomp_init
@@ -10,25 +53,30 @@ int nomp_init(const char *backend, int platform, int device) {
   if (initialized)
     return NOMP_INITIALIZED_ERROR;
 
-  char name[BUFSIZ];
-  size_t n = strnlen(backend, BUFSIZ);
+  nomp.backend = (char *)malloc(strnlen(backend, BUFSIZ));
+  strncpy(nomp.backend, backend, strnlen(backend, BUFSIZ));
+  nomp.platform_id = platform;
+  nomp.device_id = device;
+  nomp_check_env(&nomp);
+  char name[NOMP_BUFSIZ];
+  size_t n = strnlen(nomp.backend, NOMP_BUFSIZ);
   for (int i = 0; i < n; i++)
-    name[i] = tolower(backend[i]);
+    name[i] = tolower(nomp.backend[i]);
   name[n] = '\0';
 
   int err = NOMP_INVALID_BACKEND;
   // FIXME: This is ugly -- should be fixed
 #if defined(OPENCL_ENABLED)
-  if (strncmp(name, "opencl", 32) == 0)
-    err = opencl_init(&nomp, platform, device);
+  if (strncmp(name, "opencl", NOMP_BUFSIZ) == 0)
+    err = opencl_init(&nomp, nomp.platform_id, nomp.device_id);
 #endif
 #if defined(CUDA_ENABLED)
-  if (strncmp(name, "cuda", 32) == 0)
-    err = cuda_init(&nomp, platform, device);
+  if (strncmp(name, "cuda", NOMP_BUFSIZ) == 0)
+    err = cuda_init(&nomp, nomp.platform_id, nomp.device_id);
 #endif
   if (err)
     return err;
-  strncpy(nomp.name, name, BUFSIZ);
+  strncpy(nomp.name, name, NOMP_BUFSIZ);
 
   err = NOMP_PY_INITIALIZE_ERROR;
   if (!Py_IsInitialized()) {
@@ -41,9 +89,8 @@ int nomp_init(const char *backend, int platform, int device) {
     // There should be a better way to figure the installation
     // path based on the shared library path
     err = NOMP_INSTALL_DIR_NOT_FOUND;
-    char *install_dir = getenv("NOMP_INSTALL_DIR");
-    if (install_dir) {
-      char *abs_dir = strcatn(3, install_dir, "/", py_dir);
+    if (envs.install_dir) {
+      char *abs_dir = strcatn(3, envs.install_dir, "/", py_dir);
       py_append_to_sys_path(abs_dir);
       FREE(abs_dir);
       err = 0;
@@ -132,17 +179,17 @@ static int parse_clauses(char **usr_file, char **usr_func,
   unsigned i = 0;
   char *clause = NULL;
   while (clauses[i]) {
-    strnlower(&clause, clauses[i], BUFSIZ);
-    if (strncmp(clause, "transform", BUFSIZ) == 0) {
-      char *val = strndup(clauses[i + 1], BUFSIZ);
+    strnlower(&clause, clauses[i], NOMP_BUFSIZ);
+    if (strncmp(clause, "transform", NOMP_BUFSIZ) == 0) {
+      char *val = strndup(clauses[i + 1], NOMP_BUFSIZ);
       char *tok = strtok(val, ":");
       if (tok) {
-        *usr_file = strndup(tok, BUFSIZ), tok = strtok(NULL, ":");
+        *usr_file = strndup(tok, PATH_MAX), tok = strtok(NULL, ":");
         if (tok)
-          *usr_func = strndup(tok, BUFSIZ);
+          *usr_func = strndup(tok, NOMP_BUFSIZ);
       }
       FREE(val);
-    } else if (strncmp(clause, "jit", BUFSIZ) == 0) {
+    } else if (strncmp(clause, "jit", NOMP_BUFSIZ) == 0) {
     } else {
       FREE(clause);
       return NOMP_INVALID_CLAUSE;
@@ -154,7 +201,7 @@ static int parse_clauses(char **usr_file, char **usr_func,
 }
 
 int nomp_jit(int *id, const char *c_src, const char **annotations,
-             const char **clauses, unsigned nargs, const char *args, ...) {
+             const char **clauses) {
   if (*id == -1) {
     if (progs_n == progs_max) {
       progs_max += progs_max / 2 + 1;
@@ -162,56 +209,37 @@ int nomp_jit(int *id, const char *c_src, const char **annotations,
     }
 
     // Create loopy kernel from C source
-    PyObject *pKnl = NULL;
-    int err = py_c_to_loopy(&pKnl, c_src, nomp.name);
+    PyObject *py_knl = NULL;
+    int err = py_c_to_loopy(&py_knl, c_src, nomp.name);
     return_on_err(err);
 
     // Call the User callback function
     char *usr_file = NULL, *usr_func = NULL;
     err = parse_clauses(&usr_file, &usr_func, clauses);
     return_on_err(err);
-    err = py_user_callback(&pKnl, usr_file, usr_func);
+    err = py_user_callback(&py_knl, usr_file, usr_func);
     FREE(usr_file);
     FREE(usr_func);
     return_on_err(err);
 
     // Get OpenCL, CUDA, etc. source and name from the loopy kernel
     char *name, *src;
-    err = py_get_knl_name_and_src(&name, &src, pKnl);
+    err = py_get_knl_name_and_src(&name, &src, py_knl);
     return_on_err(err);
 
     // Build the kernel
-    struct prog *prog = progs[progs_n] = tcalloc(struct prog, 1);
-    err = nomp.knl_build(&nomp, prog, src, name);
+    struct prog *prg = progs[progs_n] = tcalloc(struct prog, 1);
+    err = nomp.knl_build(&nomp, prg, src, name);
     FREE(src);
     FREE(name);
     return_on_err(err);
 
-    // Get grid size of the loopy kernel after transformations. We will create a
-    // dictionary with variable name as keys, variable value as value and then
-    // pass it to the function
-    char *args_ = strndup(args, BUFSIZ), *arg = strtok(args_, ",");
-    PyObject *pDict = PyDict_New();
-    va_list vargs;
-    va_start(vargs, args);
-    for (int i = 0; i < nargs; i++) {
-      // FIXME: `type` should be able to distinguish between integer types,
-      // floating point types, boolean type or a pointer type. We are assuming
-      // it is an integer type for now.
-      int type = va_arg(vargs, int);
-      size_t size = va_arg(vargs, size_t);
-      int *p = (int *)va_arg(vargs, void *);
-      PyObject *pKey = PyUnicode_FromStringAndSize(arg, strlen(arg));
-      PyObject *pValue = PyLong_FromLong(*p);
-      PyDict_SetItem(pDict, pKey, pValue);
-      arg = strtok(NULL, ",");
-    }
-    va_end(vargs);
-
-    prog->nargs = nargs;
-    py_get_grid_size(&prog->ndim, prog->global, prog->local, pKnl, pDict);
-    FREE(args_);
-    Py_DECREF(pDict), Py_XDECREF(pKnl);
+    // Get grid size of the loopy kernel as pymbolic expressions after
+    // transformations. These grid sizes will be evaluated when the kernel is
+    // run.
+    prg->py_dict = PyDict_New();
+    py_get_grid_size(prg, py_knl);
+    Py_XDECREF(py_knl);
 
     if (err)
       return NOMP_KNL_BUILD_ERROR;
@@ -224,11 +252,30 @@ int nomp_jit(int *id, const char *c_src, const char **annotations,
 //=============================================================================
 // nomp_run
 //
-int nomp_run(int id, ...) {
+int nomp_run(int id, int nargs, ...) {
   if (id >= 0) {
+    struct prog *prg = progs[id];
+    prg->nargs = nargs;
+
     va_list args;
-    va_start(args, id);
-    int err = nomp.knl_run(&nomp, progs[id], args);
+    va_start(args, nargs);
+    for (int i = 0; i < nargs; i++) {
+      const char *var = va_arg(args, const char *);
+      int type = va_arg(args, int);
+      size_t size = va_arg(args, size_t);
+      void *val = va_arg(args, void *);
+      if (type == NOMP_INTEGER) {
+        PyObject *py_key = PyUnicode_FromStringAndSize(var, strlen(var));
+        PyObject *py_val = PyLong_FromLong(*((int *)val));
+        PyDict_SetItem(prg->py_dict, py_key, py_val);
+        Py_XDECREF(py_key), Py_XDECREF(py_val);
+      }
+    }
+    va_end(args);
+    py_eval_grid_size(prg, prg->py_dict);
+
+    va_start(args, nargs);
+    int err = nomp.knl_run(&nomp, prg, args);
     va_end(args);
     if (err)
       return NOMP_KNL_RUN_ERROR;
@@ -337,6 +384,7 @@ int nomp_finalize(void) {
   progs = NULL, progs_n = progs_max = 0;
 
   initialized = nomp.finalize(&nomp);
+  free(nomp.backend), free(envs.install_dir);
   if (initialized)
     return NOMP_FINALIZE_ERROR;
 
@@ -348,8 +396,8 @@ int nomp_finalize(void) {
 //
 void nomp_chk_(int err, const char *file, unsigned line) {
   if (err) {
-    char buf[2 * BUFSIZ];
-    nomp_err(buf, err, 2 * BUFSIZ);
+    char buf[2 * NOMP_BUFSIZ];
+    nomp_err(buf, err, 2 * NOMP_BUFSIZ);
     printf("%s:%d %s\n", file, line, buf);
     exit(1);
   }

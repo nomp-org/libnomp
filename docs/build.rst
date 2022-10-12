@@ -33,8 +33,8 @@ can't find OpenCL::
 
     cmake .. -DCMAKE_INSTALL_PREFIX=${HOME}/.nomp -DOpenCL_LIBRARY=/lib/x86_64-linux-gnu/libOpenCL.so.1
 
-Linking with clang frontend
----------------------------
+Clang frontend
+--------------
 
 Clone the llvm-project repo first::
 
@@ -76,22 +76,3 @@ This will build clang compiler in `bin/clang`. Set `NOMP_CLANG_DIR` to point to
 this clang binary directory::
 
     export NOMP_CLANG_DIR=`pwd`/bin
-
-Now you can link libnomp installation to the clang compiler using the following
-script. Make sure both `NOMP_INSTALL_DIR` and `NOMP_CLANG_DIR` are set::
-
-    #!/bin/bash
-    
-    if [ -z "${NOMP_INSTALL_DIR}" ]; then
-      echo "Error: NOMP_INSTALL_DIR is not defined !"
-      exit 1
-    fi
-    if [ -z "${NOMP_CLANG_DIR}" ]; then
-      echo "Error: NOMP_CLANG_DIR is not defined !"
-      exit 1
-    fi
-    
-    NOMP_LIB_DIR=${NOMP_INSTALL_DIR}/lib
-    NOMP_INC_DIR=${NOMP_INSTALL_DIR}/include
-    
-    ${NOMP_CLANG_DIR}/clang -fnomp -include nomp.h -I${NOMP_INC_DIR} "$@" -Wl,-rpath,${NOMP_LIB_DIR} -L${NOMP_LIB_DIR} -lnomp

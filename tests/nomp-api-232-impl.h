@@ -1,14 +1,14 @@
 #include "nomp-test.h"
 
-#define nomp_api_230_aux TOKEN_PASTE(nomp_api_230_aux, TEST_SUFFIX)
-int nomp_api_230_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {
+#define nomp_api_232_aux TOKEN_PASTE(nomp_api_232_aux, TEST_SUFFIX)
+int nomp_api_232_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {
   const char *knl_fmt =
-      "void foo(%s *a, %s *b, %s *c,int N) {                  \n"
+      "void foo(%s *a, %s *b, %s *c, int N) {                 \n"
       "  for (int i = 0; i < N; i++)                          \n"
-      "    a[i] = a[i] + b[i] + c[i];                         \n"
+      "    a[i] = a[i] * b[i] * c[i];                         \n"
       "}                                                      \n";
 
-  size_t len = strlen(knl_fmt) + 2 * strlen(TOSTRING(TEST_TYPE)) + 1;
+  size_t len = strlen(knl_fmt) + 3 * strlen(TOSTRING(TEST_TYPE)) + 1;
   char *knl = (char *)calloc(len, sizeof(char));
   snprintf(knl, len, knl_fmt, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE),
            TOSTRING(TEST_TYPE));
@@ -28,8 +28,8 @@ int nomp_api_230_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {
   return 0;
 }
 
-#define nomp_api_230 TOKEN_PASTE(nomp_api_230, TEST_SUFFIX)
-int nomp_api_230(const char *backend, int device, int platform) {
+#define nomp_api_232 TOKEN_PASTE(nomp_api_232, TEST_SUFFIX)
+int nomp_api_232(const char *backend, int device, int platform) {
   int err = nomp_init(backend, platform, device);
   nomp_chk(err);
 
@@ -45,17 +45,17 @@ int nomp_api_230(const char *backend, int device, int platform) {
   err = nomp_update(c, 0, n, sizeof(TEST_TYPE), NOMP_TO);
   nomp_chk(err);
 
-  nomp_api_230_aux(a, b, c, n);
+  nomp_api_232_aux(a, b, c, n);
 
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM);
   nomp_chk(err);
 
 #if defined(TEST_TOL)
   for (unsigned i = 0; i < n; i++)
-    nomp_assert(fabs(a[i] - n - 5) < TEST_TOL);
+    nomp_assert(fabs(a[i] - 5 * (n - i) * i) < TEST_TOL);
 #else
   for (unsigned i = 0; i < n; i++)
-    nomp_assert(a[i] == n + 5);
+    nomp_assert(a[i] == 5 * (n - i) * i);
 #endif
 
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE);
@@ -70,6 +70,6 @@ int nomp_api_230(const char *backend, int device, int platform) {
 
   return 0;
 }
-#undef nomp_api_230
+#undef nomp_api_232
 
-#undef nomp_api_230_aux
+#undef nomp_api_232_aux

@@ -86,8 +86,8 @@ static int cuda_knl_build(struct backend *bnd, struct prog *prg,
   chk_nvrtc(nvrtc_err);
 
   struct cuda_backend *cbnd = (struct cuda_backend *)bnd->bptr;
-  char arch[BUFSIZ];
-  snprintf(arch, BUFSIZ, "-arch=compute_%d%d", cbnd->prop.major,
+  char arch[NOMP_BUFSIZ];
+  snprintf(arch, NOMP_BUFSIZ, "-arch=compute_%d%d", cbnd->prop.major,
            cbnd->prop.minor);
 
   const char *opts[1] = {arch};
@@ -132,7 +132,9 @@ static int cuda_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
   struct mem *m;
   void *vargs[NARGS_MAX];
   for (int i = 0; i < nargs; i++) {
+    const char *var = va_arg(args, const char *);
     int type = va_arg(args, int);
+    size_t size = va_arg(args, size_t);
     void *p = va_arg(args, void *);
     switch (type) {
     case NOMP_INTEGER:

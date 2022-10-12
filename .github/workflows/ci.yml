@@ -1,15 +1,29 @@
-name: libnomp CI Tests
+name: Unit tests
 on:
   pull_request:
     branches: [main]
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled'
+        required: false
+        default: false
+env:
+  CACHE_NUMBER: 0  # increase to reset cache manually
+  POCL_CACHE_NUMBER: 0
 jobs:
-  main:
+  ci:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
     strategy:
       matrix:
-        compiler: [gcc-9, gcc-10, clang-10, clang-11, clang-12]
+        # compiler: [gcc-9, gcc-10, clang-10, clang-11, clang-12]
+        compiler: [gcc-10]
       fail-fast: false
     name: "${{ matrix.compiler }}"
     env:
@@ -17,32 +31,54 @@ jobs:
       TESTDIR: tests
       BUILDDIR: build
     steps:
-      - uses: actions/checkout@v2
+      - name: Setup Github actions
+        uses: actions/checkout@v3
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3.13
+        if: ${{ inputs.debug_enabled }}
+      - name: Setup conda environment "libnomp"
+        id: setup_conda
+        uses: conda-incubator/setup-miniconda@v2
         with:
-          submodules: recursive
-      - name: Setup Python 3.10.4
-        uses: actions/setup-python@v2
+          miniforge-variant: Mambaforge
+          miniforge-version: latest
+          activate-environment: libnomp
+          use-mamba: true
+      - uses: actions/cache@v2
         with:
-          python-version: 3.10.4
-      - name: Install apt dependencies and set environment
-        shell: bash
+          path: /usr/share/miniconda3/envs/libnomp
+          key:  ${{ runner.os }}-build-libnomp_environment-${{ hashFiles('environment.yml') }}-${{ env.CACHE_NUMBER }}
+        id: cache
+      - name: Update environment
+        id: update_env
         run: |
-          sudo apt -y update
-          sudo apt install -y pocl-opencl-icd opencl-headers
-          pip3 install git+https://github.com/inducer/loopy
-          pip3 install pycparser
-          echo "NOMP_INSTALL_DIR=${PWD}/install" >> $GITHUB_ENV
-
+          mamba env update -n libnomp -f environment.yml
+        if: steps.cache.outputs.cache-hit != 'true'
+      - uses: actions/cache@v2
+        with:
+          path: ~/conda_pkgs_dir/pocl
+          key:  ${{ runner.os }}-build-pocl-${{ env.POCL_CACHE_NUMBER }}
+        id: pocl_cache
+      - name: Install pocl
+        id: install_pocl
+        run: |
+          mamba install -c conda-forge pocl
+        if: (steps.pocl_cache.outputs.cache-hit && steps.libnomp_cache.outputs.cache-hit) != 'true'
       - name: Build libnomp
-        shell: bash
+        id: build_libnomp
         run: |
+          echo "NOMP_INSTALL_DIR=${PWD}/install" >> $GITHUB_ENV
           mkdir -p ${BUILDDIR}
           cd ${BUILDDIR}
-          cmake -DCMAKE_INSTALL_PREFIX=../install -DOpenCL_LIBRARY=/lib/x86_64-linux-gnu/libOpenCL.so.1 ..
+          cmake -DCMAKE_INSTALL_PREFIX=../install \
+            -DOpenCL_LIBRARY=${CONDA_PREFIX}/lib/libOpenCL.so \
+            -DOpenCL_INCLUDE_DIR=${CONDA_PREFIX}/include ..
           make install
-
-      - name: nomp-api
-        shell: bash
+      - name: Run libnomp tests
+        id: run_libnomp
         run: |
           cd ${TESTDIR}
           ./run-tests.sh
+      - name: Block to allow inspecting failures
+        run: sleep 30m
+        if: ${{ failure() && inputs.debug_enabled }}

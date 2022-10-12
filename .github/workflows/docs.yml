@@ -1,0 +1,75 @@
+name: Build and test docs
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled'
+        required: false
+        default: false
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+    env:
+      BUILDDIR: build
+      DOCSDIR: docs
+      PUSH_ON_MAIN: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    steps:
+      - name: GitHub action setup
+        uses: actions/checkout@v3
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3.13
+        if: ${{ inputs.debug_enabled }}
+      - name: Setup conda environment "libnomp-dev"
+        id: setup_conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniforge-variant: Mambaforge
+          miniforge-version: latest
+          activate-environment: libnomp-dev
+          use-mamba: true
+      - uses: actions/cache@v2
+        with:
+          path: /usr/share/miniconda3/envs/libnomp-dev
+          key:  ${{ runner.os }}-build-libnomp_dev_environment-${{ hashFiles('environment-dev.yml') }}-${{ env.CACHE_NUMBER }}
+        id: cache
+      - name: Update environment
+        id: update_env
+        run: |
+          mamba env update -n libnomp-dev -f environment-dev.yml
+        if: steps.cache.outputs.cache-hit != 'true'
+      - name: Run doxygen
+        id: run_doxygen
+        run: |
+          mkdir -p ${BUILDDIR}
+          cd ${BUILDDIR}
+          (cat ../${DOCSDIR}/Doxyfile.in; echo 'OUTPUT_DIRECTORY = "."'; echo 'INPUT = "../src"';) | doxygen -
+      - name: Run sphinx
+        id: run_sphinx
+        run: |
+          cd ${DOCSDIR}
+          sphinx-build -b html -W -Dbreathe_projects.libnomp=../${BUILDDIR}/xml . ../${BUILDDIR}/sphinx
+      - name: Create nojekyll
+        id: create_nojekyll
+        if: ${{ fromJSON(env.PUSH_ON_MAIN) }}
+        run: |
+          cd ${BUILDDIR}/sphinx && touch .nojekyll
+      - name: Deploy
+        id: deploy
+        if: ${{ fromJSON(env.PUSH_ON_MAIN) }}
+        uses: JamesIves/github-pages-deploy-action@releases/v3
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: ${{ env.BUILDDIR }}/sphinx
+      - name: Block to allow inspecting failures
+        run: sleep 30m
+        if: ${{ failure() && inputs.debug_enabled }}
