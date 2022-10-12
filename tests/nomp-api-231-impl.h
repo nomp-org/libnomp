@@ -5,7 +5,7 @@ int nomp_api_231_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {
   const char *knl_fmt =
       "void foo(%s *a, %s *b, %s *c, int N) {                 \n"
       "  for (int i = 0; i < N; i++)                          \n"
-      "    a[i] = a[i] + b[i] + c[i];                         \n"
+      "    a[i] = a[i] + 3 * b[i] + 2 * c[i];                 \n"
       "}                                                      \n";
 
   size_t len = strlen(knl_fmt) + 3 * strlen(TOSTRING(TEST_TYPE)) + 1;
@@ -54,10 +54,10 @@ int nomp_api_231(const char *backend, int device, int platform) {
 
 #if defined(TEST_TOL)
   for (unsigned i = 0; i < n; i++)
-    nomp_assert(fabs(a[i] - n - 5) < TEST_TOL);
+    nomp_assert(fabs(a[i] - n - 2 * i - 10) < TEST_TOL);
 #else
   for (unsigned i = 0; i < n; i++)
-    nomp_assert(a[i] == n + 5);
+    nomp_assert(a[i] == n + 2 * i + 10);
 #endif
 
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE);
