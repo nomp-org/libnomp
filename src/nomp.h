@@ -102,6 +102,11 @@ typedef enum {
  * @brief Invalid NOMP for clause
  */
 #define NOMP_INVALID_CLAUSE -40
+/**
+ * @ingroup nomp_errors
+ * @brief Invalid NOMP map parameters
+ */
+#define NOMP_INVALID_MAP_PARAMS -41
 
 /**
  * @ingroup nomp_errors

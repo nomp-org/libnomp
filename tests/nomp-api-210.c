@@ -1,48 +1,60 @@
 #include "nomp.h"
 #include <stdlib.h>
 
+#define TEST_TYPE int
+#define TEST_SUFFIX _int
+#include "nomp-api-210-impl.h"
+#undef TEST_TYPE
+#undef TEST_SUFFIX
+
+#define TEST_TYPE long
+#define TEST_SUFFIX _long
+#include "nomp-api-210-impl.h"
+#undef TEST_TYPE
+#undef TEST_SUFFIX
+
+#define TEST_TYPE unsigned
+#define TEST_SUFFIX _unsigned
+#include "nomp-api-210-impl.h"
+#undef TEST_TYPE
+#undef TEST_SUFFIX
+
+#define TEST_TYPE unsigned long
+#define TEST_SUFFIX _unsigned_long
+#include "nomp-api-210-impl.h"
+#undef TEST_TYPE
+#undef TEST_SUFFIX
+
+#define TEST_TOL 1e-12
+#define TEST_TYPE double
+#define TEST_SUFFIX _double
+#include "nomp-api-210-impl.h"
+#undef TEST_TYPE
+#undef TEST_SUFFIX
+#undef TEST_TOL
+
+#define TEST_TOL 1e-8
+#define TEST_TYPE float
+#define TEST_SUFFIX _float
+#include "nomp-api-210-impl.h"
+#undef TEST_TYPE
+#undef TEST_SUFFIX
+#undef TEST_TOL
+
 int main(int argc, char *argv[]) {
   char *backend = argc > 1 ? argv[1] : "opencl";
-  int device_id = argc > 2 ? atoi(argv[2]) : 0;
-  int platform_id = argc > 3 ? atoi(argv[3]) : 0;
+  int device = argc > 2 ? atoi(argv[2]) : 0;
+  int platform = argc > 3 ? atoi(argv[3]) : 0;
 
-  int err = nomp_init(backend, device_id, platform_id);
+  int err = nomp_init(backend, device, platform);
   nomp_chk(err);
 
-  int a[20] = {0}, b[20] = {1, 2, 3, 4, 5};
-  int N = 20;
-
-  err = nomp_update(a, 0, 20, sizeof(int), NOMP_TO);
-  nomp_chk(err);
-  err = nomp_update(b, 0, 20, sizeof(int), NOMP_TO);
-  nomp_chk(err);
-
-  const char *knl = "void foo(int *a, int *b, int N) {                      \n"
-                    "  for (int i = 0; i < N; i++)                          \n"
-                    "    a[i] = b[i];                                       \n"
-                    "}                                                      \n";
-
-  static int id = -1;
-  const char *annotations[1] = {0},
-             *clauses[3] = {"transform", "nomp-api-200:transform", 0};
-  err = nomp_jit(&id, knl, annotations, clauses, 3, "a,b,N", NOMP_PTR,
-                 sizeof(int), a, NOMP_PTR, sizeof(int), b, NOMP_INTEGER,
-                 sizeof(int), &N);
-  nomp_chk(err);
-
-  err = nomp_run(id, NOMP_PTR, a, NOMP_PTR, b, NOMP_INTEGER, &N, sizeof(int));
-  nomp_chk(err);
-
-  err = nomp_update(a, 0, 20, sizeof(int), NOMP_FROM);
-  nomp_chk(err);
-
-  for (int i = 0; i < N; i++)
-    nomp_assert(a[i] == b[i]);
-
-  err = nomp_update(a, 0, 20, sizeof(int), NOMP_FREE);
-  nomp_chk(err);
-  err = nomp_update(b, 0, 20, sizeof(int), NOMP_FREE);
-  nomp_chk(err);
+  nomp_api_210_int();
+  nomp_api_210_long();
+  nomp_api_210_unsigned();
+  nomp_api_210_unsigned_long();
+  nomp_api_210_double();
+  nomp_api_210_float();
 
   err = nomp_finalize();
   nomp_chk(err);

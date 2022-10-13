@@ -122,8 +122,10 @@ clang-format -i src/nomp.c
 ```
 
 If you change any python files, please use `black` and `isort` to format the python
-code before committing. Both black and isort will be available if you install the
-dev dependencies with conda. Below are some examples on how to use `black` and `isort`:
+code before committing. Also check any issues in the code with `flake8`. `black`,
+`isort` and `flake8`  will be available if you install the dev dependencies with
+conda. Below are some examples on how to use `black`, `isort` and `flake8`:
 ```bash
-black -l 80 *.py; isort *.py
+black -l 80 **/*.py; isort **/*.py
+flake8
 ```

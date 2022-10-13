@@ -54,9 +54,8 @@ int nomp_init(const char *backend, int platform, int device) {
                           ERR_STR_NOMP_INSTALL_DIR_NOT_SET);
     }
   } else {
-    // TODO: Check if we can use initialized python
-    err = nomp_set_log(NOMP_PY_INITIALIZE_ERROR, NOMP_WARNING,
-                       WARNING_STR_PYTHON_IS_ALREADY_INITIALIZED);
+    // Python is already initialized.
+    err = 0;
   }
 
   initialized = 1;
@@ -66,7 +65,7 @@ int nomp_init(const char *backend, int platform, int device) {
 //=============================================================================
 // nomp_update
 //
-static struct mem *mems = NULL;
+static struct mem **mems = NULL;
 static int mems_n = 0;
 static int mems_max = 0;
 
@@ -75,44 +74,58 @@ static int mems_max = 0;
 struct mem *mem_if_mapped(void *p) {
   // FIXME: This is O(N) in number of allocations.
   // Needs to go. Must store a hashmap.
-  for (int i = 0; i < mems_n; i++)
-    if (mems[i].bptr != NULL && mems[i].hptr == p)
-      return &mems[i];
+  for (unsigned i = 0; i < mems_n; i++) {
+    if (mems[i] && mems[i]->hptr == p)
+      return mems[i];
+  }
   return NULL;
 }
 
+static unsigned mem_if_exist(void *p, size_t idx0, size_t idx1) {
+  // FIXME: This is O(N) in number of allocations.
+  // Needs to go. Must store a hashmap.
+  for (unsigned i = 0; i < mems_n; i++) {
+    if (mems[i] && mems[i]->hptr == p && mems[i]->idx0 == idx0 &&
+        mems[i]->idx1 == idx1)
+      return i;
+  }
+  return mems_n;
+}
+
 int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
-  struct mem *m = mem_if_mapped(ptr);
-  if (m == NULL) {
+  unsigned idx = mem_if_exist(ptr, idx0, idx1);
+  if (idx == mems_n) {
+    // A new entry can't be created with NOMP_FREE or NOMP_FROM
     if (op == NOMP_FROM || op == NOMP_FREE)
       return nomp_set_log(NOMP_INVALID_MAP_PTR, NOMP_ERROR,
                           ERR_STR_INVALID_MAP_OP, op);
     op |= NOMP_ALLOC;
-  }
-
-  if (m == NULL) {
     if (mems_n == mems_max) {
       mems_max += mems_max / 2 + 1;
-      mems = (struct mem *)realloc(mems, sizeof(struct mem) * mems_max);
+      mems = trealloc(struct mem *, mems, mems_max);
     }
-    m = &mems[mems_n], mems_n++;
+    struct mem *m = mems[mems_n] = tcalloc(struct mem, 1);
     m->idx0 = idx0, m->idx1 = idx1, m->usize = usize;
     m->hptr = ptr, m->bptr = NULL;
   }
 
-  if (m->idx0 != idx0 || m->idx1 != idx1 || m->usize != usize)
-    return nomp_set_log(NOMP_INVALID_MAP_PTR, NOMP_ERROR,
-                        ERR_STR_INVALID_MAP_PTR, ptr);
-  if ((op & NOMP_ALLOC) && m->bptr != NULL)
-    return nomp_set_log(NOMP_PTR_ALREADY_MAPPED, NOMP_ERROR,
-                        ERR_STR_PTR_IS_ALREADY_ALLOCATED, ptr);
-  return nomp.map(&nomp, m, op);
+  int err = nomp.update(&nomp, mems[idx], op);
+
+  // Device memory got free'd
+  if (mems[idx]->bptr == NULL) {
+    free(mems[idx]);
+    mems[idx] = NULL;
+  } else if (idx == mems_n) {
+    mems_n++;
+  }
+
+  return err;
 }
 
 //=============================================================================
 // nomp_jit
 //
-static struct prog *progs = NULL;
+static struct prog **progs = NULL;
 static int progs_n = 0;
 static int progs_max = 0;
 
@@ -148,7 +161,7 @@ int nomp_jit(int *id, const char *c_src, const char **annotations,
   if (*id == -1) {
     if (progs_n == progs_max) {
       progs_max += progs_max / 2 + 1;
-      progs = (struct prog *)realloc(progs, sizeof(struct prog) * progs_max);
+      progs = trealloc(struct prog *, progs, progs_max);
     }
 
     // Create loopy kernel from C source
@@ -171,7 +184,7 @@ int nomp_jit(int *id, const char *c_src, const char **annotations,
     return_on_err(err);
 
     // Build the kernel
-    struct prog *prog = &progs[progs_n];
+    struct prog *prog = progs[progs_n] = tcalloc(struct prog, 1);
     err = nomp.knl_build(&nomp, prog, src, name);
     FREE(src);
     FREE(name);
@@ -218,7 +231,7 @@ int nomp_run(int id, ...) {
   if (id >= 0) {
     va_list args;
     va_start(args, id);
-    int err = nomp.knl_run(&nomp, &progs[id], args);
+    int err = nomp.knl_run(&nomp, progs[id], args);
     va_end(args);
     if (err)
       return nomp_set_log(NOMP_KNL_RUN_ERROR, NOMP_ERROR,
@@ -256,6 +269,9 @@ int nomp_err_type_to_str(char *buf, int err, size_t buf_size) {
     break;
   case NOMP_INVALID_MAP_PTR:
     strncpy(buf, "Invalid NOMP map pointer", buf_size);
+    break;
+  case NOMP_INVALID_MAP_PARAMS:
+    strncpy(buf, "Invalid NOMP map parameters", buf_size);
     break;
   case NOMP_INVALID_MAP_OP:
     strncpy(buf, "Invalid map operation", buf_size);
@@ -381,15 +397,21 @@ int nomp_finalize(void) {
                         ERR_STR_NOMP_IS_NOT_INITIALIZED);
 
   for (unsigned i = 0; i < mems_n; i++) {
-    if (mems[i].bptr != NULL)
-      nomp.map(&nomp, &mems[i], NOMP_FREE);
+    if (mems[i]) {
+      nomp.update(&nomp, mems[i], NOMP_FREE);
+      free(mems[i]);
+      mems[i] = NULL;
+    }
   }
   FREE(mems);
   mems = NULL, mems_n = mems_max = 0;
 
   for (unsigned i = 0; i < progs_n; i++) {
-    if (progs[i].bptr != NULL)
-      nomp.knl_free(&progs[i]);
+    if (progs[i]) {
+      nomp.knl_free(progs[i]);
+      free(progs[i]);
+      progs[i] = NULL;
+    }
   }
   FREE(progs);
   progs = NULL, progs_n = progs_max = 0;
@@ -403,9 +425,6 @@ int nomp_finalize(void) {
   if (initialized)
     return nomp_set_log(NOMP_FINALIZE_ERROR, NOMP_ERROR,
                         ERR_STR_FAILED_TO_FINALIZE_NOMP);
-
-  if (Py_IsInitialized())
-    Py_Finalize();
 
   return 0;
 }

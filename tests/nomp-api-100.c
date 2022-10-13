@@ -1,53 +1,74 @@
 #include "nomp.h"
 #include <stdlib.h>
 
+#define TEST_TYPE int
+#define TEST_SUFFIX _int
+#include "nomp-api-100-impl.h"
+#undef TEST_TYPE
+#undef TEST_SUFFIX
+
+#define TEST_TYPE long
+#define TEST_SUFFIX _long
+#include "nomp-api-100-impl.h"
+#undef TEST_TYPE
+#undef TEST_SUFFIX
+
+#define TEST_TYPE unsigned
+#define TEST_SUFFIX _unsigned
+#include "nomp-api-100-impl.h"
+#undef TEST_TYPE
+#undef TEST_SUFFIX
+
+#define TEST_TYPE unsigned long
+#define TEST_SUFFIX _unsigned_long
+#include "nomp-api-100-impl.h"
+#undef TEST_TYPE
+#undef TEST_SUFFIX
+
+#define TEST_TOL 1e-12
+#define TEST_TYPE double
+#define TEST_SUFFIX _double
+#include "nomp-api-100-impl.h"
+#undef TEST_TYPE
+#undef TEST_SUFFIX
+#undef TEST_TOL
+
+#define TEST_TOL 1e-8
+#define TEST_TYPE float
+#define TEST_SUFFIX _float
+#include "nomp-api-100-impl.h"
+#undef TEST_TYPE
+#undef TEST_SUFFIX
+#undef TEST_TOL
+
 int main(int argc, char *argv[]) {
   char *backend = argc > 1 ? argv[1] : "opencl";
-  int device_id = argc > 2 ? atoi(argv[2]) : 0;
-  int platform_id = argc > 3 ? atoi(argv[3]) : 0;
+  int device = argc > 2 ? atoi(argv[2]) : 0;
+  int platform = argc > 3 ? atoi(argv[3]) : 0;
 
-  int err = nomp_init(backend, device_id, platform_id);
+  int err = nomp_init(backend, device, platform);
   nomp_chk(err);
 
-  int a[10] = {0}, b[10] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+  nomp_api_100_int(0, 10);
+  nomp_api_100_long(0, 10);
+  nomp_api_100_unsigned(0, 10);
+  nomp_api_100_unsigned_long(0, 10);
+  nomp_api_100_double(0, 10);
+  nomp_api_100_float(0, 10);
 
-  // Free'ing before mapping should return an error
-  err = nomp_update(a, 0, 10, sizeof(int), NOMP_FREE);
-  nomp_assert(nomp_get_log_no(err) == NOMP_INVALID_MAP_PTR);
+  nomp_api_100_int(5, 10);
+  nomp_api_100_long(5, 10);
+  nomp_api_100_unsigned(5, 10);
+  nomp_api_100_unsigned_long(5, 10);
+  nomp_api_100_double(5, 10);
+  nomp_api_100_float(5, 10);
 
-  // D2H before H2D should return an error
-  err = nomp_update(a, 0, 10, sizeof(int), NOMP_FROM);
-  nomp_assert(nomp_get_log_no(err) == NOMP_INVALID_MAP_PTR);
-
-  // Mapping H2D multiple times is not an error
-  err = nomp_update(b, 0, 10, sizeof(int), NOMP_TO);
-  nomp_chk(err);
-  err = nomp_update(b, 0, 10, sizeof(int), NOMP_TO);
-  nomp_chk(err);
-
-  err = nomp_update(a, 0, 10, sizeof(int), NOMP_TO);
-  nomp_chk(err);
-
-  // Mapping D2H multiple times is not an error
-  err = nomp_update(a, 0, 10, sizeof(int), NOMP_FROM);
-  nomp_chk(err);
-  err = nomp_update(a, 0, 10, sizeof(int), NOMP_FROM);
-  nomp_chk(err);
-
-  // Set b to all 0's, then copy the value on the device and
-  // check if it is all 1's
-  for (int i = 0; i < 10; i++)
-    b[i] = 0;
-  err = nomp_update(b, 0, 10, sizeof(int), NOMP_FROM);
-  nomp_chk(err);
-  for (int i = 0; i < 10; i++)
-    nomp_assert(b[i] == 1);
-
-  // Free'ing after mapping is not an error
-  err = nomp_update(a, 0, 10, sizeof(int), NOMP_FREE);
-  nomp_chk(err);
-  err = nomp_update(b, 0, 10, sizeof(int), NOMP_FREE);
-  nomp_chk(err);
+  nomp_api_100_int(2, 8);
+  nomp_api_100_long(2, 8);
+  nomp_api_100_unsigned(2, 8);
+  nomp_api_100_unsigned_long(2, 8);
+  nomp_api_100_double(2, 8);
+  nomp_api_100_float(2, 8);
 
   err = nomp_finalize();
   nomp_chk(err);

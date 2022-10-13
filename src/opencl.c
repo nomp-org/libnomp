@@ -21,41 +21,38 @@ struct opencl_prog {
   cl_kernel knl;
 };
 
-static int opencl_map(struct backend *bnd, struct mem *m, const int op) {
-  struct opencl_backend *ocl = bnd->bptr;
+static int opencl_update(struct backend *bnd, struct mem *m, const int op) {
+  struct opencl_backend *ocl = (struct opencl_backend *)bnd->bptr;
 
   cl_int err;
   if (op & NOMP_ALLOC) {
-    cl_mem *clm = m->bptr = calloc(1, sizeof(cl_mem));
+    m->bptr = calloc(1, sizeof(cl_mem));
+    cl_mem *clm = (cl_mem *)m->bptr;
     *clm = clCreateBuffer(ocl->ctx, CL_MEM_READ_WRITE,
                           (m->idx1 - m->idx0) * m->usize, NULL, &err);
-    if (err != CL_SUCCESS)
+    if (err != CL_SUCCESS) {
+      free(m->bptr);
+      m->bptr = NULL;
       return 1;
-  }
-
-  if (op & NOMP_TO) {
-    cl_mem *clm = (cl_mem *)m->bptr;
-    err = clEnqueueWriteBuffer(ocl->queue, *clm, CL_TRUE, m->idx0 * m->usize,
-                               (m->idx1 - m->idx0) * m->usize, m->hptr, 0, NULL,
-                               NULL);
-    return err != CL_SUCCESS;
+    }
   }
 
   cl_mem *clm = (cl_mem *)m->bptr;
-  if (op == NOMP_FROM) {
-    err = clEnqueueReadBuffer(ocl->queue, *clm, CL_TRUE, 0,
-                              (m->idx1 - m->idx0) * m->usize, m->hptr, 0, NULL,
-                              NULL);
-
-    return err != CL_SUCCESS;
+  if (op & NOMP_TO) {
+    err = clEnqueueWriteBuffer(
+        ocl->queue, *clm, CL_TRUE, 0, (m->idx1 - m->idx0) * m->usize,
+        (char *)m->hptr + m->idx0 * m->usize, 0, NULL, NULL);
+  } else if (op == NOMP_FROM) {
+    err = clEnqueueReadBuffer(
+        ocl->queue, *clm, CL_TRUE, 0, (m->idx1 - m->idx0) * m->usize,
+        (char *)m->hptr + m->idx0 * m->usize, 0, NULL, NULL);
   } else if (op == NOMP_FREE) {
     err = clReleaseMemObject(*clm);
-    if (err != CL_SUCCESS)
-      return 1;
-    free(m->bptr), m->bptr = NULL;
+    if (err == CL_SUCCESS)
+      free(m->bptr), m->bptr = NULL;
   }
 
-  return 0;
+  return err != CL_SUCCESS;
 }
 
 static int opencl_knl_build(struct backend *bnd, struct prog *prg,
@@ -207,7 +204,7 @@ int opencl_init(struct backend *bnd, const int platform_id,
   free(cl_devices);
   free(cl_platforms);
 
-  bnd->map = opencl_map;
+  bnd->update = opencl_update;
   bnd->knl_build = opencl_knl_build;
   bnd->knl_run = opencl_knl_run;
   bnd->knl_free = opencl_knl_free;

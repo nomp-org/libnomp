@@ -13,3 +13,4 @@ dependencies:
     - clang-format==14.0.6
     - isort==5.10.1
     - black==22.8.0
+    - flake8==4.0.1

@@ -1,34 +1,56 @@
 #include "nomp.h"
 #include <stdlib.h>
 
+#define TEST_TYPE int
+#define TEST_SUFFIX _int
+#include "nomp-api-200-impl.h"
+#undef TEST_TYPE
+#undef TEST_SUFFIX
+
+#define TEST_TYPE long
+#define TEST_SUFFIX _long
+#include "nomp-api-200-impl.h"
+#undef TEST_TYPE
+#undef TEST_SUFFIX
+
+#define TEST_TYPE unsigned
+#define TEST_SUFFIX _unsigned
+#include "nomp-api-200-impl.h"
+#undef TEST_TYPE
+#undef TEST_SUFFIX
+
+#define TEST_TYPE unsigned long
+#define TEST_SUFFIX _unsigned_long
+#include "nomp-api-200-impl.h"
+#undef TEST_TYPE
+#undef TEST_SUFFIX
+
+#define TEST_TYPE double
+#define TEST_SUFFIX _double
+#include "nomp-api-200-impl.h"
+#undef TEST_TYPE
+#undef TEST_SUFFIX
+
+#define TEST_TYPE float
+#define TEST_SUFFIX _float
+#include "nomp-api-200-impl.h"
+#undef TEST_TYPE
+#undef TEST_SUFFIX
+
 int main(int argc, char *argv[]) {
   char *backend = argc > 1 ? argv[1] : "opencl";
-  int device_id = argc > 2 ? atoi(argv[2]) : 0;
-  int platform_id = argc > 3 ? atoi(argv[3]) : 0;
+  int device = argc > 2 ? atoi(argv[2]) : 0;
+  int platform = argc > 3 ? atoi(argv[3]) : 0;
 
-  int err = nomp_init(backend, device_id, platform_id);
+  int err = nomp_init(backend, device, platform);
   nomp_chk(err);
 
-  double a[10] = {0};
-  int N = 10;
-  const char *knl =
-      "void foo(double *a, int N) {                                         \n"
-      "  for (int i = 0; i < N; i++)                                        \n"
-      "    a[i] = i;                                                        \n"
-      "}                                                                    \n";
-
-  // Calling nomp_jit with invalid functions should return an error.
-  static int id = -1;
-  const char *annotations[1] = {0},
-             *clauses0[3] = {"transform", "invalid-file:invalid_func", 0};
-  err = nomp_jit(&id, knl, annotations, clauses0, 2, "a,N", NOMP_PTR,
-                 sizeof(double), a, NOMP_INTEGER, sizeof(int), &N);
-  nomp_assert(nomp_get_log_no(err) == NOMP_USER_CALLBACK_NOT_FOUND);
-
-  const char *clauses1[3] = {"transform", "nomp-api-200:transform", 0};
-  err = nomp_jit(&id, knl, annotations, clauses1, 2, "a,N", NOMP_PTR,
-                 sizeof(double), a, NOMP_INTEGER, sizeof(int), &N);
-  nomp_chk(err);
+  nomp_api_200_int();
+  nomp_api_200_long();
+  nomp_api_200_unsigned();
+  nomp_api_200_unsigned_long();
+  nomp_api_200_double();
+  nomp_api_200_float();
 
   err = nomp_finalize();
   nomp_chk(err);

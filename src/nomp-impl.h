@@ -31,6 +31,11 @@
       return err;                                                              \
   } while (0)
 
+#define tmalloc(type, count) ((type *)malloc((count) * sizeof(type)))
+#define tcalloc(type, count) ((type *)calloc((count), sizeof(type)))
+#define trealloc(type, ptr, count)                                             \
+  ((type *)realloc((ptr), (count) * sizeof(type)))
+
 struct prog {
   unsigned nargs, ndim;
   size_t local[3], global[3];
@@ -49,8 +54,8 @@ struct log {
 };
 
 struct backend {
-  char name[MAX_BACKEND_NAME_SIZE];
-  int (*map)(struct backend *, struct mem *, const int);
+  char name[BUFSIZ];
+  int (*update)(struct backend *, struct mem *, const int);
   int (*knl_build)(struct backend *, struct prog *, const char *, const char *);
   int (*knl_run)(struct backend *, struct prog *, va_list);
   int (*knl_free)(struct prog *);

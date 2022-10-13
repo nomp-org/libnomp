@@ -47,7 +47,7 @@ foreach(test ${TESTS})
   string(REPLACE ".c" "" test_exe ${temp})
   add_executable(${test_exe} ${test})
   target_link_libraries(${test_exe} nomp)
-  target_include_directories(${test_exe} PUBLIC src)
+  target_include_directories(${test_exe} PUBLIC src tests)
 endforeach(test ${TESTS})
 
 option(ENABLE_DOCS "Enable Documentation" OFF)

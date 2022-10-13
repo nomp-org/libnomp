@@ -1,7 +1,8 @@
 Introduction
 ============
 
-**nomp : Nomp isn't OpenMP**
+nomp: Nomp isn't OpenMP
+-----------------------
 
 `nomp` is a pragma based programming model for C. It looks
 superficially similar to OpenMP but acts more like OpenCL and/or
@@ -42,8 +43,9 @@ functionalities to user through easy to program pragmas.
    :caption: Table of Contents
 
    self
-   nomp
-   nomp-impl
+   build
+   user-api
+   internal-api
 
 Indices and tables
 ==================
