@@ -1,6 +1,7 @@
 #if !defined(_LIB_NOMP_H_)
 #define _LIB_NOMP_H_
 
+#include "nomp-log.h"
 #include <stddef.h>
 
 /**
@@ -30,11 +31,6 @@
  */
 #define NOMP_FREE 8
 
-typedef enum {
-  NOMP_ERROR = 0,
-  NOMP_WARNING = 1,
-  NOMP_INFORMATION = 2
-} nomp_log_type;
 /**
  * @defgroup nomp_types Types
  * Defines argument type.
@@ -332,33 +328,6 @@ void nomp_assert_(int cond, const char *file, unsigned line);
 
 void nomp_chk_(int err, const char *file, unsigned line);
 #define nomp_chk(err) nomp_chk_(err, __FILE__, __LINE__)
-
-int nomp_set_log_(const char *desc, int logno, nomp_log_type type,
-                  const char *fname, unsigned line_no, ...);
-#define nomp_set_log(logno, type, desc, ...)                                   \
-  nomp_set_log_(desc, logno, type, __FILE__, __LINE__, ##__VA_ARGS__);
-
-/**
- * @ingroup nomp_user_api
- * @brief Return error description.
- *
- * @details Returns the error description given the error_id
- * @param[in] log variable to set the error description
- * @param[in] log_id id of the error
- * @param[in] type either NOMP_ERROR, NOMP_WARNING or NOMP_INFORMATION
- * @return int
- */
-int nomp_get_log(char **log, int log_id, nomp_log_type type);
-
-/**
- * @ingroup nomp_user_api
- * @brief Return error type.
- *
- * @details Returns the error_type given the error_id
- * @param[in] log_id id of the error
- * @return int
- */
-int nomp_get_log_no(int log_id);
 
 /**
  * @ingroup nomp_user_api

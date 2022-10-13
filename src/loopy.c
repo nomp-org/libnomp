@@ -1,5 +1,4 @@
 #include "nomp-impl.h"
-#include "nomp-log-str.h"
 
 int py_append_to_sys_path(const char *path) {
   PyObject *pSys = PyImport_ImportModule("sys");

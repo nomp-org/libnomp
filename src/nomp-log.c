@@ -1,4 +1,10 @@
-#include "nomp-log-str.h"
+#include "nomp-log.h"
+#include "nomp.h"
+#include <ctype.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 const char *ERR_STR_NOMP_IS_ALREADY_INITIALIZED =
     "libnomp is already initialized to use %s. Call nomp_finalize() before "
@@ -40,3 +46,56 @@ const char *ERR_STR_INVALID_DEVICE = "Invalid NOMP device id %d.";
 const char *ERR_STR_KNL_ARG_SET_ERROR = "Setting NOMP kernel argument failed.";
 const char *ERR_STR_INVALID_PLATFORM = "Invalid NOMP platform id %d.";
 const char *ERR_STR_MALLOC_ERROR = "NOMP malloc error.";
+
+static const char *LOG_TYPE_STRING[] = {"Error", "Warning", "Information"};
+
+int nomp_set_log_(const char *description, int logno, nomp_log_type type,
+                  const char *fname, unsigned line_no, ...) {
+  if (logs_max <= logs_n) {
+    logs_max += logs_max / 2 + 1;
+    logs = (struct log *)realloc(logs, sizeof(struct log) * logs_max);
+    if (logs == NULL)
+      return NOMP_OUT_OF_MEMORY;
+  }
+
+  va_list vargs;
+  char buf[BUFSIZ];
+  va_start(vargs, line_no);
+  vsnprintf(buf, BUFSIZ, description, vargs);
+  va_end(vargs);
+
+  const char *log_type_string = LOG_TYPE_STRING[type];
+  size_t n_desc = strnlen(buf, BUFSIZ);
+  size_t n_file = strnlen(fname, BUFSIZ);
+  size_t n_log_type = strnlen(log_type_string, BUFSIZ);
+  logs[logs_n].description =
+      (char *)calloc(n_desc + n_file + n_log_type + 4 + 3, sizeof(char));
+  snprintf(logs[logs_n].description, BUFSIZ + n_file + n_log_type + 4 + 3 + 1,
+           "%s:%s:%u %s", log_type_string, fname, line_no, buf);
+  logs[logs_n].logno = logno;
+  logs[logs_n].type = type;
+  logs_n += 1;
+  return logs_n;
+}
+
+int nomp_get_log(char **log_str, int log_id, nomp_log_type type) {
+  if (log_id <= 0 && log_id > logs_n) {
+    *log_str = NULL;
+    return NOMP_INVALID_LOG_ID;
+  }
+  struct log lg = logs[log_id - 1];
+  if (lg.type != type) {
+    return NOMP_LOG_TYPE_MISMATCH;
+  }
+  size_t n_desc = strnlen(lg.description, BUFSIZ) + 1;
+  *log_str = (char *)calloc(n_desc, sizeof(char));
+  strncpy(*log_str, lg.description, n_desc + 1);
+  return 0;
+}
+
+int nomp_get_log_no(int log_id) {
+  if (log_id <= 0 && log_id > logs_n) {
+    return NOMP_INVALID_LOG_ID;
+  }
+  return logs[log_id - 1].logno;
+}

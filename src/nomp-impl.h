@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "nomp-log.h"
 #include "nomp.h"
 
 #define MAX_BACKEND_NAME_SIZE 32
@@ -45,12 +46,6 @@ struct prog {
 struct mem {
   size_t idx0, idx1, usize;
   void *hptr, *bptr;
-};
-
-struct log {
-  char *description;
-  int logno;
-  nomp_log_type type;
 };
 
 struct backend {

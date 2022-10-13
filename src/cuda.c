@@ -1,5 +1,4 @@
 #include "nomp-impl.h"
-#include "nomp-log-str.h"
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <nvrtc.h>
