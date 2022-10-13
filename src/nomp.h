@@ -310,7 +310,6 @@ int nomp_jit(int *id, const char *c_src, const char **annotations,
  * argument.
  *
  * @param[in] id id of the kernel to be run
- * @param[in] nargs Number of arguments
  * @param[in] ... For each argument, argument type, sizeof base type and pointer
  * to the argument.
  *

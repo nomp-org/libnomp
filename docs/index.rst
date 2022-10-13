@@ -28,7 +28,7 @@ generator and runtime code transformer. `loopy` is a code generator
 for array based code on both CPUs and GPUs. In contrast, to most
 popular programming models like OpenMP/OpenCL/CUDA, etc., which force
 the user to make implementation choices at program logic level,
-`loopy` separate program logic from implementation details. 
+`loopy` separate program logic from implementation details.
 For example, all the afore mentioned programming models force the
 programmer to decide memory location for the arrays used at compile
 time (shared memory vs global memory vs register file) and how the

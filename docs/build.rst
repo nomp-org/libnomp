@@ -81,7 +81,7 @@ Now you can link libnomp installation to the clang compiler using the following
 script. Make sure both `NOMP_INSTALL_DIR` and `NOMP_CLANG_DIR` are set::
 
     #!/bin/bash
-    
+
     if [ -z "${NOMP_INSTALL_DIR}" ]; then
       echo "Error: NOMP_INSTALL_DIR is not defined !"
       exit 1
@@ -90,8 +90,8 @@ script. Make sure both `NOMP_INSTALL_DIR` and `NOMP_CLANG_DIR` are set::
       echo "Error: NOMP_CLANG_DIR is not defined !"
       exit 1
     fi
-    
+
     NOMP_LIB_DIR=${NOMP_INSTALL_DIR}/lib
     NOMP_INC_DIR=${NOMP_INSTALL_DIR}/include
-    
+
     ${NOMP_CLANG_DIR}/clang -fnomp -include nomp.h -I${NOMP_INC_DIR} "$@" -Wl,-rpath,${NOMP_LIB_DIR} -L${NOMP_LIB_DIR} -lnomp
