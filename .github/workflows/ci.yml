@@ -27,8 +27,10 @@ jobs:
       - name: Install apt dependencies and set environment
         shell: bash
         run: |
-          conda env create -f environment.yml
-          conda activate libnomp
+          sudo apt -y update
+          sudo apt install -y pocl-opencl-icd opencl-headers
+          pip3 install git+https://github.com/inducer/loopy
+          pip3 install pycparser
           echo "NOMP_INSTALL_DIR=${PWD}/install" >> $GITHUB_ENV
 
       - name: Build libnomp
