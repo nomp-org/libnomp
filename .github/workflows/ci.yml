@@ -27,9 +27,6 @@ jobs:
       - name: Install apt dependencies and set environment
         shell: bash
         run: |
-          wget -P /tmp https://repo.anaconda.com/archive/Anaconda3-2020.02-Linux-x86_64.sh
-          bash /tmp/Anaconda3-2020.02-Linux-x86_64.sh -b
-          source ~/.bashrc
           conda env create -f environment.yml
           conda activate libnomp
           echo "NOMP_INSTALL_DIR=${PWD}/install" >> $GITHUB_ENV
