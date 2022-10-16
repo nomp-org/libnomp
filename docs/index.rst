@@ -44,6 +44,7 @@ functionalities to user through easy to program pragmas.
 
    self
    build
+   nomp-usage
    user-api
    internal-api
 
