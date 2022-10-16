@@ -1,14 +1,17 @@
-from dataclasses import dataclass, fields
+from dataclasses import dataclass, fields, replace
 from typing import Dict, FrozenSet, List, Optional, Union
 
 import islpy as isl
 import loopy as lp
-import pycparser.c_ast as c_ast
 import pymbolic.primitives as prim
 from loopy.isl_helpers import make_slab
 from loopy.kernel.data import AddressSpace
 from loopy.symbolic import aff_from_expr
-from pycparser import c_parser
+from loopy.target.c.compyte.dtypes import (
+    DTypeRegistry,
+    fill_registry_with_c_types,
+)
+from pycparser import c_ast, c_parser
 from pytools import UniqueNameGenerator, memoize
 
 LOOPY_LANG_VERSION = (2018, 2)
@@ -18,9 +21,9 @@ _C_BIN_OPS_TO_PYMBOLIC_OPS = {
     "*": lambda x, y: prim.Product((x, y)),
     "+": lambda x, y: prim.Sum((x, y)),
     "-": lambda l, r: prim.Sum((l, prim.Product((-1, r)))),
-    "/": lambda l, r: prim.Quotient(l, r),
-    "//": lambda l, r: prim.FloorDiv(l, r),
-    "%": lambda l, r: prim.Remainder(l, r),
+    "/": prim.Quotient,
+    "//": prim.FloorDiv,
+    "%": prim.Remainder,
     "<": lambda l, r: prim.Comparison(l, "<", r),
     "<=": lambda l, r: prim.Comparison(l, "<=", r),
     ">": lambda l, r: prim.Comparison(l, ">", r),
@@ -37,23 +40,13 @@ class IdentityMapper:
         """Visit a node."""
         try:
             mapper_method = getattr(self, "map_" + node.__class__.__name__)
-        except AttributeError:
-            mapper_method = getattr(self, "map_generic_ast_node")
-
+        except AttributeError as exc:
+            raise NotImplementedError(
+                f"Mapper method for {node.__class__.name} is not implemented."
+            ) from exc
         return mapper_method(node, *args, **kwargs)
 
     __call__ = rec
-
-    def map_generic_ast_node(
-        self, node: c_ast.Node, *args, **kwargs
-    ) -> c_ast.Node:
-        new_kwargs = {}
-        for attr_name in node.__slots__:
-            if attr_name != "__weakref__":
-                attr = getattr(node, attr_name)
-                new_kwargs[attr_name] = self.rec(attr, *args, **kwargs)
-
-        return type(node)(**new_kwargs)
 
     def map_NoneType(self, node, *args, **kwargs) -> None:
         return None
@@ -72,11 +65,6 @@ class IdentityMapper:
 # so we use it here instead of general @cache.
 @memoize
 def dtype_to_ctype_registry():
-    from loopy.target.c.compyte.dtypes import (
-        DTypeRegistry,
-        fill_registry_with_c_types,
-    )
-
     dtype_reg = DTypeRegistry()
     fill_registry_with_c_types(dtype_reg, True)
     return dtype_reg
@@ -92,14 +80,14 @@ def _get_dtype_from_decl_type(decl):
     ):
         ctype = " ".join(decl.type.type.names)
         return dtype_to_ctype_registry().get_or_register_dtype(ctype)
-    elif (
+    if (
         isinstance(decl, c_ast.TypeDecl)
         and isinstance(decl.type, c_ast.IdentifierType)
         and isinstance(decl.type.names, list)
     ):
         ctype = " ".join(decl.type.names)
         return dtype_to_ctype_registry().get_or_register_dtype(ctype)
-    elif isinstance(decl, c_ast.ArrayDecl):
+    if isinstance(decl, c_ast.ArrayDecl):
         return _get_dtype_from_decl_type(decl.type)
 
     raise NotImplementedError(f"_get_dtype_from_decl: {decl}")
@@ -121,19 +109,15 @@ class CToLoopyExpressionMapper(IdentityMapper):
     def map_ArrayRef(self, expr: c_ast.ArrayRef):
         if isinstance(expr.name, c_ast.ID):
             return prim.Subscript(self.rec(expr.name), self.rec(expr.subscript))
-        elif isinstance(expr.name, c_ast.ArrayRef):
+        if isinstance(expr.name, c_ast.ArrayRef):
             return prim.Subscript(
                 self.rec(expr.name.name),
                 (self.rec(expr.name.subscript), self.rec(expr.subscript)),
             )
-        else:
-            raise NotImplementedError
+        raise NotImplementedError
 
     def map_InitList(self, expr: c_ast.InitList):
         raise SyntaxError
-
-    def map_generic_ast_node(self, expr: c_ast.Node):
-        raise NotImplementedError
 
 
 # @dataclass automatically adds special methods like __init__ and __repr__
@@ -147,8 +131,6 @@ class CToLoopyMapperContext:
     name_gen: UniqueNameGenerator
 
     def copy(self, **kwargs) -> "CToLoopyMapperContext":
-        from dataclasses import replace
-
         return replace(self, **kwargs)
 
 
@@ -167,19 +149,19 @@ class CToLoopyMapperAccumulator:
 
 class CToLoopyLoopBoundMapper(CToLoopyExpressionMapper):
     def map_BinaryOp(self, expr: c_ast.BinaryOp):
-        op = _C_BIN_OPS_TO_PYMBOLIC_OPS["//" if expr.op == "/" else expr.op]
-        return op(self.rec(expr.left), self.rec(expr.right))
+        bin_op = _C_BIN_OPS_TO_PYMBOLIC_OPS["//" if expr.op == "/" else expr.op]
+        return bin_op(self.rec(expr.left), self.rec(expr.right))
 
 
 # Helper function for parsing for loop kernels
-def check_and_parse_for(expr: c_ast.For, context: CToLoopyMapperContext):
+def check_and_parse_for(expr: c_ast.For):
     (init_decl,) = expr.init.decls
     iname = init_decl.name
 
     # Sanity checks
     if len(expr.init.decls) != 1:
         raise NotImplementedError(
-            "More than one initialization" " declarations not yet supported."
+            "More than one initialization declarations not yet supported."
         )
 
     if not (
@@ -245,7 +227,7 @@ class CToLoopyMapper(IdentityMapper):
         return true_result
 
     def map_For(self, expr: c_ast.For, context: CToLoopyMapperContext):
-        (iname, lbound_expr, ubound_expr) = check_and_parse_for(expr, context)
+        (iname, lbound_expr, ubound_expr) = check_and_parse_for(expr)
 
         space = isl.Space.create_from_names(
             isl.DEFAULT_CONTEXT, set=[iname], params=context.value_args
@@ -277,7 +259,7 @@ class CToLoopyMapper(IdentityMapper):
                 dims += [expr.type.type.dim]
             elif not isinstance(expr.type.type, c_ast.TypeDecl):
                 raise NotImplementedError
-            shape = tuple([CToLoopyExpressionMapper()(dim) for dim in dims])
+            shape = tuple(CToLoopyExpressionMapper()(dim) for dim in dims)
         else:
             raise NotImplementedError
 
@@ -303,18 +285,17 @@ class CToLoopyMapper(IdentityMapper):
                     )
                 ],
             )
-        else:
-            return CToLoopyMapperAccumulator(
-                [],
-                [],
-                [
-                    lp.TemporaryVariable(
-                        name,
-                        dtype=_get_dtype_from_decl_type(expr.type),
-                        shape=shape,
-                    )
-                ],
-            )
+        return CToLoopyMapperAccumulator(
+            [],
+            [],
+            [
+                lp.TemporaryVariable(
+                    name,
+                    dtype=_get_dtype_from_decl_type(expr.type),
+                    shape=shape,
+                )
+            ],
+        )
 
     def map_Compound(
         self, expr: c_ast.Compound, context: CToLoopyMapperContext
@@ -323,8 +304,7 @@ class CToLoopyMapper(IdentityMapper):
             return self.combine(
                 [self.rec(child, context) for child in expr.block_items]
             )
-        else:
-            return CToLoopyMapperAccumulator([], [], [])
+        return CToLoopyMapperAccumulator([], [], [])
 
     def map_Assignment(
         self, expr: c_ast.Assignment, context: CToLoopyMapperContext
@@ -387,12 +367,11 @@ def decl_to_knl_arg(decl: c_ast.Decl, dtype):
     decl_type = decl.type
     if isinstance(decl_type, c_ast.TypeDecl):
         return lp.ValueArg(decl.name, dtype=dtype)
-    elif isinstance(decl_type, c_ast.PtrDecl):
+    if isinstance(decl_type, c_ast.PtrDecl):
         return lp.ArrayArg(
             decl.name, dtype=dtype, address_space=AddressSpace.GLOBAL
         )
-    else:
-        raise NotImplementedError(f"decl_to_knl_arg: {decl} is invalid.")
+    raise NotImplementedError(f"decl_to_knl_arg: {decl} is invalid.")
 
 
 def c_to_loopy(c_str: str, backend: str):
@@ -424,11 +403,12 @@ def c_to_loopy(c_str: str, backend: str):
     unique_domains = frozenset()
     for domain in acc.domains:
         new = True
-        for d in unique_domains:
-            if d == domain:
+        for unique_domain in unique_domains:
+            if unique_domain == domain:
                 new = False
                 for (i, j) in zip(
-                    d.get_id_dict().keys(), domain.get_id_dict().keys()
+                    unique_domain.get_id_dict().keys(),
+                    domain.get_id_dict().keys(),
                 ):
                     if i.get_name() != j.get_name():
                         new = True
@@ -454,11 +434,11 @@ if __name__ == "__main__":
     import sys
 
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-    knl = """
+    KNL_STR = """
           void foo(double *a, int N) {
             for (int i = 0; i < N; i++)
               a[i] = i;
           }
           """
-    lp_knl = c_to_loopy(knl, "cuda")
+    lp_knl = c_to_loopy(KNL_STR, "cuda")
     print(lp.generate_code_v2(lp_knl).device_code())
