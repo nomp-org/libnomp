@@ -104,7 +104,7 @@ if (a < 5)
   printf("a < 5");
 else if (a == 5)
   printf("a == 5");
-} else {
+else {
   b = a;
   printf("a > 5");
 }

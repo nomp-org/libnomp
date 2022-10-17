@@ -33,8 +33,8 @@ can't find OpenCL::
 
     cmake .. -DCMAKE_INSTALL_PREFIX=${HOME}/.nomp -DOpenCL_LIBRARY=/lib/x86_64-linux-gnu/libOpenCL.so.1
 
-Building clang frontend
------------------------
+Clang frontend
+--------------
 
 Clone the llvm-project repo first::
 
