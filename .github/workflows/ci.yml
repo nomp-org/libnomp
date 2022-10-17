@@ -9,7 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        compiler: [gcc-9, gcc-10, clang-10, clang-11, clang-12]
+        # compiler: [gcc-9, gcc-10, clang-10, clang-11, clang-12]
+        compiler: [gcc-10, clang-12]
       fail-fast: false
     name: "${{ matrix.compiler }}"
     env:
