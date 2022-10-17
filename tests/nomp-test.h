@@ -1,5 +1,5 @@
-#if !defined(NOMP_TEST_H_)
-#define NOMP_TEST_H_
+#if !defined(_NOMP_TEST_H_)
+#define _NOMP_TEST_H_
 
 #include <math.h>
 #include <stdio.h>
@@ -11,4 +11,4 @@
 #define TOSTRING_(x) #x
 #define TOSTRING(x) TOSTRING_(x)
 
-#endif
+#endif // _NOMP_TEST_H_
