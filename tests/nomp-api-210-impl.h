@@ -17,19 +17,18 @@ int nomp_api_210() {
       "}                                                      \n";
 
   size_t len = strlen(knl_fmt) + 2 * strlen(TOSTRING(TEST_TYPE)) + 1;
-  char *knl = calloc(len, sizeof(char));
+  char *knl = (char *)calloc(len, sizeof(char));
   snprintf(knl, len, knl_fmt, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE));
 
   static int id = -1;
   const char *annotations[1] = {0},
              *clauses[3] = {"transform", "nomp-api-200:transform", 0};
-  err = nomp_jit(&id, knl, annotations, clauses, 3, "a,b,N", NOMP_PTR,
-                 sizeof(TEST_TYPE), a, NOMP_PTR, sizeof(TEST_TYPE), b,
-                 NOMP_INTEGER, sizeof(int), &N);
+  err = nomp_jit(&id, knl, annotations, clauses);
   nomp_chk(err);
   free(knl);
 
-  err = nomp_run(id, NOMP_PTR, a, NOMP_PTR, b, NOMP_INTEGER, &N, sizeof(int));
+  err = nomp_run(id, 3, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
+                 sizeof(TEST_TYPE), b, "N", NOMP_INTEGER, sizeof(int), &N);
   nomp_chk(err);
 
   err = nomp_update(a, 0, 20, sizeof(TEST_TYPE), NOMP_FROM);

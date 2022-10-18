@@ -103,17 +103,17 @@ static int opencl_knl_build(struct backend *bnd, struct prog *prg,
 static int opencl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
   const int ndim = prg->ndim, nargs = prg->nargs;
   const size_t *global = prg->global, *local = prg->local;
-
   struct opencl_prog *ocl_prg = (struct opencl_prog *)prg->bptr;
-  size_t size;
   struct mem *m;
+  size_t size;
   for (int i = 0; i < nargs; i++) {
+    const char *var = va_arg(args, const char *);
     int type = va_arg(args, int);
+    size = va_arg(args, size_t);
     void *p = va_arg(args, void *);
     switch (type) {
     case NOMP_INTEGER:
     case NOMP_FLOAT:
-      size = va_arg(args, size_t);
       break;
     case NOMP_PTR:
       m = mem_if_mapped(p);

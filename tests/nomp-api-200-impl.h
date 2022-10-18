@@ -9,7 +9,7 @@ int nomp_api_200() {
       "}                                                                    \n";
 
   size_t len = strlen(knl_fmt) + strlen(TOSTRING(TEST_TYPE)) + 1;
-  char *knl = calloc(len, sizeof(char));
+  char *knl = (char *)calloc(len, sizeof(char));
   snprintf(knl, len, knl_fmt, TOSTRING(TEST_TYPE));
 
   TEST_TYPE a[10] = {0};
@@ -19,14 +19,13 @@ int nomp_api_200() {
   static int id = -1;
   const char *annotations[1] = {0},
              *clauses0[3] = {"transform", "invalid-file:invalid_func", 0};
-  int err = nomp_jit(&id, knl, annotations, clauses0, 2, "a,N", NOMP_PTR,
-                     sizeof(TEST_TYPE), a, NOMP_INTEGER, sizeof(int), &N);
+  int err = nomp_jit(&id, knl, annotations, clauses0);
   nomp_assert(err == NOMP_USER_CALLBACK_NOT_FOUND);
 
   const char *clauses1[3] = {"transform", "nomp-api-200:transform", 0};
-  err = nomp_jit(&id, knl, annotations, clauses1, 2, "a,N", NOMP_PTR,
-                 sizeof(TEST_TYPE), a, NOMP_INTEGER, sizeof(int), &N);
+  err = nomp_jit(&id, knl, annotations, clauses1);
   nomp_chk(err);
+
   free(knl);
 
   return 0;
