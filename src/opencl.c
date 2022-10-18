@@ -25,12 +25,12 @@ static int opencl_update(struct backend *bnd, struct mem *m, const int op) {
 
   cl_int err;
   if (op & NOMP_ALLOC) {
-    m->bptr = calloc(1, sizeof(cl_mem));
+    m->bptr = tcalloc(cl_mem, 1);
     cl_mem *clm = (cl_mem *)m->bptr;
     *clm = clCreateBuffer(ocl->ctx, CL_MEM_READ_WRITE,
                           (m->idx1 - m->idx0) * m->usize, NULL, &err);
     if (err != CL_SUCCESS) {
-      free(m->bptr);
+      tfree(m->bptr);
       m->bptr = NULL;
       return 1;
     }
@@ -48,7 +48,7 @@ static int opencl_update(struct backend *bnd, struct mem *m, const int op) {
   } else if (op == NOMP_FREE) {
     err = clReleaseMemObject(*clm);
     if (err == CL_SUCCESS)
-      free(m->bptr), m->bptr = NULL;
+      tfree(m->bptr), m->bptr = NULL;
   }
 
   return err != CL_SUCCESS;
@@ -57,8 +57,7 @@ static int opencl_update(struct backend *bnd, struct mem *m, const int op) {
 static int opencl_knl_build(struct backend *bnd, struct prog *prg,
                             const char *source, const char *name) {
   struct opencl_backend *ocl = bnd->bptr;
-  struct opencl_prog *ocl_prg = prg->bptr =
-      calloc(1, sizeof(struct opencl_prog));
+  struct opencl_prog *ocl_prg = prg->bptr = tcalloc(struct opencl_prog, 1);
 
   cl_int err;
   ocl_prg->prg = clCreateProgramWithSource(
@@ -74,7 +73,7 @@ static int opencl_knl_build(struct backend *bnd, struct prog *prg,
                           NULL, &log_size);
 
     // Allocate memory for the log
-    char *log = (char *)calloc(log_size, sizeof(char));
+    char *log = tcalloc(char, log_size);
     // Verify log memory allocation
     if (!log)
       return 1;
@@ -149,7 +148,7 @@ static int opencl_knl_free(struct prog *prg) {
   err = clReleaseProgram(ocl_prg->prg);
   if (err != CL_SUCCESS)
     return 1;
-  free(prg->bptr), prg->bptr = NULL;
+  tfree(prg->bptr), prg->bptr = NULL;
 
   return 0;
 }
@@ -162,7 +161,7 @@ static int opencl_finalize(struct backend *bnd) {
   err = clReleaseContext(ocl->ctx);
   if (err != CL_SUCCESS)
     return 1;
-  free(bnd->bptr), bnd->bptr = NULL;
+  tfree(bnd->bptr), bnd->bptr = NULL;
 
   return 0;
 }
@@ -174,7 +173,7 @@ int opencl_init(struct backend *bnd, const int platform_id,
   if (platform_id < 0 | platform_id >= num_platforms)
     return nomp_set_log(NOMP_INVALID_PLATFORM, NOMP_ERROR,
                         ERR_STR_INVALID_PLATFORM, platform_id);
-  cl_platform_id *cl_platforms = calloc(num_platforms, sizeof(cl_platform_id));
+  cl_platform_id *cl_platforms = tcalloc(cl_platform_id, num_platforms);
   if (cl_platforms == NULL)
     return nomp_set_log(NOMP_MALLOC_ERROR, NOMP_ERROR, ERR_STR_MALLOC_ERROR);
   err = clGetPlatformIDs(num_platforms, cl_platforms, &num_platforms);
@@ -186,7 +185,7 @@ int opencl_init(struct backend *bnd, const int platform_id,
     return nomp_set_log(NOMP_INVALID_DEVICE, NOMP_ERROR, ERR_STR_INVALID_DEVICE,
                         device_id);
 
-  cl_device_id *cl_devices = calloc(num_devices, sizeof(cl_device_id));
+  cl_device_id *cl_devices = tcalloc(cl_device_id, num_devices);
   if (cl_devices == NULL)
     return nomp_set_log(NOMP_MALLOC_ERROR, NOMP_ERROR, ERR_STR_MALLOC_ERROR);
 
@@ -194,14 +193,13 @@ int opencl_init(struct backend *bnd, const int platform_id,
                        &num_devices);
   cl_device_id device = cl_devices[device_id];
 
-  struct opencl_backend *ocl = bnd->bptr =
-      calloc(1, sizeof(struct opencl_backend));
+  struct opencl_backend *ocl = bnd->bptr = tcalloc(struct opencl_backend, 1);
   ocl->device_id = device;
   ocl->ctx = clCreateContext(NULL, 1, &device, NULL, NULL, &err);
   ocl->queue = clCreateCommandQueueWithProperties(ocl->ctx, device, 0, &err);
 
-  free(cl_devices);
-  free(cl_platforms);
+  tfree(cl_devices);
+  tfree(cl_platforms);
 
   bnd->update = opencl_update;
   bnd->knl_build = opencl_knl_build;

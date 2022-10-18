@@ -29,6 +29,7 @@ add_library(nomp SHARED ${SOURCES})
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 target_link_libraries(nomp PRIVATE Python3::Python)
+include_directories(${Python3_INCLUDE_DIRS})
 if (ENABLE_OPENCL)
   find_package(OpenCL REQUIRED)
   target_link_libraries(nomp PRIVATE OpenCL::OpenCL)

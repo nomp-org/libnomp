@@ -2,7 +2,7 @@
 
 char *strcatn(int nstr, ...) {
   unsigned n = 0, max = NOMP_BUFSIZ;
-  char *out = (char *)calloc(max, sizeof(char));
+  char *out = tcalloc(char, max);
 
   va_list vargs;
   va_start(vargs, nstr);
@@ -10,7 +10,7 @@ char *strcatn(int nstr, ...) {
     const char *s = va_arg(vargs, const char *);
     if (max <= n + strlen(s)) {
       max = 3 * (n + strlen(s)) / 2 + 1;
-      out = realloc(out, sizeof(char) * max);
+      out = trealloc(out, char, max);
     }
     strncpy(out + n, s, strlen(s));
     n += strlen(s);
@@ -26,7 +26,7 @@ int strnlower(char **out, const char *in, size_t max) {
   if (len == max)
     return 1;
 
-  char *wrk = *out = (char *)realloc(*out, (len + 1) * sizeof(char));
+  char *wrk = *out = trealloc(*out, char, len + 1);
   for (unsigned i = 0; i < len; i++)
     wrk[i] = tolower(in[i]);
   wrk[len] = '\0';
