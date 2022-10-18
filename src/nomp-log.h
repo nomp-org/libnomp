@@ -1,5 +1,6 @@
 #if !defined(_NOMP_LOG_H_)
 #define _NOMP_LOG_H_
+#include "nomp.h"
 #include <stddef.h>
 
 extern const char *ERR_STR_NOMP_IS_ALREADY_INITIALIZED;
@@ -29,12 +30,6 @@ extern const char *ERR_STR_KNL_ARG_SET_ERROR;
 extern const char *ERR_STR_INVALID_PLATFORM;
 extern const char *ERR_STR_MALLOC_ERROR;
 
-typedef enum {
-  NOMP_ERROR = 0,
-  NOMP_WARNING = 1,
-  NOMP_INFORMATION = 2
-} nomp_log_type;
-
 struct log {
   char *description;
   int logno;
@@ -50,25 +45,4 @@ int nomp_set_log_(const char *desc, int logno, nomp_log_type type,
 #define nomp_set_log(logno, type, desc, ...)                                   \
   nomp_set_log_(desc, logno, type, __FILE__, __LINE__, ##__VA_ARGS__);
 
-/**
- * @ingroup nomp_user_api
- * @brief Return error description.
- *
- * @details Returns the error description given the error_id
- * @param[in] log variable to set the error description
- * @param[in] log_id id of the error
- * @param[in] type either NOMP_ERROR, NOMP_WARNING or NOMP_INFORMATION
- * @return int
- */
-int nomp_get_log(char **log, int log_id, nomp_log_type type);
-
-/**
- * @ingroup nomp_user_api
- * @brief Return error type.
- *
- * @details Returns the error_type given the error_id
- * @param[in] log_id id of the error
- * @return int
- */
-int nomp_get_log_no(int log_id);
 #endif

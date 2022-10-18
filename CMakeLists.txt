@@ -13,7 +13,7 @@ set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 # outside the build tree to the install RPATH
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-set(SOURCES src/nomp.c src/loopy.c src/auxiliary.c src/nomp-log-str.c)
+set(SOURCES src/nomp.c src/loopy.c src/auxiliary.c src/nomp-log.c)
 if (ENABLE_OPENCL)
   list(APPEND SOURCES src/opencl.c)
   add_compile_definitions(OPENCL_ENABLED)

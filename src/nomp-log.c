@@ -1,5 +1,4 @@
 #include "nomp-log.h"
-#include "nomp.h"
 #include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
