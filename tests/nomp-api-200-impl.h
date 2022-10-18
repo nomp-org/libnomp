@@ -1,3 +1,4 @@
+#include "nomp-impl.h"
 #include "nomp-test.h"
 
 #define nomp_api_200 TOKEN_PASTE(nomp_api_200, TEST_SUFFIX)
@@ -9,7 +10,7 @@ int nomp_api_200() {
       "}                                                                    \n";
 
   size_t len = strlen(knl_fmt) + strlen(TOSTRING(TEST_TYPE)) + 1;
-  char *knl = (char *)calloc(len, sizeof(char));
+  char *knl = tcalloc(char, len);
   snprintf(knl, len, knl_fmt, TOSTRING(TEST_TYPE));
 
   TEST_TYPE a[10] = {0};
@@ -25,8 +26,7 @@ int nomp_api_200() {
   const char *clauses1[3] = {"transform", "nomp-api-200:transform", 0};
   err = nomp_jit(&id, knl, annotations, clauses1);
   nomp_chk(err);
-
-  free(knl);
+  tfree(knl);
 
   return 0;
 }

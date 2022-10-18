@@ -48,12 +48,11 @@ static inline void *srealloc(void *ptr, size_t size, const char *file,
 }
 
 #define tfree(x) sfree(x, __FILE__, __LINE__)
-#define tmalloc(type, count)                                                   \
-  ((type *)smalloc((count) * sizeof(type), __FILE__, __LINE__))
-#define tcalloc(type, count)                                                   \
-  ((type *)scalloc((count), sizeof(type), __FILE__, __LINE__))
-#define trealloc(ptr, type, count)                                             \
-  ((type *)srealloc((ptr), (count) * sizeof(type), __FILE__, __LINE__))
+#define tmalloc(T, count)                                                      \
+  ((T *)smalloc((count) * sizeof(T), __FILE__, __LINE__))
+#define tcalloc(T, count) ((T *)scalloc((count), sizeof(T), __FILE__, __LINE__))
+#define trealloc(ptr, T, count)                                                \
+  ((T *)srealloc((ptr), (count) * sizeof(T), __FILE__, __LINE__))
 
 struct prog {
   unsigned nargs, ndim;

@@ -106,7 +106,7 @@ int py_get_knl_name_and_src(char **name, char **src, PyObject *knl) {
         if (py_name) {
           Py_ssize_t size;
           const char *name_ = PyUnicode_AsUTF8AndSize(py_name, &size);
-          *name = (char *)calloc(size + 1, sizeof(char));
+          *name = tcalloc(char, size + 1);
           strncpy(*name, name_, size + 1);
           Py_DECREF(py_name), err = 0;
         }
@@ -135,7 +135,7 @@ int py_get_knl_name_and_src(char **name, char **src, PyObject *knl) {
             if (py_src) {
               Py_ssize_t size;
               const char *src_ = PyUnicode_AsUTF8AndSize(py_src, &size);
-              *src = (char *)calloc(size + 1, sizeof(char));
+              *src = tcalloc(char, size + 1);
               strncpy(*src, src_, size + 1);
               Py_DECREF(py_src), err = 0;
             }
