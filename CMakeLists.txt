@@ -41,7 +41,7 @@ set_target_properties(nomp PROPERTIES
   PUBLIC_HEADER src/nomp.h)
 target_include_directories(nomp PRIVATE src)
 
-file(GLOB TESTS tests/nomp-api-*.c)
+file(GLOB TESTS tests/nomp-api-0*.c tests/nomp-api-1*.c tests/nomp-api-20*.c tests/nomp-api-21*.c)
 foreach(test ${TESTS})
   string(REPLACE "${CMAKE_SOURCE_DIR}/tests/" "" temp ${test})
   string(REPLACE ".c" "" test_exe ${temp})

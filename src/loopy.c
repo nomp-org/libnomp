@@ -1,9 +1,11 @@
 #include "nomp-impl.h"
 
+static const char *py_module = "loopy_api";
+static const char *py_func = "c_to_loopy";
+
 int py_append_to_sys_path(const char *path) {
   PyObject *pSys = PyImport_ImportModule("sys");
-  // FIXME: Err should be an nomp error defined in `nomp.h`
-  int err = 1;
+  int err = NOMP_PY_APPEND_PATH_ERROR;
   if (pSys) {
     PyObject *pPath = PyObject_GetAttrString(pSys, "path");
     Py_DECREF(pSys);
@@ -21,7 +23,6 @@ int py_append_to_sys_path(const char *path) {
 }
 
 int py_c_to_loopy(PyObject **pKnl, const char *c_src, const char *backend) {
-  // Create the loopy kernel based on `c_src`.
   int err = NOMP_LOOPY_CONVERSION_ERROR;
   PyObject *pModuleStr = PyUnicode_FromString(py_module),
            *pModule = PyImport_Import(pModuleStr);
@@ -130,82 +131,81 @@ int py_get_knl_name_and_src(char **name, char **src, PyObject *pKnl) {
   return 0;
 }
 
-int py_get_grid_size(unsigned *ndim, size_t *global, size_t *local,
-                     PyObject *pKnl, PyObject *pDict) {
-  // Intiialize global and local sizes to 1
-  global[0] = global[1] = global[2] = 1;
-  local[0] = local[1] = local[2] = 1;
-
-  if (pKnl) {
-    // Get global and local grid size as experssions from loopy
-    int err = NOMP_LOOPY_GRIDSIZE_FAILED;
-    PyObject *pGridSize = NULL;
+int py_get_grid_size(struct prog *prg, PyObject *py_knl) {
+  int err = NOMP_GET_GRIDSIZE_FAILED;
+  if (py_knl) {
     // knl.callables_table
-    PyObject *pCallablesTable = PyObject_GetAttrString(pKnl, "callables_table");
-    if (pCallablesTable) {
+    PyObject *py_callables = PyObject_GetAttrString(py_knl, "callables_table");
+    if (py_callables) {
       // knl.default_entrypoint.get_grid_size_upper_bounds_as_exprs
-      PyObject *pDefaultEntryPoint =
-          PyObject_GetAttrString(pKnl, "default_entrypoint");
-      if (pDefaultEntryPoint) {
-        PyObject *pGridSizeUboundAsExpr = PyObject_GetAttrString(
-            pDefaultEntryPoint, "get_grid_size_upper_bounds_as_exprs");
-        if (pGridSizeUboundAsExpr) {
-          pGridSize = PyObject_CallFunctionObjArgs(pGridSizeUboundAsExpr,
-                                                   pCallablesTable, NULL);
-          Py_DECREF(pGridSizeUboundAsExpr), err = 0;
-        }
-        Py_DECREF(pDefaultEntryPoint);
-      }
-      Py_DECREF(pCallablesTable);
-    }
-    if (err) {
-      PyErr_Print();
-      return err;
-    }
-
-    // If the expressions are not NULL, iterate through them and evaluate with
-    // pymbolic
-    err = NOMP_GRIDSIZE_CALCULATION_FAILED;
-    if (pGridSize) {
-      assert(PyTuple_Check(pGridSize));
-      assert(PyTuple_Size(pGridSize) == 2);
-      PyObject *pEvaluator = PyImport_ImportModule("pymbolic.mapper.evaluator");
-      if (pEvaluator) {
-        PyObject *pEvaluate = PyObject_GetAttrString(pEvaluator, "evaluate");
-        if (pEvaluate) {
-          // Iterate through grid sizes, evaluate and set `global` and `local`
-          // sizes respectively.
-          PyObject *pGlobal = PyTuple_GetItem(pGridSize, 0);
-          assert(PyTuple_Check(pGlobal));
-          *ndim = PyTuple_Size(pGlobal);
-          for (int i = 0; i < PyTuple_Size(pGlobal); i++) {
-            PyObject *pDim = PyTuple_GetItem(pGlobal, i);
-            PyObject *pResult =
-                PyObject_CallFunctionObjArgs(pEvaluate, pDim, pDict, NULL);
-            if (pResult)
-              global[i] = PyLong_AsLong(pResult);
+      PyObject *py_entry = PyObject_GetAttrString(py_knl, "default_entrypoint");
+      if (py_entry) {
+        PyObject *py_expr = PyObject_GetAttrString(
+            py_entry, "get_grid_size_upper_bounds_as_exprs");
+        if (py_expr) {
+          PyObject *py_grid_size =
+              PyObject_CallFunctionObjArgs(py_expr, py_callables, NULL);
+          if (py_grid_size) {
+            prg->py_global = PyTuple_GetItem(py_grid_size, 0);
+            prg->py_local = PyTuple_GetItem(py_grid_size, 1);
+            prg->ndim = PyTuple_Size(prg->py_global);
+            if (PyTuple_Size(prg->py_local) > prg->ndim)
+              prg->ndim = PyTuple_Size(prg->py_local);
+            Py_DECREF(py_grid_size);
+            err = 0;
           }
-
-          PyObject *pLocal = PyTuple_GetItem(pGridSize, 1);
-          assert(PyTuple_Check(pLocal));
-          for (int i = 0; i < PyTuple_Size(pLocal); i++) {
-            PyObject *pDim = PyTuple_GetItem(pLocal, i);
-            PyObject *pResult =
-                PyObject_CallFunctionObjArgs(pEvaluate, pDim, pDict, NULL);
-            if (pResult)
-              local[i] = PyLong_AsLong(pResult);
-          }
-          Py_DECREF(pEvaluate), err = 0;
+          Py_DECREF(py_expr);
         }
-        Py_DECREF(pEvaluator);
+        Py_DECREF(py_entry);
       }
-      Py_DECREF(pGridSize);
-    }
-    if (err) {
-      PyErr_Print();
-      return err;
+      Py_DECREF(py_callables);
     }
   }
+  return err;
+}
 
-  return 0;
+static int py_eval_grid_size_aux(size_t *out, PyObject *py_grid, unsigned dim,
+                                 PyObject *py_evaluate, PyObject *py_dict) {
+  PyObject *py_dim = PyTuple_GetItem(py_grid, dim);
+  int err = 1;
+  if (py_dim) {
+    PyObject *py_result =
+        PyObject_CallFunctionObjArgs(py_evaluate, py_dim, py_dict, NULL);
+    if (py_result) {
+      out[dim] = PyLong_AsLong(py_result);
+      Py_DECREF(py_result), err = 0;
+    }
+  }
+  return err;
+}
+
+int py_eval_grid_size(struct prog *prg, PyObject *py_dict) {
+  // If the expressions are not NULL, iterate through them and evaluate with
+  // pymbolic. Also, we should calculate and store a hash of the py_dict that
+  // is passed. If the hash is the same, no need of re-evaluating the grid
+  // size.
+  for (unsigned i = 0; i < prg->ndim; i++)
+    prg->global[i] = prg->local[i] = 1;
+
+  int err = 0;
+  if (prg->py_global && prg->py_local) {
+    PyObject *py_mapper = PyImport_ImportModule("pymbolic.mapper.evaluator");
+    if (py_mapper) {
+      PyObject *py_evaluate = PyObject_GetAttrString(py_mapper, "evaluate");
+      if (py_evaluate) {
+        // Iterate through grid sizes, evaluate and set `global` and `local`
+        // sizes respectively.
+        for (unsigned i = 0; i < PyTuple_Size(prg->py_global); i++)
+          err |= py_eval_grid_size_aux(prg->global, prg->py_global, i,
+                                       py_evaluate, py_dict);
+        for (unsigned i = 0; i < PyTuple_Size(prg->py_local); i++)
+          err |= py_eval_grid_size_aux(prg->local, prg->py_local, i,
+                                       py_evaluate, py_dict);
+        Py_DECREF(py_evaluate);
+        err = (err != 0) * NOMP_EVAL_GRIDSIZE_FAILED;
+      }
+      Py_DECREF(py_mapper);
+    }
+  }
+  return err;
 }

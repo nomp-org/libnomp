@@ -3,6 +3,8 @@
 static struct backend nomp;
 static int initialized = 0;
 
+static const char *py_dir = "python";
+
 //=============================================================================
 // nomp_init
 //
@@ -154,7 +156,7 @@ static int parse_clauses(char **usr_file, char **usr_func,
 }
 
 int nomp_jit(int *id, const char *c_src, const char **annotations,
-             const char **clauses, unsigned nargs, const char *args, ...) {
+             const char **clauses) {
   if (*id == -1) {
     if (progs_n == progs_max) {
       progs_max += progs_max / 2 + 1;
@@ -162,56 +164,37 @@ int nomp_jit(int *id, const char *c_src, const char **annotations,
     }
 
     // Create loopy kernel from C source
-    PyObject *pKnl = NULL;
-    int err = py_c_to_loopy(&pKnl, c_src, nomp.name);
+    PyObject *py_knl = NULL;
+    int err = py_c_to_loopy(&py_knl, c_src, nomp.name);
     return_on_err(err);
 
     // Call the User callback function
     char *usr_file = NULL, *usr_func = NULL;
     err = parse_clauses(&usr_file, &usr_func, clauses);
     return_on_err(err);
-    err = py_user_callback(&pKnl, usr_file, usr_func);
+    err = py_user_callback(&py_knl, usr_file, usr_func);
     FREE(usr_file);
     FREE(usr_func);
     return_on_err(err);
 
     // Get OpenCL, CUDA, etc. source and name from the loopy kernel
     char *name, *src;
-    err = py_get_knl_name_and_src(&name, &src, pKnl);
+    err = py_get_knl_name_and_src(&name, &src, py_knl);
     return_on_err(err);
 
     // Build the kernel
-    struct prog *prog = progs[progs_n] = tcalloc(struct prog, 1);
-    err = nomp.knl_build(&nomp, prog, src, name);
+    struct prog *prg = progs[progs_n] = tcalloc(struct prog, 1);
+    err = nomp.knl_build(&nomp, prg, src, name);
     FREE(src);
     FREE(name);
     return_on_err(err);
 
-    // Get grid size of the loopy kernel after transformations. We will create a
-    // dictionary with variable name as keys, variable value as value and then
-    // pass it to the function
-    char *args_ = strndup(args, BUFSIZ), *arg = strtok(args_, ",");
-    PyObject *pDict = PyDict_New();
-    va_list vargs;
-    va_start(vargs, args);
-    for (int i = 0; i < nargs; i++) {
-      // FIXME: `type` should be able to distinguish between integer types,
-      // floating point types, boolean type or a pointer type. We are assuming
-      // it is an integer type for now.
-      int type = va_arg(vargs, int);
-      size_t size = va_arg(vargs, size_t);
-      int *p = (int *)va_arg(vargs, void *);
-      PyObject *pKey = PyUnicode_FromStringAndSize(arg, strlen(arg));
-      PyObject *pValue = PyLong_FromLong(*p);
-      PyDict_SetItem(pDict, pKey, pValue);
-      arg = strtok(NULL, ",");
-    }
-    va_end(vargs);
-
-    prog->nargs = nargs;
-    py_get_grid_size(&prog->ndim, prog->global, prog->local, pKnl, pDict);
-    FREE(args_);
-    Py_DECREF(pDict), Py_XDECREF(pKnl);
+    // Get grid size of the loopy kernel as pymbolic expressions after
+    // transformations. These grid sizes will be evaluated when the kernel is
+    // run.
+    prg->py_dict = PyDict_New();
+    py_get_grid_size(prg, py_knl);
+    Py_XDECREF(py_knl);
 
     if (err)
       return NOMP_KNL_BUILD_ERROR;
@@ -224,11 +207,30 @@ int nomp_jit(int *id, const char *c_src, const char **annotations,
 //=============================================================================
 // nomp_run
 //
-int nomp_run(int id, ...) {
+int nomp_run(int id, int nargs, ...) {
   if (id >= 0) {
+    struct prog *prg = progs[id];
+    prg->nargs = nargs;
+
     va_list args;
-    va_start(args, id);
-    int err = nomp.knl_run(&nomp, progs[id], args);
+    va_start(args, nargs);
+    for (int i = 0; i < nargs; i++) {
+      // FIXME: `type` should be able to distinguish between integer, floating
+      // point or a pointer type. We are assuming it is an integer for now.
+      const char *var = va_arg(args, const char *);
+      int type = va_arg(args, int);
+      size_t size = va_arg(args, size_t);
+      void *val = va_arg(args, void *);
+      PyObject *py_key = PyUnicode_FromStringAndSize(var, strlen(var));
+      PyObject *py_val = PyLong_FromLong(*((int *)val));
+      PyDict_SetItem(prg->py_dict, py_key, py_val);
+      // Py_XDECREF(py_key), Py_XDECREF(py_val);
+    }
+    va_end(args);
+    py_eval_grid_size(prg, prg->py_dict);
+
+    va_start(args, nargs);
+    int err = nomp.knl_run(&nomp, prg, args);
     va_end(args);
     if (err)
       return NOMP_KNL_RUN_ERROR;
