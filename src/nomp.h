@@ -144,7 +144,6 @@
  * @brief User callback function failed
  */
 #define NOMP_USER_CALLBACK_FAILURE -99
-
 /**
  * @ingroup nomp_errors
  * @brief Loopy conversion failed
@@ -164,12 +163,17 @@
  * @ingroup nomp_errors
  * @brief Code generation from loopy kernel failed
  */
-#define NOMP_LOOPY_GRIDSIZE_FAILED -103
+#define NOMP_GET_GRIDSIZE_FAILED -103
 /**
  * @ingroup nomp_errors
  * @brief Grid size calculation failed
  */
-#define NOMP_GRIDSIZE_CALCULATION_FAILED -103
+#define NOMP_EVAL_GRIDSIZE_FAILED -103
+/**
+ * @ingroup nomp_errors
+ * @brief NOMP python initialization failed
+ */
+#define NOMP_PY_APPEND_PATH_ERROR -104
 
 /**
  * @ingroup nomp_errors
@@ -280,25 +284,19 @@ int nomp_update(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
  * }
  * const char *knl = "for (unsigned i = 0; i < N; i++) a[i] += b[i];"
  * static int id = -1;
- * int err = nomp_jit(&id, knl, NULL, "file:function", 3, "a,b,N", NOMP_PTR,
- *                    sizeof(double), a, NOMP_PTR, sizeof(double), b,
- *                    NOMP_INTEGER, sizeof(int), &N);
+ * const char *annotations[1] = {0},
+ *            *clauses[3] = {"transform", "file:function", 0};
+ * int err = nomp_jit(&id, knl, annotations, clauses);
  * @endcode
  *
- * @param[out] id id of the generated kernel.
+ * @param[out] id Id of the generated kernel.
  * @param[in] c_src Kernel source in C.
- * @param[in] annotations Annotations to perform user defined (domain specific)
- * transformations.
- * @param[in] clauses Clauses that tell nomp meta information about the kernel
- * @param[in] nargs Number of arguments to the kernel.
- * @param[in] args Comma separated list of argument names.
- * @param[in] ... For each argument, we pass the argument type (one of @ref
- * nomp_types), size of the base type and the pointer to the argument.
- *
+ * @param[in] annotations Annotations to perform user defined transformations.
+ * @param[in] clauses Clauses to provide meta information about the kernel.
  * @return int
  */
 int nomp_jit(int *id, const char *c_src, const char **annotations,
-             const char **clauses, unsigned nargs, const char *args, ...);
+             const char **clauses);
 
 /**
  * @ingroup nomp_user_api
@@ -306,16 +304,16 @@ int nomp_jit(int *id, const char *c_src, const char **annotations,
  *
  * @details Runs the kernel with a given kernel id. Kernel id is followed by the
  * number of arguments. Then for each argument we pass the argument type (@ref
- * nomp_types) size of the base type in case of an integer and pointer to the
- * argument.
+ * nomp_types), size of the base type, etc.
  *
- * @param[in] id id of the kernel to be run
- * @param[in] ... For each argument, argument type, sizeof base type and pointer
- * to the argument.
+ * @param[in] id Id of the kernel to be run.
+ * @param[in] nargs Number of arguments to the kernel.
+ * @param[in] ... For each variable, variable name, type, sizeof base type, and
+ * a pointer to the variable.
  *
  * @return int
  */
-int nomp_run(int id, ...);
+int nomp_run(int id, int nargs, ...);
 
 int nomp_err(char *buf, int err, size_t buf_size);
 

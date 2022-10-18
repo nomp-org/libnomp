@@ -15,13 +15,12 @@ int nomp_api_220_aux(TEST_TYPE *a, TEST_TYPE *b, int N) {
   static int id = -1;
   const char *annotations[1] = {0},
              *clauses[3] = {"transform", "nomp-api-200:transform", 0};
-  int err = nomp_jit(&id, knl, annotations, clauses, 3, "a,b,N", NOMP_PTR,
-                     sizeof(TEST_TYPE), a, NOMP_PTR, sizeof(TEST_TYPE), b,
-                     NOMP_INTEGER, sizeof(int), &N);
+  int err = nomp_jit(&id, knl, annotations, clauses);
   nomp_chk(err);
   free(knl);
 
-  err = nomp_run(id, NOMP_PTR, a, NOMP_PTR, b, NOMP_INTEGER, &N, sizeof(int));
+  err = nomp_run(id, 3, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
+                 sizeof(TEST_TYPE), b, "N", NOMP_INTEGER, sizeof(int), &N);
   nomp_chk(err);
 
   return 0;

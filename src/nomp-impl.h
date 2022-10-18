@@ -14,10 +14,6 @@
 
 #include "nomp.h"
 
-#define py_dir "python"
-#define py_module "loopy_api"
-#define py_func "c_to_loopy"
-
 #define FREE(x)                                                                \
   do {                                                                         \
     if (x)                                                                     \
@@ -37,7 +33,8 @@
 
 struct prog {
   unsigned nargs, ndim;
-  size_t local[3], global[3];
+  PyObject *py_global, *py_local, *py_dict;
+  size_t global[3], local[3];
   void *bptr;
 };
 
@@ -160,15 +157,20 @@ int py_get_knl_name_and_src(char **name, char **src, PyObject *pKnl);
  * @ingroup nomp_py_utils
  * @brief Get global and local grid sizes
  *
- * @param ndim Number of dimensions of the kernel
- * @param global Global grid
- * @param local Local grid
- * @param pKnl Python kernal object
- * @param pDict Dictionary with variable name as keys, variable values as values
+ * @param prg Nomp program object
+ * @param py_knl Python kernal object
  * @return int
  */
-int py_get_grid_size(unsigned *ndim, size_t *global, size_t *local,
-                     PyObject *pKnl, PyObject *pDict);
+int py_get_grid_size(struct prog *prg, PyObject *py_knl);
+/**
+ * @ingroup nomp_py_utils
+ * @brief Evaluate global and local grid sizes for the program
+ *
+ * @param prg Nomp program
+ * @param py_dict Dictionary with variable name as keys, value as values
+ * @return int
+ */
+int py_eval_grid_size(struct prog *prg, PyObject *py_dict);
 
 //==============================================================================
 // Other helper functions
