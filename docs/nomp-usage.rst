@@ -1,7 +1,8 @@
 How to use nomp
 ===============
 
-Make sure both `NOMP_INSTALL_DIR` and `NOMP_CLANG_DIR` are set and follow the :doc:`Build instructions <build>` correctly. 
+Make sure both `NOMP_INSTALL_DIR` and `NOMP_CLANG_DIR` are set and follow
+the :doc:`Build instructions <build>` correctly. 
 
 Create new folder(`nomp-test`) and add following files in the folder.
 
