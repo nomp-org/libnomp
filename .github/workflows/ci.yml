@@ -12,8 +12,11 @@ on:
         required: false
         default: true
 jobs:
-  main:
+  ci:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
     strategy:
       matrix:
         # compiler: [gcc-9, gcc-10, clang-10, clang-11, clang-12]
@@ -25,30 +28,28 @@ jobs:
       TESTDIR: tests
       BUILDDIR: build
     steps:
-      - uses: actions/checkout@v2
+      - name: Setup Github actions
+        uses: actions/checkout@v2
+      - name: Setup conda environment "libnomp"
+        uses: conda-incubator/setup-miniconda@v2
         with:
-          submodules: recursive
-      - name: Setup Python 3.10.4
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.10.4
-      - name: Install apt dependencies and set environment
-        shell: bash
+          mamba-version: "*"
+          channels: conda-forge, defaults
+          channel-priority: true
+          environment-file: environment.yml
+          activate-environment: libnomp
+          auto-activate-base: false
+      - name: Install pocl
         run: |
-          sudo apt -y update
-          sudo apt install -y pocl-opencl-icd opencl-headers
-          pip3 install git+https://github.com/inducer/loopy
-          pip3 install pycparser
-          echo "NOMP_INSTALL_DIR=${PWD}/install" >> $GITHUB_ENV
+          conda install -c conda-forge pocl
       - name: Build libnomp
-        shell: bash
         run: |
+          echo "NOMP_INSTALL_DIR=${PWD}/install" >> $GITHUB_ENV
           mkdir -p ${BUILDDIR}
           cd ${BUILDDIR}
-          cmake -DCMAKE_INSTALL_PREFIX=../install -DOpenCL_LIBRARY=/lib/x86_64-linux-gnu/libOpenCL.so.1 ..
+          cmake -DCMAKE_INSTALL_PREFIX=../install -DOpenCL_LIBRARY=${CONDA_PREFIX}/lib/libOpenCL.so -DOpenCL_INCLUDE_DIR=${CONDA_PREFIX}/include ..
           make install
-      - name: nomp-api
-        shell: bash
+      - name: Run libnomp tests
         run: |
           cd ${TESTDIR}
           ./run-tests.sh

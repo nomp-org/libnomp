@@ -25,11 +25,11 @@ jobs:
     steps:
       - name: GitHub action setup
         uses: actions/checkout@v2
-      - name: Set conda environment "libnomp-dev"
+      - name: Setup conda environment "libnomp-dev"
         uses: conda-incubator/setup-miniconda@v2
         with:
           mamba-version: "*"
-          channels: conda-forge,defaults
+          channels: conda-forge, defaults
           channel-priority: true
           environment-file: environment-dev.yml
           activate-environment: libnomp-dev
