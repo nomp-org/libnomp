@@ -27,7 +27,7 @@ int nomp_api_240_aux(TEST_TYPE *a, TEST_TYPE *b, int N) {
 }
 
 #define nomp_api_240 TOKEN_PASTE(nomp_api_240, TEST_SUFFIX)
-int nomp_api_240(n) {
+int nomp_api_240(int n) {
   nomp_assert(n <= 20);
   TEST_TYPE a[20], b[20];
   for (unsigned i = 0; i < n; i++)
@@ -59,34 +59,5 @@ int nomp_api_240(n) {
   return 0;
 }
 #undef nomp_api_240
-
-#define nomp_api_240_no_free TOKEN_PASTE(nomp_api_240_no_free, TEST_SUFFIX)
-int nomp_api_240_no_free(int n) {
-  nomp_assert(n <= 20);
-  static TEST_TYPE a[20], b[20];
-  for (unsigned i = 0; i < n; i++)
-    a[i] = n - i, b[i] = i;
-
-  int err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO);
-  nomp_chk(err);
-  err = nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO);
-  nomp_chk(err);
-
-  nomp_api_240_aux(a, b, n);
-
-  err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM);
-  nomp_chk(err);
-
-#if defined(TEST_TOL)
-  for (unsigned i = 0; i < n; i++)
-    nomp_assert(fabs(a[i] - n) < TEST_TOL);
-#else
-  for (unsigned i = 0; i < n; i++)
-    nomp_assert(a[i] == n);
-#endif
-
-  return 0;
-}
-#undef nomp_api_240_no_free
 
 #undef nomp_api_240_aux
