@@ -15,11 +15,23 @@ conda env create -f environment.yml
 conda activate libnomp
 ```
 
+You can use mamba to install the dependencies faster:
+```bash
+mamba env create -f environment.yml
+mamba activate libnomp
+```
+
 If you are planning on contributing to `libnomp`, install the dev dependencies
 instead:
 ```bash
 conda env create -f environment-dev.yml
 conda activate libnomp-dev
+```
+
+Similarly, you can install the dev dependencies with mamba as well:
+```bash
+mamba env create -f environment-dev.yml
+mamba activate libnomp-dev
 ```
 
 Use `cmake` to build the repo after installing the dependencies:
