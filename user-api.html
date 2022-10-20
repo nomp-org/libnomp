@@ -135,7 +135,7 @@ Operation op will be performed on the array slice [start_idx, end_idx), i.e., on
 <li><p><strong>start_idx</strong> – <strong>[in]</strong> Start index in the vector. </p></li>
 <li><p><strong>end_idx</strong> – <strong>[in]</strong> End index in the vector. </p></li>
 <li><p><strong>unit_size</strong> – <strong>[in]</strong> Size of a single vector element. </p></li>
-<li><p><strong>op</strong> – <strong>[in]</strong> Operation to perform (One of Map Direction). </p></li>
+<li><p><strong>op</strong> – <strong>[in]</strong> Operation to perform (One of <a class="reference internal" href="#group-nomp-update-direction"><span class="std std-ref">Map Direction</span></a>). </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -172,7 +172,7 @@ Operation op will be performed on the array slice [start_idx, end_idx), i.e., on
 <li><p><strong>clauses</strong> – <strong>[in]</strong> Clauses that tell nomp meta information about the kernel </p></li>
 <li><p><strong>nargs</strong> – <strong>[in]</strong> Number of arguments to the kernel. </p></li>
 <li><p><strong>args</strong> – <strong>[in]</strong> Comma separated list of argument names. </p></li>
-<li><p><strong>...</strong> – <strong>[in]</strong> For each argument, we pass the argument type (one of Types), size of the base type and the pointer to the argument.</p></li>
+<li><p><strong>...</strong> – <strong>[in]</strong> For each argument, we pass the argument type (one of <a class="reference internal" href="#group-nomp-types"><span class="std std-ref">Types</span></a>), size of the base type and the pointer to the argument.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -185,7 +185,7 @@ Operation op will be performed on the array slice [start_idx, end_idx), i.e., on
 <dt class="sig sig-object cpp" id="_CPPv48nomp_runiz">
 <span id="_CPPv38nomp_runiz"></span><span id="_CPPv28nomp_runiz"></span><span id="nomp_run__i.z"></span><span class="target" id="group__nomp__user__api_1ga494dfc32c43ad18c16022bfdcaeec9c3"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_run</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48nomp_runiz" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Runs the kernel. </p>
-<p>Runs the kernel with a given kernel id. Kernel id is followed by the number of arguments. Then for each argument we pass the argument type (Types) size of the base type in case of an integer and pointer to the argument.</p>
+<p>Runs the kernel with a given kernel id. Kernel id is followed by the number of arguments. Then for each argument we pass the argument type (<a class="reference internal" href="#group-nomp-types"><span class="std std-ref">Types</span></a>) size of the base type in case of an integer and pointer to the argument.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -213,7 +213,7 @@ Operation op will be performed on the array slice [start_idx, end_idx), i.e., on
 
 </section>
 <section id="map-direction">
-<h2>Map Direction<a class="headerlink" href="#map-direction" title="Permalink to this heading"></a></h2>
+<span id="group-nomp-update-direction"></span><h2>Map Direction<a class="headerlink" href="#map-direction" title="Permalink to this heading"></a></h2>
 <p>Defines the operation direction in <cite>nomp_update</cite>.</p>
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_ALLOC">
@@ -241,7 +241,7 @@ Operation op will be performed on the array slice [start_idx, end_idx), i.e., on
 
 </section>
 <section id="data-types">
-<h2>Data Types<a class="headerlink" href="#data-types" title="Permalink to this heading"></a></h2>
+<span id="group-nomp-types"></span><h2>Data Types<a class="headerlink" href="#data-types" title="Permalink to this heading"></a></h2>
 <p>Defines argument type.</p>
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_INTEGER">
@@ -263,7 +263,7 @@ Operation op will be performed on the array slice [start_idx, end_idx), i.e., on
 
 </section>
 <section id="errors">
-<h2>Errors<a class="headerlink" href="#errors" title="Permalink to this heading"></a></h2>
+<span id="group-nomp-errors"></span><h2>Errors<a class="headerlink" href="#errors" title="Permalink to this heading"></a></h2>
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_INVALID_BACKEND">
 <span class="target" id="group__nomp__errors_1ga9f0d37022c3fdb904926cff5164889bc"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_INVALID_BACKEND</span></span></span><a class="headerlink" href="#c.NOMP_INVALID_BACKEND" title="Permalink to this definition"></a><br /></dt>
