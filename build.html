@@ -20,7 +20,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="User API" href="user-api.html" />
+    <link rel="next" title="How to use nomp" href="nomp-usage.html" />
     <link rel="prev" title="Introduction" href="index.html" /> 
 </head>
 
@@ -44,9 +44,10 @@
 <li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Build instructions</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#libnomp">libnomp</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#linking-with-clang-frontend">Linking with clang frontend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#clang-frontend">Clang frontend</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="nomp-usage.html">How to use nomp</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user-api.html">User API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="internal-api.html">Internal API</a></li>
 </ul>
@@ -109,8 +110,8 @@ can’t find OpenCL:</p>
 </pre></div>
 </div>
 </section>
-<section id="linking-with-clang-frontend">
-<h2>Linking with clang frontend<a class="headerlink" href="#linking-with-clang-frontend" title="Permalink to this heading"></a></h2>
+<section id="clang-frontend">
+<h2>Clang frontend<a class="headerlink" href="#clang-frontend" title="Permalink to this heading"></a></h2>
 <p>Clone the llvm-project repo first:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">nomp</span><span class="o">-</span><span class="n">org</span><span class="o">/</span><span class="n">llvm</span><span class="o">-</span><span class="n">project</span><span class="o">.</span><span class="n">git</span>
 </pre></div>
@@ -152,25 +153,6 @@ this clang binary directory:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>export NOMP_CLANG_DIR=`pwd`/bin
 </pre></div>
 </div>
-<p>Now you can link libnomp installation to the clang compiler using the following
-script. Make sure both <cite>NOMP_INSTALL_DIR</cite> and <cite>NOMP_CLANG_DIR</cite> are set:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>#!/bin/bash
-
-if [ -z &quot;${NOMP_INSTALL_DIR}&quot; ]; then
-  echo &quot;Error: NOMP_INSTALL_DIR is not defined !&quot;
-  exit 1
-fi
-if [ -z &quot;${NOMP_CLANG_DIR}&quot; ]; then
-  echo &quot;Error: NOMP_CLANG_DIR is not defined !&quot;
-  exit 1
-fi
-
-NOMP_LIB_DIR=${NOMP_INSTALL_DIR}/lib
-NOMP_INC_DIR=${NOMP_INSTALL_DIR}/include
-
-${NOMP_CLANG_DIR}/clang -fnomp -include nomp.h -I${NOMP_INC_DIR} &quot;$@&quot; -Wl,-rpath,${NOMP_LIB_DIR} -L${NOMP_LIB_DIR} -lnomp
-</pre></div>
-</div>
 </section>
 </section>
 
@@ -179,7 +161,7 @@ ${NOMP_CLANG_DIR}/clang -fnomp -include nomp.h -I${NOMP_INC_DIR} &quot;$@&quot; 
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="index.html" class="btn btn-neutral float-left" title="Introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="user-api.html" class="btn btn-neutral float-right" title="User API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="nomp-usage.html" class="btn btn-neutral float-right" title="How to use nomp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
