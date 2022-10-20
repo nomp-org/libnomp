@@ -1,7 +1,7 @@
 #include "nomp-impl.h"
 
 char *strcatn(int nstr, ...) {
-  unsigned n = 0, max = BUFSIZ;
+  unsigned n = 0, max = NOMP_BUFSIZ;
   char *out = (char *)calloc(max, sizeof(char));
 
   va_list vargs;

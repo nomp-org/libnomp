@@ -14,6 +14,8 @@
 
 #include "nomp.h"
 
+#define NOMP_BUFSIZ 64
+
 #define FREE(x)                                                                \
   do {                                                                         \
     if (x)                                                                     \
@@ -44,7 +46,7 @@ struct mem {
 };
 
 struct backend {
-  char name[BUFSIZ];
+  char name[NOMP_BUFSIZ];
   int (*update)(struct backend *, struct mem *, const int);
   int (*knl_build)(struct backend *, struct prog *, const char *, const char *);
   int (*knl_run)(struct backend *, struct prog *, va_list);
@@ -155,7 +157,7 @@ int py_get_knl_name_and_src(char **name, char **src, PyObject *knl);
 int py_get_grid_size(struct prog *prg, PyObject *knl);
 /**
  * @ingroup nomp_py_utils
- * @brief Evaluate global and local grid sizes based on the dictionaty `dict`.
+ * @brief Evaluate global and local grid sizes based on the dictionary `dict`.
  *
  * @param[in] prg Nomp program.
  * @param[in] dict Dictionary with variable name as keys, variable value as

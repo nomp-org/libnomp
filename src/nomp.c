@@ -12,8 +12,8 @@ int nomp_init(const char *backend, int platform, int device) {
   if (initialized)
     return NOMP_INITIALIZED_ERROR;
 
-  char name[BUFSIZ];
-  size_t n = strnlen(backend, BUFSIZ);
+  char name[NOMP_BUFSIZ];
+  size_t n = strnlen(backend, NOMP_BUFSIZ);
   for (int i = 0; i < n; i++)
     name[i] = tolower(backend[i]);
   name[n] = '\0';
@@ -21,16 +21,16 @@ int nomp_init(const char *backend, int platform, int device) {
   int err = NOMP_INVALID_BACKEND;
   // FIXME: This is ugly -- should be fixed
 #if defined(OPENCL_ENABLED)
-  if (strncmp(name, "opencl", 32) == 0)
+  if (strncmp(name, "opencl", NOMP_BUFSIZ) == 0)
     err = opencl_init(&nomp, platform, device);
 #endif
 #if defined(CUDA_ENABLED)
-  if (strncmp(name, "cuda", 32) == 0)
+  if (strncmp(name, "cuda", NOMP_BUFSIZ) == 0)
     err = cuda_init(&nomp, platform, device);
 #endif
   if (err)
     return err;
-  strncpy(nomp.name, name, BUFSIZ);
+  strncpy(nomp.name, name, NOMP_BUFSIZ);
 
   err = NOMP_PY_INITIALIZE_ERROR;
   if (!Py_IsInitialized()) {
@@ -134,17 +134,17 @@ static int parse_clauses(char **usr_file, char **usr_func,
   unsigned i = 0;
   char *clause = NULL;
   while (clauses[i]) {
-    strnlower(&clause, clauses[i], BUFSIZ);
-    if (strncmp(clause, "transform", BUFSIZ) == 0) {
-      char *val = strndup(clauses[i + 1], BUFSIZ);
+    strnlower(&clause, clauses[i], NOMP_BUFSIZ);
+    if (strncmp(clause, "transform", NOMP_BUFSIZ) == 0) {
+      char *val = strndup(clauses[i + 1], NOMP_BUFSIZ);
       char *tok = strtok(val, ":");
       if (tok) {
-        *usr_file = strndup(tok, BUFSIZ), tok = strtok(NULL, ":");
+        *usr_file = strndup(tok, NOMP_BUFSIZ), tok = strtok(NULL, ":");
         if (tok)
-          *usr_func = strndup(tok, BUFSIZ);
+          *usr_func = strndup(tok, NOMP_BUFSIZ);
       }
       FREE(val);
-    } else if (strncmp(clause, "jit", BUFSIZ) == 0) {
+    } else if (strncmp(clause, "jit", NOMP_BUFSIZ) == 0) {
     } else {
       FREE(clause);
       return NOMP_INVALID_CLAUSE;
@@ -350,8 +350,8 @@ int nomp_finalize(void) {
 //
 void nomp_chk_(int err, const char *file, unsigned line) {
   if (err) {
-    char buf[2 * BUFSIZ];
-    nomp_err(buf, err, 2 * BUFSIZ);
+    char buf[2 * NOMP_BUFSIZ];
+    nomp_err(buf, err, 2 * NOMP_BUFSIZ);
     printf("%s:%d %s\n", file, line, buf);
     exit(1);
   }
