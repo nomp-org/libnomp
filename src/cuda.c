@@ -86,8 +86,8 @@ static int cuda_knl_build(struct backend *bnd, struct prog *prg,
   chk_nvrtc(nvrtc_err);
 
   struct cuda_backend *cbnd = (struct cuda_backend *)bnd->bptr;
-  char arch[BUFSIZ];
-  snprintf(arch, BUFSIZ, "-arch=compute_%d%d", cbnd->prop.major,
+  char arch[NOMP_BUFSIZ];
+  snprintf(arch, NOMP_BUFSIZ, "-arch=compute_%d%d", cbnd->prop.major,
            cbnd->prop.minor);
 
   const char *opts[1] = {arch};
