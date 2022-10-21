@@ -10,7 +10,7 @@ on:
         type: boolean
         description: 'Run the build with tmate debugging enabled'
         required: false
-        default: true
+        default: false
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -30,7 +30,11 @@ jobs:
     steps:
       - name: Setup Github actions
         uses: actions/checkout@v2
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3.13
+        if: ${{ inputs.debug_enabled }}
       - name: Setup conda environment "libnomp"
+        id: setup_conda
         uses: conda-incubator/setup-miniconda@v2
         with:
           mamba-version: "*"
@@ -40,19 +44,24 @@ jobs:
           activate-environment: libnomp
           auto-activate-base: false
       - name: Install pocl
+        id: install_pocl
         run: |
           conda install -c conda-forge pocl
       - name: Build libnomp
+        id: build_libnomp
         run: |
           echo "NOMP_INSTALL_DIR=${PWD}/install" >> $GITHUB_ENV
           mkdir -p ${BUILDDIR}
           cd ${BUILDDIR}
-          cmake -DCMAKE_INSTALL_PREFIX=../install -DOpenCL_LIBRARY=${CONDA_PREFIX}/lib/libOpenCL.so -DOpenCL_INCLUDE_DIR=${CONDA_PREFIX}/include ..
+          cmake -DCMAKE_INSTALL_PREFIX=../install \
+            -DOpenCL_LIBRARY=${CONDA_PREFIX}/lib/libOpenCL.so \
+            -DOpenCL_INCLUDE_DIR=${CONDA_PREFIX}/include ..
           make install
       - name: Run libnomp tests
+        id: run_libnomp
         run: |
           cd ${TESTDIR}
           ./run-tests.sh
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3.13
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+      - name: Block to allow inspecting failures
+        run: sleep 30m
+        if: ${{ failure() && inputs.debug_enabled }}
