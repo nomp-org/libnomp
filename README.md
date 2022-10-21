@@ -1,5 +1,7 @@
 # libnomp
 
+[![Unit tests](https://github.com/nomp-org/libnomp/actions/workflows/ci.yml/badge.svg)](https://github.com/nomp-org/libnomp/actions/workflows/ci.yml)
+
 Runtime for [nomp](https://github.com/nomp-org/nomp)
 
 ## Build instructions
