@@ -1,4 +1,3 @@
-#include "nomp-impl.h"
 #include "nomp-test.h"
 
 #define nomp_api_200 TOKEN_PASTE(nomp_api_200, TEST_SUFFIX)

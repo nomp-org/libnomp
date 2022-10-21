@@ -116,8 +116,7 @@ static int cuda_knl_build(struct backend *bnd, struct prog *prg,
   CUresult cu_err = cuModuleLoadData(&cprg->module, ptx);
   chk_cu(cu_err);
 
-  if (ptx)
-    tfree(ptx);
+  tfree(ptx);
 
   cu_err = cuModuleGetFunction(&cprg->kernel, cprg->module, name);
   chk_cu(cu_err);

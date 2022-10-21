@@ -1,6 +1,7 @@
 #if !defined(_NOMP_TEST_H_)
 #define _NOMP_TEST_H_
 
+#include "nomp-mem.h"
 #include <math.h>
 #include <regex.h>
 #include <stdio.h>

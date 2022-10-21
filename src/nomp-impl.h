@@ -13,6 +13,7 @@
 #include <string.h>
 
 #include "nomp-log.h"
+#include "nomp-mem.h"
 #include "nomp.h"
 
 #define NOMP_BUFSIZ 64
@@ -23,36 +24,6 @@
     if (err)                                                                   \
       return err;                                                              \
   } while (0)
-
-static inline int sfree(void *p, const char *file, unsigned line) {
-  if (!p)
-    free(p);
-  return 0;
-}
-
-static inline void *smalloc(size_t size, const char *file, unsigned line) {
-  void *restrict res = malloc(size);
-  return res;
-}
-
-static inline void *scalloc(size_t nmemb, size_t size, const char *file,
-                            unsigned line) {
-  void *restrict res = calloc(nmemb, size);
-  return res;
-}
-
-static inline void *srealloc(void *ptr, size_t size, const char *file,
-                             unsigned line) {
-  void *restrict res = realloc(ptr, size);
-  return res;
-}
-
-#define tfree(x) sfree(x, __FILE__, __LINE__)
-#define tmalloc(T, count)                                                      \
-  ((T *)smalloc((count) * sizeof(T), __FILE__, __LINE__))
-#define tcalloc(T, count) ((T *)scalloc((count), sizeof(T), __FILE__, __LINE__))
-#define trealloc(ptr, T, count)                                                \
-  ((T *)srealloc((ptr), (count) * sizeof(T), __FILE__, __LINE__))
 
 struct prog {
   unsigned nargs, ndim;
