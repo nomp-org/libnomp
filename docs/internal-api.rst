@@ -21,6 +21,12 @@ Python helper functions
    :project: libnomp
    :content-only:
 
+Memory management functions
+---------------------------
+.. doxygengroup:: nomp_mem_management
+   :project: libnomp
+   :content-only:
+
 Other helper functions
 ----------------------
 .. doxygengroup:: nomp_other_utils

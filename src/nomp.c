@@ -357,8 +357,7 @@ int nomp_finalize(void) {
   for (unsigned i = 0; i < mems_n; i++) {
     if (mems[i]) {
       nomp.update(&nomp, mems[i], NOMP_FREE);
-      tfree(mems[i]);
-      mems[i] = NULL;
+      tfree(mems[i]), mems[i] = NULL;
     }
   }
   tfree(mems);
@@ -367,8 +366,7 @@ int nomp_finalize(void) {
   for (unsigned i = 0; i < progs_n; i++) {
     if (progs[i]) {
       nomp.knl_free(progs[i]);
-      tfree(progs[i]);
-      progs[i] = NULL;
+      tfree(progs[i]), progs[i] = NULL;
     }
   }
   tfree(progs);
