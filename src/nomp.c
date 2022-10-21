@@ -215,16 +215,16 @@ int nomp_run(int id, int nargs, ...) {
     va_list args;
     va_start(args, nargs);
     for (int i = 0; i < nargs; i++) {
-      // FIXME: `type` should be able to distinguish between integer, floating
-      // point or a pointer type. We are assuming it is an integer for now.
       const char *var = va_arg(args, const char *);
       int type = va_arg(args, int);
       size_t size = va_arg(args, size_t);
       void *val = va_arg(args, void *);
-      PyObject *py_key = PyUnicode_FromStringAndSize(var, strlen(var));
-      PyObject *py_val = PyLong_FromLong(*((int *)val));
-      PyDict_SetItem(prg->py_dict, py_key, py_val);
-      // Py_XDECREF(py_key), Py_XDECREF(py_val);
+      if (type == NOMP_INTEGER) {
+        PyObject *py_key = PyUnicode_FromStringAndSize(var, strlen(var));
+        PyObject *py_val = PyLong_FromLong(*((int *)val));
+        PyDict_SetItem(prg->py_dict, py_key, py_val);
+        Py_XDECREF(py_key), Py_XDECREF(py_val);
+      }
     }
     va_end(args);
     py_eval_grid_size(prg, prg->py_dict);
