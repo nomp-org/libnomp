@@ -22,7 +22,7 @@ int nomp_api_240_aux(TEST_TYPE *a, TEST_TYPE *b, int N) {
                  sizeof(TEST_TYPE), b, "N", NOMP_INTEGER, sizeof(int), &N);
   nomp_chk(err);
 
-  free(knl);
+  tfree(knl);
   return 0;
 }
 
