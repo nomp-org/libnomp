@@ -1,16 +1,23 @@
-name: libnomp CI Tests
+name: Unit tests
 on:
   pull_request:
     branches: [main]
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled'
+        required: false
+        default: false
 jobs:
   main:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         # compiler: [gcc-9, gcc-10, clang-10, clang-11, clang-12]
-        compiler: [gcc-10, clang-12]
+        compiler: [gcc-10]
       fail-fast: false
     name: "${{ matrix.compiler }}"
     env:
@@ -33,7 +40,6 @@ jobs:
           pip3 install git+https://github.com/inducer/loopy
           pip3 install pycparser
           echo "NOMP_INSTALL_DIR=${PWD}/install" >> $GITHUB_ENV
-
       - name: Build libnomp
         shell: bash
         run: |
@@ -41,9 +47,11 @@ jobs:
           cd ${BUILDDIR}
           cmake -DCMAKE_INSTALL_PREFIX=../install -DOpenCL_LIBRARY=/lib/x86_64-linux-gnu/libOpenCL.so.1 ..
           make install
-
       - name: nomp-api
         shell: bash
         run: |
           cd ${TESTDIR}
           ./run-tests.sh
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3.13
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
