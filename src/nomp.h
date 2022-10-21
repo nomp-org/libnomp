@@ -198,6 +198,21 @@
  * @brief NOMP kernel run failed
  */
 #define NOMP_KNL_RUN_ERROR -131
+/**
+ * @ingroup nomp_errors
+ * @brief NOMP run out of memory
+ */
+#define NOMP_OUT_OF_MEMORY -140
+/**
+ * @ingroup nomp_errors
+ * @brief NOMP invalid log id
+ */
+#define NOMP_INVALID_LOG_ID -141
+/**
+ * @ingroup nomp_errors
+ * @brief NOMP log type mismatch
+ */
+#define NOMP_LOG_TYPE_MISMATCH -142
 
 #ifdef __cplusplus
 extern "C" {
@@ -324,7 +339,39 @@ int nomp_jit(int *id, const char *c_src, const char **annotations,
  */
 int nomp_run(int id, int nargs, ...);
 
-int nomp_err(char *buf, int err, size_t buf_size);
+void nomp_assert_(int cond, const char *file, unsigned line);
+#define nomp_assert(cond) nomp_assert_(cond, __FILE__, __LINE__)
+
+void nomp_chk_(int err, const char *file, unsigned line);
+#define nomp_chk(err) nomp_chk_(err, __FILE__, __LINE__)
+
+typedef enum {
+  NOMP_ERROR = 0,
+  NOMP_WARNING = 1,
+  NOMP_INFORMATION = 2
+} nomp_log_type;
+
+/**
+ * @ingroup nomp_user_api
+ * @brief Return error description.
+ *
+ * @details Returns the error description given the error_id
+ * @param[in] log variable to set the error description
+ * @param[in] log_id id of the error
+ * @param[in] type either NOMP_ERROR, NOMP_WARNING or NOMP_INFORMATION
+ * @return int
+ */
+int nomp_get_log(char **log, int log_id, nomp_log_type type);
+
+/**
+ * @ingroup nomp_user_api
+ * @brief Return error type.
+ *
+ * @details Returns the error_type given the error_id
+ * @param[in] log_id id of the error
+ * @return int
+ */
+int nomp_get_log_no(int log_id);
 
 /**
  * @ingroup nomp_user_api
@@ -338,13 +385,6 @@ int nomp_err(char *buf, int err, size_t buf_size);
  * @return int
  */
 int nomp_finalize(void);
-
-void nomp_chk_(int err, const char *file, unsigned line);
-#define nomp_chk(err) nomp_chk_(err, __FILE__, __LINE__)
-
-void nomp_assert_(int cond, const char *file, unsigned line);
-#define nomp_assert(cond) nomp_assert_(cond, __FILE__, __LINE__)
-
 #ifdef __cplusplus
 }
 #endif
