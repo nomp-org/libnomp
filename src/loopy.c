@@ -48,7 +48,9 @@ int py_c_to_loopy(PyObject **knl, const char *src, const char *backend) {
     }
     Py_DECREF(lpy_api);
   }
-
+  if (err)
+    return nomp_set_log(NOMP_LOOPY_CONVERSION_ERROR, NOMP_ERROR,
+                        ERR_STR_LOOPY_CONVERSION_ERROR);
   return err;
 }
 
@@ -73,7 +75,14 @@ int py_user_callback(PyObject **knl, const char *file, const char *func) {
       Py_DECREF(py_file);
     }
   }
-
+  if (err) {
+    if (err == NOMP_USER_CALLBACK_NOT_FOUND) {
+      err =
+          nomp_set_log(err, NOMP_ERROR, ERR_STR_USER_CALLBACK_NOT_FOUND, file);
+    } else {
+      err = nomp_set_log(err, NOMP_ERROR, ERR_STR_USER_CALLBACK_FAILURE, func);
+    }
+  }
   return err;
 }
 
@@ -102,6 +111,11 @@ int py_get_knl_name_and_src(char **name, char **src, PyObject *knl) {
         Py_XDECREF(entry), Py_DECREF(iter);
       }
       Py_DECREF(epts);
+    }
+    if (err) {
+      PyErr_Print();
+      return nomp_set_log(NOMP_LOOPY_KNL_NAME_NOT_FOUND, NOMP_ERROR,
+                          ERR_STR_LOOPY_KNL_NAME_NOT_FOUND, *name);
     }
     return_on_err(err);
 
@@ -132,7 +146,11 @@ int py_get_knl_name_and_src(char **name, char **src, PyObject *knl) {
       Py_DECREF(lpy);
     }
   }
-
+  if (err) {
+      PyErr_Print();
+      return nomp_set_log(NOMP_LOOPY_CODEGEN_FAILED, NOMP_ERROR,
+                          ERR_STR_LOOPY_CODEGEN_FAILED, *name);
+  }
   return err;
 }
 
@@ -166,7 +184,11 @@ int py_get_grid_size(struct prog *prg, PyObject *knl) {
       Py_DECREF(callables);
     }
   }
-
+  if (err) {
+      PyErr_Print();
+      return nomp_set_log(NOMP_GET_GRIDSIZE_FAILED, NOMP_ERROR,
+                          ERR_STR_LOOPY_GRIDSIZE_FAILED);
+  }
   return err;
 }
 
@@ -183,7 +205,6 @@ static int py_eval_grid_size_aux(size_t *out, PyObject *grid, unsigned dim,
       Py_DECREF(rslt), err = 0;
     }
   }
-
   return err;
 }
 
@@ -213,6 +234,11 @@ int py_eval_grid_size(struct prog *prg, PyObject *dict) {
         err = (err != 0) * NOMP_EVAL_GRIDSIZE_FAILED;
       }
       Py_DECREF(mapper);
+    }
+    if (err) {
+      PyErr_Print();
+      return nomp_set_log(NOMP_EVAL_GRIDSIZE_FAILED, NOMP_ERROR,
+                          ERR_STR_GRIDSIZE_CALCULATION_FAILED);
     }
   }
 

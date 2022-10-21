@@ -10,29 +10,33 @@ static const char *py_dir = "python";
 //
 int nomp_init(const char *backend, int platform, int device) {
   if (initialized)
-    return NOMP_INITIALIZED_ERROR;
+    return nomp_set_log(NOMP_INITIALIZED_ERROR, NOMP_ERROR,
+                        ERR_STR_NOMP_IS_ALREADY_INITIALIZED, nomp.name);
 
-  char name[NOMP_BUFSIZ];
-  size_t n = strnlen(backend, NOMP_BUFSIZ);
+  char name[MAX_BACKEND_NAME_SIZE];
+  size_t n = strnlen(backend, MAX_BACKEND_NAME_SIZE);
   for (int i = 0; i < n; i++)
     name[i] = tolower(backend[i]);
   name[n] = '\0';
 
-  int err = NOMP_INVALID_BACKEND;
-  // FIXME: This is ugly -- should be fixed
+  int err = 0;
+  if (strncmp(name, "opencl", MAX_BACKEND_NAME_SIZE) == 0) {
 #if defined(OPENCL_ENABLED)
   if (strncmp(name, "opencl", NOMP_BUFSIZ) == 0)
     err = opencl_init(&nomp, platform, device);
 #endif
+  } else if (strncmp(name, "cuda", MAX_BACKEND_NAME_SIZE) == 0) {
 #if defined(CUDA_ENABLED)
-  if (strncmp(name, "cuda", NOMP_BUFSIZ) == 0)
     err = cuda_init(&nomp, platform, device);
 #endif
-  if (err)
-    return err;
-  strncpy(nomp.name, name, NOMP_BUFSIZ);
+  } else {
+    err = nomp_set_log(NOMP_INVALID_BACKEND, NOMP_ERROR,
+                       ERR_STR_FAILED_TO_INITIALIZE_NOMP, name);
+  }
+  return_on_err(err);
 
-  err = NOMP_PY_INITIALIZE_ERROR;
+  strncpy(nomp.name, name, MAX_BACKEND_NAME_SIZE);
+
   if (!Py_IsInitialized()) {
     // May be we need the isolated configuration listed here:
     // https://docs.python.org/3/c-api/init_config.html#init-config
@@ -42,20 +46,22 @@ int nomp_init(const char *backend, int platform, int device) {
     py_append_to_sys_path(".");
     // There should be a better way to figure the installation
     // path based on the shared library path
-    err = NOMP_INSTALL_DIR_NOT_FOUND;
     char *install_dir = getenv("NOMP_INSTALL_DIR");
     if (install_dir) {
       char *abs_dir = strcatn(3, install_dir, "/", py_dir);
       py_append_to_sys_path(abs_dir);
       FREE(abs_dir);
-      err = 0;
+    } else {
+      return nomp_set_log(NOMP_INSTALL_DIR_NOT_FOUND, NOMP_ERROR,
+                          ERR_STR_NOMP_INSTALL_DIR_NOT_SET);
     }
   } else {
     // Python is already initialized.
     err = 0;
   }
   if (err)
-    return err;
+    return nomp_set_log(NOMP_PY_INITIALIZE_ERROR, NOMP_ERROR,
+                        ERR_STR_PY_INITIALIZE_ERROR);
 
   initialized = 1;
   return 0;
@@ -96,8 +102,8 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
   if (idx == mems_n) {
     // A new entry can't be created with NOMP_FREE or NOMP_FROM
     if (op == NOMP_FROM || op == NOMP_FREE)
-      return NOMP_INVALID_MAP_PTR;
-    // NOMP_ALLOC is implied since this is a new entry
+      return nomp_set_log(NOMP_INVALID_MAP_PTR, NOMP_ERROR,
+                          ERR_STR_INVALID_MAP_OP, op);
     op |= NOMP_ALLOC;
     if (mems_n == mems_max) {
       mems_max += mems_max / 2 + 1;
@@ -197,7 +203,8 @@ int nomp_jit(int *id, const char *c_src, const char **annotations,
     Py_XDECREF(py_knl);
 
     if (err)
-      return NOMP_KNL_BUILD_ERROR;
+      return nomp_set_log(NOMP_KNL_BUILD_ERROR, NOMP_ERROR,
+                          ERR_STR_KNL_BUILD_ERROR);
     *id = progs_n++;
   }
 
@@ -233,16 +240,24 @@ int nomp_run(int id, int nargs, ...) {
     int err = nomp.knl_run(&nomp, prg, args);
     va_end(args);
     if (err)
-      return NOMP_KNL_RUN_ERROR;
+      return nomp_set_log(NOMP_KNL_RUN_ERROR, NOMP_ERROR,
+                          ERR_STR_KERNEL_RUN_FAILED, id);
     return 0;
   }
-  return NOMP_INVALID_KNL;
+  return nomp_set_log(NOMP_INVALID_KNL, NOMP_ERROR, ERR_STR_INVALID_KERNEL, id);
 }
 
 //=============================================================================
-// nomp_err
+// Helper functions: nomp_assert & nomp_err
 //
-int nomp_err(char *buf, int err, size_t buf_size) {
+void nomp_assert_(int cond, const char *file, unsigned line) {
+  if (!cond) {
+    printf("nomp_assert failure at %s:%d\n", file, line);
+    exit(1);
+  }
+}
+
+int nomp_err_type_to_str(char *buf, int err, size_t buf_size) {
   switch (err) {
   case NOMP_INVALID_BACKEND:
     strncpy(buf, "Invalid NOMP backend", buf_size);
@@ -311,12 +326,25 @@ int nomp_err(char *buf, int err, size_t buf_size) {
   return 0;
 }
 
+void nomp_chk_(int err_id, const char *file, unsigned line) {
+  if (err_id == 0)
+    return;
+  char *err_str;
+  int err = nomp_get_log(&err_str, err_id, NOMP_ERROR);
+  if (err != NOMP_INVALID_LOG_ID && err != NOMP_LOG_TYPE_MISMATCH) {
+    printf("%s:%d %s\n", file, line, err_str);
+    free(err_str);
+    exit(1);
+  }
+}
+
 //=============================================================================
 // nomp_finalize
 //
 int nomp_finalize(void) {
   if (!initialized)
-    return NOMP_NOT_INITIALIZED_ERROR;
+    return nomp_set_log(NOMP_NOT_INITIALIZED_ERROR, NOMP_ERROR,
+                        ERR_STR_NOMP_IS_NOT_INITIALIZED);
 
   for (unsigned i = 0; i < mems_n; i++) {
     if (mems[i]) {
@@ -338,28 +366,15 @@ int nomp_finalize(void) {
   FREE(progs);
   progs = NULL, progs_n = progs_max = 0;
 
+  for (unsigned i = 0; i < logs_n; i++)
+    FREE(logs[i].description);
+  FREE(logs);
+  logs = NULL, logs_n = logs_max = 0;
+
   initialized = nomp.finalize(&nomp);
   if (initialized)
-    return NOMP_FINALIZE_ERROR;
+    return nomp_set_log(NOMP_FINALIZE_ERROR, NOMP_ERROR,
+                        ERR_STR_FAILED_TO_FINALIZE_NOMP);
 
   return 0;
-}
-
-//=============================================================================
-// Helper functions: nomp_err & nomp_assert
-//
-void nomp_chk_(int err, const char *file, unsigned line) {
-  if (err) {
-    char buf[2 * NOMP_BUFSIZ];
-    nomp_err(buf, err, 2 * NOMP_BUFSIZ);
-    printf("%s:%d %s\n", file, line, buf);
-    exit(1);
-  }
-}
-
-void nomp_assert_(int cond, const char *file, unsigned line) {
-  if (!cond) {
-    printf("nomp_assert failure at %s:%d\n", file, line);
-    exit(1);
-  }
 }

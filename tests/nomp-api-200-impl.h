@@ -20,7 +20,7 @@ int nomp_api_200() {
   const char *annotations[1] = {0},
              *clauses0[3] = {"transform", "invalid-file:invalid_func", 0};
   int err = nomp_jit(&id, knl, annotations, clauses0);
-  nomp_assert(err == NOMP_USER_CALLBACK_NOT_FOUND);
+  nomp_assert(nomp_get_log_no(err) == NOMP_USER_CALLBACK_NOT_FOUND);
 
   const char *clauses1[3] = {"transform", "nomp-api-200:transform", 0};
   err = nomp_jit(&id, knl, annotations, clauses1);

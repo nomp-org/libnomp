@@ -12,9 +12,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "nomp-log.h"
 #include "nomp.h"
 
 #define NOMP_BUFSIZ 64
+#define MAX_BACKEND_NAME_SIZE 32
 
 #define FREE(x)                                                                \
   do {                                                                         \
@@ -22,7 +24,7 @@
       free(x);                                                                 \
   } while (0)
 
-#define return_on_err(err, ...)                                                \
+#define return_on_err(err)                                                     \
   do {                                                                         \
     if (err)                                                                   \
       return err;                                                              \

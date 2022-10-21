@@ -118,18 +118,21 @@ static int opencl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
     case NOMP_PTR:
       m = mem_if_mapped(p);
       if (m == NULL)
-        return NOMP_INVALID_MAP_PTR;
+        return nomp_set_log(NOMP_INVALID_MAP_PTR, NOMP_ERROR,
+                            ERR_STR_INVALID_MAP_PTR, p);
       p = m->bptr;
       size = sizeof(cl_mem);
       break;
-    default:
-      return NOMP_KNL_ARG_TYPE_ERROR;
+    default:;
+      return nomp_set_log(NOMP_KNL_ARG_TYPE_ERROR, NOMP_ERROR,
+                          ERR_STR_INVALID_KNL_ARG_TYPE, type);
       break;
     }
 
     cl_int err = clSetKernelArg(ocl_prg->knl, i, size, p);
     if (err != CL_SUCCESS)
-      return NOMP_KNL_ARG_SET_ERROR;
+      return nomp_set_log(NOMP_KNL_ARG_SET_ERROR, NOMP_ERROR,
+                          ERR_STR_KNL_ARG_SET_ERROR);
   }
 
   struct opencl_backend *ocl = (struct opencl_backend *)bnd->bptr;
@@ -169,23 +172,23 @@ int opencl_init(struct backend *bnd, const int platform_id,
   cl_uint num_platforms;
   cl_int err = clGetPlatformIDs(0, NULL, &num_platforms);
   if (platform_id < 0 | platform_id >= num_platforms)
-    return NOMP_INVALID_PLATFORM;
-
+    return nomp_set_log(NOMP_INVALID_PLATFORM, NOMP_ERROR,
+                        ERR_STR_INVALID_PLATFORM, platform_id);
   cl_platform_id *cl_platforms = calloc(num_platforms, sizeof(cl_platform_id));
   if (cl_platforms == NULL)
-    return NOMP_MALLOC_ERROR;
-
+    return nomp_set_log(NOMP_MALLOC_ERROR, NOMP_ERROR, ERR_STR_MALLOC_ERROR);
   err = clGetPlatformIDs(num_platforms, cl_platforms, &num_platforms);
   cl_platform_id platform = cl_platforms[platform_id];
 
   cl_uint num_devices;
   err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 0, NULL, &num_devices);
   if (device_id < 0 || device_id >= num_devices)
-    return NOMP_INVALID_DEVICE;
+    return nomp_set_log(NOMP_INVALID_DEVICE, NOMP_ERROR, ERR_STR_INVALID_DEVICE,
+                        device_id);
 
   cl_device_id *cl_devices = calloc(num_devices, sizeof(cl_device_id));
   if (cl_devices == NULL)
-    return NOMP_MALLOC_ERROR;
+    return nomp_set_log(NOMP_MALLOC_ERROR, NOMP_ERROR, ERR_STR_MALLOC_ERROR);
 
   err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, num_devices, cl_devices,
                        &num_devices);
