@@ -9,7 +9,7 @@ int nomp_api_233_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {
       "}                                                      \n";
 
   size_t len = strlen(knl_fmt) + 3 * strlen(TOSTRING(TEST_TYPE)) + 1;
-  char *knl = (char *)calloc(len, sizeof(char));
+  char *knl = tcalloc(char, len);
   snprintf(knl, len, knl_fmt, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE),
            TOSTRING(TEST_TYPE));
 
@@ -24,7 +24,7 @@ int nomp_api_233_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {
                  NOMP_INTEGER, sizeof(int), &N);
   nomp_chk(err);
 
-  free(knl);
+  tfree(knl);
   return 0;
 }
 
