@@ -2,7 +2,6 @@
 #define _LIB_NOMP_H_
 
 #include <stddef.h>
-
 /**
  * @defgroup nomp_update_direction Update Direction
  *
@@ -210,9 +209,9 @@
 #define NOMP_INVALID_LOG_ID -141
 /**
  * @ingroup nomp_errors
- * @brief NOMP log type mismatch
+ * @brief NOMP unknown error
  */
-#define NOMP_LOG_TYPE_MISMATCH -142
+#define NOMP_UNKNOWN_ERROR -142
 
 #ifdef __cplusplus
 extern "C" {
@@ -345,30 +344,52 @@ void nomp_assert_(int cond, const char *file, unsigned line);
 void nomp_chk_(int err, const char *file, unsigned line);
 #define nomp_chk(err) nomp_chk_(err, __FILE__, __LINE__)
 
+/**
+ * @ingroup nomp_logs
+ * @brief NOMP logs can be of an error, warning or an information.
+ */
 typedef enum {
   NOMP_ERROR = 0,
   NOMP_WARNING = 1,
   NOMP_INFORMATION = 2
 } nomp_log_type;
 
+int nomp_set_log_(const char *desc, int logno, nomp_log_type type,
+                  const char *fname, unsigned line_no, ...);
 /**
  * @ingroup nomp_user_api
- * @brief Return error description.
+ * @brief Sets a log.
  *
- * @details Returns the error description given the error_id
- * @param[in] log variable to set the error description
- * @param[in] log_id id of the error
- * @param[in] type either NOMP_ERROR, NOMP_WARNING or NOMP_INFORMATION
+ * @details Sets a log given a description of the log and log type and returns a
+ * unique log_id.
+ * @param[in] logno unique id of the log kind.
+ * @param[in] type type of the log either NOMP_ERROR, NOMP_WARNING or
+ * NOMP_INFORMATION.
+ * @param[in] desc detailed description of the log.
+ * @param[in] log_id id of the error.
  * @return int
  */
-int nomp_get_log(char **log, int log_id, nomp_log_type type);
+#define nomp_set_log(logno, type, desc, ...)                                   \
+  nomp_set_log_(desc, logno, type, __FILE__, __LINE__, ##__VA_ARGS__)
 
 /**
  * @ingroup nomp_user_api
- * @brief Return error type.
+ * @brief Return log description.
  *
- * @details Returns the error_type given the error_id
- * @param[in] log_id id of the error
+ * @details Returns the log description given the log_id.
+ * @param[out] log variable to set the error description.
+ * @param[in] log_id id of the error.
+ * @return int
+ */
+int nomp_get_log(char **log, int log_id);
+
+/**
+ * @ingroup nomp_user_api
+ * @brief Return log number.
+ *
+ * @details Returns the log number given the log_id. If log_id
+ * is invalid return NOMP_INVALID_LOG_ID.
+ * @param[in] log_id id of the log.
  * @return int
  */
 int nomp_get_log_no(int log_id);

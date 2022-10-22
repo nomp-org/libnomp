@@ -208,4 +208,12 @@ char *strcatn(int nstr, ...);
  */
 int strnlower(char **out, const char *in, size_t max);
 
+/**
+ * @ingroup nomp_log_utils
+ * @brief Free log variables.
+ *
+ * @return void
+ */
+void nomp_finalize_logs();
+
 #endif // _LIB_NOMP_IMPL_H_

@@ -1,4 +1,4 @@
-#include "nomp-log.h"
+#include "nomp-impl.h"
 #include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -47,7 +47,17 @@ const char *ERR_STR_INVALID_PLATFORM = "Invalid NOMP platform id %d.";
 const char *ERR_STR_MALLOC_ERROR = "NOMP malloc error.";
 const char *ERR_STR_KNL_BUILD_ERROR = "NOMP kernel build error.";
 const char *ERR_STR_PY_INITIALIZE_ERROR = "NOMP python initialize error.";
+const char *ERR_STR_INVALID_LOG_ID = "Invalid log id %d.";
+const char *ERR_STR_NOMP_UNKOWN_ERROR = "Unkown error id %d";
 
+struct log {
+  char *description;
+  int logno;
+  nomp_log_type type;
+};
+
+static struct log *logs = NULL;
+static unsigned logs_n = 0, logs_max = 0;
 static const char *LOG_TYPE_STRING[] = {"Error", "Warning", "Information"};
 
 int nomp_set_log_(const char *description, int logno, nomp_log_type type,
@@ -66,37 +76,41 @@ int nomp_set_log_(const char *description, int logno, nomp_log_type type,
   va_end(vargs);
 
   const char *log_type_string = LOG_TYPE_STRING[type];
-  size_t n_desc = strnlen(buf, BUFSIZ);
-  size_t n_file = strnlen(fname, BUFSIZ);
-  size_t n_log_type = strnlen(log_type_string, BUFSIZ);
+  size_t n_desc = strnlen(buf, BUFSIZ), n_file = strnlen(fname, BUFSIZ),
+         n_log_type = strnlen(log_type_string, BUFSIZ);
   logs[logs_n].description =
-      (char *)calloc(n_desc + n_file + n_log_type + 4 + 3, sizeof(char));
-  snprintf(logs[logs_n].description, BUFSIZ + n_file + n_log_type + 4 + 3 + 1,
-           "%s:%s:%u %s", log_type_string, fname, line_no, buf);
+      (char *)calloc(n_desc + n_file + n_log_type + 6 + 3, sizeof(char));
+  snprintf(logs[logs_n].description, BUFSIZ + n_file + n_log_type + 6 + 3 + 1,
+           "[%s] %s:%u %s", log_type_string, fname, line_no, buf);
   logs[logs_n].logno = logno;
   logs[logs_n].type = type;
   logs_n += 1;
   return logs_n;
 }
 
-int nomp_get_log(char **log_str, int log_id, nomp_log_type type) {
+int nomp_get_log(char **log_str, int log_id) {
   if (log_id <= 0 && log_id > logs_n) {
     *log_str = NULL;
-    return NOMP_INVALID_LOG_ID;
+    return nomp_set_log(NOMP_INVALID_LOG_ID, NOMP_ERROR, ERR_STR_INVALID_LOG_ID,
+                        log_id);
   }
   struct log lg = logs[log_id - 1];
-  if (lg.type != type) {
-    return NOMP_LOG_TYPE_MISMATCH;
-  }
   size_t n_desc = strnlen(lg.description, BUFSIZ) + 1;
   *log_str = (char *)calloc(n_desc, sizeof(char));
-  strncpy(*log_str, lg.description, n_desc + 1);
+  strncpy(*log_str, lg.description, n_desc);
   return 0;
 }
 
 int nomp_get_log_no(int log_id) {
-  if (log_id <= 0 && log_id > logs_n) {
-    return NOMP_INVALID_LOG_ID;
-  }
+  if (log_id <= 0 && log_id > logs_n)
+    return nomp_set_log(NOMP_INVALID_LOG_ID, NOMP_ERROR, ERR_STR_INVALID_LOG_ID,
+                        log_id);
   return logs[log_id - 1].logno;
+}
+
+void nomp_finalize_logs() {
+  for (unsigned i = 0; i < logs_n; i++)
+    FREE(logs[i].description);
+  FREE(logs);
+  logs = NULL, logs_n = logs_max = 0;
 }
