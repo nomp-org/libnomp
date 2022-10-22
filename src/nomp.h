@@ -10,22 +10,23 @@
 
 /**
  * @ingroup nomp_update_direction
- * @brief NOMP allocation operation.
+ * @brief Allocate memory on the device.
  */
 #define NOMP_ALLOC 1
 /**
  * @ingroup nomp_update_direction
- * @brief Mapping of host to device(H2D) operation.
+ * @brief Copy host data to device. Memory will be allocated if not allocated
+ * already.
  */
 #define NOMP_TO 2
 /**
  * @ingroup nomp_update_direction
- * @brief Mapping of device to host(D2H) operation.
+ * @brief Copy device data to host.
  */
 #define NOMP_FROM 4
 /**
  * @ingroup nomp_update_direction
- * @brief NOMP freeing operation.
+ * @brief Free memory allocated on the device.
  */
 #define NOMP_FREE 8
 
@@ -36,17 +37,17 @@
 
 /**
  * @ingroup nomp_types
- * @brief Integer argument type
+ * @brief Integer argument type.
  */
 #define NOMP_INTEGER 1
 /**
  * @ingroup nomp_types
- * @brief Float argument type
+ * @brief Floating point argument type.
  */
 #define NOMP_FLOAT 2
 /**
  * @ingroup nomp_types
- * @brief Pointer argument type
+ * @brief Pointer argument type.
  */
 #define NOMP_PTR 4
 
