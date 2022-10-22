@@ -3,6 +3,15 @@
 static const char *py_module = "loopy_api";
 static const char *py_func = "c_to_loopy";
 
+void py_print(PyObject *obj) {
+  PyObject *repr = PyObject_Repr(obj);
+  PyObject *str = PyUnicode_AsEncodedString(repr, "utf-8", "~E~");
+  const char *bytes = PyBytes_AS_STRING(str);
+  printf("%s", bytes);
+  Py_XDECREF(repr);
+  Py_XDECREF(str);
+}
+
 int py_append_to_sys_path(const char *path) {
   PyObject *pSys = PyImport_ImportModule("sys");
   int err = NOMP_PY_APPEND_PATH_ERROR;
@@ -131,14 +140,14 @@ int py_get_knl_name_and_src(char **name, char **src, PyObject *pKnl) {
   return 0;
 }
 
-int py_get_grid_size(struct prog *prg, PyObject *py_knl) {
+int py_get_grid_size(struct prog *prg, PyObject *knl) {
   int err = NOMP_GET_GRIDSIZE_FAILED;
-  if (py_knl) {
+  if (knl) {
     // knl.callables_table
-    PyObject *py_callables = PyObject_GetAttrString(py_knl, "callables_table");
+    PyObject *py_callables = PyObject_GetAttrString(knl, "callables_table");
     if (py_callables) {
       // knl.default_entrypoint.get_grid_size_upper_bounds_as_exprs
-      PyObject *py_entry = PyObject_GetAttrString(py_knl, "default_entrypoint");
+      PyObject *py_entry = PyObject_GetAttrString(knl, "default_entrypoint");
       if (py_entry) {
         PyObject *py_expr = PyObject_GetAttrString(
             py_entry, "get_grid_size_upper_bounds_as_exprs");
@@ -151,7 +160,6 @@ int py_get_grid_size(struct prog *prg, PyObject *py_knl) {
             prg->ndim = PyTuple_Size(prg->py_global);
             if (PyTuple_Size(prg->py_local) > prg->ndim)
               prg->ndim = PyTuple_Size(prg->py_local);
-            Py_DECREF(py_grid_size);
             err = 0;
           }
           Py_DECREF(py_expr);

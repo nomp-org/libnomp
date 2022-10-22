@@ -196,9 +196,9 @@ char *strcatn(int nstr, ...);
  * @ingroup nomp_other_utils
  * @brief Convert a C-string to lowercase
  *
- * Convert input string `in` to lower case and store in `out`. Maximum size for
- * input string `in` is specified by `max`. Returns 0 if successful, otherwise
- * return 1.
+ * Convert input string `in` to lower case and store in `out`. Maximum size
+ * for input string `in` is specified by `max`. Returns 0 if successful,
+ * otherwise return 1.
  *
  * @param[out] out Address of output string
  * @param[in] in Input string
