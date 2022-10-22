@@ -330,8 +330,8 @@ void nomp_chk_(int err_id, const char *file, unsigned line) {
   if (err_id == 0)
     return;
   char *err_str;
-  int err = nomp_get_log(&err_str, err_id, NOMP_ERROR);
-  if (err != NOMP_INVALID_LOG_ID && err != NOMP_LOG_TYPE_MISMATCH) {
+  int err = nomp_get_log(&err_str, err_id);
+  if (err != NOMP_INVALID_LOG_ID) {
     printf("%s:%d %s\n", file, line, err_str);
     free(err_str);
     exit(1);
@@ -365,11 +365,6 @@ int nomp_finalize(void) {
   }
   FREE(progs);
   progs = NULL, progs_n = progs_max = 0;
-
-  for (unsigned i = 0; i < logs_n; i++)
-    FREE(logs[i].description);
-  FREE(logs);
-  logs = NULL, logs_n = logs_max = 0;
 
   initialized = nomp.finalize(&nomp);
   if (initialized)

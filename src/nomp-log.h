@@ -1,6 +1,5 @@
 #if !defined(_NOMP_LOG_H_)
 #define _NOMP_LOG_H_
-#include "nomp.h"
 #include <stddef.h>
 
 extern const char *ERR_STR_NOMP_IS_ALREADY_INITIALIZED;
@@ -31,20 +30,7 @@ extern const char *ERR_STR_INVALID_PLATFORM;
 extern const char *ERR_STR_MALLOC_ERROR;
 extern const char *ERR_STR_KNL_BUILD_ERROR;
 extern const char *ERR_STR_PY_INITIALIZE_ERROR;
-
-struct log {
-  char *description;
-  int logno;
-  nomp_log_type type;
-};
-
-static struct log *logs = NULL;
-static unsigned logs_n = 0;
-static unsigned logs_max = 0;
-
-int nomp_set_log_(const char *desc, int logno, nomp_log_type type,
-                  const char *fname, unsigned line_no, ...);
-#define nomp_set_log(logno, type, desc, ...)                                   \
-  nomp_set_log_(desc, logno, type, __FILE__, __LINE__, ##__VA_ARGS__);
+extern const char *ERR_STR_INVALID_LOG_ID;
+extern const char *ERR_STR_NOMP_UNKOWN_ERROR;
 
 #endif

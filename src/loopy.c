@@ -76,12 +76,14 @@ int py_user_callback(PyObject **knl, const char *file, const char *func) {
     }
   }
   if (err) {
-    if (err == NOMP_USER_CALLBACK_NOT_FOUND) {
+    if (err == NOMP_USER_CALLBACK_NOT_FOUND)
       err =
           nomp_set_log(err, NOMP_ERROR, ERR_STR_USER_CALLBACK_NOT_FOUND, file);
-    } else {
+    else if (err == NOMP_USER_CALLBACK_FAILURE)
       err = nomp_set_log(err, NOMP_ERROR, ERR_STR_USER_CALLBACK_FAILURE, func);
-    }
+    else
+      err = nomp_set_log(NOMP_UNKNOWN_ERROR, NOMP_ERROR,
+                         ERR_STR_NOMP_UNKOWN_ERROR, err);
   }
   return err;
 }
@@ -147,9 +149,9 @@ int py_get_knl_name_and_src(char **name, char **src, PyObject *knl) {
     }
   }
   if (err) {
-      PyErr_Print();
-      return nomp_set_log(NOMP_LOOPY_CODEGEN_FAILED, NOMP_ERROR,
-                          ERR_STR_LOOPY_CODEGEN_FAILED, *name);
+    PyErr_Print();
+    return nomp_set_log(NOMP_LOOPY_CODEGEN_FAILED, NOMP_ERROR,
+                        ERR_STR_LOOPY_CODEGEN_FAILED, *name);
   }
   return err;
 }
@@ -185,9 +187,9 @@ int py_get_grid_size(struct prog *prg, PyObject *knl) {
     }
   }
   if (err) {
-      PyErr_Print();
-      return nomp_set_log(NOMP_GET_GRIDSIZE_FAILED, NOMP_ERROR,
-                          ERR_STR_LOOPY_GRIDSIZE_FAILED);
+    PyErr_Print();
+    return nomp_set_log(NOMP_GET_GRIDSIZE_FAILED, NOMP_ERROR,
+                        ERR_STR_LOOPY_GRIDSIZE_FAILED);
   }
   return err;
 }
