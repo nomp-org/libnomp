@@ -55,19 +55,15 @@ struct backend {
 
 /**
  * @ingroup nomp_other_utils
- * @brief Returns the pointer to the allocated memory corresponding to 'p'.
+ * @brief Returns the mem object corresponding to host pointer `p`.
  *
- * Returns the pointer to the allocated memory corresponding to 'p'.
- * If no buffer has been allocated for 'p' returns *mems_n*
+ * Returns the mem object corresponding to host ponter `p`. If no buffer has
+ * been allocated for `p` on the device, returns NULL.
  *
- * @param p Value which required the pointer of it
- * @return struct mem*
+ * @param[in] p Host pointer
+ * @return struct mem *
  */
 struct mem *mem_if_mapped(void *p);
-
-//==============================================================================
-// Backend init functions
-//
 
 /**
  * @defgroup nomp_backend_init Backend init functions
@@ -75,40 +71,34 @@ struct mem *mem_if_mapped(void *p);
 
 /**
  * @ingroup nomp_backend_init
- * @brief Initializes OpenCL backend with the specified platform and device
+ * @brief Initializes OpenCL backend with the specified platform and device.
  *
- * Initializes OpenCL backend while creating the command queue using the
+ * Initializes OpenCL backend while creating a command queue using the
  * given platform id and device id. Returns a negative value if an error
- * occurs during the initialization, otherwise returns 0.
+ * occured during the initialization, otherwise returns 0.
  *
- * @param backend Target backend for code generation.
- * @param platform_id Target platform id to share resources and execute kernals
- *                 in the targeted device.
- * @param device_id Target device id to execute kernals.
+ * @param[in] backend Target backend for code generation.
+ * @param[in] platform_id Target platform id.
+ * @param[in] device_id Target device id.
  * @return int
  */
 int opencl_init(struct backend *backend, const int platform_id,
                 const int device_id);
 /**
  * @ingroup nomp_backend_init
- * @brief Initializes Cuda backend with the specified platform and device
+ * @brief Initializes Cuda backend with the specified platform and device.
  *
- * Initializes Cuda backend using the given platform id and device id.
- * Returns a negative value if an error occurs during the initialization,
- * otherwise returns 0.
+ * Initializes Cuda backend using the given device id. Platform id is not
+ * used in the initialization of Cuda backend. Returns a negative value if an
+ * error occured during the initialization, otherwise returns 0.
  *
- * @param backend Target backend for code generation.
- * @param platform_id Target platform id to share resources and execute kernals
- *                 in the targeted device.
- * @param device_id Target device id to execute kernals.
+ * @param[in] backend Target backend for code generation.
+ * @param[in] platform_id Target platform id.
+ * @param[in] device_id Target device id.
  * @return int
  */
 int cuda_init(struct backend *backend, const int platform_id,
               const int device_id);
-
-//==============================================================================
-// Python helper functions
-//
 
 /**
  * @defgroup nomp_py_utils Python helper functions
@@ -118,65 +108,72 @@ int cuda_init(struct backend *backend, const int platform_id,
  * @ingroup nomp_py_utils
  * @brief Appends specified path to system path.
  *
- * @param path Path to append
+ * @param[in] path Path to be appended to system path.
  * @return int
  */
 int py_append_to_sys_path(const char *path);
 /**
  * @ingroup nomp_py_utils
- * @brief Creates loopy kernel from C source
+ * @brief Creates loopy kernel from C source.
  *
- * @param pKnl Python kernal object
- * @param c_src C kernal source
- * @param backend Backend name
+ * @param[out] knl Loopy kernal object.
+ * @param[in] c_src C kernal source.
+ * @param[in] backend Backend name.
  * @return int
  */
-int py_c_to_loopy(PyObject **pKnl, const char *c_src, const char *backend);
+int py_c_to_loopy(PyObject **knl, const char *c_src, const char *backend);
 /**
  * @ingroup nomp_py_utils
- * @brief Calls the user callback function specfied by file name and
- * function name, on the kernal
+ * @brief Calls the user callback function `func` in file `file`.
  *
- * @param pKnl Python kernal object
- * @param file File to the callback function
- * @param func Declared name of the callback function
+ * @param[in,out] knl Python kernal object.
+ * @param[in] file File with the callback function.
+ * @param[in] func Callback function name.
  * @return int
  */
-int py_user_callback(PyObject **pKnl, const char *file, const char *func);
+int py_user_callback(PyObject **knl, const char *file, const char *func);
 /**
  * @ingroup nomp_py_utils
- * @brief Get kernal name and source
+ * @brief Get kernal name and generated source for the backend.
  *
- * @param name Array of pointers to name
- * @param src Array of pointers to kernal source
- * @param pKnl Python kernal object
+ * @param[out] name Kernel name as a C-string.
+ * @param[out] src Kernel source as a C-string.
+ * @param[in] knl Loopy kernal object.
  * @return int
  */
-int py_get_knl_name_and_src(char **name, char **src, PyObject *pKnl);
+int py_get_knl_name_and_src(char **name, char **src, PyObject *knl);
 /**
  * @ingroup nomp_py_utils
- * @brief Get global and local grid sizes
+ * @brief Get global and local grid sizes as `pymoblic` expressions.
  *
- * @param prg Nomp program object
- * @param py_knl Python kernal object
+ * Grid sizes are stored in the program object itself.
+ *
+ * @param[in] prg Nomp program object.
+ * @param[in] knl Python kernal object.
  * @return int
  */
-int py_get_grid_size(struct prog *prg, PyObject *py_knl);
+int py_get_grid_size(struct prog *prg, PyObject *knl);
 /**
  * @ingroup nomp_py_utils
- * @brief Evaluate global and local grid sizes for the program
+ * @brief Evaluate global and local grid sizes based on the dictionaty `dict`.
  *
- * @param prg Nomp program
- * @param py_dict Dictionary with variable name as keys, value as values
+ * @param[in] prg Nomp program.
+ * @param[in] dict Dictionary with variable name as keys, variable value as
+ * values.
  * @return int
  */
-int py_eval_grid_size(struct prog *prg, PyObject *py_dict);
+int py_eval_grid_size(struct prog *prg, PyObject *dict);
+/**
+ * @ingroup nomp_py_utils
+ * @brief Get the representation of python object.
+ *
+ * @param obj Python object.
+ * @return void
+ */
+void py_print(PyObject *obj);
 
-//==============================================================================
-// Other helper functions
-//
 /**
- * @defgroup nomp_other_utils Other helper functions
+ * @defgroup nomp_other_utils Other helper functions.
  */
 
 /**
@@ -184,10 +181,10 @@ int py_eval_grid_size(struct prog *prg, PyObject *py_dict);
  * @brief Concatenates atmost `nstr` strings.
  *
  * Concatenates atmost `nstr` strings and returns a pointer to
- * the destination.
+ * resulting string.
  *
- * @param nstr Number of strings to concatenate
- * @param ... Strings to concatenate
+ * @param nstr Number of strings to concatenate.
+ * @param ... Strings to concatenate.
  * @return char*
  */
 char *strcatn(int nstr, ...);
@@ -196,13 +193,13 @@ char *strcatn(int nstr, ...);
  * @ingroup nomp_other_utils
  * @brief Convert a C-string to lowercase
  *
- * Convert input string `in` to lower case and store in `out`. Maximum size
- * for input string `in` is specified by `max`. Returns 0 if successful,
- * otherwise return 1.
+ * Convert input string `in` to lower case and store in `out`. Maximum length
+ * of the input string `in` is specified by `max`. Returns 0 if successful, 1
+ * otherwise.
  *
- * @param[out] out Address of output string
- * @param[in] in Input string
- * @param[in] max Maximum allowed size for the input string
+ * @param[out] out Output string.
+ * @param[in] in Input string.
+ * @param[in] max Maximum allowed length for the input string.
  * @return int
  */
 int strnlower(char **out, const char *in, size_t max);
