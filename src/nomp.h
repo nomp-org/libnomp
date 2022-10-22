@@ -4,9 +4,8 @@
 #include <stddef.h>
 
 /**
- * @defgroup nomp_update_direction Map Direction
- * Defines the operation direction in `nomp_update`.
- * TODO: Probably these should be an enum.
+ * @defgroup nomp_update_direction Update direction
+ * Defines the direction in `nomp_update`.
  */
 
 /**
@@ -32,29 +31,28 @@
 
 /**
  * @defgroup nomp_types Types
- * Defines argument type.
- * TODO: Probably these should be an enum.
+ * Defines argument type: integer, float or a pointer.
  */
 
 /**
  * @ingroup nomp_types
- * @brief NOMP integer type
+ * @brief Integer argument type
  */
 #define NOMP_INTEGER 1
 /**
  * @ingroup nomp_types
- * @brief NOMP float type
+ * @brief Float argument type
  */
 #define NOMP_FLOAT 2
 /**
  * @ingroup nomp_types
- * @brief NOMP pointer type
+ * @brief Pointer argument type
  */
 #define NOMP_PTR 4
 
 /**
  * @defgroup nomp_errors Errors
- * TODO: Probably these should be an enum.
+ * Error ids returned by nomp api calls.
  */
 
 /**
