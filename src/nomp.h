@@ -4,8 +4,9 @@
 #include <stddef.h>
 
 /**
- * @defgroup nomp_update_direction Update direction
- * Defines the direction in `nomp_update`.
+ * @defgroup nomp_update_direction Update Direction
+ *
+ * @brief Defines the update direction (or operation) in nomp_update().
  */
 
 /**
@@ -31,8 +32,10 @@
 #define NOMP_FREE 8
 
 /**
- * @defgroup nomp_types Types
- * Defines argument type: integer, float or a pointer.
+ * @defgroup nomp_types Data Types
+ *
+ * @brief Defines argument type in a kernel. Currently, only integer, float or
+ * pointer types are supported.
  */
 
 /**
@@ -41,7 +44,7 @@
  */
 #define NOMP_INTEGER 1
 /**
- * @ingroup nomp_types
+ * @ingroup nomp_types Data Types
  * @brief Floating point argument type.
  */
 #define NOMP_FLOAT 2
@@ -53,7 +56,8 @@
 
 /**
  * @defgroup nomp_errors Errors
- * Error ids returned by nomp api calls.
+ *
+ * @brief Different types of errors returned by nomp api calls.
  */
 
 /**
@@ -200,25 +204,25 @@ extern "C" {
 #endif
 
 /**
- * @defgroup nomp_user_api API
+ * @defgroup nomp_user_api User API functions
+ *
+ * @brief libnomp API functions defined in `nomp.h`.
  */
 
 /**
  * @ingroup nomp_user_api
  * @brief Initializes libnomp with the specified backend, platform and device.
  *
- * @details Initializes the nomp code generation for the specified backend
- * (e.g., Cuda, OpenCL, etc) using the given platform id and device id. Returns
- * a negative value if an error occurs during the initialization, otherwise
+ * @details Initializes nomp code generation for the specified backend (e.g.,
+ * OpenCL, Cuda, etc) using the given platform id and device id. Returns a
+ * negative value if an error occurs during the initialization, otherwise
  * returns 0. Calling this method twice (without nomp_finalize in between) will
- * return an error (but not segfault) as well. Currently only supports Cuda and
- * OpenCL backends.
+ * return an error (but not segfault). Currently only supports Cuda and OpenCL
+ * backends.
  *
- * @param[in] backend Target backend for code generation ("Cuda", "OpenCL",
- * etc.).
- * @param[in] platform Target platform id to share resources and execute kernels
- *                 in the targeted device (only used for OpenCL backend).
- * @param[in] device Target device id to execute kernels.
+ * @param[in] backend Target backend for code generation.
+ * @param[in] platform Target platform id (only used for OpenCL backend).
+ * @param[in] device Target device id to use for computation.
  * @return int
  *
  * <b>Example usage:</b>
@@ -231,34 +235,38 @@ int nomp_init(const char *backend, int platform, int device);
 /**
  * @ingroup nomp_user_api
  * @brief Performs device to host (D2H) and host to device (H2D) memory
- * transfers, allocation and freeing of memory on the device.
+ * transfers, allocating and freeing of memory in the device.
  *
- * @param[in] ptr Pointer to the host vector.
- * @param[in] start_idx Start index in the vector.
- * @param[in] end_idx End index in the vector.
+ * @param[in] ptr Pointer to the host memory location.
+ * @param[in] start_idx Start index in the vector to start copying.
+ * @param[in] end_idx End index in the vector to end the copying.
  * @param[in] unit_size Size of a single vector element.
  * @param[in] op Operation to perform (One of @ref nomp_update_direction).
  * @return int
  *
- * @details Operation op will be performed on the array slice [start_idx,
- * end_idx), i.e., on array elements start_idx, ... end_idx - 1. This method
+ * @details Operation \p op will be performed on the array slice [\p start_idx,
+ * \p end_idx), i.e., on array elements start_idx, ... end_idx - 1. This method
  * returns a non-zero value if there is an error and 0 otherwise.
  *
  * <b>Example usage:</b>
  * @code{.c}
- * const int N = 10;
- * double a[10], b[10];
- * for (unsigned i = 0; i < N; i++) {
+ * int N = 10;
+ * double a[10];
+ * for (unsigned i = 0; i < N; i++)
  *   a[i] = i;
- *   b[i] = N - i;
- * }
+ *
+ * // Copy the value of `a` into device
  * int err = nomp_update(a, 0, N, sizeof(double), NOMP_TO);
- * int err = nomp_update(b, 0, N, sizeof(double), NOMP_TO);
- * // Code that change array values on the device (e.g., execution of a kernel)
+ *
+ * // Execution of a kernel which uses `a`
+ * ...
+ *
+ * // Copy the updated value of `a` from device
  * int err = nomp_update(a, 0, N, sizeof(double), NOMP_FROM);
- * int err = nomp_update(b, 0, N, sizeof(double), NOMP_FROM);
+ *
+ * // Free the device memory allocated for `a`
  * int err = nomp_update(a, 0, N, sizeof(double), NOMP_FREE);
- * int err = nomp_update(b, 0, N, sizeof(double), NOMP_FREE);
+ *
  * @endcode
  */
 int nomp_update(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
@@ -266,12 +274,13 @@ int nomp_update(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
 
 /**
  * @ingroup nomp_user_api
- * @brief Generate a kernel for the target backend (OpenCL, Cuda, etc.) from C
- * source.
+ * @brief Generate and compile a kernel for the targe backend (OpenCL, etc.)
+ * from C source.
  *
- * @details User defined code transformations will be applied based on the
- * annotations passed to this function. Kernel specific transformations can be
- * specified in the callback function.
+ * @details Target backend is the one provided during the initialization of
+ * libnomp using nomp_init(). User defined code transformations will be applied
+ * based on the clauses specified in \p clauses argument. Additional kernel meta
+ * data can be passed using the \p annotations argument.
  *
  * <b>Example usage:</b>
  * @code{.c}
@@ -299,16 +308,17 @@ int nomp_jit(int *id, const char *c_src, const char **annotations,
 
 /**
  * @ingroup nomp_user_api
- * @brief Runs the kernel.
+ * @brief Runs the kernel generated by nomp_jit().
  *
  * @details Runs the kernel with a given kernel id. Kernel id is followed by the
- * number of arguments. Then for each argument we pass the argument type (@ref
- * nomp_types), size of the base type, etc.
+ * number of arguments (i.e., variables). Then for each argument, four values
+ * has to be passed. First, is the argument name as a string. Second is the
+ * argument type (one of @ref nomp_types). Third is the `sizeof` argument and
+ * the fourth is the pointer to the actual argument itself.
  *
  * @param[in] id Id of the kernel to be run.
  * @param[in] nargs Number of arguments to the kernel.
- * @param[in] ... For each variable, variable name, type, sizeof base type, and
- * a pointer to the variable.
+ * @param[in] ...  Four values mentioned above for each argument.
  *
  * @return int
  */
