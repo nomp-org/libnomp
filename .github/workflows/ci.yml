@@ -32,7 +32,7 @@ jobs:
       BUILDDIR: build
     steps:
       - name: Setup Github actions
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3.13
         if: ${{ inputs.debug_enabled }}

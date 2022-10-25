@@ -24,7 +24,7 @@ jobs:
       PUSH_ON_MAIN: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     steps:
       - name: GitHub action setup
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3.13
         if: ${{ inputs.debug_enabled }}
