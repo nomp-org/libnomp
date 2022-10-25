@@ -39,20 +39,24 @@ jobs:
         id: setup_conda
         uses: conda-incubator/setup-miniconda@v2
         with:
-            miniforge-variant: Mambaforge
-            miniforge-version: latest
-            activate-environment: libnomp
-            use-mamba: true
+          miniforge-variant: Mambaforge
+          miniforge-version: latest
+          activate-environment: libnomp
+          use-mamba: true
       - uses: actions/cache@v2
         with:
           path: /usr/share/miniconda3/envs/libnomp
-          key:  ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('environment.yml') }}-${{ env.CACHE_NUMBER }}
+          key:  ${{ runner.os }}-build-libnomp_environment-${{ hashFiles('environment.yml') }}-${{ env.CACHE_NUMBER }}
         id: cache
       - name: Update environment
+        id: update_env
         run: |
-         mamba env update -n libnomp -f environment.yml
-         mamba install -n libnomp pocl
+          mamba env update -n libnomp -f environment.yml
         if: steps.cache.outputs.cache-hit != 'true'
+      - name: Install pocl
+        id: install_pocl
+        run: |
+          conda install -c conda-forge pocl
       - name: Build libnomp
         id: build_libnomp
         run: |
