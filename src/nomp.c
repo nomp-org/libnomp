@@ -139,7 +139,7 @@ static int parse_clauses(char **usr_file, char **usr_func,
       char *val = strndup(clauses[i + 1], NOMP_BUFSIZ);
       char *tok = strtok(val, ":");
       if (tok) {
-        *usr_file = strndup(tok, NOMP_BUFSIZ), tok = strtok(NULL, ":");
+        *usr_file = strndup(tok, PATH_MAX), tok = strtok(NULL, ":");
         if (tok)
           *usr_func = strndup(tok, NOMP_BUFSIZ);
       }
