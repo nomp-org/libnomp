@@ -1,3 +1,4 @@
+"""Loopy API wrapper"""
 from dataclasses import dataclass, fields, replace
 from typing import Dict, FrozenSet, List, Optional, Union
 
@@ -36,6 +37,7 @@ _BACKEND_TO_TARGET = {"opencl": lp.OpenCLTarget(), "cuda": lp.CudaTarget()}
 
 
 class IdentityMapper:
+    """AST node mapper"""
     def rec(self, node, *args, **kwargs):
         """Visit a node."""
         try:
@@ -49,15 +51,19 @@ class IdentityMapper:
     __call__ = rec
 
     def map_NoneType(self, node, *args, **kwargs) -> None:
+        """Maps None type node"""
         return None
 
     def map_str(self, node: str, *args, **kwargs) -> str:
+        """Maps string node"""
         return node
 
     def map_int(self, node: int, *args, **kwargs) -> int:
+        """Maps int node"""
         return node
 
     def map_list(self, node: list, *args, **kwargs) -> list:
+        """Maps recursively nodes in the list"""
         return [self.rec(c, *args, **kwargs) for c in node]
 
 
@@ -65,6 +71,7 @@ class IdentityMapper:
 # so we use it here instead of general @cache.
 @memoize
 def dtype_to_ctype_registry():
+    """Retrieve data type with C type"""
     dtype_reg = DTypeRegistry()
     fill_registry_with_c_types(dtype_reg, True)
     return dtype_reg
@@ -72,6 +79,7 @@ def dtype_to_ctype_registry():
 
 @memoize
 def _get_dtype_from_decl_type(decl):
+    """Retrieve data type from declaration type"""
     if (
         isinstance(decl, c_ast.PtrDecl)
         and isinstance(decl.type, c_ast.TypeDecl)
@@ -94,19 +102,24 @@ def _get_dtype_from_decl_type(decl):
 
 
 class CToLoopyExpressionMapper(IdentityMapper):
+    """Functions for mapping C expressions to Loopy"""
     def map_Constant(self, expr: c_ast.Constant):
+        "Maps C const expression"
         return (
             dtype_to_ctype_registry().get_or_register_dtype(expr.type).type
         )(expr.value)
 
     def map_BinaryOp(self, expr: c_ast.BinaryOp):
+        "Maps C binary operation"
         op = _C_BIN_OPS_TO_PYMBOLIC_OPS[expr.op]
         return op(self.rec(expr.left), self.rec(expr.right))
 
     def map_ID(self, expr: c_ast.ID):
+        """Maps C variable"""
         return prim.Variable(expr.name)
 
     def map_ArrayRef(self, expr: c_ast.ArrayRef):
+        """Maps C array reference"""
         if isinstance(expr.name, c_ast.ID):
             return prim.Subscript(self.rec(expr.name), self.rec(expr.subscript))
         if isinstance(expr.name, c_ast.ArrayRef):
@@ -117,12 +130,14 @@ class CToLoopyExpressionMapper(IdentityMapper):
         raise NotImplementedError
 
     def map_InitList(self, expr: c_ast.InitList):
+        """Maps C list initialization"""
         raise SyntaxError
 
 
 # @dataclass automatically adds special methods like __init__ and __repr__
 @dataclass
 class CToLoopyMapperContext:
+    """Record expression context information"""
     # We don't need inner/outer inames. User should do these
     # transformations with loopy API. So we should just track inames.
     inames: FrozenSet[str]
@@ -131,16 +146,19 @@ class CToLoopyMapperContext:
     name_gen: UniqueNameGenerator
 
     def copy(self, **kwargs) -> "CToLoopyMapperContext":
+        """Update class variables"""
         return replace(self, **kwargs)
 
 
 @dataclass
 class CToLoopyMapperAccumulator:
+    """Record C expressions"""
     domains: List[isl.BasicSet]
     statements: List[lp.InstructionBase]
     kernel_data: List[Union[lp.ValueArg, lp.TemporaryVariable]]
 
     def copy(self, *, domains=None, statements=None, kernel_data=None):
+        """Update class variables"""
         domains = domains or self.domains
         statements = statements or self.statements
         kernel_data = kernel_data or self.kernel_data
@@ -148,6 +166,7 @@ class CToLoopyMapperAccumulator:
 
 
 class CToLoopyLoopBoundMapper(CToLoopyExpressionMapper):
+    """Map loop bounds"""
     def map_BinaryOp(self, expr: c_ast.BinaryOp):
         bin_op = _C_BIN_OPS_TO_PYMBOLIC_OPS["//" if expr.op == "/" else expr.op]
         return bin_op(self.rec(expr.left), self.rec(expr.right))
@@ -155,6 +174,7 @@ class CToLoopyLoopBoundMapper(CToLoopyExpressionMapper):
 
 # Helper function for parsing for loop kernels
 def check_and_parse_for(expr: c_ast.For):
+    """Parse for loop to retrieve loop variable, lower bound and upper bound"""
     (init_decl,) = expr.init.decls
     iname = init_decl.name
 
@@ -182,7 +202,9 @@ def check_and_parse_for(expr: c_ast.For):
 
 
 class CToLoopyMapper(IdentityMapper):
+    """Map C expressions"""
     def combine(self, values):
+        """Combine mapped expressions"""
         # FIXME: Needs slightly more sophisticated checks here..
         # For example.
         # 1. No domain should have the dim_sets repeated.
@@ -197,6 +219,7 @@ class CToLoopyMapper(IdentityMapper):
         )
 
     def map_If(self, expr: c_ast.If, context: CToLoopyMapperContext):
+        """Map C if condition"""
         cond = CToLoopyExpressionMapper()(expr.cond)
 
         # Map expr.iftrue with cond
@@ -227,6 +250,7 @@ class CToLoopyMapper(IdentityMapper):
         return true_result
 
     def map_For(self, expr: c_ast.For, context: CToLoopyMapperContext):
+        """Map C for loop"""
         (iname, lbound_expr, ubound_expr) = check_and_parse_for(expr)
 
         space = isl.Space.create_from_names(
@@ -247,6 +271,7 @@ class CToLoopyMapper(IdentityMapper):
         return children_result.copy(domains=children_result.domains + [domain])
 
     def map_Decl(self, expr: c_ast.Decl, context: CToLoopyMapperContext):
+        """Map C variable declaration"""
         name = expr.name
         if isinstance(expr.type, c_ast.TypeDecl):
             shape = ()
@@ -300,6 +325,7 @@ class CToLoopyMapper(IdentityMapper):
     def map_Compound(
         self, expr: c_ast.Compound, context: CToLoopyMapperContext
     ):
+        """Map C compound expression"""
         if expr.block_items is not None:
             return self.combine(
                 [self.rec(child, context) for child in expr.block_items]
@@ -309,6 +335,7 @@ class CToLoopyMapper(IdentityMapper):
     def map_Assignment(
         self, expr: c_ast.Assignment, context: CToLoopyMapperContext
     ):
+        """Map C assignment"""
         lhs = CToLoopyExpressionMapper()(expr.lvalue)
         rhs = CToLoopyExpressionMapper()(expr.rvalue)
 
@@ -331,15 +358,18 @@ class CToLoopyMapper(IdentityMapper):
     def map_InitList(
         self, expr: c_ast.InitList, context: CToLoopyMapperContext
     ):
+        """Maps C list initialization"""
         raise SyntaxError
 
 
 @dataclass
 class ExternalContext:
+    "Maintain information on variable declaration in a function"
     function_name: Optional[str]
     var_to_decl: Dict[str, c_ast.Decl]
 
     def copy(self, **kwargs):
+        """Get external context with updated variable values"""
         updated_kwargs = kwargs.copy()
         for field in fields(self):
             if field.name not in updated_kwargs:
@@ -348,14 +378,17 @@ class ExternalContext:
         return ExternalContext(**updated_kwargs)
 
     def add_decl(self, var_name: str, decl: c_ast.Decl) -> None:
+        """Adds kernel parameter variable declaration to the context"""
         new_var_to_decl = self.var_to_decl.copy()
         new_var_to_decl[var_name] = decl
         return self.copy(var_to_decl=new_var_to_decl)
 
     def var_to_dtype(self, var_name: str) -> None:
+        """Converts variable to data type"""
         return _get_dtype_from_decl_type(self.var_to_decl[var_name].type)
 
     def get_typedecl(self):
+        """Get type declarations"""
         return {
             k: v
             for k, v in self.var_to_decl.items()
@@ -364,6 +397,7 @@ class ExternalContext:
 
 
 def decl_to_knl_arg(decl: c_ast.Decl, dtype):
+    """Type declaration to kernel arg"""
     decl_type = decl.type
     if isinstance(decl_type, c_ast.TypeDecl):
         return lp.ValueArg(decl.name, dtype=dtype)
@@ -375,6 +409,7 @@ def decl_to_knl_arg(decl: c_ast.Decl, dtype):
 
 
 def c_to_loopy(c_str: str, backend: str):
+    """Map C kernel to Loopy"""
     # Parse the function
     ast = c_parser.CParser().parse(c_str)
     node = ast.ext[0]
