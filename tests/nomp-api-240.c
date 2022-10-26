@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) {
   int device = argc > 2 ? atoi(argv[2]) : 0;
   int platform = argc > 3 ? atoi(argv[3]) : 0;
 
-  int err = nomp_init(backend, device, platform);
+  int err = nomp_init(backend, platform, device);
   nomp_chk(err);
 
   nomp_api_240_int(10);
