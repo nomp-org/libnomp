@@ -7,7 +7,7 @@ int nomp_api_110(const char *backend, int device, int platform, unsigned s,
 
   TEST_TYPE a[10] = {0}, b[10] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 
-  int err = nomp_init(backend, device, platform);
+  int err = nomp_init(backend, platform, device);
   nomp_chk(err);
 
   // Free'ing before mapping should return an error
