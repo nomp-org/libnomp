@@ -9,12 +9,14 @@ static struct backend nomp;
 static struct env envs;
 static int initialized = 0;
 
+static const char *py_dir = "python";
+
 static char *get_if_env(const char *name) {
   const char *temp = getenv(name);
   if (temp) {
-    char *tmp_var = (char *)malloc(strnlen(temp, BUFSIZ));
+    char *tmp_var = (char *)malloc(strnlen(temp, NOMP_BUFSIZ));
     if (tmp_var != NULL) {
-      strncpy(tmp_var, temp, strnlen(temp, BUFSIZ));
+      strncpy(tmp_var, temp, strnlen(temp, NOMP_BUFSIZ));
       return tmp_var;
     }
   }
@@ -43,8 +45,6 @@ void nomp_check_env(struct backend *backend) {
   }
   envs.verbose = strtoui(getenv("NOMP_VERBOSE_LEVEL"), NOMP_BUFSIZ);
 }
-
-static const char *py_dir = "python";
 
 //=============================================================================
 // nomp_init
@@ -179,9 +179,9 @@ static int parse_clauses(char **usr_file, char **usr_func,
   unsigned i = 0;
   char *clause = NULL;
   while (clauses[i]) {
-    strnlower(&clause, clauses[i], NOMP_BUFSIZ);
-    if (strncmp(clause, "transform", NOMP_BUFSIZ) == 0) {
-      char *val = strndup(clauses[i + 1], NOMP_BUFSIZ);
+    strnlower(&clause, clauses[i], NOMP_NOMP_BUFSIZ);
+    if (strncmp(clause, "transform", NOMP_NOMP_BUFSIZ) == 0) {
+      char *val = strndup(clauses[i + 1], NOMP_NOMP_BUFSIZ);
       char *tok = strtok(val, ":");
       if (tok) {
         *usr_file = strndup(tok, PATH_MAX), tok = strtok(NULL, ":");
