@@ -36,7 +36,7 @@ jobs:
           miniforge-version: latest
           activate-environment: libnomp-dev
           use-mamba: true
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: /usr/share/miniconda3/envs/libnomp-dev
           key:  ${{ runner.os }}-build-libnomp_dev_environment-${{ hashFiles('environment-dev.yml') }}-${{ env.CACHE_NUMBER }}
