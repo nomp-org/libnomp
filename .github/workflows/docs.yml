@@ -1,5 +1,4 @@
 name: Build and test docs
-
 on:
   pull_request:
     branches: [main]
@@ -12,6 +11,8 @@ on:
         description: 'Run the build with tmate debugging enabled'
         required: false
         default: false
+env:
+  CACHE_NUMBER: 0  # increase to reset cache manually
 jobs:
   docs:
     runs-on: ubuntu-latest
