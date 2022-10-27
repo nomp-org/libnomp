@@ -18,13 +18,13 @@ add_custom_command(OUTPUT ${DOXYGEN_INDEX_FILE}
                    DEPENDS ${LIBNOMP_HEADERS}
                    COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYFILE_OUT}
                    MAIN_DEPENDENCY ${DOXYFILE_OUT} ${DOXYFILE_IN}
-                   COMMENT "Generating docs"
+                   COMMENT "Generating documentation with Doxygen"
                    VERBATIM)
 
 add_custom_target(Doxygen ALL DEPENDS ${DOXYGEN_INDEX_FILE})
 
 set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR})
-set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/sphinx)
+set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/build)
 
 add_custom_target(Sphinx ALL
                   COMMAND ${SPHINX_EXECUTABLE} -b html
@@ -33,4 +33,5 @@ add_custom_target(Sphinx ALL
                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                   COMMENT "Generating documentation with Sphinx")
 
-install(DIRECTORY ${SPHINX_BUILD}/ DESTINATION ${CMAKE_INSTALL_PREFIX}/docs)
+install(DIRECTORY ${SPHINX_BUILD}/ DESTINATION ${CMAKE_INSTALL_PREFIX}/docs
+  MESSAGE_NEVER)
