@@ -21,7 +21,7 @@ const char *ERR_STR_INVALID_MAP_PTR = "Invalid map pointer %p.";
 const char *ERR_STR_PTR_IS_ALREADY_ALLOCATED =
     "Pointer %p is already allocated on device.";
 
-const char *ERR_STR_KERNEL_RUN_FAILED = "Kernel %d run failed";
+const char *ERR_STR_KERNEL_RUN_FAILED = "Kernel %d run failed.";
 const char *ERR_STR_INVALID_KERNEL = "Invalid kernel %d.";
 
 const char *WARNING_STR_PYTHON_IS_ALREADY_INITIALIZED =
