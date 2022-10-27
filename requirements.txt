@@ -3,4 +3,3 @@ islpy==2022.2.1
 pycparser==2.21
 pymbolic==2022.1
 pytools==2022.1.12
-cmake==3.24.1
