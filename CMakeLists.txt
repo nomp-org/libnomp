@@ -52,7 +52,7 @@ endforeach(test ${TESTS})
 
 option(ENABLE_DOCS "Enable Documentation" OFF)
 if (ENABLE_DOCS)
-  set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
   add_subdirectory ("docs")
 endif()
 
