@@ -38,6 +38,8 @@ struct mem {
 };
 
 struct backend {
+  char *backend;
+  int platform_id, device_id;
   char name[NOMP_BUFSIZ];
   int (*update)(struct backend *, struct mem *, const int);
   int (*knl_build)(struct backend *, struct prog *, const char *, const char *);
@@ -197,6 +199,19 @@ char *strcatn(int nstr, ...);
  * @return int
  */
 int strnlower(char **out, const char *in, size_t max);
+
+/**
+ * @ingroup nomp_other_utils
+ * @brief Convert a string to int
+ *
+ * Convert input string `str` to int. Returns converted int if given
+ * str successfully converted, otherwise return -1.
+ *
+ * @param[in] str String to convert into int
+ * @param[in] size Size of the string
+ * @return int
+ */
+int strntoi(const char *str, size_t size);
 
 /**
  * @ingroup nomp_log_utils

@@ -1,9 +1,61 @@
 #include "nomp-impl.h"
 
+struct env {
+  char *install_dir;
+  int verbose;
+};
+
 static struct backend nomp;
+static struct env envs;
 static int initialized = 0;
 
 static const char *py_dir = "python";
+
+static char *get_if_env(const char *name) {
+  const char *temp = getenv(name);
+  if (temp != NULL) {
+    char *tmp_var = tcalloc(char, NOMP_BUFSIZ);
+    if (tmp_var != NULL) {
+      strncpy(tmp_var, temp, NOMP_BUFSIZ);
+      return tmp_var;
+    }
+  }
+  return NULL;
+}
+
+static int nomp_check_env(struct backend *backend) {
+  char *nomp_backend = get_if_env("NOMP_BACKEND");
+  if (nomp_backend != NULL) {
+    strncpy(backend->backend, nomp_backend, NOMP_BUFSIZ);
+    tfree(nomp_backend);
+  }
+  char *platform_id_env = getenv("NOMP_PLATFORM_ID");
+  if (platform_id_env != NULL) {
+    int platform_id = strntoi(platform_id_env, NOMP_BUFSIZ);
+    if (platform_id >= 0)
+      backend->platform_id = platform_id;
+    else
+      return nomp_set_log(NOMP_INVALID_PLATFORM, NOMP_ERROR,
+                          ERR_STR_INVALID_PLATFORM, platform_id);
+  }
+  char *device_id_env = getenv("NOMP_DEVICE_ID");
+  if (device_id_env != NULL) {
+    int device_id = strntoi(device_id_env, NOMP_BUFSIZ);
+    if (device_id >= 0)
+      backend->device_id = device_id;
+    else
+      return nomp_set_log(NOMP_INVALID_DEVICE, NOMP_ERROR,
+                          ERR_STR_INVALID_DEVICE, device_id);
+  }
+  char *install_dir = get_if_env("NOMP_INSTALL_DIR");
+  if (install_dir != NULL) {
+    envs.install_dir = tcalloc(char, NOMP_BUFSIZ);
+    strncpy(envs.install_dir, install_dir, NOMP_BUFSIZ);
+    tfree(install_dir);
+  }
+  envs.verbose = strntoi(getenv("NOMP_VERBOSE_LEVEL"), NOMP_BUFSIZ);
+  return 0;
+}
 
 //=============================================================================
 // nomp_init
@@ -13,21 +65,26 @@ int nomp_init(const char *backend, int platform, int device) {
     return nomp_set_log(NOMP_INITIALIZED_ERROR, NOMP_ERROR,
                         ERR_STR_NOMP_IS_ALREADY_INITIALIZED, nomp.name);
 
+  nomp.backend = tcalloc(char, MAX_BACKEND_NAME_SIZE);
+  strncpy(nomp.backend, backend, MAX_BACKEND_NAME_SIZE);
+  nomp.platform_id = platform;
+  nomp.device_id = device;
+  int err = nomp_check_env(&nomp);
+  return_on_err(err);
+
   char name[MAX_BACKEND_NAME_SIZE];
-  size_t n = strnlen(backend, MAX_BACKEND_NAME_SIZE);
+  size_t n = strnlen(nomp.backend, MAX_BACKEND_NAME_SIZE);
   for (int i = 0; i < n; i++)
-    name[i] = tolower(backend[i]);
+    name[i] = tolower(nomp.backend[i]);
   name[n] = '\0';
 
-  int err = 0;
   if (strncmp(name, "opencl", MAX_BACKEND_NAME_SIZE) == 0) {
 #if defined(OPENCL_ENABLED)
-    if (strncmp(name, "opencl", NOMP_BUFSIZ) == 0)
-      err = opencl_init(&nomp, platform, device);
+    err = opencl_init(&nomp, nomp.platform_id, nomp.device_id);
 #endif
   } else if (strncmp(name, "cuda", MAX_BACKEND_NAME_SIZE) == 0) {
 #if defined(CUDA_ENABLED)
-    err = cuda_init(&nomp, platform, device);
+    err = cuda_init(&nomp, nomp.platform_id, nomp.device_id);
 #endif
   } else {
     err = nomp_set_log(NOMP_INVALID_BACKEND, NOMP_ERROR,
@@ -46,9 +103,8 @@ int nomp_init(const char *backend, int platform, int device) {
     py_append_to_sys_path(".");
     // There should be a better way to figure the installation
     // path based on the shared library path
-    char *install_dir = getenv("NOMP_INSTALL_DIR");
-    if (install_dir) {
-      char *abs_dir = strcatn(3, install_dir, "/", py_dir);
+    if (envs.install_dir) {
+      char *abs_dir = strcatn(3, envs.install_dir, "/", py_dir);
       py_append_to_sys_path(abs_dir);
       err = tfree(abs_dir);
     } else {
@@ -369,6 +425,7 @@ int nomp_finalize(void) {
   progs = NULL, progs_n = progs_max = 0;
 
   initialized = nomp.finalize(&nomp);
+  tfree(nomp.backend), tfree(envs.install_dir);
   if (initialized)
     return nomp_set_log(NOMP_FINALIZE_ERROR, NOMP_ERROR,
                         ERR_STR_FAILED_TO_FINALIZE_NOMP);
