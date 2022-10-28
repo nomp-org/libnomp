@@ -54,7 +54,7 @@ jobs:
         run: |
           mamba env update -n libnomp -f environment.yml
         if: steps.cache.outputs.cache-hit != 'true'
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: ~/conda_pkgs_dir/pocl
           key:  ${{ runner.os }}-build-pocl-${{ env.POCL_CACHE_NUMBER }}
