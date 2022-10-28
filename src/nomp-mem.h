@@ -37,7 +37,7 @@ int sfree(void *p, const char *file, unsigned line);
 void *smalloc(size_t size, const char *file, unsigned line);
 /**
  * @ingroup nomp_mem_management
- * @brief Helper macro for allocates memory blocks using smalloc().
+ * @brief Helper macro for allocating memory blocks using smalloc().
  * File name and line number are passed implicitly.
  *
  * @param T Type of element.
@@ -60,7 +60,7 @@ void *smalloc(size_t size, const char *file, unsigned line);
 void *scalloc(size_t nmemb, size_t size, const char *file, unsigned line);
 /**
  * @ingroup nomp_mem_management
- * @brief Helper macro for allocates an array in memory with elements
+ * @brief Helper macro for allocating an array in memory with elements
  * initialized to 0 using scalloc(). File name and line number are passed
  * implicitly.
  *
@@ -83,7 +83,7 @@ void *scalloc(size_t nmemb, size_t size, const char *file, unsigned line);
 void *srealloc(void *ptr, size_t size, const char *file, unsigned line);
 /**
  * @ingroup nomp_mem_management
- * @brief Helper macro for reallocate memory blocks using srealloc().
+ * @brief Helper macro for reallocating memory blocks using srealloc().
  * File name and line number are passed implicitly.
  *
  * @param ptr Pointer to the memory area to be reallocated.

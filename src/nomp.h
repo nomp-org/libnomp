@@ -127,19 +127,14 @@
 #define NOMP_FREE_FAILURE -67
 /**
  * @ingroup nomp_errors
- * @brief NOMP calloc failed
- */
-#define NOMP_CALLOC_FAILURE -68
-/**
- * @ingroup nomp_errors
  * @brief NOMP malloc failed
  */
-#define NOMP_MALLOC_FAILURE -69
+#define NOMP_MALLOC_FAILURE -68
 /**
  * @ingroup nomp_errors
  * @brief NOMP realloc failed
  */
-#define NOMP_REALLOC_FAILURE -70
+#define NOMP_REALLOC_FAILURE -69
 
 /**
  * @ingroup nomp_errors
