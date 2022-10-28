@@ -4,12 +4,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-static int log_match(const char *log, const char *pattern) {
+static int match_log(const char *log, const char *pattern) {
   regex_t regex;
   int result = regcomp(&regex, pattern, 0);
-  if (!result) {
+  if (!result)
     result = regexec(&regex, log, 0, NULL, 0);
-  }
   regfree(&regex);
   return !result;
 }
@@ -44,7 +43,7 @@ int main(int argc, char *argv[]) {
   nomp_assert(nomp_get_log_no(err) == NOMP_INVALID_KNL);
   char *desc;
   err = nomp_get_log(&desc, err);
-  int matched = log_match(desc, "\\[Error\\] "
+  int matched = match_log(desc, "\\[Error\\] "
                                 ".*libnomp\\/"
                                 "src\\/nomp.c:[0-9]* Invalid kernel -1.");
   nomp_assert(matched);
@@ -54,7 +53,7 @@ int main(int argc, char *argv[]) {
                  sizeof(int), b, "N", NOMP_INTEGER, sizeof(int), &n);
   nomp_assert(nomp_get_log_no(err) == NOMP_KNL_RUN_ERROR);
   err = nomp_get_log(&desc, err);
-  matched = log_match(desc, "\\[Error\\] "
+  matched = match_log(desc, "\\[Error\\] "
                             ".*\\/libnomp\\/"
                             "src\\/nomp.c:[0-9]* Kernel 0 run failed.");
   nomp_assert(matched);

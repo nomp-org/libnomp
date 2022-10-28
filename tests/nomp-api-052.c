@@ -4,12 +4,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-static int log_match(const char *log, const char *pattern) {
+static int match_log(const char *log, const char *pattern) {
   regex_t regex;
   int result = regcomp(&regex, pattern, 0);
-  if (!result) {
+  if (!result)
     result = regexec(&regex, log, 0, NULL, 0);
-  }
   regfree(&regex);
   return !result;
 }
@@ -37,7 +36,7 @@ int main(int argc, char *argv[]) {
   char *desc;
   err = nomp_get_log(&desc, err);
   int matched =
-      log_match(desc, "\\[Error\\] "
+      match_log(desc, "\\[Error\\] "
                       ".*libnomp\\/"
                       "src\\/loopy.c:[0-9]* Specified "
                       "user callback function not found in file invalid-file.");
@@ -48,7 +47,7 @@ int main(int argc, char *argv[]) {
   nomp_assert(nomp_get_log_no(err) == NOMP_USER_CALLBACK_FAILURE);
 
   err = nomp_get_log(&desc, err);
-  matched = log_match(desc, "\\[Error\\] "
+  matched = match_log(desc, "\\[Error\\] "
                             ".*libnomp\\/src\\/loopy.c:[0-9]* "
                             "User callback function invalid_transform failed.");
   nomp_assert(matched);
@@ -64,7 +63,7 @@ int main(int argc, char *argv[]) {
   nomp_assert(nomp_get_log_no(err) == NOMP_LOOPY_CONVERSION_ERROR);
 
   err = nomp_get_log(&desc, err);
-  matched = log_match(desc, "\\[Error\\] "
+  matched = match_log(desc, "\\[Error\\] "
                             ".*"
                             "libnomp\\/src\\/loopy.c:[0-9]* C "
                             "to Loopy conversion failed.");

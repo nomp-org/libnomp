@@ -4,12 +4,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-static int log_match(const char *log, const char *pattern) {
+static int match_log(const char *log, const char *pattern) {
   regex_t regex;
   int result = regcomp(&regex, pattern, 0);
-  if (!result) {
+  if (!result)
     result = regexec(&regex, log, 0, NULL, 0);
-  }
   regfree(&regex);
   return !result;
 }
@@ -25,7 +24,7 @@ int main(int argc, char *argv[]) {
 
   char *desc;
   err = nomp_get_log(&desc, err);
-  int matched = log_match(
+  int matched = match_log(
       desc,
       "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* Nomp is not initialized.");
   nomp_assert(matched);
@@ -38,7 +37,7 @@ int main(int argc, char *argv[]) {
 
   err = nomp_get_log(&desc, err);
   matched =
-      log_match(desc, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* libnomp is "
+      match_log(desc, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* libnomp is "
                       "already initialized to use opencl. Call nomp_finalize() "
                       "before calling nomp_init() again.");
   nomp_assert(matched);
@@ -50,7 +49,7 @@ int main(int argc, char *argv[]) {
   nomp_assert(nomp_get_log_no(err) == NOMP_NOT_INITIALIZED_ERROR);
 
   err = nomp_get_log(&desc, err);
-  matched = log_match(
+  matched = match_log(
       desc,
       "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* Nomp is not initialized.");
   nomp_assert(matched);
