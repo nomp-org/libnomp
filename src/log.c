@@ -110,7 +110,7 @@ int nomp_get_log_no(int log_id) {
 
 void nomp_finalize_logs() {
   for (unsigned i = 0; i < logs_n; i++)
-    FREE(logs[i].description);
-  FREE(logs);
+    tfree(logs[i].description);
+  tfree(logs);
   logs = NULL, logs_n = logs_max = 0;
 }

@@ -174,7 +174,7 @@ int opencl_init(struct backend *bnd, const int platform_id,
                         ERR_STR_INVALID_PLATFORM, platform_id);
   cl_platform_id *cl_platforms = tcalloc(cl_platform_id, num_platforms);
   if (cl_platforms == NULL)
-    return nomp_set_log(NOMP_MALLOC_ERROR, NOMP_ERROR, ERR_STR_MALLOC_ERROR);
+    return nomp_set_log(NOMP_MALLOC_FAILURE, NOMP_ERROR, ERR_STR_MALLOC_ERROR);
   err = clGetPlatformIDs(num_platforms, cl_platforms, &num_platforms);
   cl_platform_id platform = cl_platforms[platform_id];
 
@@ -186,7 +186,7 @@ int opencl_init(struct backend *bnd, const int platform_id,
 
   cl_device_id *cl_devices = tcalloc(cl_device_id, num_devices);
   if (cl_devices == NULL)
-    return nomp_set_log(NOMP_MALLOC_ERROR, NOMP_ERROR, ERR_STR_MALLOC_ERROR);
+    return nomp_set_log(NOMP_MALLOC_FAILURE, NOMP_ERROR, ERR_STR_MALLOC_ERROR);
 
   err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, num_devices, cl_devices,
                        &num_devices);
