@@ -290,9 +290,6 @@ int nomp_err_type_to_str(char *buf, int err, size_t buf_size) {
   case NOMP_FREE_FAILURE:
     strncpy(buf, "Failed to free memory", buf_size);
     break;
-  case NOMP_CALLOC_FAILURE:
-    strncpy(buf, "Failed to allocate memory", buf_size);
-    break;
   case NOMP_MALLOC_FAILURE:
     strncpy(buf, "Failed to allocate memory", buf_size);
     break;
@@ -326,7 +323,6 @@ int nomp_err_type_to_str(char *buf, int err, size_t buf_size) {
   case NOMP_KNL_RUN_ERROR:
     strncpy(buf, "NOMP kernel run failed", buf_size);
     break;
-
   default:
     break;
   }
