@@ -1,7 +1,7 @@
 #include "nomp-mem.h"
 
 int sfree(void *p, const char *file, unsigned line) {
-  if (!p)
+  if (p)
     free(p);
   return 0;
 }

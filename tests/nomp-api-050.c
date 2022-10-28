@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
       "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* Nomp is not initialized.");
   nomp_assert(matched);
 
-  free(desc);
+  tfree(desc);
 
   return 0;
 }

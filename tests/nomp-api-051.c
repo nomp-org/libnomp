@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
   err = nomp_finalize();
   nomp_chk(err);
 
-  free(desc);
+  tfree(desc);
 
   return 0;
 }

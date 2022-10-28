@@ -337,7 +337,7 @@ void nomp_chk_(int err_id, const char *file, unsigned line) {
   int err = nomp_get_log(&err_str, err_id);
   if (err != NOMP_INVALID_LOG_ID) {
     printf("%s:%d %s\n", file, line, err_str);
-    free(err_str);
+    tfree(err_str);
     exit(1);
   }
 }
