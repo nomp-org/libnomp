@@ -1,5 +1,4 @@
 #include "nomp.h"
-#include <stdlib.h>
 
 #define TEST_TYPE int
 #define TEST_SUFFIX _int

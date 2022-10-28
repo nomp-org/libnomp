@@ -1,5 +1,4 @@
 #include "nomp.h"
-#include <stdlib.h>
 
 #define TEST_IMPL_H "nomp-api-220-impl.h"
 #include "nomp-generate-tests.h"
