@@ -7,6 +7,8 @@ CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=${HOME}/.nomp  -DOpenCL_LIBRARY=/lib/x86_64-l
 RUN_TESTS=false
 TEST_GROUPS="*"
 BACKEND="opencl"
+DEVICE=0
+PLATFORM=0
 OUTPUT=""
 BUILD_SUCCESS=false
 VERBOSE=false
@@ -23,18 +25,21 @@ reset=$(tput sgr0)
 
 function print_help() {
   echo -e "usage: ./install.sh [-h|--help] [-v|--verbose] [-t|--test] [-g|--groups <test-group>]\n" \
-    "\t[-d|--debug] [-p|--port <port-number>] [-D|--docs] [-B|--browser <web-browser>]\n" \
-    "\t[-T|--testdir <build test directory>] [-b|--backend <backend>]\n\n" \
+    "\t[-x|--debug] [-P|--port <port-number>] [-D|--docs] [-B|--browser <web-browser>]\n" \
+    "\t[-b|--backend <backend>] [-p|--platform <platform>] [-d|--device <device>]\n" \
+    "\t[-T|--testdir <build test directory>]\n\n" \
     "${cyan}-h/--help:${reset} Print this help and exit.\n" \
     "${cyan}-v/--verbose:${reset} Display all the build output.\n" \
     "${cyan}-t/--test:${reset} Run all the tests after the build.\n" \
-    "${cyan}-g/--group:${reset} Pattern to filter the tests to be run (Default: ${TEST_GROUPS})\n" \
-    "${cyan}-d/--debug:${reset} Run the specified test with gdbserver.\n" \
-    "${cyan}-p/--port:${reset} Port for which gdbserver host the test case (Default: ${PORT})\n" \
+    "${cyan}-g/--group:${reset} Pattern to filter the tests to be run (Default: ${TEST_GROUPS}.)\n" \
+    "${cyan}-x/--debug:${reset} Run the specified test with gdbserver.\n" \
+    "${cyan}-P/--port:${reset} Port for which gdbserver host the test case (Default: ${PORT}).\n" \
     "${cyan}-D/--docs:${reset} Displays the user documentation after the build.\n" \
-    "${cyan}-B/--browser:${reset} Specifies the web browser to display the documentation (Default: ${BROWSER})\n" \
+    "${cyan}-B/--browser:${reset} Specifies the web browser to display the documentation (Default: ${BROWSER}).\n" \
     "${cyan}-T/--testdir:${reset} Location of test binaries, case sensitive (Default: ${BUILD_DIR}).\n" \
-    "${cyan}-b/--backend:${reset} Backend to run the tests, case insensitive (Default: ${BACKEND}).\n"
+    "${cyan}-b/--backend:${reset} Backend to run the tests, case insensitive (Default: ${BACKEND}).\n"\
+    "${cyan}-p/--platform:${reset} Platform to run the tests, case insensitive (Default: ${PLATFORM}).\n"\
+    "${cyan}-d/--device:${reset} Device to run the tests, case insensitive (Default: ${DEVICE}).\n"
 }
 
 function run_tests() {
@@ -47,12 +52,12 @@ function run_tests() {
   echo -e "\nRunning tests..."
   ERR=0
   for t in $(ls ${TESTS}); do
-    OUTPUT=$($t ${BACKEND})
+    OUTPUT=$($t ${BACKEND} ${DEVICE} ${PLATFORM})
     if [ $? -eq 0 ]; then
       echo "$t: ${green}Passed${reset}"
     else
       echo "$t: ${red}Failed${reset}"
-      echo -e "\t$OUTPUT\n"
+      echo -e "\t${OUTPUT}\n"
       ERR=$((ERR + 1))
     fi
   done
@@ -65,7 +70,7 @@ function debug_test() {
   BUILD_TEST="${BUILD_DIR}/${TEST_NAME}"
   if [[ -f "$BUILD_TEST" ]]; then
     echo -e "\nDebugging session started for: ${cyan}${TEST_NAME}${reset}"
-    gdbserver "localhost:${PORT}" "${BUILD_TEST}"
+    gdbserver "localhost:${PORT}" "${BUILD_TEST}" "${BACKEND}" "${DEVICE}" "${PLATFORM}"
     echo "Debugging session ended"
   else
     echo -e "\n${red}Test not found: nomp-api-${DEBUG_TEST}$reset"
@@ -88,12 +93,14 @@ while [ $# -gt 0 ]; do
     ;;
   -t | --test) RUN_TESTS=true ;;
   -v | --verbose) VERBOSE=true ;;
-  -p | --port) shift && PORT="${1}" ;;
-  -d | --debug) CMAKE_COMMAND+=" -DCMAKE_BUILD_TYPE=DEBUG" && shift && DEBUG_TEST="${1}" ;;
+  -P | --port) shift && PORT="${1}" ;;
+  -x | --debug) CMAKE_COMMAND+=" -DCMAKE_BUILD_TYPE=DEBUG" && shift && DEBUG_TEST="${1}" ;;
   -g | --group) shift && TEST_GROUPS="${1}" ;;
   -D | --docs) CMAKE_COMMAND+=" -DENABLE_DOCS=ON" && DISPLAY_DOCS=true ;;
   -B | --browser) shift && BROWSER="${1}" ;;
   -b | --backend) shift && BACKEND="${1}" ;;
+  -p | --platform) shift && PLATFORM="${1}" ;;
+  -d | --device) shift && DEVICE="${1}" ;;
   -T | --testdir) shift && BUILD_DIR="${1}" ;;
   *) echo "${red}Invalid argument: ${1}${reset}" &&
     echo "See ${cyan}./install.sh -h${reset} or ${cyan}./install.sh --help${reset} for the accepted commands" &&
