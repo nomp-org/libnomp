@@ -366,7 +366,6 @@ int nomp_set_log_(const char *desc, int logno, nomp_log_type type,
  * @param[in] type type of the log either NOMP_ERROR, NOMP_WARNING or
  * NOMP_INFORMATION.
  * @param[in] desc detailed description of the log.
- * @param[in] log_id id of the error.
  * @return int
  */
 #define nomp_set_log(logno, type, desc, ...)                                   \
