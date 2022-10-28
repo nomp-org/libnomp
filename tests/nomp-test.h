@@ -4,6 +4,7 @@
 #include <math.h>
 #include <regex.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define TOKEN_PASTE_(a, b) a##b

@@ -1,8 +1,5 @@
 #include "nomp-test.h"
 #include "nomp.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 int main(int argc, char *argv[]) {
   char *backend = argc > 1 ? argv[1] : "opencl";
