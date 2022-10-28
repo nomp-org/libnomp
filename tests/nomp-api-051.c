@@ -1,17 +1,8 @@
+#include "nomp-test.h"
 #include "nomp.h"
-#include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-static int match_log(const char *log, const char *pattern) {
-  regex_t regex;
-  int result = regcomp(&regex, pattern, 0);
-  if (!result)
-    result = regexec(&regex, log, 0, NULL, 0);
-  regfree(&regex);
-  return !result;
-}
 
 int main(int argc, char *argv[]) {
   char *backend = argc > 1 ? argv[1] : "opencl";
