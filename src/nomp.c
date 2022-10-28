@@ -22,8 +22,8 @@ int nomp_init(const char *backend, int platform, int device) {
   int err = 0;
   if (strncmp(name, "opencl", MAX_BACKEND_NAME_SIZE) == 0) {
 #if defined(OPENCL_ENABLED)
-  if (strncmp(name, "opencl", NOMP_BUFSIZ) == 0)
-    err = opencl_init(&nomp, platform, device);
+    if (strncmp(name, "opencl", NOMP_BUFSIZ) == 0)
+      err = opencl_init(&nomp, platform, device);
 #endif
   } else if (strncmp(name, "cuda", MAX_BACKEND_NAME_SIZE) == 0) {
 #if defined(CUDA_ENABLED)
