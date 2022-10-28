@@ -49,6 +49,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#functions">Functions</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#backend-init-functions">Backend init functions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#python-helper-functions">Python helper functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#memory-management-functions">Memory management functions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#other-helper-functions">Other helper functions</a></li>
 </ul>
 </li>
@@ -243,6 +244,151 @@
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>void </p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="memory-management-functions">
+<h3>Memory management functions<a class="headerlink" href="#memory-management-functions" title="Permalink to this heading"></a></h3>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv45sfreePvPKcj">
+<span id="_CPPv35sfreePvPKcj"></span><span id="_CPPv25sfreePvPKcj"></span><span id="sfree__voidP.cCP.unsigned"></span><span class="target" id="group__nomp__mem__management_1ga8a207a24340a601421390a38689b5154"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sfree</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">p</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv45sfreePvPKcj" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Deallocates or frees a memory block. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p</strong> – Pointer to the memory to deallocate. </p></li>
+<li><p><strong>file</strong> – Name of the file in which the function is called. </p></li>
+<li><p><strong>line</strong> – Line number in the file where the function is called. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv47smalloc6size_tPKcj">
+<span id="_CPPv37smalloc6size_tPKcj"></span><span id="_CPPv27smalloc6size_tPKcj"></span><span id="smalloc__s.cCP.unsigned"></span><span class="target" id="group__nomp__mem__management_1ga0949b0aa8f3c09a3f801e0abb42f20bb"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">smalloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47smalloc6size_tPKcj" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Allocates memory blocks. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>size</strong> – Bytes to allocate. </p></li>
+<li><p><strong>file</strong> – Name of the file in which the function is called. </p></li>
+<li><p><strong>line</strong> – Line number in the file where the function is called. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Void pointer </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv47scalloc6size_t6size_tPKcj">
+<span id="_CPPv37scalloc6size_t6size_tPKcj"></span><span id="_CPPv27scalloc6size_t6size_tPKcj"></span><span id="scalloc__s.s.cCP.unsigned"></span><span class="target" id="group__nomp__mem__management_1ga4c8d6382784529c5ba41a4bc1d2db800"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">scalloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nmemb</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47scalloc6size_t6size_tPKcj" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Allocates an array in memory with elements initialized to 0. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nmemb</strong> – Number of elements. </p></li>
+<li><p><strong>size</strong> – Length in bytes of each element. </p></li>
+<li><p><strong>file</strong> – Name of the file in which the function is called. </p></li>
+<li><p><strong>line</strong> – Line number in the file where the function is called. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Void pointer </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv48sreallocPv6size_tPKcj">
+<span id="_CPPv38sreallocPv6size_tPKcj"></span><span id="_CPPv28sreallocPv6size_tPKcj"></span><span id="srealloc__voidP.s.cCP.unsigned"></span><span class="target" id="group__nomp__mem__management_1ga5f56b5c6a6c86798effedc9b0bb96f24"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">srealloc</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ptr</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48sreallocPv6size_tPKcj" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Reallocate memory blocks. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ptr</strong> – Pointer to the memory area to be reallocated. </p></li>
+<li><p><strong>size</strong> – New size in bytes. </p></li>
+<li><p><strong>file</strong> – Name of the file in which the function is called. </p></li>
+<li><p><strong>line</strong> – Line number in the file where the function is called. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Void pointer </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.tfree">
+<span class="target" id="group__nomp__mem__management_1ga4f70f0e484d4077c3d6b85da4217fd28"></span><span class="sig-name descname"><span class="n"><span class="pre">tfree</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.tfree" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Helper macro for deallocating or freeing a memory block using <a class="reference internal" href="#group__nomp__mem__management_1ga8a207a24340a601421390a38689b5154"><span class="std std-ref">sfree()</span></a>. File name and line number are passed implicitly. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – Pointer to the memory to deallocate. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.tmalloc">
+<span class="target" id="group__nomp__mem__management_1ga6dc6dcc39d2208cd2227418cbb5b749e"></span><span class="sig-name descname"><span class="n"><span class="pre">tmalloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">T</span></span>, <span class="n"><span class="pre">count</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.tmalloc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Helper macro for allocating memory blocks using <a class="reference internal" href="#group__nomp__mem__management_1ga0949b0aa8f3c09a3f801e0abb42f20bb"><span class="std std-ref">smalloc()</span></a>. File name and line number are passed implicitly. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>T</strong> – Type of element. </p></li>
+<li><p><strong>count</strong> – Number of elements. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pointer of type T. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.tcalloc">
+<span class="target" id="group__nomp__mem__management_1ga6cc40ef03d4c48bf2fd8dfaf2a41c1c1"></span><span class="sig-name descname"><span class="n"><span class="pre">tcalloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">T</span></span>, <span class="n"><span class="pre">count</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.tcalloc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Helper macro for allocating an array in memory with elements initialized to 0 using <a class="reference internal" href="#group__nomp__mem__management_1ga4c8d6382784529c5ba41a4bc1d2db800"><span class="std std-ref">scalloc()</span></a>. File name and line number are passed implicitly. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>T</strong> – Type of element. </p></li>
+<li><p><strong>count</strong> – Number of elements. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pointer of type T. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.trealloc">
+<span class="target" id="group__nomp__mem__management_1ga731acd8d8bebcfcb21746d93071cb2a1"></span><span class="sig-name descname"><span class="n"><span class="pre">trealloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ptr</span></span>, <span class="n"><span class="pre">T</span></span>, <span class="n"><span class="pre">count</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.trealloc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Helper macro for reallocating memory blocks using <a class="reference internal" href="#group__nomp__mem__management_1ga5f56b5c6a6c86798effedc9b0bb96f24"><span class="std std-ref">srealloc()</span></a>. File name and line number are passed implicitly. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ptr</strong> – Pointer to the memory area to be reallocated. </p></li>
+<li><p><strong>T</strong> – Type of element. </p></li>
+<li><p><strong>count</strong> – Number of elements. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pointer of type T </p>
 </dd>
 </dl>
 </dd></dl>
