@@ -47,6 +47,7 @@ functionalities to user through easy to program pragmas.
    nomp-usage
    user-api
    internal-api
+   developer-docs
 
 Indices and tables
 ==================

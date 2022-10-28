@@ -20,6 +20,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Developer documentation" href="developer-docs.html" />
     <link rel="prev" title="User API" href="user-api.html" /> 
 </head>
 
@@ -53,6 +54,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="developer-docs.html">Developer documentation</a></li>
 </ul>
 
         </div>
@@ -91,13 +93,13 @@
 <dt class="sig sig-object cpp" id="_CPPv411opencl_initP7backendKiKi">
 <span id="_CPPv311opencl_initP7backendKiKi"></span><span id="_CPPv211opencl_initP7backendKiKi"></span><span id="opencl_init__backendP.iC.iC"></span><span class="target" id="group__nomp__backend__init_1gac76f1949c40487b03ed06b587b82474d"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">opencl_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411opencl_initP7backendKiKi" title="opencl_init::backend"><span class="n"><span class="pre">backend</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">backend</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">platform_id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">device_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411opencl_initP7backendKiKi" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Initializes OpenCL backend with the specified platform and device. </p>
-<p>Initializes OpenCL backend while creating the command queue using the given platform id and device id. Returns a negative value if an error occurs during the initialization, otherwise returns 0.</p>
+<p>Initializes OpenCL backend while creating a command queue using the given platform id and device id. Returns a negative value if an error occured during the initialization, otherwise returns 0.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>backend</strong> – Target backend for code generation. </p></li>
-<li><p><strong>platform_id</strong> – Target platform id to share resources and execute kernals in the targeted device. </p></li>
-<li><p><strong>device_id</strong> – Target device id to execute kernals. </p></li>
+<li><p><strong>backend</strong> – <strong>[in]</strong> Target backend for code generation. </p></li>
+<li><p><strong>platform_id</strong> – <strong>[in]</strong> Target platform id. </p></li>
+<li><p><strong>device_id</strong> – <strong>[in]</strong> Target device id. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -110,13 +112,13 @@
 <dt class="sig sig-object cpp" id="_CPPv49cuda_initP7backendKiKi">
 <span id="_CPPv39cuda_initP7backendKiKi"></span><span id="_CPPv29cuda_initP7backendKiKi"></span><span id="cuda_init__backendP.iC.iC"></span><span class="target" id="group__nomp__backend__init_1gad20aff63a4f0f808165c1b01e36fae7f"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cuda_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49cuda_initP7backendKiKi" title="cuda_init::backend"><span class="n"><span class="pre">backend</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">backend</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">platform_id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">device_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49cuda_initP7backendKiKi" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Initializes Cuda backend with the specified platform and device. </p>
-<p>Initializes Cuda backend using the given platform id and device id. Returns a negative value if an error occurs during the initialization, otherwise returns 0.</p>
+<p>Initializes Cuda backend using the given device id. Platform id is not used in the initialization of Cuda backend. Returns a negative value if an error occured during the initialization, otherwise returns 0.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>backend</strong> – Target backend for code generation. </p></li>
-<li><p><strong>platform_id</strong> – Target platform id to share resources and execute kernals in the targeted device. </p></li>
-<li><p><strong>device_id</strong> – Target device id to execute kernals. </p></li>
+<li><p><strong>backend</strong> – <strong>[in]</strong> Target backend for code generation. </p></li>
+<li><p><strong>platform_id</strong> – <strong>[in]</strong> Target platform id. </p></li>
+<li><p><strong>device_id</strong> – <strong>[in]</strong> Target device id. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -134,7 +136,7 @@
 <dd><p>Appends specified path to system path. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>path</strong> – Path to append </p>
+<dd class="field-odd"><p><strong>path</strong> – <strong>[in]</strong> Path to be appended to system path. </p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>int </p>
@@ -144,14 +146,14 @@
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv413py_c_to_loopyPP8PyObjectPKcPKc">
-<span id="_CPPv313py_c_to_loopyPP8PyObjectPKcPKc"></span><span id="_CPPv213py_c_to_loopyPP8PyObjectPKcPKc"></span><span id="py_c_to_loopy__PyObjectPP.cCP.cCP"></span><span class="target" id="group__nomp__py__utils_1ga07624e34cb6a8638586439ad78da783b"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">py_c_to_loopy</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">pKnl</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">c_src</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">backend</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413py_c_to_loopyPP8PyObjectPKcPKc" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv313py_c_to_loopyPP8PyObjectPKcPKc"></span><span id="_CPPv213py_c_to_loopyPP8PyObjectPKcPKc"></span><span id="py_c_to_loopy__PyObjectPP.cCP.cCP"></span><span class="target" id="group__nomp__py__utils_1ga6afe05407c79932755e4efd3ef3543f7"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">py_c_to_loopy</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">knl</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">c_src</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">backend</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413py_c_to_loopyPP8PyObjectPKcPKc" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Creates loopy kernel from C source. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>pKnl</strong> – Python kernal object </p></li>
-<li><p><strong>c_src</strong> – C kernal source </p></li>
-<li><p><strong>backend</strong> – Backend name </p></li>
+<li><p><strong>knl</strong> – <strong>[out]</strong> Loopy kernal object. </p></li>
+<li><p><strong>c_src</strong> – <strong>[in]</strong> C kernal source. </p></li>
+<li><p><strong>backend</strong> – <strong>[in]</strong> Backend name. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -162,14 +164,14 @@
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv416py_user_callbackPP8PyObjectPKcPKc">
-<span id="_CPPv316py_user_callbackPP8PyObjectPKcPKc"></span><span id="_CPPv216py_user_callbackPP8PyObjectPKcPKc"></span><span id="py_user_callback__PyObjectPP.cCP.cCP"></span><span class="target" id="group__nomp__py__utils_1ga77c4ac98318a80ad8904c3e4c06361dd"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">py_user_callback</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">pKnl</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">func</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416py_user_callbackPP8PyObjectPKcPKc" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Calls the user callback function specfied by file name and function name, on the kernal. </p>
+<span id="_CPPv316py_user_callbackPP8PyObjectPKcPKc"></span><span id="_CPPv216py_user_callbackPP8PyObjectPKcPKc"></span><span id="py_user_callback__PyObjectPP.cCP.cCP"></span><span class="target" id="group__nomp__py__utils_1ga652e54f19770e4d77c31136b7448df21"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">py_user_callback</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">knl</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">func</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416py_user_callbackPP8PyObjectPKcPKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Calls the user callback function <code class="docutils literal notranslate"><span class="pre">func</span></code> in file <code class="docutils literal notranslate"><span class="pre">file</span></code>. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>pKnl</strong> – Python kernal object </p></li>
-<li><p><strong>file</strong> – File to the callback function </p></li>
-<li><p><strong>func</strong> – Declared name of the callback function </p></li>
+<li><p><strong>knl</strong> – <strong>[inout]</strong> Python kernal object. </p></li>
+<li><p><strong>file</strong> – <strong>[in]</strong> File with the callback function. </p></li>
+<li><p><strong>func</strong> – <strong>[in]</strong> Callback function name. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -180,14 +182,14 @@
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv423py_get_knl_name_and_srcPPcPPcP8PyObject">
-<span id="_CPPv323py_get_knl_name_and_srcPPcPPcP8PyObject"></span><span id="_CPPv223py_get_knl_name_and_srcPPcPPcP8PyObject"></span><span id="py_get_knl_name_and_src__cPP.cPP.PyObjectP"></span><span class="target" id="group__nomp__py__utils_1ga1c7c18529b4317401e71b2f4c5c47df5"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">py_get_knl_name_and_src</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">src</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">pKnl</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423py_get_knl_name_and_srcPPcPPcP8PyObject" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Get kernal name and source. </p>
+<span id="_CPPv323py_get_knl_name_and_srcPPcPPcP8PyObject"></span><span id="_CPPv223py_get_knl_name_and_srcPPcPPcP8PyObject"></span><span id="py_get_knl_name_and_src__cPP.cPP.PyObjectP"></span><span class="target" id="group__nomp__py__utils_1gae3d45e1bda5ed89cf077d7069d5c5734"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">py_get_knl_name_and_src</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">src</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">knl</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423py_get_knl_name_and_srcPPcPPcP8PyObject" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Get kernal name and generated source for the backend. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> – Array of pointers to name </p></li>
-<li><p><strong>src</strong> – Array of pointers to kernal source </p></li>
-<li><p><strong>pKnl</strong> – Python kernal object </p></li>
+<li><p><strong>name</strong> – <strong>[out]</strong> Kernel name as a C-string. </p></li>
+<li><p><strong>src</strong> – <strong>[out]</strong> Kernel source as a C-string. </p></li>
+<li><p><strong>knl</strong> – <strong>[in]</strong> Loopy kernal object. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -197,21 +199,50 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv416py_get_grid_sizePjP6size_tP6size_tP8PyObjectP8PyObject">
-<span id="_CPPv316py_get_grid_sizePjP6size_tP6size_tP8PyObjectP8PyObject"></span><span id="_CPPv216py_get_grid_sizePjP6size_tP6size_tP8PyObjectP8PyObject"></span><span id="py_get_grid_size__unsignedP.sP.sP.PyObjectP.PyObjectP"></span><span class="target" id="group__nomp__py__utils_1gaea6a934be38522625bb7892a70f74028"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">py_get_grid_size</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ndim</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">global</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">local</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">pKnl</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">pDict</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416py_get_grid_sizePjP6size_tP6size_tP8PyObjectP8PyObject" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Get global and local grid sizes. </p>
+<dt class="sig sig-object cpp" id="_CPPv416py_get_grid_sizeP4progP8PyObject">
+<span id="_CPPv316py_get_grid_sizeP4progP8PyObject"></span><span id="_CPPv216py_get_grid_sizeP4progP8PyObject"></span><span id="py_get_grid_size__progP.PyObjectP"></span><span class="target" id="group__nomp__py__utils_1gaecb31c1669eadf2d329be255a2fe8f1b"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">py_get_grid_size</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">prog</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">prg</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">knl</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416py_get_grid_sizeP4progP8PyObject" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Get global and local grid sizes as <code class="docutils literal notranslate"><span class="pre">pymoblic</span></code> expressions. </p>
+<p>Grid sizes are stored in the program object itself.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ndim</strong> – Number of dimensions of the kernel </p></li>
-<li><p><strong>global</strong> – Global grid </p></li>
-<li><p><strong>local</strong> – Local grid </p></li>
-<li><p><strong>pKnl</strong> – Python kernal object </p></li>
-<li><p><strong>pDict</strong> – Dictionary with variable name as keys, variable values as values </p></li>
+<li><p><strong>prg</strong> – <strong>[in]</strong> Nomp program object. </p></li>
+<li><p><strong>knl</strong> – <strong>[in]</strong> Python kernal object. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>int </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417py_eval_grid_sizeP4progP8PyObject">
+<span id="_CPPv317py_eval_grid_sizeP4progP8PyObject"></span><span id="_CPPv217py_eval_grid_sizeP4progP8PyObject"></span><span id="py_eval_grid_size__progP.PyObjectP"></span><span class="target" id="group__nomp__py__utils_1gae19ccae5faa049494b5ed1a1dc5bfdf8"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">py_eval_grid_size</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">prog</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">prg</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">dict</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417py_eval_grid_sizeP4progP8PyObject" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Evaluate global and local grid sizes based on the dictionary <code class="docutils literal notranslate"><span class="pre">dict</span></code>. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prg</strong> – <strong>[in]</strong> Nomp program. </p></li>
+<li><p><strong>dict</strong> – <strong>[in]</strong> Dictionary with variable name as keys, variable value as values. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv48py_printP8PyObject">
+<span id="_CPPv38py_printP8PyObject"></span><span id="_CPPv28py_printP8PyObject"></span><span id="py_print__PyObjectP"></span><span class="target" id="group__nomp__py__utils_1ga7194b5a4a971a01545838527d60ad088"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">py_print</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">obj</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48py_printP8PyObject" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Get the representation of python object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>obj</strong> – Python object. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>void </p>
 </dd>
 </dl>
 </dd></dl>
@@ -222,14 +253,14 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv413mem_if_mappedPv">
 <span id="_CPPv313mem_if_mappedPv"></span><span id="_CPPv213mem_if_mappedPv"></span><span id="mem_if_mapped__voidP"></span><span class="target" id="group__nomp__other__utils_1gaab1db545d8487741c80dcb134fe0a2f8"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">mem</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">mem_if_mapped</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413mem_if_mappedPv" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Returns the pointer to the allocated memory corresponding to ‘p’. </p>
-<p>Returns the pointer to the allocated memory corresponding to ‘p’. If no buffer has been allocated for ‘p’ returns <em>mems_n</em></p>
+<dd><p>Returns the mem object corresponding to host pointer <code class="docutils literal notranslate"><span class="pre">p</span></code>. </p>
+<p>Returns the mem object corresponding to host ponter <code class="docutils literal notranslate"><span class="pre">p</span></code>. If no buffer has been allocated for <code class="docutils literal notranslate"><span class="pre">p</span></code> on the device, returns NULL.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>p</strong> – Value which required the pointer of it </p>
+<dd class="field-odd"><p><strong>p</strong> – <strong>[in]</strong> Host pointer </p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>struct mem* </p>
+<dd class="field-even"><p>struct mem * </p>
 </dd>
 </dl>
 </dd></dl>
@@ -238,12 +269,12 @@
 <dt class="sig sig-object cpp" id="_CPPv47strcatniz">
 <span id="_CPPv37strcatniz"></span><span id="_CPPv27strcatniz"></span><span id="strcatn__i.z"></span><span class="target" id="group__nomp__other__utils_1gabc3c28a52daffa974de7844216f5c789"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">strcatn</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nstr</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47strcatniz" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Concatenates atmost <code class="docutils literal notranslate"><span class="pre">nstr</span></code> strings. </p>
-<p>Concatenates atmost <code class="docutils literal notranslate"><span class="pre">nstr</span></code> strings and returns a pointer to the destination.</p>
+<p>Concatenates atmost <code class="docutils literal notranslate"><span class="pre">nstr</span></code> strings and returns a pointer to resulting string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nstr</strong> – Number of strings to concatenate </p></li>
-<li><p><strong>...</strong> – Strings to concatenate </p></li>
+<li><p><strong>nstr</strong> – Number of strings to concatenate. </p></li>
+<li><p><strong>...</strong> – Strings to concatenate. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -256,13 +287,13 @@
 <dt class="sig sig-object cpp" id="_CPPv49strnlowerPPcPKc6size_t">
 <span id="_CPPv39strnlowerPPcPKc6size_t"></span><span id="_CPPv29strnlowerPPcPKc6size_t"></span><span id="strnlower__cPP.cCP.s"></span><span class="target" id="group__nomp__other__utils_1ga166a3caa76b10879f30a3a9cd99e8d6f"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">strnlower</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">out</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">in</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49strnlowerPPcPKc6size_t" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Convert a C-string to lowercase. </p>
-<p>Convert input string <code class="docutils literal notranslate"><span class="pre">in</span></code> to lower case and store in <code class="docutils literal notranslate"><span class="pre">out</span></code>. Maximum size for input string <code class="docutils literal notranslate"><span class="pre">in</span></code> is specified by <code class="docutils literal notranslate"><span class="pre">max</span></code>. Returns 0 if successful, otherwise return 1.</p>
+<p>Convert input string <code class="docutils literal notranslate"><span class="pre">in</span></code> to lower case and store in <code class="docutils literal notranslate"><span class="pre">out</span></code>. Maximum length of the input string <code class="docutils literal notranslate"><span class="pre">in</span></code> is specified by <code class="docutils literal notranslate"><span class="pre">max</span></code>. Returns 0 if successful, 1 otherwise.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>out</strong> – <strong>[out]</strong> Address of output string </p></li>
-<li><p><strong>in</strong> – <strong>[in]</strong> Input string </p></li>
-<li><p><strong>max</strong> – <strong>[in]</strong> Maximum allowed size for the input string </p></li>
+<li><p><strong>out</strong> – <strong>[out]</strong> Output string. </p></li>
+<li><p><strong>in</strong> – <strong>[in]</strong> Input string. </p></li>
+<li><p><strong>max</strong> – <strong>[in]</strong> Maximum allowed length for the input string. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -280,6 +311,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="user-api.html" class="btn btn-neutral float-left" title="User API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="developer-docs.html" class="btn btn-neutral float-right" title="Developer documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

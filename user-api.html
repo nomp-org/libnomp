@@ -52,6 +52,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="internal-api.html">Internal API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer-docs.html">Developer documentation</a></li>
 </ul>
 
         </div>
@@ -88,7 +89,7 @@
 <dt class="sig sig-object cpp" id="_CPPv49nomp_initPKcii">
 <span id="_CPPv39nomp_initPKcii"></span><span id="_CPPv29nomp_initPKcii"></span><span id="nomp_init__cCP.i.i"></span><span class="target" id="group__nomp__user__api_1ga267235c506c2d16421569160bd596122"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">backend</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">platform</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">device</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49nomp_initPKcii" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Initializes libnomp with the specified backend, platform and device. </p>
-<p>Initializes the nomp code generation for the specified backend (e.g., Cuda, OpenCL, etc) using the given platform id and device id. Returns a negative value if an error occurs during the initialization, otherwise returns 0. Calling this method twice (without nomp_finalize in between) will return an error (but not segfault) as well. Currently only supports Cuda and OpenCL backends.</p>
+<p>Initializes nomp code generation for the specified backend (e.g., OpenCL, Cuda, etc) using the given platform id and device id. Returns a negative value if an error occurs during the initialization, otherwise returns 0. Calling this method twice (without nomp_finalize in between) will return an error (but not segfault). Currently only supports Cuda and OpenCL backends.</p>
 <p><strong>Example usage:</strong> <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="n">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nomp_init</span><span class="p">(</span><span class="s">&quot;OpenCL&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
@@ -96,9 +97,9 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>backend</strong> – <strong>[in]</strong> Target backend for code generation (“Cuda”, “OpenCL”, etc.). </p></li>
-<li><p><strong>platform</strong> – <strong>[in]</strong> Target platform id to share resources and execute kernels in the targeted device (only used for OpenCL backend). </p></li>
-<li><p><strong>device</strong> – <strong>[in]</strong> Target device id to execute kernels. </p></li>
+<li><p><strong>backend</strong> – <strong>[in]</strong> Target backend for code generation. </p></li>
+<li><p><strong>platform</strong> – <strong>[in]</strong> Target platform id (only used for OpenCL backend). </p></li>
+<li><p><strong>device</strong> – <strong>[in]</strong> Target device id to use for computation. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -110,33 +111,36 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv411nomp_updatePv6size_t6size_t6size_ti">
 <span id="_CPPv311nomp_updatePv6size_t6size_t6size_ti"></span><span id="_CPPv211nomp_updatePv6size_t6size_t6size_ti"></span><span id="nomp_update__voidP.s.s.s.i"></span><span class="target" id="group__nomp__user__api_1ga4d130be7ab4c387008b2402f149f7561"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_update</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ptr</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_idx</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">end_idx</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">unit_size</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">op</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411nomp_updatePv6size_t6size_t6size_ti" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Performs device to host (D2H) and host to device (H2D) memory transfers, allocation and freeing of memory on the device. </p>
+<dd><p>Performs device to host (D2H) and host to device (H2D) memory transfers, allocating and freeing of memory in the device. </p>
 <p>
-Operation op will be performed on the array slice [start_idx, end_idx), i.e., on array elements start_idx, … end_idx - 1. This method returns a non-zero value if there is an error and 0 otherwise.</p>
-<p><strong>Example usage:</strong> <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w"></span>
-<span class="kt">double</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span><span class="w"> </span><span class="n">b</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span><span class="w"></span>
-<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+Operation <code class="docutils literal notranslate"><span class="pre">op</span></code> will be performed on the array slice [<code class="docutils literal notranslate"><span class="pre">start_idx</span></code>, <code class="docutils literal notranslate"><span class="pre">end_idx</span></code>), i.e., on array elements start_idx, … end_idx - 1. This method returns a non-zero value if there is an error and 0 otherwise.</p>
+<p><strong>Example usage:</strong> <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w"></span>
+<span class="kt">double</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span><span class="w"></span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"></span>
 <span class="w">  </span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
-<span class="w">  </span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+
+<span class="c1">// Copy the value of `a` into device</span>
 <span class="kt">int</span><span class="w"> </span><span class="n">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nomp_update</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">double</span><span class="p">),</span><span class="w"> </span><span class="n">NOMP_TO</span><span class="p">);</span><span class="w"></span>
-<span class="kt">int</span><span class="w"> </span><span class="n">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nomp_update</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">double</span><span class="p">),</span><span class="w"> </span><span class="n">NOMP_TO</span><span class="p">);</span><span class="w"></span>
-<span class="c1">// Code that change array values on the device (e.g., execution of a kernel)</span>
+
+<span class="c1">// Execution of a kernel which uses `a`</span>
+<span class="p">...</span><span class="w"></span>
+
+<span class="c1">// Copy the updated value of `a` from device</span>
 <span class="kt">int</span><span class="w"> </span><span class="n">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nomp_update</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">double</span><span class="p">),</span><span class="w"> </span><span class="n">NOMP_FROM</span><span class="p">);</span><span class="w"></span>
-<span class="kt">int</span><span class="w"> </span><span class="n">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nomp_update</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">double</span><span class="p">),</span><span class="w"> </span><span class="n">NOMP_FROM</span><span class="p">);</span><span class="w"></span>
+
+<span class="c1">// Free the device memory allocated for `a`</span>
 <span class="kt">int</span><span class="w"> </span><span class="n">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nomp_update</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">double</span><span class="p">),</span><span class="w"> </span><span class="n">NOMP_FREE</span><span class="p">);</span><span class="w"></span>
-<span class="kt">int</span><span class="w"> </span><span class="n">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nomp_update</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">double</span><span class="p">),</span><span class="w"> </span><span class="n">NOMP_FREE</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
  </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ptr</strong> – <strong>[in]</strong> Pointer to the host vector. </p></li>
-<li><p><strong>start_idx</strong> – <strong>[in]</strong> Start index in the vector. </p></li>
-<li><p><strong>end_idx</strong> – <strong>[in]</strong> End index in the vector. </p></li>
+<li><p><strong>ptr</strong> – <strong>[in]</strong> Pointer to the host memory location. </p></li>
+<li><p><strong>start_idx</strong> – <strong>[in]</strong> Start index in the vector to start copying. </p></li>
+<li><p><strong>end_idx</strong> – <strong>[in]</strong> End index in the vector to end the copying. </p></li>
 <li><p><strong>unit_size</strong> – <strong>[in]</strong> Size of a single vector element. </p></li>
-<li><p><strong>op</strong> – <strong>[in]</strong> Operation to perform (One of <a class="reference internal" href="#group-nomp-update-direction"><span class="std std-ref">Map Direction</span></a>). </p></li>
+<li><p><strong>op</strong> – <strong>[in]</strong> Operation to perform (One of <a class="reference internal" href="#group-nomp-update-direction"><span class="std std-ref">Update Direction</span></a>). </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -146,10 +150,10 @@ Operation op will be performed on the array slice [start_idx, end_idx), i.e., on
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv48nomp_jitPiPKcPPKcPPKcjPKcz">
-<span id="_CPPv38nomp_jitPiPKcPPKcPPKcjPKcz"></span><span id="_CPPv28nomp_jitPiPKcPPKcPPKcjPKcz"></span><span id="nomp_jit__iP.cCP.cCPP.cCPP.unsigned.cCP.z"></span><span class="target" id="group__nomp__user__api_1gadf6823b58228b0503ba498a8df3075fa"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_jit</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">c_src</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">annotations</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">clauses</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nargs</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">args</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48nomp_jitPiPKcPPKcPPKcjPKcz" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Generate a kernel for the target backend (OpenCL, Cuda, etc.) from C source. </p>
-<p>User defined code transformations will be applied based on the annotations passed to this function. Kernel specific transformations can be specified in the callback function.</p>
+<dt class="sig sig-object cpp" id="_CPPv48nomp_jitPiPKcPPKcPPKc">
+<span id="_CPPv38nomp_jitPiPKcPPKcPPKc"></span><span id="_CPPv28nomp_jitPiPKcPPKcPPKc"></span><span id="nomp_jit__iP.cCP.cCPP.cCPP"></span><span class="target" id="group__nomp__user__api_1ga33e47a7c7889a6d238133edbed77b493"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_jit</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">c_src</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">annotations</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">clauses</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48nomp_jitPiPKcPPKcPPKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Generate and compile a kernel for the targe backend (OpenCL, etc.) from C source. </p>
+<p>Target backend is the one provided during the initialization of libnomp using <a class="reference internal" href="#group__nomp__user__api_1ga267235c506c2d16421569160bd596122"><span class="std std-ref">nomp_init()</span></a>. User defined code transformations will be applied based on the clauses specified in <code class="docutils literal notranslate"><span class="pre">clauses</span></code> argument. Additional kernel meta data can be passed using the <code class="docutils literal notranslate"><span class="pre">annotations</span></code> argument.</p>
 <p><strong>Example usage:</strong> <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w"></span>
 <span class="kt">double</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span><span class="w"> </span><span class="n">b</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span><span class="w"></span>
 <span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
@@ -158,22 +162,19 @@ Operation op will be performed on the array slice [start_idx, end_idx), i.e., on
 <span class="p">}</span><span class="w"></span>
 <span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">knl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;for (unsigned i = 0; i &lt; N; i++) a[i] += b[i];&quot;</span><span class="w"></span>
 <span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
-<span class="kt">int</span><span class="w"> </span><span class="n">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nomp_jit</span><span class="p">(</span><span class="o">&amp;</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">knl</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;file:function&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;a,b,N&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">NOMP_PTR</span><span class="p">,</span><span class="w"></span>
-<span class="w">                   </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">double</span><span class="p">),</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">NOMP_PTR</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">double</span><span class="p">),</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"></span>
-<span class="w">                   </span><span class="n">NOMP_INTEGER</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">N</span><span class="p">);</span><span class="w"></span>
+<span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">annotations</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">},</span><span class="w"></span>
+<span class="w">           </span><span class="o">*</span><span class="n">clauses</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;transform&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;file:function&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">};</span><span class="w"></span>
+<span class="kt">int</span><span class="w"> </span><span class="n">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nomp_jit</span><span class="p">(</span><span class="o">&amp;</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">knl</span><span class="p">,</span><span class="w"> </span><span class="n">annotations</span><span class="p">,</span><span class="w"> </span><span class="n">clauses</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> – <strong>[out]</strong> id of the generated kernel. </p></li>
+<li><p><strong>id</strong> – <strong>[out]</strong> Id of the generated kernel. </p></li>
 <li><p><strong>c_src</strong> – <strong>[in]</strong> Kernel source in C. </p></li>
-<li><p><strong>annotations</strong> – <strong>[in]</strong> Annotations to perform user defined (domain specific) transformations. </p></li>
-<li><p><strong>clauses</strong> – <strong>[in]</strong> Clauses that tell nomp meta information about the kernel </p></li>
-<li><p><strong>nargs</strong> – <strong>[in]</strong> Number of arguments to the kernel. </p></li>
-<li><p><strong>args</strong> – <strong>[in]</strong> Comma separated list of argument names. </p></li>
-<li><p><strong>...</strong> – <strong>[in]</strong> For each argument, we pass the argument type (one of <a class="reference internal" href="#group-nomp-types"><span class="std std-ref">Types</span></a>), size of the base type and the pointer to the argument.</p></li>
+<li><p><strong>annotations</strong> – <strong>[in]</strong> Annotations to perform user defined transformations. </p></li>
+<li><p><strong>clauses</strong> – <strong>[in]</strong> Clauses to provide meta information about the kernel. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -183,16 +184,50 @@ Operation op will be performed on the array slice [start_idx, end_idx), i.e., on
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv48nomp_runiz">
-<span id="_CPPv38nomp_runiz"></span><span id="_CPPv28nomp_runiz"></span><span id="nomp_run__i.z"></span><span class="target" id="group__nomp__user__api_1ga494dfc32c43ad18c16022bfdcaeec9c3"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_run</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48nomp_runiz" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Runs the kernel. </p>
-<p>Runs the kernel with a given kernel id. Kernel id is followed by the number of arguments. Then for each argument we pass the argument type (<a class="reference internal" href="#group-nomp-types"><span class="std std-ref">Types</span></a>) size of the base type in case of an integer and pointer to the argument.</p>
+<dt class="sig sig-object cpp" id="_CPPv48nomp_runiiz">
+<span id="_CPPv38nomp_runiiz"></span><span id="_CPPv28nomp_runiiz"></span><span id="nomp_run__i.i.z"></span><span class="target" id="group__nomp__user__api_1gad688f785834daf7b761458f3f327dc7a"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_run</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nargs</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48nomp_runiiz" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Runs the kernel generated by <a class="reference internal" href="#group__nomp__user__api_1ga33e47a7c7889a6d238133edbed77b493"><span class="std std-ref">nomp_jit()</span></a>. </p>
+<p>Runs the kernel with a given kernel id. Kernel id is followed by the number of arguments (i.e., variables). Then for each argument, four values has to be passed. First, is the argument name as a string. Second is the argument type (one of <a class="reference internal" href="#group-nomp-types"><span class="std std-ref">Data Types</span></a>). Third is the <code class="docutils literal notranslate"><span class="pre">sizeof</span></code> argument and the fourth is the pointer to the actual argument itself.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> – <strong>[in]</strong> id of the kernel to be run </p></li>
-<li><p><strong>...</strong> – <strong>[in]</strong> For each argument, argument type, sizeof base type and pointer to the argument.</p></li>
+<li><p><strong>id</strong> – <strong>[in]</strong> Id of the kernel to be run. </p></li>
+<li><p><strong>nargs</strong> – <strong>[in]</strong> Number of arguments to the kernel. </p></li>
+<li><p><strong>...</strong> – <strong>[in]</strong> Four values mentioned above for each argument.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412nomp_get_logPPci">
+<span id="_CPPv312nomp_get_logPPci"></span><span id="_CPPv212nomp_get_logPPci"></span><span id="nomp_get_log__cPP.i"></span><span class="target" id="group__nomp__user__api_1ga18d9b1146c47c43f5994123466fda874"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_get_log</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">log</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">log_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412nomp_get_logPPci" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Return log description. </p>
+<p>Returns the log description given the log_id. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>log</strong> – <strong>[out]</strong> variable to set the error description. </p></li>
+<li><p><strong>log_id</strong> – <strong>[in]</strong> id of the error. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415nomp_get_log_noi">
+<span id="_CPPv315nomp_get_log_noi"></span><span id="_CPPv215nomp_get_log_noi"></span><span id="nomp_get_log_no__i"></span><span class="target" id="group__nomp__user__api_1ga6100f1d4760f0d62ace45115288d19eb"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_get_log_no</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">log_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415nomp_get_log_noi" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Return log number. </p>
+<p>Returns the log number given the log_id. If log_id is invalid return NOMP_INVALID_LOG_ID. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>log_id</strong> – <strong>[in]</strong> id of the log. </p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>int </p>
@@ -212,6 +247,25 @@ Operation op will be performed on the array slice [start_idx, end_idx), i.e., on
 </dl>
 </dd></dl>
 
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.nomp_set_log">
+<span class="target" id="group__nomp__user__api_1ga84628482d4a5d18219e89e354247fc3c"></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_set_log</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">logno</span></span>, <span class="n"><span class="pre">type</span></span>, <span class="n"><span class="pre">desc</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nomp_set_log" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets a log. </p>
+<p>Sets a log given a description of the log and log type and returns a unique log_id. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logno</strong> – <strong>[in]</strong> unique id of the log kind. </p></li>
+<li><p><strong>type</strong> – <strong>[in]</strong> type of the log either NOMP_ERROR, NOMP_WARNING or NOMP_INFORMATION. </p></li>
+<li><p><strong>desc</strong> – <strong>[in]</strong> detailed description of the log. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int </p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="map-direction">
 <span id="group-nomp-update-direction"></span><h2>Map Direction<a class="headerlink" href="#map-direction" title="Permalink to this heading"></a></h2>
@@ -219,25 +273,25 @@ Operation op will be performed on the array slice [start_idx, end_idx), i.e., on
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_ALLOC">
 <span class="target" id="group__nomp__update__direction_1ga6396fa3689603c84e0aeab05db3f4542"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_ALLOC</span></span></span><a class="headerlink" href="#c.NOMP_ALLOC" title="Permalink to this definition"></a><br /></dt>
-<dd><p>NOMP allocation operation. </p>
+<dd><p>Allocate memory on the device. </p>
 </dd></dl>
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_TO">
 <span class="target" id="group__nomp__update__direction_1gafe993b1f74722f53eccc1d727db21076"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_TO</span></span></span><a class="headerlink" href="#c.NOMP_TO" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Mapping of host to device(H2D) operation. </p>
+<dd><p>Copy host data to device. Memory will be allocated if not allocated already. </p>
 </dd></dl>
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_FROM">
 <span class="target" id="group__nomp__update__direction_1ga8b9e94ecff340018b7250429aae72437"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_FROM</span></span></span><a class="headerlink" href="#c.NOMP_FROM" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Mapping of device to host(D2H) operation. </p>
+<dd><p>Copy device data to host. </p>
 </dd></dl>
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_FREE">
 <span class="target" id="group__nomp__update__direction_1ga98833fef31d0f4702734e15d3fbc85ad"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_FREE</span></span></span><a class="headerlink" href="#c.NOMP_FREE" title="Permalink to this definition"></a><br /></dt>
-<dd><p>NOMP freeing operation. </p>
+<dd><p>Free memory allocated on the device. </p>
 </dd></dl>
 
 </section>
@@ -247,19 +301,19 @@ Operation op will be performed on the array slice [start_idx, end_idx), i.e., on
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_INTEGER">
 <span class="target" id="group__nomp__types_1ga0a149d4d4cfa6ee18175623efe1ca493"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_INTEGER</span></span></span><a class="headerlink" href="#c.NOMP_INTEGER" title="Permalink to this definition"></a><br /></dt>
-<dd><p>NOMP integer type. </p>
+<dd><p>Integer argument type. </p>
 </dd></dl>
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_FLOAT">
 <span class="target" id="group__nomp__types_1ga3adcd2861534aeb653712569b1e53653"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_FLOAT</span></span></span><a class="headerlink" href="#c.NOMP_FLOAT" title="Permalink to this definition"></a><br /></dt>
-<dd><p>NOMP float type. </p>
+<dd><p>Floating point argument type. </p>
 </dd></dl>
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_PTR">
 <span class="target" id="group__nomp__types_1gaf1c443674b7ef95b31778d4391508715"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_PTR</span></span></span><a class="headerlink" href="#c.NOMP_PTR" title="Permalink to this definition"></a><br /></dt>
-<dd><p>NOMP pointer type. </p>
+<dd><p>Pointer argument type. </p>
 </dd></dl>
 
 </section>
@@ -386,15 +440,21 @@ Operation op will be performed on the array slice [start_idx, end_idx), i.e., on
 </dd></dl>
 
 <dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.NOMP_LOOPY_GRIDSIZE_FAILED">
-<span class="target" id="group__nomp__errors_1ga020a912aaeb4a07d7936cb9520d61e15"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_LOOPY_GRIDSIZE_FAILED</span></span></span><a class="headerlink" href="#c.NOMP_LOOPY_GRIDSIZE_FAILED" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="c.NOMP_GET_GRIDSIZE_FAILED">
+<span class="target" id="group__nomp__errors_1ga0b75e935a14893002e53cfa9436ddfc8"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_GET_GRIDSIZE_FAILED</span></span></span><a class="headerlink" href="#c.NOMP_GET_GRIDSIZE_FAILED" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Code generation from loopy kernel failed. </p>
 </dd></dl>
 
 <dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.NOMP_GRIDSIZE_CALCULATION_FAILED">
-<span class="target" id="group__nomp__errors_1ga33a2e0d4338eff594e45be1d364e8afd"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_GRIDSIZE_CALCULATION_FAILED</span></span></span><a class="headerlink" href="#c.NOMP_GRIDSIZE_CALCULATION_FAILED" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="c.NOMP_EVAL_GRIDSIZE_FAILED">
+<span class="target" id="group__nomp__errors_1gaae7d7de9fed47f9df335d428380fca63"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_EVAL_GRIDSIZE_FAILED</span></span></span><a class="headerlink" href="#c.NOMP_EVAL_GRIDSIZE_FAILED" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Grid size calculation failed. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.NOMP_PY_APPEND_PATH_ERROR">
+<span class="target" id="group__nomp__errors_1ga25026a8ec18f4a71d82ecc8efb260308"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_PY_APPEND_PATH_ERROR</span></span></span><a class="headerlink" href="#c.NOMP_PY_APPEND_PATH_ERROR" title="Permalink to this definition"></a><br /></dt>
+<dd><p>NOMP python initialization failed. </p>
 </dd></dl>
 
 <dl class="cpp macro">
@@ -419,6 +479,24 @@ Operation op will be performed on the array slice [start_idx, end_idx), i.e., on
 <dt class="sig sig-object cpp" id="c.NOMP_KNL_RUN_ERROR">
 <span class="target" id="group__nomp__errors_1ga9eec6f67a17214727838dd47a49e03fc"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_KNL_RUN_ERROR</span></span></span><a class="headerlink" href="#c.NOMP_KNL_RUN_ERROR" title="Permalink to this definition"></a><br /></dt>
 <dd><p>NOMP kernel run failed. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.NOMP_OUT_OF_MEMORY">
+<span class="target" id="group__nomp__errors_1gacd8e8198fa1af96e0c86e6e9f0dd12f0"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_OUT_OF_MEMORY</span></span></span><a class="headerlink" href="#c.NOMP_OUT_OF_MEMORY" title="Permalink to this definition"></a><br /></dt>
+<dd><p>NOMP run out of memory. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.NOMP_INVALID_LOG_ID">
+<span class="target" id="group__nomp__errors_1ga9dbae7bc102ac3287c61a1807f391160"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_INVALID_LOG_ID</span></span></span><a class="headerlink" href="#c.NOMP_INVALID_LOG_ID" title="Permalink to this definition"></a><br /></dt>
+<dd><p>NOMP invalid log id. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.NOMP_UNKNOWN_ERROR">
+<span class="target" id="group__nomp__errors_1ga8fbba645f226f431c14dea7cefb18764"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_UNKNOWN_ERROR</span></span></span><a class="headerlink" href="#c.NOMP_UNKNOWN_ERROR" title="Permalink to this definition"></a><br /></dt>
+<dd><p>NOMP unknown error. </p>
 </dd></dl>
 
 </section>

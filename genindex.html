@@ -43,6 +43,7 @@
 <li class="toctree-l1"><a class="reference internal" href="nomp-usage.html">How to use nomp</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user-api.html">User API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="internal-api.html">Internal API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer-docs.html">Developer documentation</a></li>
 </ul>
 
         </div>
@@ -101,6 +102,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="user-api.html#c.NOMP_ALLOC">NOMP_ALLOC (C macro)</a>
 </li>
+      <li><a href="user-api.html#c.NOMP_EVAL_GRIDSIZE_FAILED">NOMP_EVAL_GRIDSIZE_FAILED (C macro)</a>
+</li>
       <li><a href="user-api.html#_CPPv413nomp_finalizev">nomp_finalize (C++ function)</a>
 </li>
       <li><a href="user-api.html#c.NOMP_FINALIZE_ERROR">NOMP_FINALIZE_ERROR (C macro)</a>
@@ -111,7 +114,11 @@
 </li>
       <li><a href="user-api.html#c.NOMP_FROM">NOMP_FROM (C macro)</a>
 </li>
-      <li><a href="user-api.html#c.NOMP_GRIDSIZE_CALCULATION_FAILED">NOMP_GRIDSIZE_CALCULATION_FAILED (C macro)</a>
+      <li><a href="user-api.html#c.NOMP_GET_GRIDSIZE_FAILED">NOMP_GET_GRIDSIZE_FAILED (C macro)</a>
+</li>
+      <li><a href="user-api.html#_CPPv412nomp_get_logPPci">nomp_get_log (C++ function)</a>
+</li>
+      <li><a href="user-api.html#_CPPv415nomp_get_log_noi">nomp_get_log_no (C++ function)</a>
 </li>
       <li><a href="user-api.html#_CPPv49nomp_initPKcii">nomp_init (C++ function)</a>
 </li>
@@ -129,17 +136,19 @@
 </li>
       <li><a href="user-api.html#c.NOMP_INVALID_KNL">NOMP_INVALID_KNL (C macro)</a>
 </li>
+      <li><a href="user-api.html#c.NOMP_INVALID_LOG_ID">NOMP_INVALID_LOG_ID (C macro)</a>
+</li>
       <li><a href="user-api.html#c.NOMP_INVALID_MAP_OP">NOMP_INVALID_MAP_OP (C macro)</a>
 </li>
       <li><a href="user-api.html#c.NOMP_INVALID_MAP_PARAMS">NOMP_INVALID_MAP_PARAMS (C macro)</a>
 </li>
       <li><a href="user-api.html#c.NOMP_INVALID_MAP_PTR">NOMP_INVALID_MAP_PTR (C macro)</a>
 </li>
-      <li><a href="user-api.html#c.NOMP_INVALID_PLATFORM">NOMP_INVALID_PLATFORM (C macro)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="user-api.html#_CPPv48nomp_jitPiPKcPPKcPPKcjPKcz">nomp_jit (C++ function)</a>
+      <li><a href="user-api.html#c.NOMP_INVALID_PLATFORM">NOMP_INVALID_PLATFORM (C macro)</a>
+</li>
+      <li><a href="user-api.html#_CPPv48nomp_jitPiPKcPPKcPPKc">nomp_jit (C++ function)</a>
 </li>
       <li><a href="user-api.html#c.NOMP_KNL_ARG_SET_ERROR">NOMP_KNL_ARG_SET_ERROR (C macro)</a>
 </li>
@@ -153,23 +162,29 @@
 </li>
       <li><a href="user-api.html#c.NOMP_LOOPY_CONVERSION_ERROR">NOMP_LOOPY_CONVERSION_ERROR (C macro)</a>
 </li>
-      <li><a href="user-api.html#c.NOMP_LOOPY_GRIDSIZE_FAILED">NOMP_LOOPY_GRIDSIZE_FAILED (C macro)</a>
-</li>
       <li><a href="user-api.html#c.NOMP_LOOPY_KNL_NAME_NOT_FOUND">NOMP_LOOPY_KNL_NAME_NOT_FOUND (C macro)</a>
 </li>
       <li><a href="user-api.html#c.NOMP_MALLOC_ERROR">NOMP_MALLOC_ERROR (C macro)</a>
 </li>
       <li><a href="user-api.html#c.NOMP_NOT_INITIALIZED_ERROR">NOMP_NOT_INITIALIZED_ERROR (C macro)</a>
 </li>
+      <li><a href="user-api.html#c.NOMP_OUT_OF_MEMORY">NOMP_OUT_OF_MEMORY (C macro)</a>
+</li>
       <li><a href="user-api.html#c.NOMP_PTR">NOMP_PTR (C macro)</a>
 </li>
       <li><a href="user-api.html#c.NOMP_PTR_ALREADY_MAPPED">NOMP_PTR_ALREADY_MAPPED (C macro)</a>
 </li>
+      <li><a href="user-api.html#c.NOMP_PY_APPEND_PATH_ERROR">NOMP_PY_APPEND_PATH_ERROR (C macro)</a>
+</li>
       <li><a href="user-api.html#c.NOMP_PY_INITIALIZE_ERROR">NOMP_PY_INITIALIZE_ERROR (C macro)</a>
 </li>
-      <li><a href="user-api.html#_CPPv48nomp_runiz">nomp_run (C++ function)</a>
+      <li><a href="user-api.html#_CPPv48nomp_runiiz">nomp_run (C++ function)</a>
+</li>
+      <li><a href="user-api.html#c.nomp_set_log">nomp_set_log (C macro)</a>
 </li>
       <li><a href="user-api.html#c.NOMP_TO">NOMP_TO (C macro)</a>
+</li>
+      <li><a href="user-api.html#c.NOMP_UNKNOWN_ERROR">NOMP_UNKNOWN_ERROR (C macro)</a>
 </li>
       <li><a href="user-api.html#_CPPv411nomp_updatePv6size_t6size_t6size_ti">nomp_update (C++ function)</a>
 </li>
@@ -195,11 +210,15 @@
 </li>
       <li><a href="internal-api.html#_CPPv413py_c_to_loopyPP8PyObjectPKcPKc">py_c_to_loopy (C++ function)</a>
 </li>
+      <li><a href="internal-api.html#_CPPv417py_eval_grid_sizeP4progP8PyObject">py_eval_grid_size (C++ function)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="internal-api.html#_CPPv416py_get_grid_sizePjP6size_tP6size_tP8PyObjectP8PyObject">py_get_grid_size (C++ function)</a>
+      <li><a href="internal-api.html#_CPPv416py_get_grid_sizeP4progP8PyObject">py_get_grid_size (C++ function)</a>
 </li>
       <li><a href="internal-api.html#_CPPv423py_get_knl_name_and_srcPPcPPcP8PyObject">py_get_knl_name_and_src (C++ function)</a>
+</li>
+      <li><a href="internal-api.html#_CPPv48py_printP8PyObject">py_print (C++ function)</a>
 </li>
       <li><a href="internal-api.html#_CPPv416py_user_callbackPP8PyObjectPKcPKc">py_user_callback (C++ function)</a>
 </li>
