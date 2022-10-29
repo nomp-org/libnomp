@@ -31,7 +31,8 @@ static int opencl_update(struct backend *bnd, struct mem *m, const int op) {
                           (m->idx1 - m->idx0) * m->usize, NULL, &err);
     if (err != CL_SUCCESS) {
       tfree(m->bptr), m->bptr = NULL;
-      return 1;
+      return nomp_set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR,
+                          ERR_STR_OPENCL_FAILURE, "create buffer");
     }
   }
 
@@ -62,7 +63,8 @@ static int opencl_knl_build(struct backend *bnd, struct prog *prg,
   ocl_prg->prg = clCreateProgramWithSource(
       ocl->ctx, 1, (const char **)(&source), NULL, &err);
   if (err != CL_SUCCESS)
-    return 1;
+    return nomp_set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
+                        "kernel build");
 
   err = clBuildProgram(ocl_prg->prg, 0, NULL, NULL, NULL, NULL);
   if (err != CL_SUCCESS) {
@@ -75,7 +77,8 @@ static int opencl_knl_build(struct backend *bnd, struct prog *prg,
     char *log = tcalloc(char, log_size);
     // Verify log memory allocation
     if (!log)
-      return 1;
+      return nomp_set_log(NOMP_TCALLOC_FAILED, NOMP_ERROR,
+                          ERR_STR_TCALLOC_FAILURE);
 
     // Get the log
     clGetProgramBuildInfo(ocl_prg->prg, ocl->device_id, CL_PROGRAM_BUILD_LOG,
@@ -86,13 +89,15 @@ static int opencl_knl_build(struct backend *bnd, struct prog *prg,
     ocl_prg->prg = NULL;
     ocl_prg->knl = NULL;
 
-    return 1;
+    return nomp_set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
+                        "kernel build");
   }
 
   ocl_prg->knl = clCreateKernel(ocl_prg->prg, name, &err);
   if (err != CL_SUCCESS) {
     ocl_prg->knl = NULL;
-    return 1;
+    return nomp_set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
+                        "kernel create");
   }
 
   return 0;
@@ -143,10 +148,12 @@ static int opencl_knl_free(struct prog *prg) {
   struct opencl_prog *ocl_prg = prg->bptr;
   cl_int err = clReleaseKernel(ocl_prg->knl);
   if (err != CL_SUCCESS)
-    return 1;
+    return nomp_set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
+                        "kernel release");
   err = clReleaseProgram(ocl_prg->prg);
   if (err != CL_SUCCESS)
-    return 1;
+    return nomp_set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
+                        "program release");
   tfree(prg->bptr), prg->bptr = NULL;
 
   return 0;
@@ -156,10 +163,12 @@ static int opencl_finalize(struct backend *bnd) {
   struct opencl_backend *ocl = bnd->bptr;
   cl_int err = clReleaseCommandQueue(ocl->queue);
   if (err != CL_SUCCESS)
-    return 1;
+    return nomp_set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
+                        "command queue release");
   err = clReleaseContext(ocl->ctx);
   if (err != CL_SUCCESS)
-    return 1;
+    return nomp_set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
+                        "context release");
   tfree(bnd->bptr), bnd->bptr = NULL;
 
   return 0;

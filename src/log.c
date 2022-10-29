@@ -51,6 +51,11 @@ const char *ERR_STR_INVALID_LOG_ID = "Invalid log id %d.";
 const char *ERR_STR_NOMP_UNKOWN_ERROR = "Unkown error id %d";
 const char *ERR_STR_NOMP_INVALID_CLAUSE =
     "Invalid clause is passed into nomp_jit: %s";
+const char *ERR_STR_EXCEED_MAX_LEN_STR =
+    "String length exceed the max length of %d.";
+const char *ERR_STR_CUDA_FAILURE = "CUDA %s failed: %s.";
+const char *ERR_STR_TCALLOC_FAILURE = "NOMP tcalloc failure.";
+const char *ERR_STR_OPENCL_FAILURE = "OpenCL %s failure.";
 
 struct log {
   char *description;
