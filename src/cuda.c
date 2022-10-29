@@ -11,7 +11,8 @@
       const char *msg;                                                         \
       cuGetErrorName(x, &msg);                                                 \
       fprintf(stderr, "%s:%u %s\n", file, line, msg);                          \
-      return 1;                                                                \
+      return nomp_set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE, \
+                          "operation", msg);                                   \
     }                                                                          \
   } while (0)
 
@@ -20,8 +21,10 @@
 #define chk_nvrtc_(file, line, x)                                              \
   do {                                                                         \
     if (x != NVRTC_SUCCESS) {                                                  \
-      fprintf(stderr, "%s:%d %s\n", file, line, nvrtcGetErrorString(x));       \
-      return 1;                                                                \
+      const char *msg = nvrtcGetErrorString(x);                                \
+      fprintf(stderr, "%s:%d %s\n", file, line, msg);                          \
+      return nomp_set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE, \
+                          "runtime compilation", msg);                         \
     }                                                                          \
   } while (0)
 #define chk_nvrtc(x) chk_nvrtc_(__FILE__, __LINE__, x)
@@ -29,8 +32,10 @@
 #define chk_cuda_(file, line, x)                                               \
   do {                                                                         \
     if (x != cudaSuccess) {                                                    \
-      fprintf(stderr, "%s:%d %s\n", file, line, cudaGetErrorString(x));        \
-      return 1;                                                                \
+      const char *msg = cudaGetErrorString(x);                                 \
+      fprintf(stderr, "%s:%d %s\n", file, line, msg);                          \
+      return nomp_set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE, \
+                          "operation", msg);                                   \
     }                                                                          \
   } while (0)
 #define chk_cuda(x) chk_cuda_(__FILE__, __LINE__, x)

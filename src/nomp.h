@@ -222,6 +222,26 @@
  * @brief NOMP unknown error
  */
 #define NOMP_UNKNOWN_ERROR -142
+/**
+ * @ingroup nomp_errors
+ * @brief NOMP string length exceed max length.
+ */
+#define NOMP_STR_EXCEED_MAX_LEN -143
+/**
+ * @ingroup nomp_errors
+ * @brief NOMP cuda queried operation failed.
+ */
+#define NOMP_CUDA_FAILURE -144
+/**
+ * @ingroup nomp_errors
+ * @brief NOMP tcalloc failure.
+ */
+#define NOMP_TCALLOC_FAILED -145
+/**
+ * @ingroup nomp_errors
+ * @brief NOMP OPENCL failure.
+ */
+#define NOMP_OPENCL_FAILURE -146
 
 #ifdef __cplusplus
 extern "C" {

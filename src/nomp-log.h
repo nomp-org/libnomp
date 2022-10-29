@@ -33,5 +33,8 @@ extern const char *ERR_STR_KNL_BUILD_ERROR;
 extern const char *ERR_STR_PY_INITIALIZE_ERROR;
 extern const char *ERR_STR_INVALID_LOG_ID;
 extern const char *ERR_STR_NOMP_UNKOWN_ERROR;
-
+extern const char *ERR_STR_EXCEED_MAX_LEN_STR;
+extern const char *ERR_STR_CUDA_FAILURE;
+extern const char *ERR_STR_TCALLOC_FAILURE;
+extern const char *ERR_STR_OPENCL_FAILURE;
 #endif
