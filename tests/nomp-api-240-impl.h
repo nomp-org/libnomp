@@ -9,7 +9,7 @@ int nomp_api_240_aux(TEST_TYPE *a, TEST_TYPE *b, int N) {
       "}                                                      \n";
 
   size_t len = strlen(knl_fmt) + 2 * strlen(TOSTRING(TEST_TYPE)) + 1;
-  char *knl = (char *)calloc(len, sizeof(char));
+  char *knl = tcalloc(char, len);
   snprintf(knl, len, knl_fmt, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE));
 
   static int id = -1;
