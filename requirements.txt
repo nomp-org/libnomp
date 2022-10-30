@@ -1,5 +1,5 @@
 git+https://github.com/inducer/loopy.git#egg=loopy
 islpy==2022.2.1
-pycparser==2.21
+libclang==14.0.6
 pymbolic==2022.1
 pytools==2022.1.12
