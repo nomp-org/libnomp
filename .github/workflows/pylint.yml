@@ -1,12 +1,16 @@
-name: pylint Check
-on: [pull_request]
+name: pylint check
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
 env:
   CACHE_NUMBER: 0  # increase to reset cache manually
 jobs:
-  py-formatting-check:
+  pylint-check:
     runs-on: ubuntu-latest
     steps:
-      - name: GitHub action setup
+      - name: Setup GitHub actions
         uses: actions/checkout@v3
       - name: Setup conda environment "libnomp-dev"
         id: setup_conda
