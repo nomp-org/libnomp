@@ -1,6 +1,5 @@
 name: pylint Check
 on: [pull_request]
-
 env:
   CACHE_NUMBER: 0  # increase to reset cache manually
 jobs:
@@ -26,7 +25,7 @@ jobs:
         id: update_env
         run: |
           mamba env update -n libnomp-dev -f environment-dev.yml
-        if: steps.cache.outputs.cache-hit != 'true
+        if: steps.cache.outputs.cache-hit != 'true'
       - name: Lint with pylint
         run:
           pylint ./python
