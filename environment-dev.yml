@@ -14,5 +14,6 @@ dependencies:
     - breathe==4.34.0
     - Sphinx==5.1.1
     - sphinx-rtd-theme==1.0.0
+    - pylint==2.15.5
   - clang-format=15.0.3
   - doxygen
