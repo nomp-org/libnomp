@@ -38,8 +38,8 @@ struct mem {
 };
 
 struct backend {
-  char *backend;
-  int platform_id, device_id;
+  char *backend, *install_dir;
+  int platform_id, device_id, verbose;
   char name[NOMP_BUFSIZ];
   int (*update)(struct backend *, struct mem *, const int);
   int (*knl_build)(struct backend *, struct prog *, const char *, const char *);
