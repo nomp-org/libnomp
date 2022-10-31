@@ -31,8 +31,8 @@ static int nomp_check_env(struct backend *backend) {
     backend->device_id = device_id;
   tmp = get_if_env("NOMP_INSTALL_DIR");
   if (tmp != NULL) {
-    backend->install_dir = tcalloc(char, NOMP_BUFSIZ);
-    strncpy(backend->install_dir, tmp, NOMP_BUFSIZ);
+    backend->install_dir = tcalloc(char, PATH_MAX);
+    strncpy(backend->install_dir, tmp, PATH_MAX);
     tfree(tmp);
   }
   backend->verbose = strntoi(getenv("NOMP_VERBOSE_LEVEL"), NOMP_BUFSIZ);
