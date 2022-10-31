@@ -29,7 +29,7 @@ jobs:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3.13
         if: ${{ inputs.debug_enabled }}
-      - name: Setup conda environment "libnomp-dev"
+      - name: Setup Mambaforge
         id: setup_conda
         uses: conda-incubator/setup-miniconda@v2
         with:
@@ -37,10 +37,11 @@ jobs:
           miniforge-version: latest
           activate-environment: libnomp-dev
           use-mamba: true
-      - uses: actions/cache@v3
+      - name: Cache conda environment
+        uses: actions/cache@v3
         with:
-          path: /usr/share/miniconda3/envs/libnomp-dev
-          key:  ${{ runner.os }}-build-libnomp_dev_environment-${{ hashFiles('environment-dev.yml') }}-${{ env.CACHE_NUMBER }}
+          path: ${{ env.CONDA }}/envs/libnomp-dev
+          key:  conda-${{ runner.os }}-${{ hashFiles('environment-dev.yml') }}-${{ env.CACHE_NUMBER }}
         id: cache
       - name: Update environment
         id: update_env

@@ -12,7 +12,8 @@ on:
         required: false
         default: false
 env:
-  CACHE_NUMBER: 0  # increase to reset cache manually
+  # Increase to reset cache
+  CACHE_NUMBER: 1
   POCL_CACHE_NUMBER: 0
 jobs:
   ci:
@@ -36,7 +37,7 @@ jobs:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3.13
         if: ${{ inputs.debug_enabled }}
-      - name: Setup conda environment "libnomp"
+      - name: Setup Mambaforge
         id: setup_conda
         uses: conda-incubator/setup-miniconda@v2
         with:
@@ -44,10 +45,11 @@ jobs:
           miniforge-version: latest
           activate-environment: libnomp
           use-mamba: true
-      - uses: actions/cache@v3
+      - name: Cache conda environment
+        uses: actions/cache@v3
         with:
-          path: /usr/share/miniconda3/envs/libnomp
-          key:  ${{ runner.os }}-build-libnomp_environment-${{ hashFiles('environment.yml') }}-${{ env.CACHE_NUMBER }}
+          path: ${{ env.CONDA }}/envs/libnomp
+          key:  conda-${{ runner.os }}-${{ hashFiles('environment.yml') }}-${{ env.CACHE_NUMBER }}
         id: cache
       - name: Update environment
         id: update_env
@@ -63,7 +65,7 @@ jobs:
         id: install_pocl
         run: |
           mamba install -c conda-forge pocl
-        if: (steps.pocl_cache.outputs.cache-hit && steps.libnomp_cache.outputs.cache-hit) != 'true'
+        if: (steps.pocl_cache.outputs.cache-hit != 'true') || (steps.cache.outputs.cache-hit != 'true')
       - name: Build libnomp
         id: build_libnomp
         run: |
