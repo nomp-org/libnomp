@@ -37,8 +37,7 @@ int strnlower(char **out, const char *in, size_t max) {
 int strntoi(const char *str, size_t size) {
   if (str == NULL)
     return -1;
-  char *end_ptr;
-  char *str_dup = strndup(str, size);
+  char *str_dup = strndup(str, size), *end_ptr;
   int num = (int)strtol(str_dup, &end_ptr, 10);
   if (str_dup == end_ptr || '\0' != *end_ptr) {
     tfree(str_dup);
