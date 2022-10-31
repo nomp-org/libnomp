@@ -12,24 +12,15 @@ jobs:
     steps:
       - name: Setup GitHub actions
         uses: actions/checkout@v3
-      - name: Setup conda environment "libnomp-dev"
-        id: setup_conda
-        uses: conda-incubator/setup-miniconda@v2
+      - name: Setup Python 3.10
+        uses: actions/setup-python@v4
         with:
-          miniforge-variant: Mambaforge
-          miniforge-version: latest
-          activate-environment: libnomp-dev
-          use-mamba: true
-      - uses: actions/cache@v3
-        with:
-          path: /usr/share/miniconda3/envs/libnomp-dev
-          key:  ${{ runner.os }}-build-libnomp_dev_environment-${{ hashFiles('environment-dev.yml') }}-${{ env.CACHE_NUMBER }}
-        id: cache
-      - name: Update environment
-        id: update_env
+          python-version: '3.10'
+      - name: Install dependencies
         run: |
-          mamba env update -n libnomp-dev -f environment-dev.yml
-        if: steps.cache.outputs.cache-hit != 'true'
-      - name: Lint with pylint
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pylint
+      - name: Run pylint check
         run:
           pylint ./python
