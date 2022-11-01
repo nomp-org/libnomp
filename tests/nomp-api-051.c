@@ -7,7 +7,7 @@ int main(int argc, char *argv[]) {
   int platform = argc > 3 ? atoi(argv[3]) : 0;
   int a[10] = {0};
 
-  int err = nomp_init(backend, device, platform);
+  int err = nomp_init(backend, platform, device);
 
   // Free'ing before mapping should return an error
   err = nomp_update(a, 0, 10, sizeof(int), NOMP_FREE);

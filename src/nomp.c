@@ -20,6 +20,7 @@ static char *get_if_env(const char *name) {
 static int nomp_check_env(struct backend *backend) {
   char *tmp = get_if_env("NOMP_BACKEND");
   if (tmp != NULL) {
+    backend->backend = trealloc(backend->backend, char, NOMP_BUFSIZ);
     strncpy(backend->backend, tmp, NOMP_BUFSIZ);
     tfree(tmp);
   }

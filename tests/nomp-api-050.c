@@ -18,9 +18,9 @@ int main(int argc, char *argv[]) {
   nomp_assert(matched);
 
   // Calling `nomp_init` twice must return an error, but must not segfault
-  err = nomp_init(backend, device_id, platform_id);
+  err = nomp_init(backend, platform_id, device_id);
   nomp_chk(err);
-  err = nomp_init(backend, device_id, platform_id);
+  err = nomp_init(backend, platform_id, device_id);
   nomp_assert(nomp_get_log_no(err) == NOMP_INITIALIZED_ERROR);
 
   err = nomp_get_log(&desc, err);
