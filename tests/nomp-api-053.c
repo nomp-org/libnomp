@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
                     "    a[i] = a[i] * b[i];                                \n"
                     "}                                                      \n";
 
-  int err = nomp_init(backend, device, platform);
+  int err = nomp_init(backend, platform, device);
   err = nomp_update(a, 0, n, sizeof(int), NOMP_TO);
   nomp_chk(err);
 
