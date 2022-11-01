@@ -20,8 +20,8 @@ static char *get_if_env(const char *name) {
 static int nomp_check_env(struct backend *backend) {
   char *tmp = get_if_env("NOMP_BACKEND");
   if (tmp != NULL) {
-    backend->backend = trealloc(backend->backend, char, NOMP_BUFSIZ);
-    strncpy(backend->backend, tmp, NOMP_BUFSIZ);
+    backend->backend = trealloc(backend->backend, char, MAX_BACKEND_NAME_SIZE);
+    strncpy(backend->backend, tmp, MAX_BACKEND_NAME_SIZE);
     tfree(tmp);
   }
   int platform_id = strntoi(getenv("NOMP_PLATFORM_ID"), NOMP_BUFSIZ);
@@ -32,8 +32,9 @@ static int nomp_check_env(struct backend *backend) {
     backend->device_id = device_id;
   tmp = get_if_env("NOMP_INSTALL_DIR");
   if (tmp != NULL) {
-    backend->install_dir = tcalloc(char, PATH_MAX);
-    strncpy(backend->install_dir, tmp, PATH_MAX);
+    size_t size = (size_t)pathconf(tmp, _PC_PATH_MAX);
+    backend->install_dir = tcalloc(char, size + 1);
+    strncpy(backend->install_dir, tmp, size + 1);
     tfree(tmp);
   }
   backend->verbose = strntoi(getenv("NOMP_VERBOSE_LEVEL"), NOMP_BUFSIZ);
@@ -183,7 +184,8 @@ static int parse_clauses(char **usr_file, char **usr_func,
       char *val = strndup(clauses[i + 1], NOMP_BUFSIZ);
       char *tok = strtok(val, ":");
       if (tok) {
-        *usr_file = strndup(tok, PATH_MAX), tok = strtok(NULL, ":");
+        size_t size = (size_t)pathconf(tok, _PC_PATH_MAX);
+        *usr_file = strndup(tok, size), tok = strtok(NULL, ":");
         if (tok)
           *usr_func = strndup(tok, NOMP_BUFSIZ);
       }
