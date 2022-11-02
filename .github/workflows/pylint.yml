@@ -23,4 +23,4 @@ jobs:
           pip install pylint
       - name: Run pylint check
         run:
-          pylint ./python
+          pylint --fail-under=8.95 ./python
