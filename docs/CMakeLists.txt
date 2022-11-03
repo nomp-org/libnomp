@@ -34,4 +34,4 @@ add_custom_target(Sphinx ALL
                   COMMENT "Generating documentation with Sphinx")
 
 install(DIRECTORY ${SPHINX_BUILD}/ DESTINATION ${CMAKE_INSTALL_PREFIX}/docs
-  MESSAGE_NEVER)
+        MESSAGE_NEVER DIRECTORY_PERMISSIONS OWNER_READ OWNER_EXECUTE)
