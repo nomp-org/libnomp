@@ -32,29 +32,13 @@ function print_help_main() {
 }
 
 function print_help_test() {
-  echo -e " NAME\n\t Running all the tests of libnomp\n\n" \
+  echo -e " NAME\n\t Running the tests of libnomp\n\n" \
     "SYNOPSIS\n" \
-    "\t lnrun t|test \t[-g|--groups <group-pattern>] [-b|--backend <backend-name>]\n" \
-    "\t\t\t[-d|--device <device-index>] [-p|--platform <platform-index>]\n\n" \
+    "\t lnrun t|test \t[-g|--groups <group-pattern>] [-t|--test-dir <test-directory>\n" \
+    "\t\t\t[-b|--backend <backend-name>] [-d|--device <device-index>] [-p|--platform <platform-index>]\n\n" \
     "OPTIONS\n" \
     "\t${cyan}-g/--group${reset}\t Pattern to filter the tests to be run (Default: ${TEST_GROUPS}).\n" \
-    "\t${cyan}-b/--backend${reset}\t Backend to run the tests, case insensitive (Default: ${BACKEND}).\n" \
-    "\t${cyan}-p/--platform${reset}\t Platform to run the tests, case insensitive (Default: ${PLATFORM}).\n" \
-    "\t${cyan}-d/--device${reset}\t Device to run the tests, case insensitive (Default: ${DEVICE}).\n\n" \
-    "EXAMPLES\n" \
-    "\t Running all the tests\n" \
-    "\t\t $ ${cyan}lnrun test${reset}\n\n" \
-    "\t Running tests with the pattern 23* along with the CUDA backend\n" \
-    "\t\t $ ${cyan}lnrun test -g 23* -b cuda${reset}"
-}
-
-function print_help_test() {
-  echo -e " NAME\n\t Run the specified libnomp test on a gdbserver\n\n" \
-    "SYNOPSIS\n" \
-    "\t lnrun t|test \t[-g|--group <group-pattern>] [-b|--backend <backend-name>]\n" \
-    "\t\t\t[-d|--device <device-index>] [-p|--platform <platform-index>]\n\n" \
-    "OPTIONS\n" \
-    "\t${cyan}-g/--group${reset}\t Pattern to filter the tests to be run (Default: ${TEST_GROUPS}).\n" \
+    "\t${cyan}-t/--test-dir${reset}\t Specify the directory which the libnomp test resides (Default: ${TEST_DIR}).\n" \
     "\t${cyan}-b/--backend${reset}\t Backend to run the tests, case insensitive (Default: ${BACKEND}).\n" \
     "\t${cyan}-p/--platform${reset}\t Platform to run the tests, case insensitive (Default: ${PLATFORM}).\n" \
     "\t${cyan}-d/--device${reset}\t Device to run the tests, case insensitive (Default: ${DEVICE}).\n\n" \
@@ -66,7 +50,7 @@ function print_help_test() {
 }
 
 function print_help_debug() {
-  echo -e " NAME\n\t Running all the tests of libnomp\n\n" \
+  echo -e " NAME\n\t Debug the specified test\n\n" \
     "SYNOPSIS\n" \
     "\t lnrun d|debug \t[-P|--port <port-number>] [-b|--backend <backend-name>]\n" \
     "\t\t\t[-d|--device <device-index>] [-p|--platform <platform-index>]\n\n" \
@@ -161,8 +145,8 @@ while [ $# -gt 0 ]; do
     shift
     while [ $# -gt 0 ]; do
       case $1 in
-      -P | --port) shift && PORT="${1}" ;;
       -g | --group) shift && TEST_GROUPS="${1}" ;;
+      -t | --test-dir) shift && TEST_DIR="${1}" ;;
       -b | --backend) shift && BACKEND="${1}" ;;
       -p | --platform) shift && PLATFORM="${1}" ;;
       -d | --device) shift && DEVICE="${1}" ;;
