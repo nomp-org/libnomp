@@ -49,6 +49,8 @@ const char *ERR_STR_KNL_BUILD_ERROR = "NOMP kernel build error.";
 const char *ERR_STR_PY_INITIALIZE_ERROR = "NOMP python initialize error.";
 const char *ERR_STR_INVALID_LOG_ID = "Invalid log id %d.";
 const char *ERR_STR_NOMP_UNKOWN_ERROR = "Unkown error id %d";
+const char *ERR_STR_NOMP_INVALID_CLAUSE =
+    "Invalid clause is passed into nomp_jit: %s";
 
 struct log {
   char *description;

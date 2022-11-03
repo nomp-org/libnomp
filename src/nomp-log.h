@@ -14,6 +14,7 @@ extern const char *ERR_STR_PTR_IS_ALREADY_ALLOCATED;
 
 extern const char *ERR_STR_KERNEL_RUN_FAILED;
 extern const char *ERR_STR_INVALID_KERNEL;
+extern const char *ERR_STR_NOMP_INVALID_CLAUSE;
 
 extern const char *WARNING_STR_PYTHON_IS_ALREADY_INITIALIZED;
 extern const char *ERR_STR_LOOPY_CONVERSION_ERROR;

@@ -12,12 +12,14 @@ int main(int argc, char *argv[]) {
       "    a[i] = i;                                                        \n"
       "}                                                                    \n";
 
-  // Calling nomp_jit with invalid functions should return an error.
   static int id = -1;
   const char *annotations[1] = {0},
              *clauses0[3] = {"transform", "invalid-file:invalid_func", 0},
-             *clauses1[3] = {"transform", "nomp-api-50:invalid_transform", 0};
+             *clauses1[3] = {"transform", "nomp-api-50:invalid_transform", 0},
+             *clauses2[3] = {"invalid-clause", "nomp-api-50:transform", 0};
   int err = nomp_init(backend, platform, device);
+
+  // Calling nomp_jit with invalid functions should return an error.
   err = nomp_jit(&id, valid_knl, annotations, clauses0);
   nomp_assert(nomp_get_log_no(err) == NOMP_USER_CALLBACK_NOT_FOUND);
 
@@ -38,6 +40,17 @@ int main(int argc, char *argv[]) {
   matched = match_log(desc, "\\[Error\\] "
                             ".*libnomp\\/src\\/loopy.c:[0-9]* "
                             "User callback function invalid_transform failed.");
+  nomp_assert(matched);
+
+  // Calling nomp_jit with invalid clauses shoud return an error.
+  err = nomp_jit(&id, valid_knl, annotations, clauses2);
+  nomp_assert(nomp_get_log_no(err) == NOMP_INVALID_CLAUSE);
+
+  err = nomp_get_log(&desc, err);
+  matched =
+      match_log(desc, "\\[Error\\] "
+                      ".*libnomp\\/src\\/nomp.c:[0-9]* "
+                      "Invalid clause is passed into nomp_jit: invalid-clause");
   nomp_assert(matched);
 
   // Missing a semi-colon thus the kernel have a syntax error

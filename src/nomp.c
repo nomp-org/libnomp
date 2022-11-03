@@ -191,7 +191,8 @@ static int parse_clauses(char **usr_file, char **usr_func,
     } else if (strncmp(clause, "jit", NOMP_BUFSIZ) == 0) {
     } else {
       tfree(clause);
-      return NOMP_INVALID_CLAUSE;
+      return nomp_set_log(NOMP_INVALID_CLAUSE, NOMP_ERROR,
+                          ERR_STR_NOMP_INVALID_CLAUSE, clauses[i]);
     }
     i = i + 2;
   }
