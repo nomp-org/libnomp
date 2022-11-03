@@ -372,9 +372,9 @@ int nomp_err_type_to_str(char *buf, int err, size_t buf_size) {
 void nomp_chk_(int err_id, const char *file, unsigned line) {
   if (err_id == 0)
     return;
-  char *err_str;
-  int err = nomp_get_log(&err_str, err_id);
-  if (err != NOMP_INVALID_LOG_ID) {
+  if (nomp_get_log_type(err_id) == NOMP_ERROR) {
+    char *err_str;
+    int err = nomp_get_log_str(&err_str, err_id);
     printf("%s:%d %s\n", file, line, err_str);
     tfree(err_str);
     exit(1);

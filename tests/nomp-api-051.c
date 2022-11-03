@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
   nomp_assert(nomp_get_log_no(err) == NOMP_INVALID_MAP_PTR);
 
   char *desc;
-  err = nomp_get_log(&desc, err);
+  err = nomp_get_log_str(&desc, err);
   int matched = match_log(desc, "\\[Error\\] "
                                 ".*libnomp\\/src\\/nomp.c:[0-9]* "
                                 "Invalid map pointer operation 8.");
@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
   err = nomp_update(a, 0, 10, sizeof(int), NOMP_FROM);
   nomp_assert(nomp_get_log_no(err) == NOMP_INVALID_MAP_PTR);
 
-  err = nomp_get_log(&desc, err);
+  err = nomp_get_log_str(&desc, err);
   matched = match_log(desc, "\\[Error\\] "
                             ".*libnomp\\/src\\/nomp.c:[0-9]* "
                             "Invalid map pointer operation 4.");

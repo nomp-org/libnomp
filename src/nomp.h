@@ -56,32 +56,32 @@
 /**
  * @defgroup nomp_errors Errors
  *
- * @brief Different types of errors returned by nomp api calls.
+ * @brief Different types of errors returned by libnomp api calls.
  */
 
 /**
  * @ingroup nomp_errors
- * @brief Invalid NOMP backend
+ * @brief Invalid libnomp backend
  */
 #define NOMP_INVALID_BACKEND -32
 /**
  * @ingroup nomp_errors
- * @brief Invalid NOMP platform
+ * @brief Invalid libnomp platform
  */
 #define NOMP_INVALID_PLATFORM -33
 /**
  * @ingroup nomp_errors
- * @brief Invalid NOMP device
+ * @brief Invalid libnomp device
  */
 #define NOMP_INVALID_DEVICE -34
 /**
  * @ingroup nomp_errors
- * @brief Invalid NOMP map pointer
+ * @brief Invalid libnomp map pointer
  */
 #define NOMP_INVALID_MAP_PTR -36
 /**
  * @ingroup nomp_errors
- * @brief Invalid NOMP map operation
+ * @brief Invalid libnomp map operation
  */
 #define NOMP_INVALID_MAP_OP -37
 /**
@@ -91,54 +91,54 @@
 #define NOMP_PTR_ALREADY_MAPPED -38
 /**
  * @ingroup nomp_errors
- * @brief Invalid NOMP kernel
+ * @brief Invalid libnomp kernel
  */
 #define NOMP_INVALID_KNL -39
 /**
  * @ingroup nomp_errors
- * @brief Invalid NOMP for clause
+ * @brief Invalid libnomp for clause
  */
 #define NOMP_INVALID_CLAUSE -40
 /**
  * @ingroup nomp_errors
- * @brief Invalid NOMP map parameters
+ * @brief Invalid libnomp map parameters
  */
 #define NOMP_INVALID_MAP_PARAMS -41
 
 /**
  * @ingroup nomp_errors
- * @brief NOMP is already initialized
+ * @brief libnomp is already initialized
  */
 #define NOMP_INITIALIZED_ERROR -64
 /**
  * @ingroup nomp_errors
- * @brief NOMP is not initialized
+ * @brief libnomp is not initialized
  */
 #define NOMP_NOT_INITIALIZED_ERROR -65
 /**
  * @ingroup nomp_errors
- * @brief Failed to finalize NOMP
+ * @brief Failed to finalize libnomp
  */
 #define NOMP_FINALIZE_ERROR -66
 /**
  * @ingroup nomp_errors
- * @brief NOMP memory free failed
+ * @brief libnomp memory free failed
  */
 #define NOMP_FREE_FAILURE -67
 /**
  * @ingroup nomp_errors
- * @brief NOMP malloc failed
+ * @brief libnomp malloc failed
  */
 #define NOMP_MALLOC_FAILURE -68
 /**
  * @ingroup nomp_errors
- * @brief NOMP realloc failed
+ * @brief libnomp realloc failed
  */
 #define NOMP_REALLOC_FAILURE -69
 
 /**
  * @ingroup nomp_errors
- * @brief NOMP python initialization failed
+ * @brief libnomp python initialization failed
  */
 #define NOMP_PY_INITIALIZE_ERROR -96
 /**
@@ -183,63 +183,63 @@
 #define NOMP_EVAL_GRIDSIZE_FAILED -103
 /**
  * @ingroup nomp_errors
- * @brief NOMP python initialization failed
+ * @brief libnomp python initialization failed
  */
 #define NOMP_PY_APPEND_PATH_ERROR -104
 
 /**
  * @ingroup nomp_errors
- * @brief NOMP kernel build failed
+ * @brief libnomp kernel build failed
  */
 #define NOMP_KNL_BUILD_ERROR -128
 /**
  * @ingroup nomp_errors
- * @brief Invalid NOMP kernel argument type
+ * @brief Invalid libnomp kernel argument type
  */
 #define NOMP_KNL_ARG_TYPE_ERROR -129
 /**
  * @ingroup nomp_errors
- * @brief Setting NOMP kernel argument failed
+ * @brief Setting libnomp kernel argument failed
  */
 #define NOMP_KNL_ARG_SET_ERROR -130
 /**
  * @ingroup nomp_errors
- * @brief NOMP kernel run failed
+ * @brief libnomp kernel run failed
  */
 #define NOMP_KNL_RUN_ERROR -131
 /**
  * @ingroup nomp_errors
- * @brief NOMP run out of memory
+ * @brief libnomp run out of memory
  */
 #define NOMP_OUT_OF_MEMORY -140
 /**
  * @ingroup nomp_errors
- * @brief NOMP invalid log id
+ * @brief libnomp invalid log id
  */
 #define NOMP_INVALID_LOG_ID -141
 /**
  * @ingroup nomp_errors
- * @brief NOMP unknown error
+ * @brief libnomp unknown error
  */
 #define NOMP_UNKNOWN_ERROR -142
 /**
  * @ingroup nomp_errors
- * @brief NOMP string length exceed max length.
+ * @brief libnomp string length exceed max length.
  */
 #define NOMP_STR_EXCEED_MAX_LEN -143
 /**
  * @ingroup nomp_errors
- * @brief NOMP cuda queried operation failed.
+ * @brief libnomp Cuda operation failed.
  */
 #define NOMP_CUDA_FAILURE -144
 /**
  * @ingroup nomp_errors
- * @brief NOMP tcalloc failure.
+ * @brief libnomp tcalloc failure.
  */
 #define NOMP_TCALLOC_FAILED -145
 /**
  * @ingroup nomp_errors
- * @brief NOMP OPENCL failure.
+ * @brief libnomp OpenCL failure.
  */
 #define NOMP_OPENCL_FAILURE -146
 
@@ -410,7 +410,7 @@ int nomp_set_log_(const char *desc, int logno, nomp_log_type type,
  * @param[in] log_id id of the error.
  * @return int
  */
-int nomp_get_log(char **log, int log_id);
+int nomp_get_log_str(char **log, int log_id);
 
 /**
  * @ingroup nomp_user_api
@@ -422,6 +422,18 @@ int nomp_get_log(char **log, int log_id);
  * @return int
  */
 int nomp_get_log_no(int log_id);
+
+/**
+ * @ingroup nomp_user_api
+ * @brief Return log type.
+ *
+ * @details Returns the log type given the log_id. Log type is either
+ * NOMP_ERROR, NOMP_INFORMATION or NOMP_WARNING. If log_id is invalid return
+ * NOMP_INVALID_LOG_ID.
+ * @param[in] log_id id of the log.
+ * @return int
+ */
+int nomp_get_log_type(int log_id);
 
 /**
  * @ingroup nomp_user_api

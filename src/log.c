@@ -14,7 +14,7 @@ const char *ERR_STR_FAILED_TO_FINALIZE_NOMP = "Failed to finalize libnomp.";
 const char *ERR_STR_NOMP_INSTALL_DIR_NOT_SET =
     "Environment variable NOMP_INSTALL_DIR, which is required by libnomp is "
     "not set.";
-const char *ERR_STR_NOMP_IS_NOT_INITIALIZED = "Nomp is not initialized.";
+const char *ERR_STR_NOMP_IS_NOT_INITIALIZED = "libnomp is not initialized.";
 
 const char *ERR_STR_INVALID_MAP_OP = "Invalid map pointer operation %d.";
 const char *ERR_STR_INVALID_MAP_PTR = "Invalid map pointer %p.";
@@ -38,23 +38,23 @@ const char *ERR_STR_LOOPY_CODEGEN_FAILED =
 const char *ERR_STR_LOOPY_GRIDSIZE_FAILED = "Loopy grid size failure.";
 const char *ERR_STR_GRIDSIZE_CALCULATION_FAILED =
     "Loopy grid size calculation failure.";
-
 const char *ERR_STR_INVALID_KNL_ARG_TYPE =
-    "Invalid NOMP kernel argument type %d.";
-const char *ERR_STR_INVALID_DEVICE = "Invalid NOMP device id %d.";
-const char *ERR_STR_KNL_ARG_SET_ERROR = "Setting NOMP kernel argument failed.";
-const char *ERR_STR_INVALID_PLATFORM = "Invalid NOMP platform id %d.";
-const char *ERR_STR_MALLOC_ERROR = "NOMP malloc error.";
-const char *ERR_STR_KNL_BUILD_ERROR = "NOMP kernel build error.";
-const char *ERR_STR_PY_INITIALIZE_ERROR = "NOMP python initialize error.";
+    "Invalid libnomp kernel argument type %d.";
+const char *ERR_STR_INVALID_DEVICE = "Invalid libnomp device id %d.";
+const char *ERR_STR_KNL_ARG_SET_ERROR =
+    "Setting libnomp kernel argument failed.";
+const char *ERR_STR_INVALID_PLATFORM = "Invalid libnomp platform id %d.";
+const char *ERR_STR_MALLOC_ERROR = "libnomp malloc error.";
+const char *ERR_STR_KNL_BUILD_ERROR = "libnomp kernel build error.";
+const char *ERR_STR_PY_INITIALIZE_ERROR = "libnomp python initialize error.";
 const char *ERR_STR_INVALID_LOG_ID = "Invalid log id %d.";
 const char *ERR_STR_NOMP_UNKOWN_ERROR = "Unkown error id %d";
 const char *ERR_STR_NOMP_INVALID_CLAUSE =
     "Invalid clause is passed into nomp_jit: %s";
 const char *ERR_STR_EXCEED_MAX_LEN_STR =
     "String length exceed the max length of %d.";
-const char *ERR_STR_CUDA_FAILURE = "CUDA %s failed: %s.";
-const char *ERR_STR_TCALLOC_FAILURE = "NOMP tcalloc failure.";
+const char *ERR_STR_CUDA_FAILURE = "Cuda %s failed: %s.";
+const char *ERR_STR_TCALLOC_FAILURE = "libnomp tcalloc failure.";
 const char *ERR_STR_OPENCL_FAILURE = "OpenCL %s failure.";
 
 struct log {
@@ -95,7 +95,7 @@ int nomp_set_log_(const char *description, int logno, nomp_log_type type,
   return logs_n;
 }
 
-int nomp_get_log(char **log_str, int log_id) {
+int nomp_get_log_str(char **log_str, int log_id) {
   if (log_id <= 0 && log_id > logs_n) {
     *log_str = NULL;
     return nomp_set_log(NOMP_INVALID_LOG_ID, NOMP_ERROR, ERR_STR_INVALID_LOG_ID,
@@ -113,6 +113,13 @@ int nomp_get_log_no(int log_id) {
     return nomp_set_log(NOMP_INVALID_LOG_ID, NOMP_ERROR, ERR_STR_INVALID_LOG_ID,
                         log_id);
   return logs[log_id - 1].logno;
+}
+
+int nomp_get_log_type(int log_id) {
+  if (log_id <= 0 && log_id > logs_n)
+    return nomp_set_log(NOMP_INVALID_LOG_ID, NOMP_ERROR, ERR_STR_INVALID_LOG_ID,
+                        log_id);
+  return logs[log_id - 1].type;
 }
 
 void nomp_finalize_logs() {
