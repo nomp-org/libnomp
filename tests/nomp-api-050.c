@@ -11,10 +11,9 @@ int main(int argc, char *argv[]) {
   nomp_assert(nomp_get_log_no(err) == NOMP_NOT_INITIALIZED_ERROR);
 
   char *desc;
-  err = nomp_get_log(&desc, err);
-  int matched = match_log(
-      desc,
-      "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* Nomp is not initialized.");
+  err = nomp_get_log_str(&desc, err);
+  int matched = match_log(desc, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* "
+                                "libnomp is not initialized.");
   nomp_assert(matched);
 
   // Calling `nomp_init` twice must return an error, but must not segfault
@@ -23,7 +22,7 @@ int main(int argc, char *argv[]) {
   err = nomp_init(backend, platform_id, device_id);
   nomp_assert(nomp_get_log_no(err) == NOMP_INITIALIZED_ERROR);
 
-  err = nomp_get_log(&desc, err);
+  err = nomp_get_log_str(&desc, err);
   matched =
       match_log(desc, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* libnomp is "
                       "already initialized to use opencl. Call nomp_finalize() "
@@ -36,10 +35,9 @@ int main(int argc, char *argv[]) {
   err = nomp_finalize();
   nomp_assert(nomp_get_log_no(err) == NOMP_NOT_INITIALIZED_ERROR);
 
-  err = nomp_get_log(&desc, err);
-  matched = match_log(
-      desc,
-      "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* Nomp is not initialized.");
+  err = nomp_get_log_str(&desc, err);
+  matched = match_log(desc, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* "
+                            "libnomp is not initialized.");
   nomp_assert(matched);
 
   tfree(desc);

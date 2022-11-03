@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
                  sizeof(int), b, "N", NOMP_INTEGER, sizeof(int), &n);
   nomp_assert(nomp_get_log_no(err) == NOMP_INVALID_KNL);
   char *desc;
-  err = nomp_get_log(&desc, err);
+  err = nomp_get_log_str(&desc, err);
   int matched = match_log(desc, "\\[Error\\] "
                                 ".*libnomp\\/"
                                 "src\\/nomp.c:[0-9]* Invalid kernel -1.");
@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
   err = nomp_run(id, 3, "a", NOMP_PTR, sizeof(int), a, "b", NOMP_PTR,
                  sizeof(int), b, "N", NOMP_INTEGER, sizeof(int), &n);
   nomp_assert(nomp_get_log_no(err) == NOMP_KNL_RUN_ERROR);
-  err = nomp_get_log(&desc, err);
+  err = nomp_get_log_str(&desc, err);
   matched = match_log(desc, "\\[Error\\] "
                             ".*\\/libnomp\\/"
                             "src\\/nomp.c:[0-9]* Kernel 0 run failed.");

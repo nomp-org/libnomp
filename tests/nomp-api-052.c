@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
   nomp_assert(nomp_get_log_no(err) == NOMP_USER_CALLBACK_NOT_FOUND);
 
   char *desc;
-  err = nomp_get_log(&desc, err);
+  err = nomp_get_log_str(&desc, err);
   int matched =
       match_log(desc, "\\[Error\\] "
                       ".*libnomp\\/"
@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
   err = nomp_jit(&id, valid_knl, annotations, clauses1);
   nomp_assert(nomp_get_log_no(err) == NOMP_USER_CALLBACK_FAILURE);
 
-  err = nomp_get_log(&desc, err);
+  err = nomp_get_log_str(&desc, err);
   matched = match_log(desc, "\\[Error\\] "
                             ".*libnomp\\/src\\/loopy.c:[0-9]* "
                             "User callback function invalid_transform failed.");
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
   err = nomp_jit(&id, invalid_knl, annotations, clauses0);
   nomp_assert(nomp_get_log_no(err) == NOMP_LOOPY_CONVERSION_ERROR);
 
-  err = nomp_get_log(&desc, err);
+  err = nomp_get_log_str(&desc, err);
   matched = match_log(desc, "\\[Error\\] "
                             ".*"
                             "libnomp\\/src\\/loopy.c:[0-9]* C "
