@@ -381,7 +381,8 @@ void nomp_chk_(int err, const char *file, unsigned line);
 typedef enum {
   NOMP_ERROR = 0,
   NOMP_WARNING = 1,
-  NOMP_INFORMATION = 2
+  NOMP_INFORMATION = 2,
+  NOMP_INVALID = 3
 } nomp_log_type;
 
 int nomp_set_log_(const char *desc, int logno, nomp_log_type type,
@@ -429,11 +430,11 @@ int nomp_get_log_no(int log_id);
  *
  * @details Returns the log type given the log_id. Log type is either
  * NOMP_ERROR, NOMP_INFORMATION or NOMP_WARNING. If log_id is invalid return
- * NOMP_INVALID_LOG_ID.
+ * NOMP_INVALID.
  * @param[in] log_id id of the log.
  * @return int
  */
-int nomp_get_log_type(int log_id);
+nomp_log_type nomp_get_log_type(int log_id);
 
 /**
  * @ingroup nomp_user_api

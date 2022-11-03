@@ -21,7 +21,7 @@
 
 #define return_on_err(err)                                                     \
   do {                                                                         \
-    if (err)                                                                   \
+    if (nomp_get_log_type(err) == NOMP_ERROR)                                  \
       return err;                                                              \
   } while (0)
 
