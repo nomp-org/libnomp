@@ -31,6 +31,7 @@ jobs:
       CC: ${{ matrix.compiler }}
       TESTDIR: tests
       BUILDDIR: build
+      SCRIPTDIR: scripts
     steps:
       - name: Setup Github actions
         uses: actions/checkout@v3
@@ -79,8 +80,7 @@ jobs:
       - name: Run libnomp tests
         id: run_libnomp
         run: |
-          cd ${TESTDIR}
-          ./run-tests.sh
+          ${NOMP_INSTALL_DIR}/${SCRIPTDIR}/lnrun test -t ${NOMP_INSTALL_DIR}/${TESTDIR}
       - name: Block to allow inspecting failures
         run: sleep 30m
         if: ${{ failure() && inputs.debug_enabled }}
