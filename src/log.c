@@ -109,16 +109,15 @@ int nomp_get_log_str(char **log_str, int log_id) {
 }
 
 int nomp_get_log_no(int log_id) {
-  if (log_id <= 0 && log_id > logs_n)
+  if (log_id <= 0 || log_id > logs_n)
     return nomp_set_log(NOMP_INVALID_LOG_ID, NOMP_ERROR, ERR_STR_INVALID_LOG_ID,
                         log_id);
   return logs[log_id - 1].logno;
 }
 
-int nomp_get_log_type(int log_id) {
-  if (log_id <= 0 && log_id > logs_n)
-    return nomp_set_log(NOMP_INVALID_LOG_ID, NOMP_ERROR, ERR_STR_INVALID_LOG_ID,
-                        log_id);
+nomp_log_type nomp_get_log_type(int log_id) {
+  if (log_id <= 0 || log_id > logs_n)
+    return NOMP_INVALID;
   return logs[log_id - 1].type;
 }
 

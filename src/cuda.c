@@ -10,7 +10,6 @@
     if (x != CUDA_SUCCESS) {                                                   \
       const char *msg;                                                         \
       cuGetErrorName(x, &msg);                                                 \
-      fprintf(stderr, "%s:%u %s\n", file, line, msg);                          \
       return nomp_set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE, \
                           "operation", msg);                                   \
     }                                                                          \
@@ -22,7 +21,6 @@
   do {                                                                         \
     if (x != NVRTC_SUCCESS) {                                                  \
       const char *msg = nvrtcGetErrorString(x);                                \
-      fprintf(stderr, "%s:%d %s\n", file, line, msg);                          \
       return nomp_set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE, \
                           "runtime compilation", msg);                         \
     }                                                                          \
@@ -33,7 +31,6 @@
   do {                                                                         \
     if (x != cudaSuccess) {                                                    \
       const char *msg = cudaGetErrorString(x);                                 \
-      fprintf(stderr, "%s:%d %s\n", file, line, msg);                          \
       return nomp_set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE, \
                           "operation", msg);                                   \
     }                                                                          \
