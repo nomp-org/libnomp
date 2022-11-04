@@ -32,7 +32,7 @@ static int opencl_update(struct backend *bnd, struct mem *m, const int op) {
     if (err != CL_SUCCESS) {
       tfree(m->bptr), m->bptr = NULL;
       return nomp_set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR,
-                          ERR_STR_OPENCL_FAILURE, "create buffer");
+                          ERR_STR_OPENCL_FAILURE, "create buffer", err);
     }
   }
 
@@ -64,7 +64,7 @@ static int opencl_knl_build(struct backend *bnd, struct prog *prg,
       ocl->ctx, 1, (const char **)(&source), NULL, &err);
   if (err != CL_SUCCESS)
     return nomp_set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
-                        "kernel build");
+                        "kernel build", err);
 
   err = clBuildProgram(ocl_prg->prg, 0, NULL, NULL, NULL, NULL);
   if (err != CL_SUCCESS) {
@@ -90,14 +90,14 @@ static int opencl_knl_build(struct backend *bnd, struct prog *prg,
     ocl_prg->knl = NULL;
 
     return nomp_set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
-                        "kernel build");
+                        "kernel build", err);
   }
 
   ocl_prg->knl = clCreateKernel(ocl_prg->prg, name, &err);
   if (err != CL_SUCCESS) {
     ocl_prg->knl = NULL;
     return nomp_set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
-                        "kernel create");
+                        "kernel create", err);
   }
 
   return 0;
@@ -149,11 +149,11 @@ static int opencl_knl_free(struct prog *prg) {
   cl_int err = clReleaseKernel(ocl_prg->knl);
   if (err != CL_SUCCESS)
     return nomp_set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
-                        "kernel release");
+                        "kernel release", err);
   err = clReleaseProgram(ocl_prg->prg);
   if (err != CL_SUCCESS)
     return nomp_set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
-                        "program release");
+                        "program release", err);
   tfree(prg->bptr), prg->bptr = NULL;
 
   return 0;
@@ -164,11 +164,11 @@ static int opencl_finalize(struct backend *bnd) {
   cl_int err = clReleaseCommandQueue(ocl->queue);
   if (err != CL_SUCCESS)
     return nomp_set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
-                        "command queue release");
+                        "command queue release", err);
   err = clReleaseContext(ocl->ctx);
   if (err != CL_SUCCESS)
     return nomp_set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
-                        "context release");
+                        "context release", err);
   tfree(bnd->bptr), bnd->bptr = NULL;
 
   return 0;

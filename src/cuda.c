@@ -99,8 +99,14 @@ static int cuda_knl_build(struct backend *bnd, struct prog *prg,
     nvrtcGetProgramLogSize(prog, &log_size);
     char *log = tcalloc(char, log_size);
     nvrtcGetProgramLog(prog, log);
-    fprintf(stderr, "%s\n%s", nvrtcGetErrorString(nvrtc_err), log);
-    tfree(log);
+    const char *err_str = nvrtcGetErrorString(nvrtc_err);
+    size_t msg_size = log_size + strlen(err_str) + 2;
+    char *msg = tcalloc(char, msg_size);
+    snprintf(msg, msg_size, "%s: %s", err_str, log);
+    int err_id = nomp_set_log(NOMP_CUDA_FAILURE, NOMP_ERROR,
+                              ERR_STR_CUDA_FAILURE, "build", msg);
+    tfree(log), tfree(msg);
+    return err_id;
   }
 
   size_t ptx_size;

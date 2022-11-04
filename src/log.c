@@ -55,7 +55,7 @@ const char *ERR_STR_EXCEED_MAX_LEN_STR =
     "String length exceed the max length of %d.";
 const char *ERR_STR_CUDA_FAILURE = "Cuda %s failed: %s.";
 const char *ERR_STR_TCALLOC_FAILURE = "libnomp tcalloc failure.";
-const char *ERR_STR_OPENCL_FAILURE = "OpenCL %s failure.";
+const char *ERR_STR_OPENCL_FAILURE = "OpenCL %s failure with error code: %d.";
 
 struct log {
   char *description;
