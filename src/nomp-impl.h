@@ -211,7 +211,7 @@ int strnlower(char **out, const char *in, size_t max);
  * @param[in] size Size of the string
  * @return int
  */
-int strntoi(const char *str, size_t size);
+int strntoui(const char *str, size_t size);
 
 /**
  * @ingroup nomp_other_utils
