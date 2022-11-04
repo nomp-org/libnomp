@@ -35,17 +35,17 @@ int strnlower(char **out, const char *in, size_t max) {
   return 0;
 }
 
-int strntoi(const char *str, size_t size) {
+int strntoui(const char *str, size_t size) {
   if (str == NULL)
     return -1;
+
   char *str_dup = strndup(str, size), *end_ptr;
   int num = (int)strtol(str_dup, &end_ptr, 10);
-  if (str_dup == end_ptr || '\0' != *end_ptr) {
-    tfree(str_dup);
-    return -1;
-  }
+  if (str_dup == end_ptr || '\0' != *end_ptr || num < 0)
+    num = -1;
   tfree(str_dup);
-  return num >= 0 ? num : -1;
+
+  return num;
 }
 
 size_t pathlen(const char *path) {

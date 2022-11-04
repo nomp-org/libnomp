@@ -17,27 +17,30 @@ static char *get_if_env(const char *name) {
   return NULL;
 }
 
-static int nomp_check_env(struct backend *backend) {
+static int check_env(struct backend *backend) {
   char *tmp = get_if_env("NOMP_BACKEND");
   if (tmp != NULL) {
     backend->backend = trealloc(backend->backend, char, MAX_BACKEND_NAME_SIZE);
-    strncpy(backend->backend, tmp, MAX_BACKEND_NAME_SIZE);
-    tfree(tmp);
+    strncpy(backend->backend, tmp, MAX_BACKEND_NAME_SIZE), tfree(tmp);
   }
-  int platform_id = strntoi(getenv("NOMP_PLATFORM_ID"), NOMP_BUFSIZ);
+
+  int platform_id = strntoui(getenv("NOMP_PLATFORM_ID"), NOMP_BUFSIZ);
   if (platform_id >= 0)
     backend->platform_id = platform_id;
-  int device_id = strntoi(getenv("NOMP_DEVICE_ID"), NOMP_BUFSIZ);
+
+  int device_id = strntoui(getenv("NOMP_DEVICE_ID"), NOMP_BUFSIZ);
   if (device_id >= 0)
     backend->device_id = device_id;
+
   tmp = get_if_env("NOMP_INSTALL_DIR");
   if (tmp != NULL) {
     size_t size = pathlen(tmp);
     backend->install_dir = tcalloc(char, size + 1);
-    strncpy(backend->install_dir, tmp, size + 1);
-    tfree(tmp);
+    strncpy(backend->install_dir, tmp, size + 1), tfree(tmp);
   }
-  backend->verbose = strntoi(getenv("NOMP_VERBOSE_LEVEL"), NOMP_BUFSIZ);
+
+  backend->verbose = strntoui(getenv("NOMP_VERBOSE_LEVEL"), NOMP_BUFSIZ);
+
   return 0;
 }
 
@@ -51,8 +54,10 @@ int nomp_init(const char *backend, int platform, int device) {
 
   nomp.backend = tcalloc(char, MAX_BACKEND_NAME_SIZE);
   strncpy(nomp.backend, backend, MAX_BACKEND_NAME_SIZE);
+
   nomp.platform_id = platform, nomp.device_id = device;
-  int err = nomp_check_env(&nomp);
+
+  int err = check_env(&nomp);
   return_on_err(err);
 
   char name[MAX_BACKEND_NAME_SIZE];
@@ -156,12 +161,10 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
   int err = nomp.update(&nomp, mems[idx], op);
 
   // Device memory got free'd
-  if (mems[idx]->bptr == NULL) {
-    tfree(mems[idx]);
-    mems[idx] = NULL;
-  } else if (idx == mems_n) {
+  if (mems[idx]->bptr == NULL)
+    tfree(mems[idx]), mems[idx] = NULL;
+  else if (idx == mems_n)
     mems_n++;
-  }
 
   return err;
 }
@@ -222,13 +225,18 @@ int nomp_jit(int *id, const char *c_src, const char **annotations,
     int err = py_c_to_loopy(&py_knl, c_src, nomp.name);
     return_on_err(err);
 
-    // Call the User callback function
+    // Handle annotations
+
+    // Parse the clauses
     char *usr_file = NULL, *usr_func = NULL;
     err = parse_clauses(&usr_file, &usr_func, clauses);
     return_on_err(err);
+
+    // Call the User callback function
     err = py_user_callback(&py_knl, usr_file, usr_func);
     tfree(usr_file), tfree(usr_func);
     return_on_err(err);
+
     // Get OpenCL, CUDA, etc. source and name from the loopy kernel
     char *name, *src;
     err = py_get_knl_name_and_src(&name, &src, py_knl);
@@ -323,24 +331,25 @@ int nomp_finalize(void) {
 
   for (unsigned i = 0; i < mems_n; i++) {
     if (mems[i]) {
+      // FIXME: Check error returned form `nomp.update`
       nomp.update(&nomp, mems[i], NOMP_FREE);
       tfree(mems[i]), mems[i] = NULL;
     }
   }
-  tfree(mems);
-  mems = NULL, mems_n = mems_max = 0;
+  tfree(mems), mems = NULL, mems_n = mems_max = 0;
 
   for (unsigned i = 0; i < progs_n; i++) {
     if (progs[i]) {
+      // FIXME: Check error returned form `nomp.knl_free`
       nomp.knl_free(progs[i]);
       tfree(progs[i]), progs[i] = NULL;
     }
   }
-  tfree(progs);
-  progs = NULL, progs_n = progs_max = 0;
+  tfree(progs), progs = NULL, progs_n = progs_max = 0;
+
+  tfree(nomp.backend), tfree(nomp.install_dir);
 
   initialized = nomp.finalize(&nomp);
-  tfree(nomp.backend), tfree(nomp.install_dir);
   if (initialized)
     return set_log(NOMP_FINALIZE_ERROR, NOMP_ERROR,
                    ERR_STR_FAILED_TO_FINALIZE_NOMP);
