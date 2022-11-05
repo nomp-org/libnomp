@@ -1,15 +1,22 @@
 #!/bin/bash
 
 # script variables
+: "${NOMP_SOURCE_DIR:="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"}"
+: "${NOMP_BUILD_DIR:="${NOMP_SOURCE_DIR}/build"}"
+: "${NOMP_CMAKE_OPTS:=""}"
 : "${NOMP_INSTALL_DIR:="${HOME}/.nomp"}"
-SOURCE_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-BUILD_DIR="${SOURCE_DIR}/build"
-CMAKE_OPTS=("-DCMAKE_INSTALL_PREFIX=${HOME}/.nomp" "-DOpenCL_LIBRARY=/lib/x86_64-linux-gnu/libOpenCL.so.1")
-VERBOSE=false
-OUTPUT=""
-CONFIGURE_SUCCESS=false
-SCRIPT_PATH="${NOMP_INSTALL_DIR}/scripts"
-NOMP_ENVIRONMENT=""
+: "${NOMP_OPENCL_LIBRARY:="/lib/x86_64-linux-gnu/libOpenCL.so.1"}"
+: "${NOMP_BUILD_TYPE:=""}"
+: "${NOMP_ENABLE_DOCS:=false}"
+
+# update env variable if cmake opts provided
+[[ -n ${NOMP_CMAKE_OPTS} ]] && {
+  grep -xFq "export NOMP_CMAKE_OPTS=${NOMP_CMAKE_OPTS}" ~/.bashrc || {
+    grep -wq "export NOMP_CMAKE_OPTS=" ~/.bashrc &&
+      sed -i "s/NOMP\_CMAKE\_OPTS=.*/NOMP\_CMAKE\_OPTS=\"${NOMP_CMAKE_OPTS}\"/" ~/.bashrc ||
+      echo -e "# setup nomp cmake options \nexport NOMP_CMAKE_OPTS=\"${NOMP_CMAKE_OPTS}\"" >>~/.bashrc
+  }
+}
 
 # colors
 red=$(tput setaf 1)
@@ -21,14 +28,15 @@ function print_help() {
   echo -e "usage: ./lncfg [-h|--help] [-v|--verbose] [-d|--debug] [-D|--docs]\n" \
     "\t[-i|--install-dir <install directory>]\n\n" \
     "${cyan}-h/--help:${reset} Print help for libnomp configuration.\n" \
-    "${cyan}-v/--verbose:${reset} Display all the build output.\n" \
-    "${cyan}-d/--debug:${reset} Build with debug symbols.\n" \
-    "${cyan}-D/--docs:${reset} Build with user documentation.\n" \
-    "${cyan}-i/--install-dir:${reset} Specify installation directory for libnomp (Default: ${NOMP_INSTALL_DIR}).\n"
+    "${cyan}-b/--build-type:${reset} Specify the build type for cmake." \
+    "Accepted values: Debug, Release, RelWithDebInfo and MinSizeRel.\n" \
+    "${cyan}-d/--enable-docs:${reset} Build with user documentation (Default: false).\n" \
+    "${cyan}-i/--install-dir:${reset} Specify installation directory for libnomp (Default: ${NOMP_INSTALL_DIR}).\n" \
+    "${cyan}-o/--opencl-lib:${reset} Specify OpenCL library path (Default: ${NOMP_OPENCL_LIBRARY}).\n"
 }
 
 # create build directory if not exists
-[[ ! -d "${BUILD_DIR}" ]] && mkdir build
+[[ ! -d "${NOMP_BUILD_DIR}" ]] && mkdir build
 
 # parse the options
 while [ $# -gt 0 ]; do
@@ -37,10 +45,10 @@ while [ $# -gt 0 ]; do
     print_help
     exit 0
     ;;
-  -v | --verbose) VERBOSE=true ;;
-  -d | --debug) CMAKE_OPTS+=("-DCMAKE_BUILD_TYPE=DEBUG") ;;
-  -D | --docs) CMAKE_OPTS+=("-DENABLE_DOCS=ON") ;;
+  -b | --build-type) shift && NOMP_BUILD_TYPE=${1^^} ;;
+  -d | --enable-docs) NOMP_ENABLE_DOCS=true ;;
   -i | --install-dir) shift && NOMP_INSTALL_DIR="${1}" ;;
+  -o | --opencl-lib) shift && NOMP_OPENCL_LIBRARY="${1}" ;;
   *) echo "${red}Invalid argument: ${1}${reset}" &&
     echo "See ${cyan}./lncfg -h${reset} or ${cyan}./lncfg --help${reset} for the accepted commands" &&
     exit 1 ;;
@@ -48,33 +56,32 @@ while [ $# -gt 0 ]; do
   shift
 done
 
+# update the cmake opts
+[[ -n ${NOMP_CMAKE_OPTS} ]] &&
+  NOMP_CMAKE_OPTS_ARR=("${NOMP_CMAKE_OPTS}") ||
+  NOMP_CMAKE_OPTS_ARR=()
+[[ ${NOMP_CMAKE_OPTS} != *"DOpenCL_LIBRARY"* ]] &&
+  NOMP_CMAKE_OPTS_ARR+=("-DOpenCL_LIBRARY=${NOMP_OPENCL_LIBRARY}")
+[[ ${NOMP_CMAKE_OPTS} != *"DCMAKE_INSTALL_PREFIX"* ]] &&
+  NOMP_CMAKE_OPTS_ARR+=("-DCMAKE_INSTALL_PREFIX=${NOMP_INSTALL_DIR}") &&
+  [[ ${NOMP_CMAKE_OPTS} != *"DENABLE_DOCS"* && "${NOMP_ENABLE_DOCS}" = true ]] &&
+  NOMP_CMAKE_OPTS_ARR+=("-DENABLE_DOCS=ON")
+[[ ${NOMP_CMAKE_OPTS} != *"DCMAKE_BUILD_TYPE"* && -n "${NOMP_BUILD_TYPE}" ]] &&
+  NOMP_CMAKE_OPTS_ARR+=("-DCMAKE_BUILD_TYPE=${NOMP_BUILD_TYPE}")
+
 # configure cmake
+NOMP_CONFIGURE_SUCCESS=false
 echo "Configuring build files for libnomp..."
-cd "${BUILD_DIR}" &&
-  OUTPUT+=$(cmake .. "${CMAKE_OPTS[@]}") &&
-  CONFIGURE_SUCCESS=true
+cd "${NOMP_BUILD_DIR}" &&
+  cmake .. "${NOMP_CMAKE_OPTS_ARR[@]}" &&
+  NOMP_CONFIGURE_SUCCESS=true
 
-if [ "${CONFIGURE_SUCCESS}" = true ]; then
-  [ "${VERBOSE}" = true ] && echo "${OUTPUT}"
+if [ "${NOMP_CONFIGURE_SUCCESS}" = true ]; then
   echo "${green}Successfully created build files for libnomp${reset}"
-  echo "To install libnomp, execute '${cyan}cd ${SOURCE_DIR}/build && make install${reset}'"
-
-  # set the install env variable if not set
-  [[ -n "${NOMP_INSTALL_DIR}" ]] &&
-    export "NOMP_INSTALL_DIR=${NOMP_INSTALL_DIR}" &&
-    { grep -xFq "export NOMP_INSTALL_DIR=${NOMP_INSTALL_DIR}" ~/.bashrc ||
-      NOMP_ENVIRONMENT="# setup nomp environment variables\nexport NOMP_INSTALL_DIR=${NOMP_INSTALL_DIR}\n"; }
-
-  # add lnrun script to path
-  [[ ${PATH} != *"${SCRIPT_PATH}"* ]] &&
-    export "PATH=${SCRIPT_PATH}:${PATH}" &&
-    { grep -xFq "export PATH=${SCRIPT_PATH}:\${PATH}" ~/.bashrc ||
-      NOMP_ENVIRONMENT+="export PATH=${SCRIPT_PATH}:\${PATH}\n"; }
-
-  [[ ${NOMP_ENVIRONMENT} ]] && echo -e "${NOMP_ENVIRONMENT}" >>~/.bashrc
+  echo "To install libnomp, execute '${cyan}./lninstall${reset}'"
   exit 0
 else
   echo "${OUTPUT}"
-  echo "${red}Failed to build libnomp${reset}"
+  echo "${red}Failed to create build files for libnomp${reset}"
   exit 1
 fi
