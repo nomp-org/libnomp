@@ -80,7 +80,7 @@ jobs:
       - name: Run libnomp tests
         id: run_libnomp
         run: |
-          ${NOMP_INSTALL_DIR}/${SCRIPTDIR}/lnrun test -t ${NOMP_INSTALL_DIR}/${TESTDIR}
+          ${NOMP_INSTALL_DIR}/${SCRIPTDIR}/lnrun test
       - name: Block to allow inspecting failures
         run: sleep 30m
         if: ${{ failure() && inputs.debug_enabled }}

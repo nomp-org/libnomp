@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# script variables
+: "${NOMP_SOURCE_DIR:="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"}"
+: "${NOMP_INSTALL_DIR:="${HOME}/.nomp"}"
+: "${NOMP_SCRIPT_PATH:="${NOMP_INSTALL_DIR}/scripts"}"
+
+# colors
+red=$(tput setaf 1)
+green=$(tput setaf 2)
+cyan=$(tput setaf 6)
+reset=$(tput sgr0)
+
+# installing libnomp
+NOMP_INSTALL_SUCCESS=false
+cd "${NOMP_SOURCE_DIR}/build" &&
+  make install &&
+  NOMP_INSTALL_SUCCESS=true
+
+if [[ ${NOMP_INSTALL_SUCCESS} = true ]]; then
+  echo "${green}Successfully installed libnomp${reset}"
+  echo "See ${cyan}lnrun -h${reset} for available commands"
+
+  # set the install env variable if not
+  NOMP_ENVIRONMENT=""
+  [[ -n ${NOMP_INSTALL_DIR} ]] &&
+    export "NOMP_INSTALL_DIR=${NOMP_INSTALL_DIR}" &&
+    { grep -xFq "export NOMP_INSTALL_DIR=${NOMP_INSTALL_DIR}" ~/.bashrc ||
+      NOMP_ENVIRONMENT="# setup nomp environment variables\nexport NOMP_INSTALL_DIR=${NOMP_INSTALL_DIR}\n"; }
+
+  # add lnrun script to path
+  [[ ${PATH} != *"${NOMP_SCRIPT_PATH}"* ]] &&
+    export "PATH=${NOMP_SCRIPT_PATH}:${PATH}" &&
+    { grep -xFq "export PATH=${NOMP_SCRIPT_PATH}:\${PATH}" ~/.bashrc ||
+      NOMP_ENVIRONMENT+="export PATH=${NOMP_SCRIPT_PATH}:\${PATH}\n"; }
+
+  [[ ${NOMP_ENVIRONMENT} ]] && echo -e "${NOMP_ENVIRONMENT}" >>~/.bashrca
+  cd "${NOMP_SOURCE_DIR}" || exit 0
+else
+  echo "${red}Failed to install libnomp${reset}"
+fi
