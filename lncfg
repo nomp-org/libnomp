@@ -63,8 +63,8 @@ done
 [[ ${NOMP_CMAKE_OPTS} != *"DOpenCL_LIBRARY"* ]] &&
   NOMP_CMAKE_OPTS_ARR+=("-DOpenCL_LIBRARY=${NOMP_OPENCL_LIBRARY}")
 [[ ${NOMP_CMAKE_OPTS} != *"DCMAKE_INSTALL_PREFIX"* ]] &&
-  NOMP_CMAKE_OPTS_ARR+=("-DCMAKE_INSTALL_PREFIX=${NOMP_INSTALL_DIR}") &&
-  [[ ${NOMP_CMAKE_OPTS} != *"DENABLE_DOCS"* && "${NOMP_ENABLE_DOCS}" = true ]] &&
+  NOMP_CMAKE_OPTS_ARR+=("-DCMAKE_INSTALL_PREFIX=${NOMP_INSTALL_DIR}")
+[[ ${NOMP_CMAKE_OPTS} != *"DENABLE_DOCS"* && "${NOMP_ENABLE_DOCS}" = true ]] &&
   NOMP_CMAKE_OPTS_ARR+=("-DENABLE_DOCS=ON")
 [[ ${NOMP_CMAKE_OPTS} != *"DCMAKE_BUILD_TYPE"* && -n "${NOMP_BUILD_TYPE}" ]] &&
   NOMP_CMAKE_OPTS_ARR+=("-DCMAKE_BUILD_TYPE=${NOMP_BUILD_TYPE}")
@@ -76,12 +76,11 @@ cd "${NOMP_BUILD_DIR}" &&
   cmake .. "${NOMP_CMAKE_OPTS_ARR[@]}" &&
   NOMP_CONFIGURE_SUCCESS=true
 
-if [ "${NOMP_CONFIGURE_SUCCESS}" = true ]; then
+if [[ ${NOMP_CONFIGURE_SUCCESS} = true ]]; then
   echo "${green}Successfully created build files for libnomp${reset}"
-  echo "To install libnomp, execute '${cyan}./lninstall${reset}'"
+  echo "To install libnomp, execute '${cyan}. lninstall${reset}'"
   exit 0
 else
-  echo "${OUTPUT}"
   echo "${red}Failed to create build files for libnomp${reset}"
   exit 1
 fi
