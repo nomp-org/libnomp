@@ -45,8 +45,8 @@ static int nomp_check_env(struct backend *backend) {
 //
 int nomp_init(const char *backend, int platform, int device) {
   if (initialized)
-    return nomp_set_log(NOMP_INITIALIZED_ERROR, NOMP_ERROR,
-                        ERR_STR_NOMP_IS_ALREADY_INITIALIZED, nomp.name);
+    return set_log(NOMP_INITIALIZED_ERROR, NOMP_ERROR,
+                   ERR_STR_NOMP_IS_ALREADY_INITIALIZED, nomp.name);
 
   nomp.backend = tcalloc(char, MAX_BACKEND_NAME_SIZE);
   strncpy(nomp.backend, backend, MAX_BACKEND_NAME_SIZE);
@@ -69,8 +69,8 @@ int nomp_init(const char *backend, int platform, int device) {
     err = cuda_init(&nomp, nomp.platform_id, nomp.device_id);
 #endif
   } else {
-    err = nomp_set_log(NOMP_INVALID_BACKEND, NOMP_ERROR,
-                       ERR_STR_FAILED_TO_INITIALIZE_NOMP, name);
+    err = set_log(NOMP_INVALID_BACKEND, NOMP_ERROR,
+                  ERR_STR_FAILED_TO_INITIALIZE_NOMP, name);
   }
   return_on_err(err);
 
@@ -90,16 +90,16 @@ int nomp_init(const char *backend, int platform, int device) {
       py_append_to_sys_path(abs_dir);
       err = tfree(abs_dir);
     } else {
-      return nomp_set_log(NOMP_INSTALL_DIR_NOT_FOUND, NOMP_ERROR,
-                          ERR_STR_NOMP_INSTALL_DIR_NOT_SET);
+      return set_log(NOMP_INSTALL_DIR_NOT_FOUND, NOMP_ERROR,
+                     ERR_STR_NOMP_INSTALL_DIR_NOT_SET);
     }
   } else {
     // Python is already initialized.
     err = 0;
   }
   if (err)
-    return nomp_set_log(NOMP_PY_INITIALIZE_ERROR, NOMP_ERROR,
-                        ERR_STR_PY_INITIALIZE_ERROR);
+    return set_log(NOMP_PY_INITIALIZE_ERROR, NOMP_ERROR,
+                   ERR_STR_PY_INITIALIZE_ERROR);
 
   initialized = 1;
   return 0;
@@ -140,8 +140,8 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
   if (idx == mems_n) {
     // A new entry can't be created with NOMP_FREE or NOMP_FROM
     if (op == NOMP_FROM || op == NOMP_FREE)
-      return nomp_set_log(NOMP_INVALID_MAP_PTR, NOMP_ERROR,
-                          ERR_STR_INVALID_MAP_OP, op);
+      return set_log(NOMP_INVALID_MAP_PTR, NOMP_ERROR, ERR_STR_INVALID_MAP_OP,
+                     op);
     op |= NOMP_ALLOC;
     if (mems_n == mems_max) {
       mems_max += mems_max / 2 + 1;
@@ -191,8 +191,8 @@ static int parse_clauses(char **usr_file, char **usr_func,
     } else if (strncmp(clause, "jit", NOMP_BUFSIZ) == 0) {
     } else {
       tfree(clause);
-      return nomp_set_log(NOMP_INVALID_CLAUSE, NOMP_ERROR,
-                          ERR_STR_NOMP_INVALID_CLAUSE, clauses[i]);
+      return set_log(NOMP_INVALID_CLAUSE, NOMP_ERROR,
+                     ERR_STR_NOMP_INVALID_CLAUSE, clauses[i]);
     }
     i = i + 2;
   }
@@ -240,8 +240,7 @@ int nomp_jit(int *id, const char *c_src, const char **annotations,
     Py_XDECREF(py_knl);
 
     if (err)
-      return nomp_set_log(NOMP_KNL_BUILD_ERROR, NOMP_ERROR,
-                          ERR_STR_KNL_BUILD_ERROR);
+      return set_log(NOMP_KNL_BUILD_ERROR, NOMP_ERROR, ERR_STR_KNL_BUILD_ERROR);
     *id = progs_n++;
   }
 
@@ -277,11 +276,11 @@ int nomp_run(int id, int nargs, ...) {
     int err = nomp.knl_run(&nomp, prg, args);
     va_end(args);
     if (err)
-      return nomp_set_log(NOMP_KNL_RUN_ERROR, NOMP_ERROR,
-                          ERR_STR_KERNEL_RUN_FAILED, id);
+      return set_log(NOMP_KNL_RUN_ERROR, NOMP_ERROR, ERR_STR_KERNEL_RUN_FAILED,
+                     id);
     return 0;
   }
-  return nomp_set_log(NOMP_INVALID_KNL, NOMP_ERROR, ERR_STR_INVALID_KERNEL, id);
+  return set_log(NOMP_INVALID_KNL, NOMP_ERROR, ERR_STR_INVALID_KERNEL, id);
 }
 
 //=============================================================================
@@ -386,8 +385,8 @@ void nomp_chk_(int err_id, const char *file, unsigned line) {
 //
 int nomp_finalize(void) {
   if (!initialized)
-    return nomp_set_log(NOMP_NOT_INITIALIZED_ERROR, NOMP_ERROR,
-                        ERR_STR_NOMP_IS_NOT_INITIALIZED);
+    return set_log(NOMP_NOT_INITIALIZED_ERROR, NOMP_ERROR,
+                   ERR_STR_NOMP_IS_NOT_INITIALIZED);
 
   for (unsigned i = 0; i < mems_n; i++) {
     if (mems[i]) {
@@ -410,8 +409,8 @@ int nomp_finalize(void) {
   initialized = nomp.finalize(&nomp);
   tfree(nomp.backend), tfree(nomp.install_dir);
   if (initialized)
-    return nomp_set_log(NOMP_FINALIZE_ERROR, NOMP_ERROR,
-                        ERR_STR_FAILED_TO_FINALIZE_NOMP);
+    return set_log(NOMP_FINALIZE_ERROR, NOMP_ERROR,
+                   ERR_STR_FAILED_TO_FINALIZE_NOMP);
 
   return 0;
 }

@@ -31,8 +31,8 @@ static int opencl_update(struct backend *bnd, struct mem *m, const int op) {
                           (m->idx1 - m->idx0) * m->usize, NULL, &err);
     if (err != CL_SUCCESS) {
       tfree(m->bptr), m->bptr = NULL;
-      return nomp_set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR,
-                          ERR_STR_OPENCL_FAILURE, "create buffer", err);
+      return set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
+                     "create buffer", err);
     }
   }
 
@@ -63,8 +63,8 @@ static int opencl_knl_build(struct backend *bnd, struct prog *prg,
   ocl_prg->prg = clCreateProgramWithSource(
       ocl->ctx, 1, (const char **)(&source), NULL, &err);
   if (err != CL_SUCCESS)
-    return nomp_set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
-                        "kernel build", err);
+    return set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
+                   "kernel build", err);
 
   err = clBuildProgram(ocl_prg->prg, 0, NULL, NULL, NULL, NULL);
   if (err != CL_SUCCESS) {
@@ -77,8 +77,7 @@ static int opencl_knl_build(struct backend *bnd, struct prog *prg,
     char *log = tcalloc(char, log_size);
     // Verify log memory allocation
     if (!log)
-      return nomp_set_log(NOMP_TCALLOC_FAILED, NOMP_ERROR,
-                          ERR_STR_TCALLOC_FAILURE);
+      return set_log(NOMP_TCALLOC_FAILED, NOMP_ERROR, ERR_STR_TCALLOC_FAILURE);
 
     // Get the log
     clGetProgramBuildInfo(ocl_prg->prg, ocl->device_id, CL_PROGRAM_BUILD_LOG,
@@ -89,15 +88,15 @@ static int opencl_knl_build(struct backend *bnd, struct prog *prg,
     ocl_prg->prg = NULL;
     ocl_prg->knl = NULL;
 
-    return nomp_set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
-                        "kernel build", err);
+    return set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
+                   "kernel build", err);
   }
 
   ocl_prg->knl = clCreateKernel(ocl_prg->prg, name, &err);
   if (err != CL_SUCCESS) {
     ocl_prg->knl = NULL;
-    return nomp_set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
-                        "kernel create", err);
+    return set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
+                   "kernel create", err);
   }
 
   return 0;
@@ -121,21 +120,21 @@ static int opencl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
     case NOMP_PTR:
       m = mem_if_mapped(p);
       if (m == NULL)
-        return nomp_set_log(NOMP_INVALID_MAP_PTR, NOMP_ERROR,
-                            ERR_STR_INVALID_MAP_PTR, p);
+        return set_log(NOMP_INVALID_MAP_PTR, NOMP_ERROR,
+                       ERR_STR_INVALID_MAP_PTR, p);
       p = m->bptr;
       size = sizeof(cl_mem);
       break;
     default:;
-      return nomp_set_log(NOMP_KNL_ARG_TYPE_ERROR, NOMP_ERROR,
-                          ERR_STR_INVALID_KNL_ARG_TYPE, type);
+      return set_log(NOMP_KNL_ARG_TYPE_ERROR, NOMP_ERROR,
+                     ERR_STR_INVALID_KNL_ARG_TYPE, type);
       break;
     }
 
     cl_int err = clSetKernelArg(ocl_prg->knl, i, size, p);
     if (err != CL_SUCCESS)
-      return nomp_set_log(NOMP_KNL_ARG_SET_ERROR, NOMP_ERROR,
-                          ERR_STR_KNL_ARG_SET_ERROR);
+      return set_log(NOMP_KNL_ARG_SET_ERROR, NOMP_ERROR,
+                     ERR_STR_KNL_ARG_SET_ERROR);
   }
 
   struct opencl_backend *ocl = (struct opencl_backend *)bnd->bptr;
@@ -148,12 +147,12 @@ static int opencl_knl_free(struct prog *prg) {
   struct opencl_prog *ocl_prg = prg->bptr;
   cl_int err = clReleaseKernel(ocl_prg->knl);
   if (err != CL_SUCCESS)
-    return nomp_set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
-                        "kernel release", err);
+    return set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
+                   "kernel release", err);
   err = clReleaseProgram(ocl_prg->prg);
   if (err != CL_SUCCESS)
-    return nomp_set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
-                        "program release", err);
+    return set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
+                   "program release", err);
   tfree(prg->bptr), prg->bptr = NULL;
 
   return 0;
@@ -163,12 +162,12 @@ static int opencl_finalize(struct backend *bnd) {
   struct opencl_backend *ocl = bnd->bptr;
   cl_int err = clReleaseCommandQueue(ocl->queue);
   if (err != CL_SUCCESS)
-    return nomp_set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
-                        "command queue release", err);
+    return set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
+                   "command queue release", err);
   err = clReleaseContext(ocl->ctx);
   if (err != CL_SUCCESS)
-    return nomp_set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
-                        "context release", err);
+    return set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
+                   "context release", err);
   tfree(bnd->bptr), bnd->bptr = NULL;
 
   return 0;
@@ -179,23 +178,23 @@ int opencl_init(struct backend *bnd, const int platform_id,
   cl_uint num_platforms;
   cl_int err = clGetPlatformIDs(0, NULL, &num_platforms);
   if (platform_id < 0 | platform_id >= num_platforms)
-    return nomp_set_log(NOMP_INVALID_PLATFORM, NOMP_ERROR,
-                        ERR_STR_INVALID_PLATFORM, platform_id);
+    return set_log(NOMP_INVALID_PLATFORM, NOMP_ERROR, ERR_STR_INVALID_PLATFORM,
+                   platform_id);
   cl_platform_id *cl_platforms = tcalloc(cl_platform_id, num_platforms);
   if (cl_platforms == NULL)
-    return nomp_set_log(NOMP_MALLOC_FAILURE, NOMP_ERROR, ERR_STR_MALLOC_ERROR);
+    return set_log(NOMP_MALLOC_FAILURE, NOMP_ERROR, ERR_STR_MALLOC_ERROR);
   err = clGetPlatformIDs(num_platforms, cl_platforms, &num_platforms);
   cl_platform_id platform = cl_platforms[platform_id];
 
   cl_uint num_devices;
   err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 0, NULL, &num_devices);
   if (device_id < 0 || device_id >= num_devices)
-    return nomp_set_log(NOMP_INVALID_DEVICE, NOMP_ERROR, ERR_STR_INVALID_DEVICE,
-                        device_id);
+    return set_log(NOMP_INVALID_DEVICE, NOMP_ERROR, ERR_STR_INVALID_DEVICE,
+                   device_id);
 
   cl_device_id *cl_devices = tcalloc(cl_device_id, num_devices);
   if (cl_devices == NULL)
-    return nomp_set_log(NOMP_MALLOC_FAILURE, NOMP_ERROR, ERR_STR_MALLOC_ERROR);
+    return set_log(NOMP_MALLOC_FAILURE, NOMP_ERROR, ERR_STR_MALLOC_ERROR);
 
   err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, num_devices, cl_devices,
                        &num_devices);

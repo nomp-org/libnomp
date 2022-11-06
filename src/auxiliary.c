@@ -24,8 +24,8 @@ char *strcatn(int nstr, ...) {
 int strnlower(char **out, const char *in, size_t max) {
   unsigned len = strnlen(in, max);
   if (len == max)
-    return nomp_set_log(NOMP_STR_EXCEED_MAX_LEN, NOMP_ERROR,
-                        ERR_STR_EXCEED_MAX_LEN_STR, max);
+    return set_log(NOMP_STR_EXCEED_MAX_LEN, NOMP_ERROR,
+                   ERR_STR_EXCEED_MAX_LEN_STR, max);
 
   char *wrk = *out = trealloc(*out, char, len + 1);
   for (unsigned i = 0; i < len; i++)

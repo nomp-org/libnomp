@@ -10,8 +10,8 @@
     if (x != CUDA_SUCCESS) {                                                   \
       const char *msg;                                                         \
       cuGetErrorName(x, &msg);                                                 \
-      return nomp_set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE, \
-                          "operation", msg);                                   \
+      return set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE,      \
+                     "operation", msg);                                        \
     }                                                                          \
   } while (0)
 
@@ -21,8 +21,8 @@
   do {                                                                         \
     if (x != NVRTC_SUCCESS) {                                                  \
       const char *msg = nvrtcGetErrorString(x);                                \
-      return nomp_set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE, \
-                          "runtime compilation", msg);                         \
+      return set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE,      \
+                     "runtime compilation", msg);                              \
     }                                                                          \
   } while (0)
 #define chk_nvrtc(x) chk_nvrtc_(__FILE__, __LINE__, x)
@@ -31,8 +31,8 @@
   do {                                                                         \
     if (x != cudaSuccess) {                                                    \
       const char *msg = cudaGetErrorString(x);                                 \
-      return nomp_set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE, \
-                          "operation", msg);                                   \
+      return set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE,      \
+                     "operation", msg);                                        \
     }                                                                          \
   } while (0)
 #define chk_cuda(x) chk_cuda_(__FILE__, __LINE__, x)
@@ -103,8 +103,8 @@ static int cuda_knl_build(struct backend *bnd, struct prog *prg,
     size_t msg_size = log_size + strlen(err_str) + 2;
     char *msg = tcalloc(char, msg_size);
     snprintf(msg, msg_size, "%s: %s", err_str, log);
-    int err_id = nomp_set_log(NOMP_CUDA_FAILURE, NOMP_ERROR,
-                              ERR_STR_CUDA_FAILURE, "build", msg);
+    int err_id = set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE,
+                         "build", msg);
     tfree(log), tfree(msg);
     return err_id;
   }
@@ -150,13 +150,13 @@ static int cuda_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
     case NOMP_PTR:
       m = mem_if_mapped(p);
       if (m == NULL)
-        return nomp_set_log(NOMP_INVALID_MAP_PTR, NOMP_ERROR,
-                            ERR_STR_INVALID_MAP_PTR, p);
+        return set_log(NOMP_INVALID_MAP_PTR, NOMP_ERROR,
+                       ERR_STR_INVALID_MAP_PTR, p);
       p = &m->bptr;
       break;
     default:
-      return nomp_set_log(NOMP_KNL_ARG_TYPE_ERROR, NOMP_ERROR,
-                          ERR_STR_INVALID_KNL_ARG_TYPE, type);
+      return set_log(NOMP_KNL_ARG_TYPE_ERROR, NOMP_ERROR,
+                     ERR_STR_INVALID_KNL_ARG_TYPE, type);
       break;
     }
     vargs[i] = p;
@@ -185,8 +185,8 @@ int cuda_init(struct backend *bnd, const int platform_id, const int device_id) {
   CUresult result = cudaGetDeviceCount(&num_devices);
   chk_cu(result);
   if (device_id < 0 || device_id >= num_devices)
-    return nomp_set_log(NOMP_INVALID_DEVICE, NOMP_ERROR, ERR_STR_INVALID_DEVICE,
-                        device_id);
+    return set_log(NOMP_INVALID_DEVICE, NOMP_ERROR, ERR_STR_INVALID_DEVICE,
+                   device_id);
   result = cudaSetDevice(device_id);
   chk_cu(result);
 

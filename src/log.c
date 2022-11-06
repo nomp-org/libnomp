@@ -67,8 +67,8 @@ static struct log *logs = NULL;
 static unsigned logs_n = 0, logs_max = 0;
 static const char *LOG_TYPE_STRING[] = {"Error", "Warning", "Information"};
 
-int nomp_set_log_(const char *description, int logno, nomp_log_type type,
-                  const char *fname, unsigned line_no, ...) {
+int set_log_(const char *description, int logno, nomp_log_type type,
+             const char *fname, unsigned line_no, ...) {
   if (logs_max <= logs_n) {
     logs_max += logs_max / 2 + 1;
     logs = (struct log *)realloc(logs, sizeof(struct log) * logs_max);
@@ -96,10 +96,9 @@ int nomp_set_log_(const char *description, int logno, nomp_log_type type,
 }
 
 int nomp_get_log_str(char **log_str, int log_id) {
-  if (log_id <= 0 && log_id > logs_n) {
+  if (log_id <= 0 || log_id > logs_n) {
     *log_str = NULL;
-    return nomp_set_log(NOMP_INVALID_LOG_ID, NOMP_ERROR, ERR_STR_INVALID_LOG_ID,
-                        log_id);
+    return NOMP_INVALID_LOG_ID;
   }
   struct log lg = logs[log_id - 1];
   size_t n_desc = strnlen(lg.description, BUFSIZ) + 1;
@@ -110,8 +109,7 @@ int nomp_get_log_str(char **log_str, int log_id) {
 
 int nomp_get_log_no(int log_id) {
   if (log_id <= 0 || log_id > logs_n)
-    return nomp_set_log(NOMP_INVALID_LOG_ID, NOMP_ERROR, ERR_STR_INVALID_LOG_ID,
-                        log_id);
+    return NOMP_INVALID_LOG_ID;
   return logs[log_id - 1].logno;
 }
 

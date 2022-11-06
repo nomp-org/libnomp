@@ -385,23 +385,6 @@ typedef enum {
   NOMP_INVALID = 3
 } nomp_log_type;
 
-int nomp_set_log_(const char *desc, int logno, nomp_log_type type,
-                  const char *fname, unsigned line_no, ...);
-/**
- * @ingroup nomp_user_api
- * @brief Sets a log.
- *
- * @details Sets a log given a description of the log and log type and returns a
- * unique log_id.
- * @param[in] logno unique id of the log kind.
- * @param[in] type type of the log either NOMP_ERROR, NOMP_WARNING or
- * NOMP_INFORMATION.
- * @param[in] desc detailed description of the log.
- * @return int
- */
-#define nomp_set_log(logno, type, desc, ...)                                   \
-  nomp_set_log_(desc, logno, type, __FILE__, __LINE__, ##__VA_ARGS__)
-
 /**
  * @ingroup nomp_user_api
  * @brief Return log description.
