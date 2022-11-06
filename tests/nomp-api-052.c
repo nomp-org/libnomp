@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
   err = nomp_jit(&id, valid_knl, annotations, clauses2);
   nomp_assert(nomp_get_log_no(err) == NOMP_INVALID_CLAUSE);
 
-  err = nomp_get_log(&desc, err);
+  err = nomp_get_log_str(&desc, err);
   matched =
       match_log(desc, "\\[Error\\] "
                       ".*libnomp\\/src\\/nomp.c:[0-9]* "
