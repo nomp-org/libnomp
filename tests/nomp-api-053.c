@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
 
   static int id = -1;
   const char *annotations[1] = {0},
-             *clauses[3] = {"transform", "nomp-api-50:transform", 0};
+             *clauses[4] = {"transform", "nomp-api-50", "transform", 0};
   err = nomp_jit(&id, knl, annotations, clauses);
   nomp_chk(err);
 

@@ -15,7 +15,7 @@ int nomp_api_230_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {
 
   static int id = -1;
   const char *annotations[1] = {0},
-             *clauses[3] = {"transform", "nomp-api-200:transform", 0};
+             *clauses[4] = {"transform", "nomp-api-200", "transform", 0};
   int err = nomp_jit(&id, knl, annotations, clauses);
   nomp_chk(err);
 

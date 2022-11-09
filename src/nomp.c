@@ -181,22 +181,19 @@ static int parse_clauses(char **usr_file, char **usr_func,
   while (clauses[i]) {
     strnlower(&clause, clauses[i], NOMP_BUFSIZ);
     if (strncmp(clause, "transform", NOMP_BUFSIZ) == 0) {
-      char *val = strndup(clauses[i + 1], NOMP_BUFSIZ);
-      char *tok = strtok(val, ":");
-      if (tok) {
-        size_t size = (size_t)pathconf(tok, _PC_PATH_MAX);
-        *usr_file = strndup(tok, size), tok = strtok(NULL, ":");
-        if (tok)
-          *usr_func = strndup(tok, NOMP_BUFSIZ);
+      if (clauses[i + 1]) {
+        size_t size = (size_t)pathconf(clauses[i + 1], _PC_PATH_MAX);
+        *usr_file = strndup(clauses[i + 1], size);
       }
-      tfree(val);
+      if (clauses[i + 2])
+        *usr_func = strndup(clauses[i + 2], NOMP_BUFSIZ);
     } else if (strncmp(clause, "jit", NOMP_BUFSIZ) == 0) {
     } else {
       tfree(clause);
       return set_log(NOMP_INVALID_CLAUSE, NOMP_ERROR,
                      ERR_STR_NOMP_INVALID_CLAUSE, clauses[i]);
     }
-    i = i + 2;
+    i = i + 3;
   }
   tfree(clause);
   return 0;

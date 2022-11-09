@@ -22,7 +22,7 @@ int nomp_api_210() {
 
   static int id = -1;
   const char *annotations[1] = {0},
-             *clauses[3] = {"transform", "nomp-api-200:transform", 0};
+             *clauses[4] = {"transform", "nomp-api-200", "transform", 0};
   err = nomp_jit(&id, knl, annotations, clauses);
   nomp_chk(err);
   tfree(knl);
