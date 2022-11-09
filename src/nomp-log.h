@@ -19,6 +19,8 @@ extern const char *ERR_STR_NOMP_INVALID_CLAUSE;
 
 extern const char *WARNING_STR_PYTHON_IS_ALREADY_INITIALIZED;
 extern const char *ERR_STR_LOOPY_CONVERSION_ERROR;
+extern const char *ERR_STR_FILE_NAME_NOT_PROVIDED;
+extern const char *ERR_STR_USER_CALLBACK_NOT_PROVIDED;
 extern const char *ERR_STR_USER_CALLBACK_NOT_FOUND;
 extern const char *ERR_STR_USER_CALLBACK_FAILURE;
 extern const char *ERR_STR_LOOPY_KNL_NAME_NOT_FOUND;

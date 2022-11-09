@@ -28,6 +28,9 @@ const char *WARNING_STR_PYTHON_IS_ALREADY_INITIALIZED =
     "Python is already initialized. Using already initialized python version.";
 
 const char *ERR_STR_LOOPY_CONVERSION_ERROR = "C to Loopy conversion failed.";
+const char *ERR_STR_FILE_NAME_NOT_PROVIDED = "File name is not provided.";
+const char *ERR_STR_USER_CALLBACK_NOT_PROVIDED =
+    "User callback function is not provided.";
 const char *ERR_STR_USER_CALLBACK_NOT_FOUND =
     "Specified user callback function not found in file %s.";
 const char *ERR_STR_USER_CALLBACK_FAILURE = "User callback function %s failed.";

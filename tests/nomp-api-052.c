@@ -14,10 +14,11 @@ int main(int argc, char *argv[]) {
 
   static int id = -1;
   const char *annotations[1] = {0},
-             *clauses0[4] = {"transform", "invalid-file", "invalid_func", 0},
-             *clauses1[4] = {"transform", "nomp-api-50", "invalid_transform",
-                             0},
-             *clauses2[4] = {"invalid-clause", "nomp-api-50", "transform", 0};
+             *clauses0[4] = {"transform", "invalid-file", "invalid", 0},
+             *clauses1[4] = {"transform", "nomp-api-50", "invalid_func", 0},
+             *clauses2[4] = {"invalid-clause", "nomp-api-50", "transform", 0},
+             *clauses3[4] = {"transform", NULL, "transform", 0},
+             *clauses4[4] = {"transform", "nomp-api-50", NULL, 0};
   int err = nomp_init(backend, platform, device);
 
   // Calling nomp_jit with invalid functions should return an error.
@@ -40,7 +41,7 @@ int main(int argc, char *argv[]) {
   err = nomp_get_log_str(&desc, err);
   matched = match_log(desc, "\\[Error\\] "
                             ".*libnomp\\/src\\/loopy.c:[0-9]* "
-                            "User callback function invalid_transform failed.");
+                            "User callback function invalid_func failed.");
   nomp_assert(matched);
 
   // Calling nomp_jit with invalid clauses shoud return an error.
@@ -69,6 +70,26 @@ int main(int argc, char *argv[]) {
                             ".*"
                             "libnomp\\/src\\/loopy.c:[0-9]* C "
                             "to Loopy conversion failed.");
+  nomp_assert(matched);
+
+  // Missing file name should return an error.
+  err = nomp_jit(&id, valid_knl, annotations, clauses3);
+  nomp_assert(nomp_get_log_no(err) == NOMP_FILE_NAME_NOT_PROVIDED);
+
+  err = nomp_get_log_str(&desc, err);
+  matched = match_log(desc, "\\[Error\\] "
+                            ".*libnomp\\/src\\/nomp.c:[0-9]* "
+                            "File name is not provided.");
+  nomp_assert(matched);
+
+  // Missing user callback should return an error.
+  err = nomp_jit(&id, valid_knl, annotations, clauses4);
+  nomp_assert(nomp_get_log_no(err) == NOMP_USER_CALLBACK_NOT_PROVIDED);
+
+  err = nomp_get_log_str(&desc, err);
+  matched = match_log(desc, "\\[Error\\] "
+                            ".*libnomp\\/src\\/nomp.c:[0-9]* "
+                            "User callback function is not provided.");
   nomp_assert(matched);
 
   err = nomp_finalize();
