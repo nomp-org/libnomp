@@ -15,7 +15,7 @@ int nomp_api_300_aux(TEST_TYPE *a, TEST_TYPE *b, int row, int col) {
 
   static int id = -1;
   const char *annotations[1] = {0},
-             *clauses[3] = {"transform", "nomp-api-300:transform", 0};
+             *clauses[4] = {"transform", "nomp-api-300", "transform", 0};
   int err = nomp_jit(&id, knl, annotations, clauses);
   nomp_chk(err);
 

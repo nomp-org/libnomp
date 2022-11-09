@@ -14,9 +14,10 @@ int main(int argc, char *argv[]) {
 
   static int id = -1;
   const char *annotations[1] = {0},
-             *clauses0[3] = {"transform", "invalid-file:invalid_func", 0},
-             *clauses1[3] = {"transform", "nomp-api-50:invalid_transform", 0},
-             *clauses2[3] = {"invalid-clause", "nomp-api-50:transform", 0};
+             *clauses0[4] = {"transform", "invalid-file", "invalid_func", 0},
+             *clauses1[4] = {"transform", "nomp-api-50", "invalid_transform",
+                             0},
+             *clauses2[4] = {"invalid-clause", "nomp-api-50", "transform", 0};
   int err = nomp_init(backend, platform, device);
 
   // Calling nomp_jit with invalid functions should return an error.

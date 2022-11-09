@@ -337,7 +337,7 @@ int nomp_update(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
  * const char *knl = "for (unsigned i = 0; i < N; i++) a[i] += b[i];"
  * static int id = -1;
  * const char *annotations[1] = {0},
- *            *clauses[3] = {"transform", "file:function", 0};
+ *            *clauses[4] = {"transform", "file", "function", 0};
  * int err = nomp_jit(&id, knl, annotations, clauses);
  * @endcode
  *
