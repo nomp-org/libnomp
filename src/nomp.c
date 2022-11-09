@@ -32,7 +32,7 @@ static int nomp_check_env(struct backend *backend) {
     backend->device_id = device_id;
   tmp = get_if_env("NOMP_INSTALL_DIR");
   if (tmp != NULL) {
-    size_t size = (size_t)pathconf(tmp, _PC_PATH_MAX);
+    size_t size = pathlen(tmp);
     backend->install_dir = tcalloc(char, size + 1);
     strncpy(backend->install_dir, tmp, size + 1);
     tfree(tmp);
@@ -182,18 +182,27 @@ static int parse_clauses(char **usr_file, char **usr_func,
     strnlower(&clause, clauses[i], NOMP_BUFSIZ);
     if (strncmp(clause, "transform", NOMP_BUFSIZ) == 0) {
       if (clauses[i + 1]) {
-        size_t size = (size_t)pathconf(clauses[i + 1], _PC_PATH_MAX);
+        size_t size = pathlen(clauses[i + 1]);
         *usr_file = strndup(clauses[i + 1], size);
+      } else {
+        tfree(clause);
+        return set_log(NOMP_FILE_NAME_NOT_PROVIDED, NOMP_ERROR,
+                       ERR_STR_FILE_NAME_NOT_PROVIDED);
       }
-      if (clauses[i + 2])
+      if (clauses[i + 2]) {
         *usr_func = strndup(clauses[i + 2], NOMP_BUFSIZ);
+      } else {
+        tfree(clause);
+        return set_log(NOMP_USER_CALLBACK_NOT_PROVIDED, NOMP_ERROR,
+                       ERR_STR_USER_CALLBACK_NOT_PROVIDED);
+      }
+      i = i + 3;
     } else if (strncmp(clause, "jit", NOMP_BUFSIZ) == 0) {
     } else {
       tfree(clause);
       return set_log(NOMP_INVALID_CLAUSE, NOMP_ERROR,
                      ERR_STR_NOMP_INVALID_CLAUSE, clauses[i]);
     }
-    i = i + 3;
   }
   tfree(clause);
   return 0;

@@ -47,3 +47,7 @@ int strntoi(const char *str, size_t size) {
   tfree(str_dup);
   return num >= 0 ? num : -1;
 }
+
+size_t pathlen(const char *path) {
+  return (size_t)pathconf(path, _PC_PATH_MAX);
+}

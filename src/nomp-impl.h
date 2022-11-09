@@ -214,6 +214,17 @@ int strnlower(char **out, const char *in, size_t max);
 int strntoi(const char *str, size_t size);
 
 /**
+ * @ingroup nomp_other_utils
+ * @brief Returns maximum length of a path.
+ *
+ * Returns the maximum length of specified path.
+ *
+ * @param[in] path Path to get the maximum length.
+ * @return size_t
+ */
+size_t pathlen(const char *path);
+
+/**
  * @ingroup nomp_log_utils
  * @brief Free log variables.
  *

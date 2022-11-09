@@ -186,6 +186,16 @@
  * @brief libnomp python initialization failed
  */
 #define NOMP_PY_APPEND_PATH_ERROR -104
+/**
+ * @ingroup nomp_errors
+ * @brief Specified file name is invalid.
+ */
+#define NOMP_FILE_NAME_NOT_PROVIDED -105
+/**
+ * @ingroup nomp_errors
+ * @brief Specified user callback is invalid.
+ */
+#define NOMP_USER_CALLBACK_NOT_PROVIDED -106
 
 /**
  * @ingroup nomp_errors
