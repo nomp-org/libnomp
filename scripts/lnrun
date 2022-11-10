@@ -29,7 +29,9 @@ function print_help_main() {
     "COMMANDS\n" \
     "\t${cyan}t${reset}, ${cyan}test${reset} \t Run all the tests\n" \
     "\t${cyan}d${reset}, ${cyan}debug${reset} \t Debug a provided test case\n" \
-    "\t${cyan}D${reset}, ${cyan}docs${reset} \t Open the user documentation on the web browser"
+    "\t${cyan}D${reset}, ${cyan}docs${reset} \t Open the user documentation on the web browser\n\n" \
+    "To view the usage of each command, execute ${cyan}lnrun -h <command>${reset} or" \
+    "${cyan}lnrun --help <command>${reset}"
 }
 
 function print_help_test() {
