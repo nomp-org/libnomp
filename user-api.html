@@ -163,7 +163,7 @@ Operation <code class="docutils literal notranslate"><span class="pre">op</span>
 <span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">knl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;for (unsigned i = 0; i &lt; N; i++) a[i] += b[i];&quot;</span><span class="w"></span>
 <span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
 <span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">annotations</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">},</span><span class="w"></span>
-<span class="w">           </span><span class="o">*</span><span class="n">clauses</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;transform&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;file:function&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">};</span><span class="w"></span>
+<span class="w">           </span><span class="o">*</span><span class="n">clauses</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;transform&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;file&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;function&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">};</span><span class="w"></span>
 <span class="kt">int</span><span class="w"> </span><span class="n">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nomp_jit</span><span class="p">(</span><span class="o">&amp;</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">knl</span><span class="p">,</span><span class="w"> </span><span class="n">annotations</span><span class="p">,</span><span class="w"> </span><span class="n">clauses</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
@@ -463,6 +463,18 @@ Operation <code class="docutils literal notranslate"><span class="pre">op</span>
 <dt class="sig sig-object cpp" id="c.NOMP_PY_APPEND_PATH_ERROR">
 <span class="target" id="group__nomp__errors_1ga25026a8ec18f4a71d82ecc8efb260308"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_PY_APPEND_PATH_ERROR</span></span></span><a class="headerlink" href="#c.NOMP_PY_APPEND_PATH_ERROR" title="Permalink to this definition"></a><br /></dt>
 <dd><p>libnomp python initialization failed </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.NOMP_FILE_NAME_NOT_PROVIDED">
+<span class="target" id="group__nomp__errors_1ga481490fd706dfa3dff2288797b02de4c"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_FILE_NAME_NOT_PROVIDED</span></span></span><a class="headerlink" href="#c.NOMP_FILE_NAME_NOT_PROVIDED" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Specified file name is invalid. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.NOMP_USER_CALLBACK_NOT_PROVIDED">
+<span class="target" id="group__nomp__errors_1ga451975547618fa0367804a8add1e391e"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_USER_CALLBACK_NOT_PROVIDED</span></span></span><a class="headerlink" href="#c.NOMP_USER_CALLBACK_NOT_PROVIDED" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Specified user callback is invalid. </p>
 </dd></dl>
 
 <dl class="cpp macro">
