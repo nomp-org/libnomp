@@ -1,14 +1,14 @@
 #!/bin/bash
 
 # script variables
+NOMP_SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+NOMP_LNSTATE_PATH="${NOMP_SOURCE_DIR}/.lnstate"
+
 : "${NOMP_INSTALL_DIR:="${HOME}/.nomp"}"
 : "${NOMP_OPENCL_LIBRARY:="/lib/x86_64-linux-gnu/libOpenCL.so.1"}"
-: "${NOMP_BUILD_TYPE:=""}"
-: "${NOMP_ENABLE_DOCS:=false}"
-
-NOMP_SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-NOMP_BUILD_DIR="${NOMP_SOURCE_DIR}/build"
-NOMP_LNSTATE_PATH="${NOMP_SOURCE_DIR}/.lnstate"
+: "${NOMP_BUILD_TYPE:="RelWithDebInfo"}"
+: "${NOMP_ENABLE_DOCS:="OFF"}"
+: "${NOMP_BUILD_DIR:="${NOMP_SOURCE_DIR}/build"}"
 
 # colors
 red=$(tput setaf 1)
@@ -27,14 +27,6 @@ function print_help() {
     "${cyan}-o/--opencl-lib:${reset} Specify OpenCL library path (Default: ${NOMP_OPENCL_LIBRARY}).\n"
 }
 
-function update_variable() {
-  grep -xFq "${1}=${2}" "${NOMP_LNSTATE_PATH}" || {
-    grep -wq "${1}=" "${NOMP_LNSTATE_PATH}" &&
-      sed -i "s+${1}=.*+${1}=${2}+" "${NOMP_LNSTATE_PATH}" ||
-      echo -e "${1}=${2}" >>"${NOMP_LNSTATE_PATH}"
-  }
-}
-
 # create build directory if not exists
 [[ ! -d "${NOMP_BUILD_DIR}" ]] && mkdir build
 
@@ -46,7 +38,7 @@ while [ $# -gt 0 ]; do
     exit 0
     ;;
   -b | --build-type) shift && NOMP_BUILD_TYPE=${1^^} ;;
-  -d | --enable-docs) NOMP_ENABLE_DOCS=true ;;
+  -d | --enable-docs) NOMP_ENABLE_DOCS="ON" ;;
   -i | --install-dir) shift && NOMP_INSTALL_DIR="${1}" ;;
   -o | --opencl-lib) shift && NOMP_OPENCL_LIBRARY="${1}" ;;
   *) echo "${red}Invalid argument: ${1}${reset}" &&
@@ -60,14 +52,11 @@ done
 NOMP_CMAKE_OPTS=()
 NOMP_CMAKE_OPTS+=("-DOpenCL_LIBRARY=${NOMP_OPENCL_LIBRARY}")
 NOMP_CMAKE_OPTS+=("-DCMAKE_INSTALL_PREFIX=${NOMP_INSTALL_DIR}")
-[[ ${NOMP_ENABLE_DOCS} = true ]] &&
-  NOMP_CMAKE_OPTS+=("-DENABLE_DOCS=ON")
-[[ -n ${NOMP_BUILD_TYPE} ]] &&
-  NOMP_CMAKE_OPTS+=("-DCMAKE_BUILD_TYPE=${NOMP_BUILD_TYPE}")
+NOMP_CMAKE_OPTS+=("-DENABLE_DOCS=${NOMP_ENABLE_DOCS}")
+NOMP_CMAKE_OPTS+=("-DCMAKE_BUILD_TYPE=${NOMP_BUILD_TYPE}")
 
 # update lnstate variables
-update_variable "NOMP_SOURCE_DIR" "${NOMP_SOURCE_DIR}"
-update_variable "NOMP_INSTALL_DIR" "${NOMP_INSTALL_DIR}"
+echo -e "NOMP_INSTALL_DIR=${NOMP_INSTALL_DIR}\nNOMP_BUILD_DIR=${NOMP_BUILD_DIR}" >"${NOMP_LNSTATE_PATH}"
 
 # configure cmake
 NOMP_CONFIGURE_SUCCESS=false
@@ -78,7 +67,8 @@ cd "${NOMP_BUILD_DIR}" &&
 
 if [[ ${NOMP_CONFIGURE_SUCCESS} = true ]]; then
   echo "${green}Successfully created build files for libnomp${reset}"
-  echo "To install libnomp, execute '${cyan}. lninstall${reset}'"
+  echo "To install libnomp, either execute ${cyan}./lninstall${reset} or" \
+    "execute the command ${cyan}cmake --build ${NOMP_BUILD_DIR} --target install${reset}"
   exit 0
 else
   echo "${red}Failed to create build files for libnomp${reset}"
