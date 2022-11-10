@@ -44,7 +44,10 @@ if [[ ${NOMP_INSTALL_SUCCESS} = true ]]; then
   echo "${green}Successfully installed libnomp${reset}"
   echo "See ${cyan}lnrun -h${reset} or ${cyan}lnrun --help${reset} for available commands"
 
+  [[ ${NOMP_DEFAULT_PROMPT} = "n" ]] && exit 0
   NOMP_ENVIRONMENT=""
+
+  # add nomp install dir to env
   [[ -n ${NOMP_INSTALL_DIR} ]] &&
     { grep -xFq "export NOMP_INSTALL_DIR=${NOMP_INSTALL_DIR}" ~/.bashrc ||
       NOMP_ENVIRONMENT="# Setup nomp environment variables\nexport NOMP_INSTALL_DIR=${NOMP_INSTALL_DIR}\n"; }
@@ -54,10 +57,9 @@ if [[ ${NOMP_INSTALL_SUCCESS} = true ]]; then
     { grep -xFq "export PATH=${NOMP_BIN_PATH}:\${PATH}" ~/.bashrc ||
       NOMP_ENVIRONMENT+="export PATH=${NOMP_BIN_PATH}:\${PATH}\n"; }
 
-  # set the install env variable if not
+  # set the libnomp env variables if not
   if [[ -n ${NOMP_ENVIRONMENT} ]]; then
     [[ ${NOMP_DEFAULT_PROMPT} = "y" ]] && update_bashrc
-    [[ ${NOMP_DEFAULT_PROMPT} = "n" ]] && exit 0
     while :; do
       read -p "Do you wish to add libnomp variables to .bashrc? [Y|n]: " -n 1 -r
       echo
@@ -68,5 +70,3 @@ if [[ ${NOMP_INSTALL_SUCCESS} = true ]]; then
 else
   echo "${red}Failed to install libnomp${reset}"
 fi
-
-cd "${NOMP_SOURCE_DIR}" || exit 0
