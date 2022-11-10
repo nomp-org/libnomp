@@ -8,8 +8,8 @@
 : "${NOMP_BROWSER:="google-chrome"}"
 : "${NOMP_TEST_GROUPS:="*"}"
 
-NOMP_SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-NOMP_INSTALL_DIR="${NOMP_SCRIPT_DIR}/../"
+NOMP_BIN_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+NOMP_INSTALL_DIR="${NOMP_BIN_DIR}/../"
 NOMP_TEST_DIR="${NOMP_INSTALL_DIR}/tests"
 
 # colors
