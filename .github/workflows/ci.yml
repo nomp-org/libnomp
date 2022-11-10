@@ -29,9 +29,6 @@ jobs:
     name: "${{ matrix.compiler }}"
     env:
       CC: ${{ matrix.compiler }}
-      TESTDIR: tests
-      BUILDDIR: build
-      BINDIR: bin
     steps:
       - name: Setup Github actions
         uses: actions/checkout@v3
@@ -70,17 +67,13 @@ jobs:
       - name: Build libnomp
         id: build_libnomp
         run: |
-          echo "NOMP_INSTALL_DIR=${PWD}/install" >> $GITHUB_ENV
-          mkdir -p ${BUILDDIR}
-          cd ${BUILDDIR}
-          cmake -DCMAKE_INSTALL_PREFIX=../install \
-            -DOpenCL_LIBRARY=${CONDA_PREFIX}/lib/libOpenCL.so \
-            -DOpenCL_INCLUDE_DIR=${CONDA_PREFIX}/include ..
-          make install
+          echo "NOMP_INSTALL_DIR=${PWD}/install" >> $GITHUB_ENV 
+          ./lncfg -i ../install -o "${CONDA_PREFIX}/lib/libOpenCL.so" 
+          ./lninstall --no
       - name: Run libnomp tests
         id: run_libnomp
         run: |
-          ${NOMP_INSTALL_DIR}/${BINDIR}/lnrun test
+          "${NOMP_INSTALL_DIR}/bin/lnrun" test
       - name: Block to allow inspecting failures
         run: sleep 30m
         if: ${{ failure() && inputs.debug_enabled }}
