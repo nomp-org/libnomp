@@ -61,91 +61,65 @@
 
 /**
  * @ingroup nomp_errors
- * @brief libnomp is already initialized
+ * @brief libnomp is already initialized.
  */
-#define NOMP_INITIALIZED_ERROR -256
+#define NOMP_RUNTIME_ALREADY_INITIALIZED -256
 /**
  * @ingroup nomp_errors
- * @brief libnomp is not initialized
+ * @brief libnomp is not initialized.
  */
-#define NOMP_NOT_INITIALIZED_ERROR -257
+#define NOMP_RUNTIME_NOT_INITIALIZED -257
 /**
  * @ingroup nomp_errors
- * @brief Failed to finalize libnomp
+ * @brief Failed to finalize libnomp.
  */
-#define NOMP_FINALIZE_ERROR -258
-/**
- * @ingroup nomp_errors
- * @brief libnomp memory free failed
- */
-
-#define NOMP_FREE_FAILURE -259
+#define NOMP_RUNTIME_FAILED_TO_FINALIZE -258
 /**
  * @ingroup nomp_errors
  * @brief libnomp malloc failed
  */
-#define NOMP_MEM_ALLOC_FAILURE -260
+#define NOMP_RUNTIME_MEMORY_ALLOCATION_FAILED -259
+/**
+ * @ingroup nomp_errors
+ * @brief One of the inputs to a libnomp function call are not valid.
+ */
+#define NOMP_RUNTIME_NULL_INPUT_ENCOUNTERED -260
 
 /**
  * @ingroup nomp_errors
- * @brief One of the inputs to a libnomp function are null.
+ * @brief One of the inputs to a libnomp function call are not provided.
  */
-#define NOMP_NULL_INPUT -1
+#define NOMP_USER_INPUT_NOT_PROVIDED -128
 /**
  * @ingroup nomp_errors
- * @brief libnomp invalid log id
+ * @brief One of the inputs to a libnomp function call are not valid.
  */
-#define NOMP_INVALID_LOG_ID -141
+#define NOMP_USER_INPUT_NOT_VALID -129
 /**
  * @ingroup nomp_errors
- * @brief libnomp unknown error
+ * @brief Device id provided to a libnomp function call is not valid.
  */
-#define NOMP_UNKNOWN_ERROR -142
+#define NOMP_USER_DEVICE_NOT_VALID -130
 /**
  * @ingroup nomp_errors
- * @brief Invalid libnomp backend
+ * @brief Platform id provided to a libnomp function call is not valid.
  */
-#define NOMP_INVALID_BACKEND -128
-/**
- * @ingroup nomp_errors
- * @brief Invalid libnomp platform
- */
-#define NOMP_INVALID_PLATFORM -129
-/**
- * @ingroup nomp_errors
- * @brief Invalid libnomp device
- */
-#define NOMP_INVALID_DEVICE -130
+#define NOMP_USER_PLATFORM_NOT_VALID -131
 /**
  * @ingroup nomp_errors
  * @brief Invalid libnomp map pointer
  */
-#define NOMP_INVALID_MAP_PTR -132
+#define NOMP_USER_MAP_PTR_NOT_VALID -132
 /**
  * @ingroup nomp_errors
- * @brief Invalid libnomp map operation
+ * @brief libnomp invalid log id
  */
-#define NOMP_INVALID_MAP_OP -133
+#define NOMP_USER_LOG_ID_NOT_VALID -133
 /**
  * @ingroup nomp_errors
- * @brief Pointer is already mapped
+ * @brief User callback function failed
  */
-#define NOMP_PTR_ALREADY_MAPPED -134
-/**
- * @ingroup nomp_errors
- * @brief Invalid libnomp kernel
- */
-#define NOMP_INVALID_KNL -135
-/**
- * @ingroup nomp_errors
- * @brief Invalid libnomp for clause
- */
-#define NOMP_INVALID_CLAUSE -136
-/**
- * @ingroup nomp_errors
- * @brief Invalid libnomp map parameters
- */
-#define NOMP_INVALID_MAP_PARAMS -137
+#define NOMP_USER_CALLBACK_FAILURE -134
 
 /**
  * @ingroup nomp_errors
@@ -154,19 +128,10 @@
 #define NOMP_PY_INITIALIZE_ERROR -383
 /**
  * @ingroup nomp_errors
- * @brief NOMP_INSTALL_DIR env. variable is not set
+ * @brief A python call made by libnomp failed.
  */
-#define NOMP_INSTALL_DIR_NOT_FOUND -384
-/**
- * @ingroup nomp_errors
- * @brief Specified user callback function not found
- */
-#define NOMP_USER_CALLBACK_NOT_FOUND -385
-/**
- * @ingroup nomp_errors
- * @brief User callback function failed
- */
-#define NOMP_USER_CALLBACK_FAILURE -386
+#define NOMP_PY_CALL_FAILED -392
+
 /**
  * @ingroup nomp_errors
  * @brief Loopy conversion failed
@@ -186,43 +151,18 @@
  * @ingroup nomp_errors
  * @brief Code generation from loopy kernel failed
  */
-#define NOMP_GET_GRIDSIZE_FAILED -390
+#define NOMP_LOOPY_GET_GRIDSIZE_FAILED -390
 /**
  * @ingroup nomp_errors
  * @brief Grid size calculation failed
  */
-#define NOMP_EVAL_GRIDSIZE_FAILED -390
-/**
- * @ingroup nomp_errors
- * @brief libnomp python initialization failed
- */
-#define NOMP_PY_APPEND_PATH_ERROR -391
-/**
- * @ingroup nomp_errors
- * @brief Specified file name is invalid.
- */
-#define NOMP_FILE_NAME_NOT_PROVIDED -392
-/**
- * @ingroup nomp_errors
- * @brief Specified user callback is invalid.
- */
-#define NOMP_USER_CALLBACK_NOT_PROVIDED -393
-/**
- * @ingroup nomp_errors
- * @brief A python call made by libnomp failed.
- */
-#define NOMP_PY_CALL_FAILED -394
+#define NOMP_LOOPY_EVAL_GRIDSIZE_FAILED -391
 
-/**
- * @ingroup nomp_errors
- * @brief libnomp kernel build failed
- */
-#define NOMP_KNL_BUILD_ERROR -512
 /**
  * @ingroup nomp_errors
  * @brief Invalid libnomp kernel argument type
  */
-#define NOMP_KNL_ARG_TYPE_ERROR -513
+#define NOMP_KNL_ARG_TYPE_NOT_VALID -513
 /**
  * @ingroup nomp_errors
  * @brief Setting libnomp kernel argument failed
@@ -338,9 +278,8 @@ int nomp_update(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
  * }
  * const char *knl = "for (unsigned i = 0; i < N; i++) a[i] += b[i];"
  * static int id = -1;
- * const char *annotations[1] = {0},
- *            *clauses[4] = {"transform", "file", "function", 0};
- * int err = nomp_jit(&id, knl, annotations, clauses);
+ * const char *clauses[4] = {"transform", "file", "function", 0};
+ * int err = nomp_jit(&id, knl, clauses);
  * @endcode
  *
  * @param[out] id Id of the generated kernel.
@@ -349,8 +288,7 @@ int nomp_update(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
  * @param[in] clauses Clauses to provide meta information about the kernel.
  * @return int
  */
-int nomp_jit(int *id, const char *c_src, const char **annotations,
-             const char **clauses);
+int nomp_jit(int *id, const char *c_src, const char **clauses);
 
 /**
  * @ingroup nomp_user_api
@@ -403,7 +341,7 @@ int nomp_get_log_str(char **log, int log_id);
  * @brief Return log number.
  *
  * @details Returns the log number given the log_id. If log_id
- * is invalid return NOMP_INVALID_LOG_ID.
+ * is invalid return NOMP_USER_LOG_ID_NOT_VALID.
  * @param[in] log_id id of the log.
  * @return int
  */

@@ -38,7 +38,7 @@ struct mem {
 };
 
 struct backend {
-  char *backend, *install_dir, *annts_script;
+  char *backend, *install_dir, *annts_script, *annts_func;
   int platform_id, device_id, verbose;
   char name[NOMP_BUFSIZ];
   int (*update)(struct backend *, struct mem *, const int);
@@ -80,6 +80,7 @@ struct mem *mem_if_mapped(void *p);
  */
 int opencl_init(struct backend *backend, const int platform_id,
                 const int device_id);
+
 /**
  * @ingroup nomp_backend_init
  * @brief Initializes Cuda backend with the specified platform and device.
@@ -108,6 +109,7 @@ int cuda_init(struct backend *backend, const int platform_id,
  * @return int
  */
 int py_append_to_sys_path(const char *path);
+
 /**
  * @ingroup nomp_py_utils
  * @brief Creates loopy kernel from C source.
@@ -118,16 +120,41 @@ int py_append_to_sys_path(const char *path);
  * @return int
  */
 int py_c_to_loopy(PyObject **knl, const char *c_src, const char *backend);
+
 /**
  * @ingroup nomp_py_utils
- * @brief Calls the user callback function `func` in file `file`.
+ * @brief Apply transformations on a loopy kernel based on annotations.
  *
- * @param[in,out] knl Python kernal object.
- * @param[in] file File with the callback function.
- * @param[in] func Callback function name.
+ * Apply the transformations defined in function \p func in file \p file on the
+ * loopy kernel \p knl based on the key value paris (annotations) passed in \p
+ * annts. \p knl will be modified based on the transformations. Function will
+ * return a non-zero value if there was an error after registering a log.
+ *
+ * @param[in,out] knl Pointer to loopy kernal object.
+ * @param[in] annts Annotations (as a PyDict) to specify which transformations
+ * to apply.
+ * @param[in] file Path to the file containing transform function \p func.
+ * @param[in] func Transform function.
+ * @return int
+ */
+int py_user_annotate(PyObject **knl, PyObject *annts, const char *file,
+                     const char *func);
+
+/**
+ * @ingroup nomp_py_utils
+ * @brief Apply kernel specific user transformations on a loopy kernel.
+ *
+ * Call the user transform function \p func in file \p file on the loopy kernel
+ * \p knl. \p knl will be modified based on the transformations. Function will
+ * return a non-zero value if there was an error after registering a log.
+ *
+ * @param[in,out] knl Pointer to loopy kernal object.
+ * @param[in] file Path to the file containing transform function \p func.
+ * @param[in] func Transform function.
  * @return int
  */
 int py_user_transform(PyObject **knl, const char *file, const char *func);
+
 /**
  * @ingroup nomp_py_utils
  * @brief Get kernal name and generated source for the backend.
@@ -138,6 +165,7 @@ int py_user_transform(PyObject **knl, const char *file, const char *func);
  * @return int
  */
 int py_get_knl_name_and_src(char **name, char **src, PyObject *knl);
+
 /**
  * @ingroup nomp_py_utils
  * @brief Get global and local grid sizes as `pymoblic` expressions.
@@ -149,6 +177,7 @@ int py_get_knl_name_and_src(char **name, char **src, PyObject *knl);
  * @return int
  */
 int py_get_grid_size(struct prog *prg, PyObject *knl);
+
 /**
  * @ingroup nomp_py_utils
  * @brief Evaluate global and local grid sizes based on the dictionary `dict`.
@@ -159,6 +188,7 @@ int py_get_grid_size(struct prog *prg, PyObject *knl);
  * @return int
  */
 int py_eval_grid_size(struct prog *prg, PyObject *dict);
+
 /**
  * @ingroup nomp_py_utils
  * @brief Get the representation of python object.
