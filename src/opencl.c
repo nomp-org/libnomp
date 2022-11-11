@@ -77,7 +77,8 @@ static int opencl_knl_build(struct backend *bnd, struct prog *prg,
     char *log = tcalloc(char, log_size);
     // Verify log memory allocation
     if (!log)
-      return set_log(NOMP_TCALLOC_FAILED, NOMP_ERROR, ERR_STR_TCALLOC_FAILURE);
+      return set_log(NOMP_MEM_ALLOC_FAILURE, NOMP_ERROR,
+                     ERR_STR_MEM_ALLOC_FAILURE);
 
     // Get the log
     clGetProgramBuildInfo(ocl_prg->prg, ocl->device_id, CL_PROGRAM_BUILD_LOG,
@@ -182,7 +183,8 @@ int opencl_init(struct backend *bnd, const int platform_id,
                    platform_id);
   cl_platform_id *cl_platforms = tcalloc(cl_platform_id, num_platforms);
   if (cl_platforms == NULL)
-    return set_log(NOMP_MALLOC_FAILURE, NOMP_ERROR, ERR_STR_MALLOC_ERROR);
+    return set_log(NOMP_MEM_ALLOC_FAILURE, NOMP_ERROR,
+                   ERR_STR_MEM_ALLOC_FAILURE);
   err = clGetPlatformIDs(num_platforms, cl_platforms, &num_platforms);
   cl_platform_id platform = cl_platforms[platform_id];
 
@@ -194,7 +196,8 @@ int opencl_init(struct backend *bnd, const int platform_id,
 
   cl_device_id *cl_devices = tcalloc(cl_device_id, num_devices);
   if (cl_devices == NULL)
-    return set_log(NOMP_MALLOC_FAILURE, NOMP_ERROR, ERR_STR_MALLOC_ERROR);
+    return set_log(NOMP_MEM_ALLOC_FAILURE, NOMP_ERROR,
+                   ERR_STR_MEM_ALLOC_FAILURE);
 
   err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, num_devices, cl_devices,
                        &num_devices);

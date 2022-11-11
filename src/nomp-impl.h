@@ -21,8 +21,8 @@
 
 #define return_on_err(err)                                                     \
   do {                                                                         \
-    if (nomp_get_log_type(err) == NOMP_ERROR)                                  \
-      return err;                                                              \
+    if (nomp_get_log_type((err)) == NOMP_ERROR)                                \
+      return (err);                                                            \
   } while (0)
 
 struct prog {
@@ -38,7 +38,7 @@ struct mem {
 };
 
 struct backend {
-  char *backend, *install_dir;
+  char *backend, *install_dir, *annts_script;
   int platform_id, device_id, verbose;
   char name[NOMP_BUFSIZ];
   int (*update)(struct backend *, struct mem *, const int);
@@ -127,7 +127,7 @@ int py_c_to_loopy(PyObject **knl, const char *c_src, const char *backend);
  * @param[in] func Callback function name.
  * @return int
  */
-int py_user_callback(PyObject **knl, const char *file, const char *func);
+int py_user_transform(PyObject **knl, const char *file, const char *func);
 /**
  * @ingroup nomp_py_utils
  * @brief Get kernal name and generated source for the backend.
@@ -224,6 +224,25 @@ int strntoui(const char *str, size_t size);
  */
 size_t pathlen(const char *path);
 
+/**
+ * @ingroup nomp_internal_api
+ * @brief Returns a non-zero error if the input is NULL.
+ *
+ * This function call set_log() to register an error if the input is NULL.
+ * Use the macro nomp_null_input() to automatically add last three arguments.
+ *
+ * @param[in] p Input pointer.
+ * @param[in] func Function in which the null check is done.
+ * @param[in] line Line number where the null check is done.
+ * @param[in] file File name in which the null check is done.
+ * @return int
+ */
+int check_null_input_(void *p, const char *func, unsigned line,
+                      const char *file);
+#define check_null_input(p)                                                    \
+  check_null_input_((void *)(p), __func__, __LINE__, __FILE__)
+
+size_t pathlen(const char *path);
 /**
  * @ingroup nomp_log_utils
  * @brief Free log variables.

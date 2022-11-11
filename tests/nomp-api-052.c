@@ -23,26 +23,28 @@ int main(int argc, char *argv[]) {
 
   // Calling nomp_jit with invalid functions should return an error.
   err = nomp_jit(&id, valid_knl, annotations, clauses0);
-  nomp_assert(nomp_get_log_no(err) == NOMP_USER_CALLBACK_NOT_FOUND);
+  nomp_assert(nomp_get_log_no(err) == NOMP_PY_CALL_FAILED);
 
   char *desc;
   err = nomp_get_log_str(&desc, err);
   int matched =
       match_log(desc, "\\[Error\\] "
-                      ".*libnomp\\/"
-                      "src\\/loopy.c:[0-9]* Specified "
-                      "user callback function not found in file invalid-file.");
+                      ".*src\\/loopy.c:[0-9]* PyImport_Import() failed when "
+                      "importing user transform file: invalid-file.");
   nomp_assert(matched);
+  tfree(desc);
 
   // Invalid transform function
   err = nomp_jit(&id, valid_knl, annotations, clauses1);
-  nomp_assert(nomp_get_log_no(err) == NOMP_USER_CALLBACK_FAILURE);
+  nomp_assert(nomp_get_log_no(err) == NOMP_PY_CALL_FAILED);
 
   err = nomp_get_log_str(&desc, err);
-  matched = match_log(desc, "\\[Error\\] "
-                            ".*libnomp\\/src\\/loopy.c:[0-9]* "
-                            "User callback function invalid_func failed.");
+  matched = match_log(
+      desc, "\\[Error\\] "
+            ".*src\\/loopy.c:[0-9]* PyObject_CallFunctionObjArgs() failed when "
+            "calling user transform function: invalid_func.");
   nomp_assert(matched);
+  tfree(desc);
 
   // Calling nomp_jit with invalid clauses shoud return an error.
   err = nomp_jit(&id, valid_knl, annotations, clauses2);
@@ -54,6 +56,7 @@ int main(int argc, char *argv[]) {
                       ".*libnomp\\/src\\/nomp.c:[0-9]* "
                       "Invalid clause is passed into nomp_jit: invalid-clause");
   nomp_assert(matched);
+  tfree(desc);
 
   // Missing a semi-colon thus the kernel have a syntax error
   const char *invalid_knl =
@@ -71,6 +74,7 @@ int main(int argc, char *argv[]) {
                             "libnomp\\/src\\/loopy.c:[0-9]* C "
                             "to Loopy conversion failed.");
   nomp_assert(matched);
+  tfree(desc);
 
   // Missing file name should return an error.
   err = nomp_jit(&id, valid_knl, annotations, clauses3);
@@ -81,6 +85,7 @@ int main(int argc, char *argv[]) {
                             ".*libnomp\\/src\\/nomp.c:[0-9]* "
                             "File name is not provided.");
   nomp_assert(matched);
+  tfree(desc);
 
   // Missing user callback should return an error.
   err = nomp_jit(&id, valid_knl, annotations, clauses4);
@@ -91,11 +96,10 @@ int main(int argc, char *argv[]) {
                             ".*libnomp\\/src\\/nomp.c:[0-9]* "
                             "User callback function is not provided.");
   nomp_assert(matched);
+  tfree(desc);
 
   err = nomp_finalize();
   nomp_chk(err);
-
-  tfree(desc);
 
   return 0;
 }

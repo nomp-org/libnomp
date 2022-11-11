@@ -1,9 +1,15 @@
 #include "nomp-impl.h"
 
-static struct backend nomp;
-static int initialized = 0;
-
-static const char *py_dir = "python";
+int check_null_input_(void *p, const char *func, unsigned line,
+                      const char *file) {
+  if (!p) {
+    return set_log(
+        NOMP_NULL_INPUT, NOMP_ERROR,
+        "Input pointer passed to function \"%s\" at line %d in fle %s is NULL.",
+        func, line, file);
+  }
+  return 0;
+}
 
 static char *get_if_env(const char *name) {
   const char *tmp = getenv(name);
@@ -37,16 +43,28 @@ static int check_env(struct backend *backend) {
     size_t size = pathlen(tmp);
     backend->install_dir = tcalloc(char, size + 1);
     strncpy(backend->install_dir, tmp, size + 1), tfree(tmp);
+  } else {
+    // TODO: Default to ${HOME}/.nomp. If the doesn't exist, error out.
   }
 
   backend->verbose = strntoui(getenv("NOMP_VERBOSE_LEVEL"), NOMP_BUFSIZ);
 
+  tmp = get_if_env("NOMP_ANNOTATE_SCRIPT");
+  if (tmp) {
+    size_t size = pathlen(tmp);
+    backend->annts_script = tcalloc(char, size + 1);
+    strncpy(backend->annts_script, tmp, size + 1), tfree(tmp);
+  } else {
+    // TODO: Default to current dir.
+  }
+
   return 0;
 }
 
-//=============================================================================
-// nomp_init
-//
+static struct backend nomp;
+static int initialized = 0;
+static const char *py_dir = "python";
+
 int nomp_init(const char *backend, int platform, int device) {
   if (initialized)
     return set_log(NOMP_INITIALIZED_ERROR, NOMP_ERROR,
@@ -54,7 +72,6 @@ int nomp_init(const char *backend, int platform, int device) {
 
   nomp.backend = tcalloc(char, MAX_BACKEND_NAME_SIZE);
   strncpy(nomp.backend, backend, MAX_BACKEND_NAME_SIZE);
-
   nomp.platform_id = platform, nomp.device_id = device;
 
   int err = check_env(&nomp);
@@ -111,9 +128,6 @@ int nomp_init(const char *backend, int platform, int device) {
   return 0;
 }
 
-//=============================================================================
-// nomp_update
-//
 static struct mem **mems = NULL;
 static int mems_n = 0;
 static int mems_max = 0;
@@ -169,9 +183,6 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
   return err;
 }
 
-//=============================================================================
-// nomp_jit
-//
 static struct prog **progs = NULL;
 static int progs_n = 0;
 static int progs_max = 0;
@@ -211,7 +222,22 @@ static int parse_clauses(char **usr_file, char **usr_func,
   return 0;
 }
 
-int nomp_jit(int *id, const char *c_src, const char **annotations,
+static int annts_to_dict(PyObject *dict, const char **annts) {
+  unsigned i = 0;
+  while (annts[i]) {
+    PyObject *key =
+        PyUnicode_FromStringAndSize(annts[i], strnlen(annts[i], NOMP_BUFSIZ));
+    PyObject *val = PyUnicode_FromStringAndSize(
+        annts[i + 1], strnlen(annts[i + 1], NOMP_BUFSIZ));
+    PyDict_SetItem(dict, key, val);
+    Py_XDECREF(key), Py_XDECREF(val);
+    i += 2;
+  }
+
+  return 0;
+}
+
+int nomp_jit(int *id, const char *c_src, const char **annts,
              const char **clauses) {
   int err;
   if (*id == -1) {
@@ -221,11 +247,17 @@ int nomp_jit(int *id, const char *c_src, const char **annotations,
     }
 
     // Create loopy kernel from C source
-    PyObject *py_knl = NULL;
-    int err = py_c_to_loopy(&py_knl, c_src, nomp.name);
+    PyObject *knl = NULL;
+    int err = py_c_to_loopy(&knl, c_src, nomp.name);
     return_on_err(err);
 
     // Handle annotations
+    PyObject *annts_dict = PyDict_New();
+    err = annts_to_dict(annts_dict, annts);
+    return_on_err(err);
+    // err = py_user_annotate(&knl, dict, nomp->annts_script, "annotate");
+    // return_on_err(err);
+    Py_XDECREF(annts_dict);
 
     // Parse the clauses
     char *usr_file = NULL, *usr_func = NULL;
@@ -233,13 +265,13 @@ int nomp_jit(int *id, const char *c_src, const char **annotations,
     return_on_err(err);
 
     // Call the User callback function
-    err = py_user_callback(&py_knl, usr_file, usr_func);
+    err = py_user_transform(&knl, usr_file, usr_func);
     tfree(usr_file), tfree(usr_func);
     return_on_err(err);
 
     // Get OpenCL, CUDA, etc. source and name from the loopy kernel
     char *name, *src;
-    err = py_get_knl_name_and_src(&name, &src, py_knl);
+    err = py_get_knl_name_and_src(&name, &src, knl);
     return_on_err(err);
 
     // Build the kernel
@@ -252,8 +284,8 @@ int nomp_jit(int *id, const char *c_src, const char **annotations,
     // transformations. These grid sizes will be evaluated when the kernel is
     // run.
     prg->py_dict = PyDict_New();
-    py_get_grid_size(prg, py_knl);
-    Py_XDECREF(py_knl);
+    py_get_grid_size(prg, knl);
+    Py_XDECREF(knl);
 
     if (err)
       return set_log(NOMP_KNL_BUILD_ERROR, NOMP_ERROR, ERR_STR_KNL_BUILD_ERROR);
@@ -263,9 +295,6 @@ int nomp_jit(int *id, const char *c_src, const char **annotations,
   return 0;
 }
 
-//=============================================================================
-// nomp_run
-//
 int nomp_run(int id, int nargs, ...) {
   if (id >= 0) {
     struct prog *prg = progs[id];
@@ -299,9 +328,6 @@ int nomp_run(int id, int nargs, ...) {
   return set_log(NOMP_INVALID_KNL, NOMP_ERROR, ERR_STR_INVALID_KERNEL, id);
 }
 
-//=============================================================================
-// Helper functions: nomp_assert & nomp_err
-//
 void nomp_assert_(int cond, const char *file, unsigned line) {
   if (!cond) {
     printf("nomp_assert failure at %s:%d\n", file, line);
@@ -321,9 +347,6 @@ void nomp_chk_(int err_id, const char *file, unsigned line) {
   }
 }
 
-//=============================================================================
-// nomp_finalize
-//
 int nomp_finalize(void) {
   if (!initialized)
     return set_log(NOMP_NOT_INITIALIZED_ERROR, NOMP_ERROR,
@@ -347,7 +370,7 @@ int nomp_finalize(void) {
   }
   tfree(progs), progs = NULL, progs_n = progs_max = 0;
 
-  tfree(nomp.backend), tfree(nomp.install_dir);
+  tfree(nomp.backend), tfree(nomp.install_dir), tfree(nomp.annts_script);
 
   initialized = nomp.finalize(&nomp);
   if (initialized)

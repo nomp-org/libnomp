@@ -54,37 +54,98 @@ int py_c_to_loopy(PyObject **knl, const char *src, const char *backend) {
   return err;
 }
 
-int py_user_callback(PyObject **knl, const char *file, const char *func) {
-  int err = NOMP_USER_CALLBACK_NOT_FOUND;
+int py_user_annotate(PyObject **knl, PyObject *dict, const char *file,
+                     const char *func) {
+  check_null_input(*knl);
+  check_null_input(dict);
+  check_null_input(file);
+  check_null_input(func);
 
-  if (*knl && file && func) {
-    PyObject *py_file = PyUnicode_FromString(file);
-    if (py_file) {
-      PyObject *module = PyImport_Import(py_file);
-      if (module) {
-        PyObject *py_func = PyObject_GetAttrString(module, func);
-        if (py_func && PyCallable_Check(py_func)) {
-          err = NOMP_USER_CALLBACK_FAILURE;
-          PyObject *tknl = PyObject_CallFunctionObjArgs(py_func, *knl, NULL);
-          if (tknl)
-            Py_DECREF(*knl), *knl = tknl, tknl = NULL, err = 0;
-          Py_DECREF(py_func);
-        }
-        Py_DECREF(module);
+  PyObject *pfile = PyUnicode_FromString(file);
+  if (pfile) {
+    PyObject *module = PyImport_Import(pfile);
+    Py_DECREF(pfile);
+    if (module) {
+      PyObject *pfunc = PyObject_GetAttrString(module, func);
+      Py_DECREF(module);
+      if (pfunc && PyCallable_Check(pfunc)) {
+        PyObject *tknl = PyObject_CallFunctionObjArgs(pfunc, *knl, dict, NULL);
+        Py_DECREF(pfunc);
+        if (tknl)
+          Py_DECREF(*knl), *knl = tknl;
+        else
+          return set_log(
+              NOMP_PY_CALL_FAILED, NOMP_ERROR,
+              "PyObject_CallFunctionObjArgs() failed when calling user "
+              "annotate function: %s.",
+              func);
+      } else {
+        return set_log(NOMP_PY_CALL_FAILED, NOMP_ERROR,
+                       "PyObject_GetAttrString() failed when importing user "
+                       "annotate function: %s.",
+                       func);
       }
-      Py_DECREF(py_file);
+    } else {
+      return set_log(
+          NOMP_PY_CALL_FAILED, NOMP_ERROR,
+          "PyImport_Import() failed when importing user annotate file: %s.",
+          file);
     }
+  } else {
+    return set_log(NOMP_PY_CALL_FAILED, NOMP_ERROR,
+                   "PyUnicode_FromString() failed when converting user "
+                   "annotate file name \"%s\""
+                   "to a python string.",
+                   file);
   }
-  if (err) {
-    if (err == NOMP_USER_CALLBACK_NOT_FOUND)
-      err = set_log(err, NOMP_ERROR, ERR_STR_USER_CALLBACK_NOT_FOUND, file);
-    else if (err == NOMP_USER_CALLBACK_FAILURE)
-      err = set_log(err, NOMP_ERROR, ERR_STR_USER_CALLBACK_FAILURE, func);
-    else
-      err = set_log(NOMP_UNKNOWN_ERROR, NOMP_ERROR, ERR_STR_NOMP_UNKOWN_ERROR,
-                    err);
+
+  return 0;
+}
+
+int py_user_transform(PyObject **knl, const char *file, const char *func) {
+  check_null_input(*knl);
+  check_null_input(file);
+  check_null_input(func);
+
+  PyObject *pfile = PyUnicode_FromString(file);
+  if (pfile) {
+    PyObject *module = PyImport_Import(pfile);
+    Py_DECREF(pfile);
+    if (module) {
+      PyObject *pfunc = PyObject_GetAttrString(module, func);
+      Py_DECREF(module);
+      if (pfunc && PyCallable_Check(pfunc)) {
+        PyObject *tknl = PyObject_CallFunctionObjArgs(pfunc, *knl, NULL);
+        Py_DECREF(pfunc);
+        if (tknl)
+          Py_DECREF(*knl), *knl = tknl;
+        else
+          return set_log(
+              NOMP_PY_CALL_FAILED, NOMP_ERROR,
+              "PyObject_CallFunctionObjArgs() failed when calling user "
+              "transform function: %s.",
+              func);
+      } else {
+        return set_log(NOMP_PY_CALL_FAILED, NOMP_ERROR,
+                       "PyObject_GetAttrString() failed when importing user "
+                       "transform function: %s.",
+                       func);
+      }
+    } else {
+      return set_log(
+          NOMP_PY_CALL_FAILED, NOMP_ERROR,
+          "PyImport_Import() failed when importing user transform file: %s.",
+          file);
+    }
+  } else {
+    return set_log(NOMP_PY_CALL_FAILED, NOMP_ERROR,
+                   "PyUnicode_FromString() failed when converting user "
+                   "transform file name \"%s\""
+                   "to a python string.",
+                   file);
   }
-  return err;
+
+  return 0;
 }
 
 int py_get_knl_name_and_src(char **name, char **src, PyObject *knl) {

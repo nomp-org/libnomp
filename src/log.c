@@ -10,11 +10,17 @@ const char *ERR_STR_NOMP_IS_ALREADY_INITIALIZED =
     "calling nomp_init() again.";
 const char *ERR_STR_FAILED_TO_INITIALIZE_NOMP =
     "Failed to initialize libnomp. Invalid backend: %s";
+const char *ERR_STR_NOMP_IS_NOT_INITIALIZED = "libnomp is not initialized.";
 const char *ERR_STR_FAILED_TO_FINALIZE_NOMP = "Failed to finalize libnomp.";
+
 const char *ERR_STR_NOMP_INSTALL_DIR_NOT_SET =
     "Environment variable NOMP_INSTALL_DIR, which is required by libnomp is "
     "not set.";
-const char *ERR_STR_NOMP_IS_NOT_INITIALIZED = "libnomp is not initialized.";
+
+const char *ERR_STR_MEM_ALLOC_FAILURE = "libnomp host memory allocation error.";
+
+const char *ERR_STR_INVALID_DEVICE = "Invalid libnomp device id %d.";
+const char *ERR_STR_INVALID_PLATFORM = "Invalid libnomp platform id %d.";
 
 const char *ERR_STR_INVALID_MAP_OP = "Invalid map pointer operation %d.";
 const char *ERR_STR_INVALID_MAP_PTR = "Invalid map pointer %p.";
@@ -23,9 +29,15 @@ const char *ERR_STR_PTR_IS_ALREADY_ALLOCATED =
 
 const char *ERR_STR_KERNEL_RUN_FAILED = "Kernel %d run failed.";
 const char *ERR_STR_INVALID_KERNEL = "Invalid kernel %d.";
+const char *ERR_STR_INVALID_KNL_ARG_TYPE =
+    "Invalid libnomp kernel argument type %d.";
+const char *ERR_STR_KNL_ARG_SET_ERROR =
+    "Setting libnomp kernel argument failed.";
+const char *ERR_STR_KNL_BUILD_ERROR = "libnomp kernel build error.";
 
 const char *WARNING_STR_PYTHON_IS_ALREADY_INITIALIZED =
     "Python is already initialized. Using already initialized python version.";
+const char *ERR_STR_PY_INITIALIZE_ERROR = "libnomp python initialize error.";
 
 const char *ERR_STR_LOOPY_CONVERSION_ERROR = "C to Loopy conversion failed.";
 const char *ERR_STR_FILE_NAME_NOT_PROVIDED = "File name is not provided.";
@@ -34,6 +46,9 @@ const char *ERR_STR_USER_CALLBACK_NOT_PROVIDED =
 const char *ERR_STR_USER_CALLBACK_NOT_FOUND =
     "Specified user callback function not found in file %s.";
 const char *ERR_STR_USER_CALLBACK_FAILURE = "User callback function %s failed.";
+const char *ERR_STR_NOMP_INVALID_CLAUSE =
+    "Invalid clause is passed into nomp_jit: %s";
+
 const char *ERR_STR_LOOPY_KNL_NAME_NOT_FOUND =
     "Failed to find loopy kernel %s.";
 const char *ERR_STR_LOOPY_CODEGEN_FAILED =
@@ -41,23 +56,11 @@ const char *ERR_STR_LOOPY_CODEGEN_FAILED =
 const char *ERR_STR_LOOPY_GRIDSIZE_FAILED = "Loopy grid size failure.";
 const char *ERR_STR_GRIDSIZE_CALCULATION_FAILED =
     "Loopy grid size calculation failure.";
-const char *ERR_STR_INVALID_KNL_ARG_TYPE =
-    "Invalid libnomp kernel argument type %d.";
-const char *ERR_STR_INVALID_DEVICE = "Invalid libnomp device id %d.";
-const char *ERR_STR_KNL_ARG_SET_ERROR =
-    "Setting libnomp kernel argument failed.";
-const char *ERR_STR_INVALID_PLATFORM = "Invalid libnomp platform id %d.";
-const char *ERR_STR_MALLOC_ERROR = "libnomp malloc error.";
-const char *ERR_STR_KNL_BUILD_ERROR = "libnomp kernel build error.";
-const char *ERR_STR_PY_INITIALIZE_ERROR = "libnomp python initialize error.";
+
 const char *ERR_STR_INVALID_LOG_ID = "Invalid log id %d.";
 const char *ERR_STR_NOMP_UNKOWN_ERROR = "Unkown error id %d";
-const char *ERR_STR_NOMP_INVALID_CLAUSE =
-    "Invalid clause is passed into nomp_jit: %s";
-const char *ERR_STR_EXCEED_MAX_LEN_STR =
-    "String length exceed the max length of %d.";
+
 const char *ERR_STR_CUDA_FAILURE = "Cuda %s failed: %s.";
-const char *ERR_STR_TCALLOC_FAILURE = "libnomp tcalloc failure.";
 const char *ERR_STR_OPENCL_FAILURE = "OpenCL %s failure with error code: %d.";
 
 struct log {
@@ -74,9 +77,9 @@ int set_log_(const char *description, int logno, nomp_log_type type,
              const char *fname, unsigned line_no, ...) {
   if (logs_max <= logs_n) {
     logs_max += logs_max / 2 + 1;
-    logs = (struct log *)realloc(logs, sizeof(struct log) * logs_max);
+    logs = trealloc(logs, struct log, logs_max);
     if (logs == NULL)
-      return NOMP_OUT_OF_MEMORY;
+      return NOMP_MEM_ALLOC_FAILURE;
   }
 
   va_list vargs;
