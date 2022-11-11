@@ -8,11 +8,11 @@ int nomp_api_100(unsigned s, unsigned e) {
 
   // Free'ing before mapping should return an error
   int err = nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FREE);
-  nomp_assert(nomp_get_log_no(err) == NOMP_INVALID_MAP_PTR);
+  nomp_assert(nomp_get_log_no(err) == NOMP_USER_MAP_PTR_NOT_VALID);
 
   // D2H before H2D should return an error
   err = nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FROM);
-  nomp_assert(nomp_get_log_no(err) == NOMP_INVALID_MAP_PTR);
+  nomp_assert(nomp_get_log_no(err) == NOMP_USER_MAP_PTR_NOT_VALID);
 
   // Mapping H2D multiple times is not an error
   err = nomp_update(b, s, e, sizeof(TEST_TYPE), NOMP_TO);

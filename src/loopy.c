@@ -12,25 +12,26 @@ void py_print(PyObject *obj) {
 }
 
 int py_append_to_sys_path(const char *path) {
-  int err = NOMP_PY_APPEND_PATH_ERROR;
-
-  PyObject *py_sys = PyImport_ImportModule("sys");
-  if (py_sys) {
-    PyObject *py_path = PyObject_GetAttrString(py_sys, "path");
-    if (py_path) {
-      PyObject *py_str = PyUnicode_FromString(path);
-      PyList_Append(py_path, py_str);
-      Py_DECREF(py_path), Py_XDECREF(py_str), err = 0;
+  PyObject *sys = PyImport_ImportModule("sys");
+  if (sys) {
+    PyObject *ppath = PyObject_GetAttrString(sys, "path");
+    Py_DECREF(sys);
+    if (ppath) {
+      PyObject *pstr = PyUnicode_FromString(path);
+      int err = PyList_Append(ppath, pstr);
+      Py_DECREF(ppath), Py_XDECREF(pstr);
+      // TODO: Add the exception to the error message as well
+      if (err)
+        return set_log(NOMP_PY_CALL_FAILED, NOMP_ERROR,
+                       "Appending path to the sys.path failed.");
     }
-    Py_DECREF(py_sys);
   }
 
-  return err;
+  return 0;
 }
 
 int py_c_to_loopy(PyObject **knl, const char *src, const char *backend) {
   int err = NOMP_LOOPY_CONVERSION_ERROR;
-
   PyObject *lpy_api = PyUnicode_FromString(loopy_api);
   if (lpy_api) {
     PyObject *module = PyImport_Import(lpy_api);
@@ -54,12 +55,13 @@ int py_c_to_loopy(PyObject **knl, const char *src, const char *backend) {
   return err;
 }
 
-int py_user_annotate(PyObject **knl, PyObject *dict, const char *file,
+int py_user_annotate(PyObject **knl, PyObject *annts, const char *file,
                      const char *func) {
   check_null_input(*knl);
-  check_null_input(dict);
-  check_null_input(file);
-  check_null_input(func);
+
+  // If either file, or func are NULL, we don't have to do anything:
+  if (file == NULL || func == NULL)
+    return 0;
 
   PyObject *pfile = PyUnicode_FromString(file);
   if (pfile) {
@@ -69,7 +71,7 @@ int py_user_annotate(PyObject **knl, PyObject *dict, const char *file,
       PyObject *pfunc = PyObject_GetAttrString(module, func);
       Py_DECREF(module);
       if (pfunc && PyCallable_Check(pfunc)) {
-        PyObject *tknl = PyObject_CallFunctionObjArgs(pfunc, *knl, dict, NULL);
+        PyObject *tknl = PyObject_CallFunctionObjArgs(pfunc, *knl, annts, NULL);
         Py_DECREF(pfunc);
         if (tknl)
           Py_DECREF(*knl), *knl = tknl;
@@ -217,7 +219,7 @@ int py_get_knl_name_and_src(char **name, char **src, PyObject *knl) {
 }
 
 int py_get_grid_size(struct prog *prg, PyObject *knl) {
-  int err = NOMP_GET_GRIDSIZE_FAILED;
+  int err = NOMP_LOOPY_GET_GRIDSIZE_FAILED;
 
   if (knl) {
     // knl.callables_table
@@ -246,11 +248,9 @@ int py_get_grid_size(struct prog *prg, PyObject *knl) {
       Py_DECREF(callables);
     }
   }
-  if (err) {
-    PyErr_Print();
-    return set_log(NOMP_GET_GRIDSIZE_FAILED, NOMP_ERROR,
+  if (err)
+    return set_log(NOMP_LOOPY_GET_GRIDSIZE_FAILED, NOMP_ERROR,
                    ERR_STR_LOOPY_GRIDSIZE_FAILED);
-  }
   return err;
 }
 
@@ -293,15 +293,14 @@ int py_eval_grid_size(struct prog *prg, PyObject *dict) {
           err |= py_eval_grid_size_aux(prg->local, prg->py_local, i, evaluate,
                                        dict);
         Py_DECREF(evaluate);
-        err = (err != 0) * NOMP_EVAL_GRIDSIZE_FAILED;
+        err = (err != 0) * NOMP_LOOPY_EVAL_GRIDSIZE_FAILED;
       }
       Py_DECREF(mapper);
     }
-    if (err) {
-      PyErr_Print();
-      return set_log(NOMP_EVAL_GRIDSIZE_FAILED, NOMP_ERROR,
-                     ERR_STR_GRIDSIZE_CALCULATION_FAILED);
-    }
+    if (err)
+      return set_log(NOMP_LOOPY_EVAL_GRIDSIZE_FAILED, NOMP_ERROR,
+                     "libnomp was unable to evaluate the kernel launch "
+                     "parameters using pymbolic.");
   }
 
   return err;

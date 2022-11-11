@@ -150,13 +150,13 @@ static int cuda_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
     case NOMP_PTR:
       m = mem_if_mapped(p);
       if (m == NULL)
-        return set_log(NOMP_INVALID_MAP_PTR, NOMP_ERROR,
-                       ERR_STR_INVALID_MAP_PTR, p);
+        return set_log(NOMP_USER_MAP_PTR_NOT_VALID, NOMP_ERROR,
+                       ERR_STR_USER_MAP_PTR_NOT_VALID, p);
       p = &m->bptr;
       break;
     default:
-      return set_log(NOMP_KNL_ARG_TYPE_ERROR, NOMP_ERROR,
-                     ERR_STR_INVALID_KNL_ARG_TYPE, type);
+      return set_log(NOMP_KNL_ARG_TYPE_NOT_VALID, NOMP_ERROR,
+                     ERR_STR_KNL_ARG_TYPE_NOT_VALID, type);
       break;
     }
     vargs[i] = p;
@@ -185,8 +185,8 @@ int cuda_init(struct backend *bnd, const int platform_id, const int device_id) {
   CUresult result = cudaGetDeviceCount(&num_devices);
   chk_cu(result);
   if (device_id < 0 || device_id >= num_devices)
-    return set_log(NOMP_INVALID_DEVICE, NOMP_ERROR, ERR_STR_INVALID_DEVICE,
-                   device_id);
+    return set_log(NOMP_USER_DEVICE_NOT_VALID, NOMP_ERROR,
+                   ERR_STR_USER_DEVICE_NOT_VALID, device_id);
   result = cudaSetDevice(device_id);
   chk_cu(result);
 

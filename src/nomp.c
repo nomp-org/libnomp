@@ -4,7 +4,7 @@ int check_null_input_(void *p, const char *func, unsigned line,
                       const char *file) {
   if (!p) {
     return set_log(
-        NOMP_NULL_INPUT, NOMP_ERROR,
+        NOMP_RUNTIME_NULL_INPUT_ENCOUNTERED, NOMP_ERROR,
         "Input pointer passed to function \"%s\" at line %d in fle %s is NULL.",
         func, line, file);
   }
@@ -44,7 +44,10 @@ static int check_env(struct backend *backend) {
     backend->install_dir = tcalloc(char, size + 1);
     strncpy(backend->install_dir, tmp, size + 1), tfree(tmp);
   } else {
-    // TODO: Default to ${HOME}/.nomp. If the doesn't exist, error out.
+    // TODO: Default to ${HOME}/.nomp. If that doesn't exist, error out.
+    // Also, there is a way to find the directory where the libnomp.so
+    // located within linomp itself. Maybe we can do so in a portable
+    // manner.
   }
 
   backend->verbose = strntoui(getenv("NOMP_VERBOSE_LEVEL"), NOMP_BUFSIZ);
@@ -58,6 +61,15 @@ static int check_env(struct backend *backend) {
     // TODO: Default to current dir.
   }
 
+  tmp = get_if_env("NOMP_ANNOTATE_FUNCTION");
+  if (tmp) {
+    size_t size = pathlen(tmp);
+    backend->annts_func = tcalloc(char, size + 1);
+    strncpy(backend->annts_func, tmp, size + 1), tfree(tmp);
+  } else {
+    backend->annts_func = NULL;
+  }
+
   return 0;
 }
 
@@ -67,8 +79,11 @@ static const char *py_dir = "python";
 
 int nomp_init(const char *backend, int platform, int device) {
   if (initialized)
-    return set_log(NOMP_INITIALIZED_ERROR, NOMP_ERROR,
-                   ERR_STR_NOMP_IS_ALREADY_INITIALIZED, nomp.name);
+    return set_log(
+        NOMP_RUNTIME_ALREADY_INITIALIZED, NOMP_ERROR,
+        "libnomp is already initialized to use %s. Call nomp_finalize() before "
+        "calling nomp_init() again.",
+        nomp.name);
 
   nomp.backend = tcalloc(char, MAX_BACKEND_NAME_SIZE);
   strncpy(nomp.backend, backend, MAX_BACKEND_NAME_SIZE);
@@ -92,8 +107,8 @@ int nomp_init(const char *backend, int platform, int device) {
     err = cuda_init(&nomp, nomp.platform_id, nomp.device_id);
 #endif
   } else {
-    err = set_log(NOMP_INVALID_BACKEND, NOMP_ERROR,
-                  ERR_STR_FAILED_TO_INITIALIZE_NOMP, name);
+    err = set_log(NOMP_USER_INPUT_NOT_VALID, NOMP_ERROR,
+                  "Failed to initialized libnomp. Invalid backend: %s", name);
   }
   return_on_err(err);
 
@@ -106,23 +121,17 @@ int nomp_init(const char *backend, int platform, int device) {
     Py_Initialize();
     // Append current working dir
     py_append_to_sys_path(".");
-    // There should be a better way to figure the installation
-    // path based on the shared library path
-    if (nomp.install_dir) {
-      char *abs_dir = strcatn(3, nomp.install_dir, "/", py_dir);
-      py_append_to_sys_path(abs_dir);
-      err = tfree(abs_dir);
-    } else {
-      return set_log(NOMP_INSTALL_DIR_NOT_FOUND, NOMP_ERROR,
-                     ERR_STR_NOMP_INSTALL_DIR_NOT_SET);
-    }
+    // nomp.install_dir should be set and we use it here.
+    char *abs_dir = strcatn(3, nomp.install_dir, "/", py_dir);
+    py_append_to_sys_path(abs_dir);
+    err = tfree(abs_dir);
   } else {
     // Python is already initialized.
     err = 0;
   }
   if (err)
     return set_log(NOMP_PY_INITIALIZE_ERROR, NOMP_ERROR,
-                   ERR_STR_PY_INITIALIZE_ERROR);
+                   "Unable to initialize python during initializing libnomp.");
 
   initialized = 1;
   return 0;
@@ -160,8 +169,9 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
   if (idx == mems_n) {
     // A new entry can't be created with NOMP_FREE or NOMP_FROM
     if (op == NOMP_FROM || op == NOMP_FREE)
-      return set_log(NOMP_INVALID_MAP_PTR, NOMP_ERROR, ERR_STR_INVALID_MAP_OP,
-                     op);
+      return set_log(NOMP_USER_INPUT_NOT_VALID, NOMP_ERROR,
+                     "NOMP_FREE or NOMP_FROM can only be called on a pointer "
+                     "which is already on the device.");
     op |= NOMP_ALLOC;
     if (mems_n == mems_max) {
       mems_max += mems_max / 2 + 1;
@@ -187,58 +197,44 @@ static struct prog **progs = NULL;
 static int progs_n = 0;
 static int progs_max = 0;
 
-static int parse_clauses(char **usr_file, char **usr_func,
+static int parse_clauses(char **usr_file, char **usr_func, PyObject **dict_,
                          const char **clauses) {
-  // Currently, we only support `transform` and `jit`.
+  // Currently, we only support `transform` and `annotate` and `jit`.
+  PyObject *dict = *dict_ = PyDict_New();
   unsigned i = 0;
-  char *clause = NULL;
   while (clauses[i]) {
-    strnlower(&clause, clauses[i], NOMP_BUFSIZ);
-    if (strncmp(clause, "transform", NOMP_BUFSIZ) == 0) {
-      if (clauses[i + 1]) {
-        size_t size = pathlen(clauses[i + 1]);
-        *usr_file = strndup(clauses[i + 1], size);
-      } else {
-        tfree(clause);
-        return set_log(NOMP_FILE_NAME_NOT_PROVIDED, NOMP_ERROR,
-                       ERR_STR_FILE_NAME_NOT_PROVIDED);
-      }
-      if (clauses[i + 2]) {
-        *usr_func = strndup(clauses[i + 2], NOMP_BUFSIZ);
-      } else {
-        tfree(clause);
-        return set_log(NOMP_USER_CALLBACK_NOT_PROVIDED, NOMP_ERROR,
-                       ERR_STR_USER_CALLBACK_NOT_PROVIDED);
-      }
+    if (strncmp(clauses[i], "transform", NOMP_BUFSIZ) == 0) {
+      if (clauses[i + 1] == NULL || clauses[i + 2] == NULL)
+        return set_log(
+            NOMP_USER_INPUT_NOT_PROVIDED, NOMP_ERROR,
+            "\"transform\" clause should be followed by a file name and a "
+            "function name. At least one of them is not provided.");
+      *usr_file = strndup(clauses[i + 1], pathlen(clauses[i + 1]));
+      *usr_func = strndup(clauses[i + 2], NOMP_BUFSIZ);
       i = i + 3;
-    } else if (strncmp(clause, "jit", NOMP_BUFSIZ) == 0) {
+    } else if (strncmp(clauses[i], "annotate", NOMP_BUFSIZ) == 0) {
+      if (clauses[i + 1] == NULL || clauses[i + 2] == NULL)
+        return set_log(NOMP_USER_INPUT_NOT_PROVIDED, NOMP_ERROR,
+                       "\"annotate\" clause should be followed by a key value "
+                       "pair. At least one of them is not provided.");
+      const char *key = clauses[i + 1], *val = clauses[i + 2];
+      PyObject *pkey =
+          PyUnicode_FromStringAndSize(key, strnlen(key, NOMP_BUFSIZ));
+      PyObject *pval =
+          PyUnicode_FromStringAndSize(val, strnlen(val, NOMP_BUFSIZ));
+      PyDict_SetItem(dict, pkey, pval);
+      Py_XDECREF(pkey), Py_XDECREF(pval);
     } else {
-      tfree(clause);
-      return set_log(NOMP_INVALID_CLAUSE, NOMP_ERROR,
-                     ERR_STR_NOMP_INVALID_CLAUSE, clauses[i]);
+      return set_log(NOMP_USER_INPUT_NOT_VALID, NOMP_ERROR,
+                     "Clause %s passed into nomp_jit is not a valid caluse",
+                     clauses[i]);
     }
   }
-  tfree(clause);
-  return 0;
-}
-
-static int annts_to_dict(PyObject *dict, const char **annts) {
-  unsigned i = 0;
-  while (annts[i]) {
-    PyObject *key =
-        PyUnicode_FromStringAndSize(annts[i], strnlen(annts[i], NOMP_BUFSIZ));
-    PyObject *val = PyUnicode_FromStringAndSize(
-        annts[i + 1], strnlen(annts[i + 1], NOMP_BUFSIZ));
-    PyDict_SetItem(dict, key, val);
-    Py_XDECREF(key), Py_XDECREF(val);
-    i += 2;
-  }
 
   return 0;
 }
 
-int nomp_jit(int *id, const char *c_src, const char **annts,
-             const char **clauses) {
+int nomp_jit(int *id, const char *c_src, const char **clauses) {
   int err;
   if (*id == -1) {
     if (progs_n == progs_max) {
@@ -251,20 +247,17 @@ int nomp_jit(int *id, const char *c_src, const char **annts,
     int err = py_c_to_loopy(&knl, c_src, nomp.name);
     return_on_err(err);
 
-    // Handle annotations
-    PyObject *annts_dict = PyDict_New();
-    err = annts_to_dict(annts_dict, annts);
-    return_on_err(err);
-    // err = py_user_annotate(&knl, dict, nomp->annts_script, "annotate");
-    // return_on_err(err);
-    Py_XDECREF(annts_dict);
-
     // Parse the clauses
     char *usr_file = NULL, *usr_func = NULL;
-    err = parse_clauses(&usr_file, &usr_func, clauses);
+    PyObject *annts;
+    err = parse_clauses(&usr_file, &usr_func, &annts, clauses);
     return_on_err(err);
 
-    // Call the User callback function
+    // Handle annotate clauses if the exist
+    err = py_user_annotate(&knl, annts, nomp.annts_script, nomp.annts_func);
+    return_on_err(err);
+
+    // Handle transform clauase
     err = py_user_transform(&knl, usr_file, usr_func);
     tfree(usr_file), tfree(usr_func);
     return_on_err(err);
@@ -284,11 +277,10 @@ int nomp_jit(int *id, const char *c_src, const char **annts,
     // transformations. These grid sizes will be evaluated when the kernel is
     // run.
     prg->py_dict = PyDict_New();
-    py_get_grid_size(prg, knl);
+    err = py_get_grid_size(prg, knl);
     Py_XDECREF(knl);
+    return_on_err(err);
 
-    if (err)
-      return set_log(NOMP_KNL_BUILD_ERROR, NOMP_ERROR, ERR_STR_KNL_BUILD_ERROR);
     *id = progs_n++;
   }
 
@@ -321,11 +313,12 @@ int nomp_run(int id, int nargs, ...) {
     int err = nomp.knl_run(&nomp, prg, args);
     va_end(args);
     if (err)
-      return set_log(NOMP_KNL_RUN_ERROR, NOMP_ERROR, ERR_STR_KERNEL_RUN_FAILED,
-                     id);
+      return set_log(NOMP_KNL_RUN_ERROR, NOMP_ERROR,
+                     "Kernel execution failed for the kernel: %d", id);
     return 0;
   }
-  return set_log(NOMP_INVALID_KNL, NOMP_ERROR, ERR_STR_INVALID_KERNEL, id);
+  return set_log(NOMP_USER_INPUT_NOT_VALID, NOMP_ERROR,
+                 "Kernel id passed to nomp_run is not valid: %d", id);
 }
 
 void nomp_assert_(int cond, const char *file, unsigned line) {
@@ -349,8 +342,8 @@ void nomp_chk_(int err_id, const char *file, unsigned line) {
 
 int nomp_finalize(void) {
   if (!initialized)
-    return set_log(NOMP_NOT_INITIALIZED_ERROR, NOMP_ERROR,
-                   ERR_STR_NOMP_IS_NOT_INITIALIZED);
+    return set_log(NOMP_RUNTIME_NOT_INITIALIZED, NOMP_ERROR,
+                   "libnomp is not initialized.");
 
   for (unsigned i = 0; i < mems_n; i++) {
     if (mems[i]) {
@@ -370,12 +363,13 @@ int nomp_finalize(void) {
   }
   tfree(progs), progs = NULL, progs_n = progs_max = 0;
 
-  tfree(nomp.backend), tfree(nomp.install_dir), tfree(nomp.annts_script);
+  tfree(nomp.backend), tfree(nomp.install_dir);
+  tfree(nomp.annts_script), tfree(nomp.annts_func);
 
   initialized = nomp.finalize(&nomp);
   if (initialized)
-    return set_log(NOMP_FINALIZE_ERROR, NOMP_ERROR,
-                   ERR_STR_FAILED_TO_FINALIZE_NOMP);
+    return set_log(NOMP_RUNTIME_FAILED_TO_FINALIZE, NOMP_ERROR,
+                   "Failed to initialize libnomp.");
 
   return 0;
 }

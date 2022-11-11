@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
   err = nomp_init(backend, platform, device);
   nomp_assert(nomp_get_log_no(err) == NOMP_INVALID_BACKEND);
   err = nomp_finalize();
-  nomp_assert(nomp_get_log_no(err) == NOMP_NOT_INITIALIZED_ERROR);
+  nomp_assert(nomp_get_log_no(err) == NOMP_RUNTIME_NOT_INITIALIZED);
 
   // Setting environment variable with valid backend
   setenv("NOMP_BACKEND", "opencl", 1);
@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
   err = nomp_init(backend, INT_MAX, device);
   nomp_assert(nomp_get_log_no(err) == NOMP_INVALID_PLATFORM);
   err = nomp_finalize();
-  nomp_assert(nomp_get_log_no(err) == NOMP_NOT_INITIALIZED_ERROR);
+  nomp_assert(nomp_get_log_no(err) == NOMP_RUNTIME_NOT_INITIALIZED);
 
   // If platform-id environment variable is positive, it should have higher
   // priority.
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
   err = nomp_init(backend, platform, device);
   nomp_assert(nomp_get_log_no(err) == NOMP_INVALID_PLATFORM);
   err = nomp_finalize();
-  nomp_assert(nomp_get_log_no(err) == NOMP_NOT_INITIALIZED_ERROR);
+  nomp_assert(nomp_get_log_no(err) == NOMP_RUNTIME_NOT_INITIALIZED);
 
   // Run with a valid platform-id environment variable
   setenv("NOMP_PLATFORM_ID", "0", 1);
@@ -82,17 +82,17 @@ int main(int argc, char *argv[]) {
 
   // If both are invalid should return an error
   err = nomp_init(backend, platform, INT_MAX);
-  nomp_assert(nomp_get_log_no(err) == NOMP_INVALID_DEVICE);
+  nomp_assert(nomp_get_log_no(err) == NOMP_USER_DEVICE_NOT_VALID);
   err = nomp_finalize();
-  nomp_assert(nomp_get_log_no(err) == NOMP_NOT_INITIALIZED_ERROR);
+  nomp_assert(nomp_get_log_no(err) == NOMP_RUNTIME_NOT_INITIALIZED);
 
   // If device-id environment variable is positive, it should have higher
   // priority.
   setenv("NOMP_DEVICE_ID", int_max_str, 1);
   err = nomp_init(backend, platform, device);
-  nomp_assert(nomp_get_log_no(err) == NOMP_INVALID_DEVICE);
+  nomp_assert(nomp_get_log_no(err) == NOMP_USER_DEVICE_NOT_VALID);
   err = nomp_finalize();
-  nomp_assert(nomp_get_log_no(err) == NOMP_NOT_INITIALIZED_ERROR);
+  nomp_assert(nomp_get_log_no(err) == NOMP_RUNTIME_NOT_INITIALIZED);
 
   // Run with a valid device-id environment variable
   setenv("NOMP_DEVICE_ID", "0", 1);

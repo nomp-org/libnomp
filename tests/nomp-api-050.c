@@ -8,7 +8,7 @@ int main(int argc, char *argv[]) {
 
   // Calling `nomp_finalize` before `nomp_init` should retrun an error
   int err = nomp_finalize();
-  nomp_assert(nomp_get_log_no(err) == NOMP_NOT_INITIALIZED_ERROR);
+  nomp_assert(nomp_get_log_no(err) == NOMP_RUNTIME_NOT_INITIALIZED);
 
   char *desc;
   err = nomp_get_log_str(&desc, err);
@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
   err = nomp_init(backend, platform_id, device_id);
   nomp_chk(err);
   err = nomp_init(backend, platform_id, device_id);
-  nomp_assert(nomp_get_log_no(err) == NOMP_INITIALIZED_ERROR);
+  nomp_assert(nomp_get_log_no(err) == NOMP_RUNTIME_ALREADY_INITIALIZED);
 
   err = nomp_get_log_str(&desc, err);
   matched =
@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
   err = nomp_finalize();
   nomp_chk(err);
   err = nomp_finalize();
-  nomp_assert(nomp_get_log_no(err) == NOMP_NOT_INITIALIZED_ERROR);
+  nomp_assert(nomp_get_log_no(err) == NOMP_RUNTIME_NOT_INITIALIZED);
 
   err = nomp_get_log_str(&desc, err);
   matched = match_log(desc, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* "
