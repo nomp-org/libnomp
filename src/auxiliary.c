@@ -1,5 +1,6 @@
 #include "nomp-impl.h"
 
+// FIXME: This should take max string size as the input.
 char *strcatn(int nstr, ...) {
   unsigned n = 0, max = NOMP_BUFSIZ;
   char *out = tcalloc(char, max);
@@ -23,10 +24,6 @@ char *strcatn(int nstr, ...) {
 
 int strnlower(char **out, const char *in, size_t max) {
   unsigned len = strnlen(in, max);
-  if (len == max)
-    return set_log(NOMP_STR_EXCEED_MAX_LEN, NOMP_ERROR,
-                   ERR_STR_EXCEED_MAX_LEN_STR, max);
-
   char *wrk = *out = trealloc(*out, char, len + 1);
   for (unsigned i = 0; i < len; i++)
     wrk[i] = tolower(in[i]);

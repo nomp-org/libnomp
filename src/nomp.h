@@ -61,167 +61,36 @@
 
 /**
  * @ingroup nomp_errors
- * @brief Invalid libnomp backend
- */
-#define NOMP_INVALID_BACKEND -32
-/**
- * @ingroup nomp_errors
- * @brief Invalid libnomp platform
- */
-#define NOMP_INVALID_PLATFORM -33
-/**
- * @ingroup nomp_errors
- * @brief Invalid libnomp device
- */
-#define NOMP_INVALID_DEVICE -34
-/**
- * @ingroup nomp_errors
- * @brief Invalid libnomp map pointer
- */
-#define NOMP_INVALID_MAP_PTR -36
-/**
- * @ingroup nomp_errors
- * @brief Invalid libnomp map operation
- */
-#define NOMP_INVALID_MAP_OP -37
-/**
- * @ingroup nomp_errors
- * @brief Pointer is already mapped
- */
-#define NOMP_PTR_ALREADY_MAPPED -38
-/**
- * @ingroup nomp_errors
- * @brief Invalid libnomp kernel
- */
-#define NOMP_INVALID_KNL -39
-/**
- * @ingroup nomp_errors
- * @brief Invalid libnomp for clause
- */
-#define NOMP_INVALID_CLAUSE -40
-/**
- * @ingroup nomp_errors
- * @brief Invalid libnomp map parameters
- */
-#define NOMP_INVALID_MAP_PARAMS -41
-
-/**
- * @ingroup nomp_errors
  * @brief libnomp is already initialized
  */
-#define NOMP_INITIALIZED_ERROR -64
+#define NOMP_INITIALIZED_ERROR -256
 /**
  * @ingroup nomp_errors
  * @brief libnomp is not initialized
  */
-#define NOMP_NOT_INITIALIZED_ERROR -65
+#define NOMP_NOT_INITIALIZED_ERROR -257
 /**
  * @ingroup nomp_errors
  * @brief Failed to finalize libnomp
  */
-#define NOMP_FINALIZE_ERROR -66
+#define NOMP_FINALIZE_ERROR -258
 /**
  * @ingroup nomp_errors
  * @brief libnomp memory free failed
  */
-#define NOMP_FREE_FAILURE -67
+
+#define NOMP_FREE_FAILURE -259
 /**
  * @ingroup nomp_errors
  * @brief libnomp malloc failed
  */
-#define NOMP_MALLOC_FAILURE -68
-/**
- * @ingroup nomp_errors
- * @brief libnomp realloc failed
- */
-#define NOMP_REALLOC_FAILURE -69
+#define NOMP_MEM_ALLOC_FAILURE -260
 
 /**
  * @ingroup nomp_errors
- * @brief libnomp python initialization failed
+ * @brief One of the inputs to a libnomp function are null.
  */
-#define NOMP_PY_INITIALIZE_ERROR -96
-/**
- * @ingroup nomp_errors
- * @brief NOMP_INSTALL_DIR env. variable is not set
- */
-#define NOMP_INSTALL_DIR_NOT_FOUND -97
-/**
- * @ingroup nomp_errors
- * @brief Specified user callback function not found
- */
-#define NOMP_USER_CALLBACK_NOT_FOUND -98
-/**
- * @ingroup nomp_errors
- * @brief User callback function failed
- */
-#define NOMP_USER_CALLBACK_FAILURE -99
-/**
- * @ingroup nomp_errors
- * @brief Loopy conversion failed
- */
-#define NOMP_LOOPY_CONVERSION_ERROR -100
-/**
- * @ingroup nomp_errors
- * @brief Failed to find loopy kernel
- */
-#define NOMP_LOOPY_KNL_NAME_NOT_FOUND -101
-/**
- * @ingroup nomp_errors
- * @brief Code generation from loopy kernel failed
- */
-#define NOMP_LOOPY_CODEGEN_FAILED -102
-/**
- * @ingroup nomp_errors
- * @brief Code generation from loopy kernel failed
- */
-#define NOMP_GET_GRIDSIZE_FAILED -103
-/**
- * @ingroup nomp_errors
- * @brief Grid size calculation failed
- */
-#define NOMP_EVAL_GRIDSIZE_FAILED -103
-/**
- * @ingroup nomp_errors
- * @brief libnomp python initialization failed
- */
-#define NOMP_PY_APPEND_PATH_ERROR -104
-/**
- * @ingroup nomp_errors
- * @brief Specified file name is invalid.
- */
-#define NOMP_FILE_NAME_NOT_PROVIDED -105
-/**
- * @ingroup nomp_errors
- * @brief Specified user callback is invalid.
- */
-#define NOMP_USER_CALLBACK_NOT_PROVIDED -106
-
-/**
- * @ingroup nomp_errors
- * @brief libnomp kernel build failed
- */
-#define NOMP_KNL_BUILD_ERROR -128
-/**
- * @ingroup nomp_errors
- * @brief Invalid libnomp kernel argument type
- */
-#define NOMP_KNL_ARG_TYPE_ERROR -129
-/**
- * @ingroup nomp_errors
- * @brief Setting libnomp kernel argument failed
- */
-#define NOMP_KNL_ARG_SET_ERROR -130
-/**
- * @ingroup nomp_errors
- * @brief libnomp kernel run failed
- */
-#define NOMP_KNL_RUN_ERROR -131
-/**
- * @ingroup nomp_errors
- * @brief libnomp run out of memory
- */
-#define NOMP_OUT_OF_MEMORY -140
+#define NOMP_NULL_INPUT -1
 /**
  * @ingroup nomp_errors
  * @brief libnomp invalid log id
@@ -234,19 +103,142 @@
 #define NOMP_UNKNOWN_ERROR -142
 /**
  * @ingroup nomp_errors
- * @brief libnomp string length exceed max length.
+ * @brief Invalid libnomp backend
  */
-#define NOMP_STR_EXCEED_MAX_LEN -143
+#define NOMP_INVALID_BACKEND -128
+/**
+ * @ingroup nomp_errors
+ * @brief Invalid libnomp platform
+ */
+#define NOMP_INVALID_PLATFORM -129
+/**
+ * @ingroup nomp_errors
+ * @brief Invalid libnomp device
+ */
+#define NOMP_INVALID_DEVICE -130
+/**
+ * @ingroup nomp_errors
+ * @brief Invalid libnomp map pointer
+ */
+#define NOMP_INVALID_MAP_PTR -132
+/**
+ * @ingroup nomp_errors
+ * @brief Invalid libnomp map operation
+ */
+#define NOMP_INVALID_MAP_OP -133
+/**
+ * @ingroup nomp_errors
+ * @brief Pointer is already mapped
+ */
+#define NOMP_PTR_ALREADY_MAPPED -134
+/**
+ * @ingroup nomp_errors
+ * @brief Invalid libnomp kernel
+ */
+#define NOMP_INVALID_KNL -135
+/**
+ * @ingroup nomp_errors
+ * @brief Invalid libnomp for clause
+ */
+#define NOMP_INVALID_CLAUSE -136
+/**
+ * @ingroup nomp_errors
+ * @brief Invalid libnomp map parameters
+ */
+#define NOMP_INVALID_MAP_PARAMS -137
+
+/**
+ * @ingroup nomp_errors
+ * @brief libnomp python initialization failed
+ */
+#define NOMP_PY_INITIALIZE_ERROR -383
+/**
+ * @ingroup nomp_errors
+ * @brief NOMP_INSTALL_DIR env. variable is not set
+ */
+#define NOMP_INSTALL_DIR_NOT_FOUND -384
+/**
+ * @ingroup nomp_errors
+ * @brief Specified user callback function not found
+ */
+#define NOMP_USER_CALLBACK_NOT_FOUND -385
+/**
+ * @ingroup nomp_errors
+ * @brief User callback function failed
+ */
+#define NOMP_USER_CALLBACK_FAILURE -386
+/**
+ * @ingroup nomp_errors
+ * @brief Loopy conversion failed
+ */
+#define NOMP_LOOPY_CONVERSION_ERROR -387
+/**
+ * @ingroup nomp_errors
+ * @brief Failed to find loopy kernel
+ */
+#define NOMP_LOOPY_KNL_NAME_NOT_FOUND -388
+/**
+ * @ingroup nomp_errors
+ * @brief Code generation from loopy kernel failed
+ */
+#define NOMP_LOOPY_CODEGEN_FAILED -389
+/**
+ * @ingroup nomp_errors
+ * @brief Code generation from loopy kernel failed
+ */
+#define NOMP_GET_GRIDSIZE_FAILED -390
+/**
+ * @ingroup nomp_errors
+ * @brief Grid size calculation failed
+ */
+#define NOMP_EVAL_GRIDSIZE_FAILED -390
+/**
+ * @ingroup nomp_errors
+ * @brief libnomp python initialization failed
+ */
+#define NOMP_PY_APPEND_PATH_ERROR -391
+/**
+ * @ingroup nomp_errors
+ * @brief Specified file name is invalid.
+ */
+#define NOMP_FILE_NAME_NOT_PROVIDED -392
+/**
+ * @ingroup nomp_errors
+ * @brief Specified user callback is invalid.
+ */
+#define NOMP_USER_CALLBACK_NOT_PROVIDED -393
+/**
+ * @ingroup nomp_errors
+ * @brief A python call made by libnomp failed.
+ */
+#define NOMP_PY_CALL_FAILED -394
+
+/**
+ * @ingroup nomp_errors
+ * @brief libnomp kernel build failed
+ */
+#define NOMP_KNL_BUILD_ERROR -512
+/**
+ * @ingroup nomp_errors
+ * @brief Invalid libnomp kernel argument type
+ */
+#define NOMP_KNL_ARG_TYPE_ERROR -513
+/**
+ * @ingroup nomp_errors
+ * @brief Setting libnomp kernel argument failed
+ */
+#define NOMP_KNL_ARG_SET_ERROR -514
+/**
+ * @ingroup nomp_errors
+ * @brief libnomp kernel run failed
+ */
+#define NOMP_KNL_RUN_ERROR -515
+
 /**
  * @ingroup nomp_errors
  * @brief libnomp Cuda operation failed.
  */
 #define NOMP_CUDA_FAILURE -144
-/**
- * @ingroup nomp_errors
- * @brief libnomp tcalloc failure.
- */
-#define NOMP_TCALLOC_FAILED -145
 /**
  * @ingroup nomp_errors
  * @brief libnomp OpenCL failure.
@@ -385,7 +377,7 @@ void nomp_chk_(int err, const char *file, unsigned line);
 #define nomp_chk(err) nomp_chk_(err, __FILE__, __LINE__)
 
 /**
- * @ingroup nomp_logs
+ * @ingroup nomp_log_type
  * @brief NOMP logs can be of an error, warning or an information.
  */
 typedef enum {
@@ -435,7 +427,7 @@ nomp_log_type nomp_get_log_type(int log_id);
  *
  * @details Frees allocated runtime resources for libnomp. Returns a non-zero
  * value if an error occurs during the finalize process, otherwise returns 0.
- * Calling this method before `nomp_init` will retrun an error. Calling this
+ * Calling this method before nomp_init() will retrun an error. Calling this
  * method twice will also return an error.
  *
  * @return int
