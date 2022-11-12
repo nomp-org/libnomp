@@ -5,9 +5,9 @@
 #undef TEST_IMPL_H
 
 int main(int argc, char *argv[]) {
-  char *backend = argc > 1 ? argv[1] : "opencl";
-  int device = argc > 2 ? atoi(argv[2]) : 0;
-  int platform = argc > 3 ? atoi(argv[3]) : 0;
+  char *backend;
+  int device, platform;
+  parse_input(argc, argv, &backend, &device, &platform);
 
   nomp_api_110_int(backend, device, platform, 0, 10);
   nomp_api_110_long(backend, device, platform, 0, 10);

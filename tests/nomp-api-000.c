@@ -1,10 +1,10 @@
+#include "nomp-test.h"
 #include "nomp.h"
-#include <stdlib.h>
 
 int main(int argc, char *argv[]) {
-  char *backend = argc > 1 ? argv[1] : "opencl";
-  int device = argc > 2 ? atoi(argv[2]) : 0;
-  int platform = argc > 3 ? atoi(argv[3]) : 0;
+  char *backend;
+  int device, platform;
+  parse_input(argc, argv, &backend, &device, &platform);
 
   // Calling `nomp_finalize` before `nomp_init` should retrun an error
   int err = nomp_finalize();
