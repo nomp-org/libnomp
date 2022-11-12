@@ -12,12 +12,7 @@ int main(int argc, char *argv[]) {
   int err = nomp_init(backend, platform, device);
   nomp_chk(err);
 
-  nomp_api_210_int();
-  nomp_api_210_long();
-  nomp_api_210_unsigned();
-  nomp_api_210_unsigned_long();
-  nomp_api_210_double();
-  nomp_api_210_float();
+  TEST_SUITE(210)
 
   err = nomp_finalize();
   nomp_chk(err);

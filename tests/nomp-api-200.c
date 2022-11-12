@@ -1,4 +1,5 @@
 #include "nomp.h"
+#include "nomp-test.h"
 
 #define TEST_IMPL_H "nomp-api-200-impl.h"
 #include "nomp-generate-tests.h"
@@ -12,12 +13,7 @@ int main(int argc, char *argv[]) {
   int err = nomp_init(backend, platform, device);
   nomp_chk(err);
 
-  nomp_api_200_int();
-  nomp_api_200_long();
-  nomp_api_200_unsigned();
-  nomp_api_200_unsigned_long();
-  nomp_api_200_double();
-  nomp_api_200_float();
+  TEST_SUITE(200)
 
   err = nomp_finalize();
   nomp_chk(err);

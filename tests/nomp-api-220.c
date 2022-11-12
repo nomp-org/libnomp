@@ -12,19 +12,8 @@ int main(int argc, char *argv[]) {
   int err = nomp_init(backend, platform, device);
   nomp_chk(err);
 
-  nomp_api_220_int(10);
-  nomp_api_220_long(10);
-  nomp_api_220_unsigned(10);
-  nomp_api_220_unsigned_long(10);
-  nomp_api_220_float(10);
-  nomp_api_220_double(10);
-
-  nomp_api_220_int(20);
-  nomp_api_220_long(20);
-  nomp_api_220_unsigned(20);
-  nomp_api_220_unsigned_long(20);
-  nomp_api_220_float(20);
-  nomp_api_220_double(20);
+  TEST_SUITE(220, 10)
+  TEST_SUITE(220, 20)
 
   err = nomp_finalize();
   nomp_chk(err);
