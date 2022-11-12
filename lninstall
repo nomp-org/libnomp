@@ -2,9 +2,9 @@
 
 # script variables
 NOMP_SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-NOMP_BIN_PATH="${NOMP_INSTALL_DIR}/bin"
 NOMP_DEFAULT_PROMPT=""
 NOMP_LNSTATE_PATH="${NOMP_SOURCE_DIR}/.lnstate"
+NOMP_BIN_PATH="${NOMP_INSTALL_DIR}/bin"
 
 # colors
 red=$(tput setaf 1)
@@ -29,8 +29,8 @@ function update_bashrc() {
 # check for default prompt
 if [[ $# -gt 0 ]]; then
   case $1 in
-  --yes) NOMP_DEFAULT_PROMPT="y" ;;
-  --no) NOMP_DEFAULT_PROMPT="n" ;;
+  -y | --yes) NOMP_DEFAULT_PROMPT="y" ;;
+  -n | --no) NOMP_DEFAULT_PROMPT="n" ;;
   esac
 fi
 
@@ -48,14 +48,12 @@ if [[ ${NOMP_INSTALL_SUCCESS} = true ]]; then
   NOMP_ENVIRONMENT=""
 
   # add nomp install dir to env
-  [[ -n ${NOMP_INSTALL_DIR} ]] &&
-    { grep -xFq "export NOMP_INSTALL_DIR=${NOMP_INSTALL_DIR}" ~/.bashrc ||
-      NOMP_ENVIRONMENT="# Setup nomp environment variables\nexport NOMP_INSTALL_DIR=${NOMP_INSTALL_DIR}\n"; }
+  { grep -xFq "export NOMP_INSTALL_DIR=${NOMP_INSTALL_DIR}" ~/.bashrc ||
+    NOMP_ENVIRONMENT="# Setup nomp environment variables\nexport NOMP_INSTALL_DIR=${NOMP_INSTALL_DIR}\n"; }
 
   # add lnrun script to path
-  [[ ${PATH} != *"${NOMP_BIN_PATH}"* ]] &&
-    { grep -xFq "export PATH=${NOMP_BIN_PATH}:\${PATH}" ~/.bashrc ||
-      NOMP_ENVIRONMENT+="export PATH=${NOMP_BIN_PATH}:\${PATH}\n"; }
+  { grep -xFq "export PATH=${NOMP_BIN_PATH}:\${PATH}" ~/.bashrc ||
+    NOMP_ENVIRONMENT+="export PATH=${NOMP_BIN_PATH}:\${PATH}\n"; }
 
   # set the libnomp env variables if not
   if [[ -n ${NOMP_ENVIRONMENT} ]]; then
