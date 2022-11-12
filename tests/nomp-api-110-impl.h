@@ -1,4 +1,5 @@
 #include "nomp-test.h"
+#include "nomp.h"
 
 #define nomp_api_110 TOKEN_PASTE(nomp_api_110, TEST_SUFFIX)
 int nomp_api_110(const char *backend, int device, int platform, unsigned s,

@@ -1,4 +1,5 @@
 #include "nomp-test.h"
+#include "nomp.h"
 
 #define nomp_api_230_aux TOKEN_PASTE(nomp_api_230_aux, TEST_SUFFIX)
 int nomp_api_230_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {

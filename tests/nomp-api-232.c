@@ -1,5 +1,3 @@
-#include "nomp.h"
-
 #define TEST_IMPL_H "nomp-api-232-impl.h"
 #include "nomp-generate-tests.h"
 #undef TEST_IMPL_H
