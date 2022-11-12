@@ -15,6 +15,7 @@ int main(int argc, char *argv[]) {
   static int id = -1;
   const char *clauses0[4] = {"transform", "invalid-file", "invalid", 0};
   int err = nomp_init(backend, platform, device);
+  nomp_chk(err);
 
   // Calling nomp_jit with invalid functions should return an error.
   err = nomp_jit(&id, valid_knl, clauses0);
@@ -85,7 +86,7 @@ int main(int argc, char *argv[]) {
   nomp_assert(matched);
   tfree(desc);
 
-  // Missing a semi-colon thus the kernel have a syntax error
+  // The kernel has a syntax error due to a missing a semicolon.
   const char *invalid_knl =
       "void foo(int *a, int N) {                                             \n"
       "  for (int i = 0; i < N; i++)                                        \n"

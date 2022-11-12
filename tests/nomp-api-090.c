@@ -15,6 +15,7 @@ int main(int argc, char *argv[]) {
   int err = nomp_init(backend, platform, device);
   nomp_chk(err);
   err = nomp_finalize();
+  nomp_chk(err);
 
   // Set environment variable with invalid backend
   setenv("NOMP_BACKEND", "invalid", 1);
