@@ -12,9 +12,6 @@ int nomp_api_200() {
   char *knl = tcalloc(char, len);
   snprintf(knl, len, knl_fmt, TOSTRING(TEST_TYPE));
 
-  TEST_TYPE a[10] = {0};
-  int N = 10;
-
   // Calling nomp_jit with invalid functions should return an error.
   static int id = -1;
   const char *clauses0[4] = {"transform", "invalid-file", "invalid_func", 0};

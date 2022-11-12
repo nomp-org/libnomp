@@ -16,6 +16,7 @@ int main(int argc, char *argv[]) {
                     "}                                                      \n";
 
   int err = nomp_init(backend, platform, device);
+  nomp_chk(err);
   err = nomp_update(a, 0, n, sizeof(int), NOMP_TO);
   nomp_chk(err);
 
