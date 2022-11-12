@@ -7,12 +7,7 @@ int main(int argc, char *argv[]) {
   int device, platform;
   parse_input(argc, argv, &backend, &device, &platform);
 
-  nomp_api_233_int(backend, device, platform);
-  nomp_api_233_long(backend, device, platform);
-  nomp_api_233_unsigned(backend, device, platform);
-  nomp_api_233_unsigned_long(backend, device, platform);
-  nomp_api_233_float(backend, device, platform);
-  nomp_api_233_double(backend, device, platform);
+  TEST_SUITE(233, backend, device, platform)
 
   return 0;
 }

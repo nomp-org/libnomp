@@ -14,6 +14,16 @@
 #define TOSTRING_(x) #x
 #define TOSTRING(x) TOSTRING_(x)
 
+#define TEST_SUITE(a, ...)                                                     \
+  {                                                                            \
+    nomp_api_##a##_int(__VA_ARGS__);                                           \
+    nomp_api_##a##_long(__VA_ARGS__);                                          \
+    nomp_api_##a##_unsigned(__VA_ARGS__);                                      \
+    nomp_api_##a##_unsigned_long(__VA_ARGS__);                                 \
+    nomp_api_##a##_double(__VA_ARGS__);                                        \
+    nomp_api_##a##_float(__VA_ARGS__);                                         \
+  }
+
 static int match_log(const char *log, const char *pattern) {
   regex_t regex;
   int result = regcomp(&regex, pattern, 0);
