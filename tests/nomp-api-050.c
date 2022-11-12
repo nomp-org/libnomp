@@ -2,9 +2,9 @@
 #include "nomp.h"
 
 int main(int argc, char *argv[]) {
-  char *backend = argc > 1 ? argv[1] : "opencl";
-  int device_id = argc > 2 ? atoi(argv[2]) : 0;
-  int platform_id = argc > 3 ? atoi(argv[3]) : 0;
+  char *backend;
+  int device, platform;
+  parse_input(argc, argv, &backend, &device, &platform);
 
   // Calling `nomp_finalize` before `nomp_init` should retrun an error
   int err = nomp_finalize();
@@ -17,9 +17,9 @@ int main(int argc, char *argv[]) {
   nomp_assert(matched);
 
   // Calling `nomp_init` twice must return an error, but must not segfault
-  err = nomp_init(backend, platform_id, device_id);
+  err = nomp_init(backend, platform, device);
   nomp_chk(err);
-  err = nomp_init(backend, platform_id, device_id);
+  err = nomp_init(backend, platform, device);
   nomp_assert(nomp_get_log_no(err) == NOMP_RUNTIME_ALREADY_INITIALIZED);
 
   err = nomp_get_log_str(&desc, err);

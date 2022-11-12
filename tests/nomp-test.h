@@ -23,4 +23,13 @@ static int match_log(const char *log, const char *pattern) {
   return !result;
 }
 
+static int parse_input(int argc, char *argv[], char **backend, int *device,
+                       int *platform) {
+  *backend = argc > 1 ? argv[1] : "opencl";
+  *device = argc > 2 ? atoi(argv[2]) : 0;
+  *platform = argc > 3 ? atoi(argv[3]) : 0;
+
+  return 0;
+}
+
 #endif // _NOMP_TEST_H_
