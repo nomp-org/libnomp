@@ -11,23 +11,26 @@ int main(int argc, char *argv[]) {
 
   // Free'ing before mapping should return an error
   err = nomp_update(a, 0, 10, sizeof(int), NOMP_FREE);
-  nomp_assert(nomp_get_log_no(err) == NOMP_USER_MAP_PTR_NOT_VALID);
+  nomp_assert(nomp_get_log_no(err) == NOMP_USER_MAP_OP_NOT_VALID);
 
   char *desc;
   err = nomp_get_log_str(&desc, err);
-  int matched = match_log(desc, "\\[Error\\] "
-                                ".*libnomp\\/src\\/nomp.c:[0-9]* "
-                                "Invalid map pointer operation 8.");
+  int matched = match_log(
+      desc, "\\[Error\\] "
+            ".*libnomp\\/src\\/nomp.c:[0-9]* NOMP_FREE or NOMP_FROM can only "
+            "be called on a pointer which is already on the device.");
   nomp_assert(matched);
+  tfree(desc);
 
   // D2H before H2D should return an error
   err = nomp_update(a, 0, 10, sizeof(int), NOMP_FROM);
-  nomp_assert(nomp_get_log_no(err) == NOMP_USER_MAP_PTR_NOT_VALID);
+  nomp_assert(nomp_get_log_no(err) == NOMP_USER_MAP_OP_NOT_VALID);
 
   err = nomp_get_log_str(&desc, err);
-  matched = match_log(desc, "\\[Error\\] "
-                            ".*libnomp\\/src\\/nomp.c:[0-9]* "
-                            "Invalid map pointer operation 4.");
+  matched = match_log(
+      desc, "\\[Error\\] "
+            ".*libnomp\\/src\\/nomp.c:[0-9]* NOMP_FREE or NOMP_FROM can only "
+            "be called on a pointer which is already on the device.");
   nomp_assert(matched);
 
   err = nomp_finalize();

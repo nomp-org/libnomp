@@ -38,6 +38,7 @@ _BACKEND_TO_TARGET = {"opencl": lp.OpenCLTarget(), "cuda": lp.CudaTarget()}
 
 class IdentityMapper:
     """AST node mapper"""
+
     def rec(self, node, *args, **kwargs):
         """Visit a node."""
         try:
@@ -103,6 +104,7 @@ def _get_dtype_from_decl_type(decl):
 
 class CToLoopyExpressionMapper(IdentityMapper):
     """Functions for mapping C expressions to Loopy"""
+
     def map_Constant(self, expr: c_ast.Constant):
         "Maps C const expression"
         return (
@@ -138,6 +140,7 @@ class CToLoopyExpressionMapper(IdentityMapper):
 @dataclass
 class CToLoopyMapperContext:
     """Record expression context information"""
+
     # We don't need inner/outer inames. User should do these
     # transformations with loopy API. So we should just track inames.
     inames: FrozenSet[str]
@@ -153,6 +156,7 @@ class CToLoopyMapperContext:
 @dataclass
 class CToLoopyMapperAccumulator:
     """Record C expressions"""
+
     domains: List[isl.BasicSet]
     statements: List[lp.InstructionBase]
     kernel_data: List[Union[lp.ValueArg, lp.TemporaryVariable]]
@@ -167,6 +171,7 @@ class CToLoopyMapperAccumulator:
 
 class CToLoopyLoopBoundMapper(CToLoopyExpressionMapper):
     """Map loop bounds"""
+
     def map_BinaryOp(self, expr: c_ast.BinaryOp):
         bin_op = _C_BIN_OPS_TO_PYMBOLIC_OPS["//" if expr.op == "/" else expr.op]
         return bin_op(self.rec(expr.left), self.rec(expr.right))
@@ -203,6 +208,7 @@ def check_and_parse_for(expr: c_ast.For):
 
 class CToLoopyMapper(IdentityMapper):
     """Map C expressions"""
+
     def combine(self, values):
         """Combine mapped expressions"""
         # FIXME: Needs slightly more sophisticated checks here..
@@ -408,7 +414,7 @@ def decl_to_knl_arg(decl: c_ast.Decl, dtype):
     raise NotImplementedError(f"decl_to_knl_arg: {decl} is invalid.")
 
 
-def c_to_loopy(c_str: str, backend: str):
+def c_to_loopy(c_str: str, backend: str) -> lp.translation_unit.TranslationUnit:
     """Map C kernel to Loopy"""
     # Parse the function
     ast = c_parser.CParser().parse(c_str)

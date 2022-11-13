@@ -51,6 +51,7 @@ static int opencl_update(struct backend *bnd, struct mem *m, const int op) {
       tfree(m->bptr), m->bptr = NULL;
   }
 
+  // FIXME: Wrong. call set_log()
   return err != CL_SUCCESS;
 }
 
@@ -106,6 +107,7 @@ static int opencl_knl_build(struct backend *bnd, struct prog *prg,
 static int opencl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
   const int ndim = prg->ndim, nargs = prg->nargs;
   const size_t *global = prg->global, *local = prg->local;
+
   struct opencl_prog *ocl_prg = (struct opencl_prog *)prg->bptr;
   struct mem *m;
   size_t size;
@@ -141,6 +143,7 @@ static int opencl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
   struct opencl_backend *ocl = (struct opencl_backend *)bnd->bptr;
   cl_int err = clEnqueueNDRangeKernel(ocl->queue, ocl_prg->knl, ndim, NULL,
                                       global, local, 0, NULL, NULL);
+  // FIXME: Wrong. Call set_log()
   return err != CL_SUCCESS;
 }
 

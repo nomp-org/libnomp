@@ -107,19 +107,24 @@
 #define NOMP_USER_PLATFORM_NOT_VALID -131
 /**
  * @ingroup nomp_errors
- * @brief Invalid libnomp map pointer
+ * @brief Map pointer provided to libnomp is not valid.
  */
 #define NOMP_USER_MAP_PTR_NOT_VALID -132
 /**
  * @ingroup nomp_errors
+ * @brief Map operation provided to libnomp is not applicable.
+ */
+#define NOMP_USER_MAP_OP_NOT_VALID -133
+/**
+ * @ingroup nomp_errors
  * @brief libnomp invalid log id
  */
-#define NOMP_USER_LOG_ID_NOT_VALID -133
+#define NOMP_USER_LOG_ID_NOT_VALID -134
 /**
  * @ingroup nomp_errors
  * @brief User callback function failed
  */
-#define NOMP_USER_CALLBACK_FAILURE -134
+#define NOMP_USER_CALLBACK_FAILURE -135
 
 /**
  * @ingroup nomp_errors
@@ -130,7 +135,7 @@
  * @ingroup nomp_errors
  * @brief A python call made by libnomp failed.
  */
-#define NOMP_PY_CALL_FAILED -392
+#define NOMP_PY_CALL_FAILED -384
 
 /**
  * @ingroup nomp_errors
@@ -266,7 +271,7 @@ int nomp_update(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
  * @details Target backend is the one provided during the initialization of
  * libnomp using nomp_init(). User defined code transformations will be applied
  * based on the clauses specified in \p clauses argument. Additional kernel meta
- * data can be passed using the \p annotations argument.
+ * data can be passed using the \p clauses as well.
  *
  * <b>Example usage:</b>
  * @code{.c}
@@ -284,7 +289,6 @@ int nomp_update(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
  *
  * @param[out] id Id of the generated kernel.
  * @param[in] c_src Kernel source in C.
- * @param[in] annotations Annotations to perform user defined transformations.
  * @param[in] clauses Clauses to provide meta information about the kernel.
  * @return int
  */

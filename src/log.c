@@ -8,7 +8,8 @@
 const char *ERR_STR_RUNTIME_MEMORY_ALLOCATION_FAILURE =
     "libnomp host memory allocation failed.";
 
-const char *ERR_STR_USER_MAP_PTR_NOT_VALID = "Invalid map pointer %p.";
+const char *ERR_STR_USER_MAP_PTR_NOT_VALID =
+    "Map pointer %p was not found on device.";
 const char *ERR_STR_USER_DEVICE_NOT_VALID =
     "Device id %d passed into libnomp is not valid.";
 
@@ -44,7 +45,7 @@ static unsigned logs_n = 0, logs_max = 0;
 static const char *LOG_TYPE_STRING[] = {"Error", "Warning", "Information"};
 
 int set_log_(const char *description, int logno, nomp_log_type type,
-             const char *fname, unsigned line_no, ...) {
+             const char *fname, unsigned line, ...) {
   if (logs_max <= logs_n) {
     logs_max += logs_max / 2 + 1;
     logs = trealloc(logs, struct log, logs_max);
@@ -54,20 +55,22 @@ int set_log_(const char *description, int logno, nomp_log_type type,
 
   va_list vargs;
   char buf[BUFSIZ];
-  va_start(vargs, line_no);
+  va_start(vargs, line);
   vsnprintf(buf, BUFSIZ, description, vargs);
   va_end(vargs);
 
-  const char *log_type_string = LOG_TYPE_STRING[type];
-  size_t n_desc = strnlen(buf, BUFSIZ), n_file = strnlen(fname, BUFSIZ),
-         n_log_type = strnlen(log_type_string, BUFSIZ);
-  logs[logs_n].description =
-      (char *)calloc(n_desc + n_file + n_log_type + 6 + 3, sizeof(char));
-  snprintf(logs[logs_n].description, BUFSIZ + n_file + n_log_type + 6 + 3 + 1,
-           "[%s] %s:%u %s", log_type_string, fname, line_no, buf);
-  logs[logs_n].logno = logno;
-  logs[logs_n].type = type;
-  logs_n += 1;
+  char *desc = strndup(buf, BUFSIZ), *file = strndup(fname, BUFSIZ);
+  const char *type_str = LOG_TYPE_STRING[type];
+
+  size_t len = strnlen(desc, BUFSIZ) + strnlen(file, BUFSIZ);
+  len += strnlen(type_str, BUFSIZ) + 10 + 5 + 1; // 10 for UINT_MAX
+
+  logs[logs_n].description = tcalloc(char, len);
+  snprintf(logs[logs_n].description, len, "[%s] %s:%u %s", type_str, fname,
+           line, desc);
+  logs[logs_n].logno = logno, logs[logs_n].type = type, logs_n += 1;
+  tfree(desc), tfree(file);
+
   return logs_n;
 }
 
@@ -77,8 +80,8 @@ int nomp_get_log_str(char **log_str, int log_id) {
     return NOMP_USER_LOG_ID_NOT_VALID;
   }
   struct log lg = logs[log_id - 1];
-  size_t n_desc = strnlen(lg.description, BUFSIZ) + 1;
-  *log_str = (char *)calloc(n_desc, sizeof(char));
+  size_t n_desc = strnlen(lg.description, BUFSIZ);
+  *log_str = tcalloc(char, n_desc + 1);
   strncpy(*log_str, lg.description, n_desc);
   return 0;
 }
