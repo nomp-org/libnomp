@@ -3,10 +3,10 @@
 int check_null_input_(void *p, const char *func, unsigned line,
                       const char *file) {
   if (!p) {
-    return set_log(
-        NOMP_RUNTIME_NULL_INPUT_ENCOUNTERED, NOMP_ERROR,
-        "Input pointer passed to function \"%s\" at line %d in fle %s is NULL.",
-        func, line, file);
+    return set_log(NOMP_RUNTIME_NULL_INPUT_ENCOUNTERED, NOMP_ERROR,
+                   "Input pointer passed to function \"%s\" at line %d in file "
+                   "%s is NULL.",
+                   func, line, file);
   }
   return 0;
 }
@@ -38,16 +38,25 @@ static int check_env(struct backend *backend) {
   if (device_id >= 0)
     backend->device_id = device_id;
 
+  // FIXME: We should get rid of these defaults after implementing MPI_Init
+  // like arguments parsing for nomp_init().
   tmp = get_if_env("NOMP_INSTALL_DIR");
   if (tmp != NULL) {
     size_t size = pathlen(tmp);
     backend->install_dir = tcalloc(char, size + 1);
-    strncpy(backend->install_dir, tmp, size + 1), tfree(tmp);
+    strncpy(backend->install_dir, tmp, size), tfree(tmp);
   } else {
-    // TODO: Default to ${HOME}/.nomp. If that doesn't exist, error out.
-    // Also, there is a way to find the directory where the libnomp.so
-    // located within linomp itself. Maybe we can do so in a portable
-    // manner.
+    // Default to ${HOME}/.nomp. Also, there is a way to find the directory
+    // where the libnomp.so is located within linomp.so itself. Maybe we can do
+    // so in a portable manner.
+    const char *home = getenv("HOME");
+    if (home)
+      backend->install_dir = strcatn(2, home, "/.nomp");
+    else
+      return set_log(
+          NOMP_USER_INPUT_NOT_PROVIDED, NOMP_ERROR,
+          "Unable to initialize libnomp install directory. Neither "
+          "NOMP_INSTALL_DIR nor HOME environment variables are defined.");
   }
 
   backend->verbose = strntoui(getenv("NOMP_VERBOSE_LEVEL"), NOMP_BUFSIZ);
@@ -56,18 +65,14 @@ static int check_env(struct backend *backend) {
   if (tmp) {
     size_t size = pathlen(tmp);
     backend->annts_script = tcalloc(char, size + 1);
-    strncpy(backend->annts_script, tmp, size + 1), tfree(tmp);
-  } else {
-    // TODO: Default to current dir.
+    strncpy(backend->annts_script, tmp, size), tfree(tmp);
   }
 
   tmp = get_if_env("NOMP_ANNOTATE_FUNCTION");
   if (tmp) {
-    size_t size = pathlen(tmp);
+    size_t size = strnlen(tmp, NOMP_BUFSIZ);
     backend->annts_func = tcalloc(char, size + 1);
-    strncpy(backend->annts_func, tmp, size + 1), tfree(tmp);
-  } else {
-    backend->annts_func = NULL;
+    strncpy(backend->annts_func, tmp, size), tfree(tmp);
   }
 
   return 0;
@@ -169,7 +174,7 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
   if (idx == mems_n) {
     // A new entry can't be created with NOMP_FREE or NOMP_FROM
     if (op == NOMP_FROM || op == NOMP_FREE)
-      return set_log(NOMP_USER_INPUT_NOT_VALID, NOMP_ERROR,
+      return set_log(NOMP_USER_MAP_OP_NOT_VALID, NOMP_ERROR,
                      "NOMP_FREE or NOMP_FROM can only be called on a pointer "
                      "which is already on the device.");
     op |= NOMP_ALLOC;
@@ -225,9 +230,10 @@ static int parse_clauses(char **usr_file, char **usr_func, PyObject **dict_,
       PyDict_SetItem(dict, pkey, pval);
       Py_XDECREF(pkey), Py_XDECREF(pval);
     } else {
-      return set_log(NOMP_USER_INPUT_NOT_VALID, NOMP_ERROR,
-                     "Clause %s passed into nomp_jit is not a valid caluse",
-                     clauses[i]);
+      return set_log(
+          NOMP_USER_INPUT_NOT_VALID, NOMP_ERROR,
+          "Clause \"%s\" passed into nomp_jit is not a valid caluse.",
+          clauses[i]);
     }
   }
 
@@ -307,18 +313,18 @@ int nomp_run(int id, int nargs, ...) {
       }
     }
     va_end(args);
-    py_eval_grid_size(prg, prg->py_dict);
+    int err = py_eval_grid_size(prg, prg->py_dict);
+    return_on_err(err);
 
     va_start(args, nargs);
-    int err = nomp.knl_run(&nomp, prg, args);
+    err = nomp.knl_run(&nomp, prg, args);
     va_end(args);
-    if (err)
-      return set_log(NOMP_KNL_RUN_ERROR, NOMP_ERROR,
-                     "Kernel execution failed for the kernel: %d", id);
+    return_on_err(err);
+
     return 0;
   }
   return set_log(NOMP_USER_INPUT_NOT_VALID, NOMP_ERROR,
-                 "Kernel id passed to nomp_run is not valid: %d", id);
+                 "Kernel id %d passed to nomp_run is not valid.", id);
 }
 
 void nomp_assert_(int cond, const char *file, unsigned line) {

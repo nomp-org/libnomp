@@ -7,22 +7,17 @@ int main(int argc, char *argv[]) {
   int platform = argc > 3 ? atoi(argv[3]) : 0;
 
   const char *valid_knl =
-      "void foo(int *a, int N) {                                             \n"
+      "void foo(int *a, int N) {                                            \n"
       "  for (int i = 0; i < N; i++)                                        \n"
       "    a[i] = i;                                                        \n"
       "}                                                                    \n";
 
   static int id = -1;
-  const char *annotations[1] = {0},
-             *clauses0[4] = {"transform", "invalid-file", "invalid", 0},
-             *clauses1[4] = {"transform", "nomp-api-50", "invalid_func", 0},
-             *clauses2[4] = {"invalid-clause", "nomp-api-50", "transform", 0},
-             *clauses3[4] = {"transform", NULL, "transform", 0},
-             *clauses4[4] = {"transform", "nomp-api-50", NULL, 0};
+  const char *clauses0[4] = {"transform", "invalid-file", "invalid", 0};
   int err = nomp_init(backend, platform, device);
 
   // Calling nomp_jit with invalid functions should return an error.
-  err = nomp_jit(&id, valid_knl, annotations, clauses0);
+  err = nomp_jit(&id, valid_knl, clauses0);
   nomp_assert(nomp_get_log_no(err) == NOMP_PY_CALL_FAILED);
 
   char *desc;
@@ -35,7 +30,8 @@ int main(int argc, char *argv[]) {
   tfree(desc);
 
   // Invalid transform function
-  err = nomp_jit(&id, valid_knl, annotations, clauses1);
+  const char *clauses1[4] = {"transform", "nomp-api-50", "invalid_func", 0};
+  err = nomp_jit(&id, valid_knl, clauses1);
   nomp_assert(nomp_get_log_no(err) == NOMP_PY_CALL_FAILED);
 
   err = nomp_get_log_str(&desc, err);
@@ -47,14 +43,45 @@ int main(int argc, char *argv[]) {
   tfree(desc);
 
   // Calling nomp_jit with invalid clauses shoud return an error.
-  err = nomp_jit(&id, valid_knl, annotations, clauses2);
-  nomp_assert(nomp_get_log_no(err) == NOMP_INVALID_CLAUSE);
+  const char *clauses2[4] = {"invalid-clause", "nomp-api-50", "transform", 0};
+  err = nomp_jit(&id, valid_knl, clauses2);
+  nomp_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_NOT_VALID);
 
   err = nomp_get_log_str(&desc, err);
-  matched =
-      match_log(desc, "\\[Error\\] "
-                      ".*libnomp\\/src\\/nomp.c:[0-9]* "
-                      "Invalid clause is passed into nomp_jit: invalid-clause");
+  matched = match_log(
+      desc,
+      "\\[Error\\] "
+      ".*libnomp\\/src\\/nomp.c:[0-9]* "
+      "Clause \"invalid-clause\" passed into nomp_jit is not a valid caluse.");
+  nomp_assert(matched);
+  tfree(desc);
+
+  // Missing file name should return an error.
+  const char *clauses3[4] = {"transform", NULL, "transform", 0};
+  err = nomp_jit(&id, valid_knl, clauses3);
+  nomp_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_NOT_PROVIDED);
+
+  err = nomp_get_log_str(&desc, err);
+  matched = match_log(
+      desc, "\\[Error\\] "
+            ".*libnomp\\/src\\/nomp.c:[0-9]* "
+            "\"transform\" clause should be followed by a file name and a "
+            "function name. At least one of them is not provided.");
+
+  nomp_assert(matched);
+  tfree(desc);
+
+  // Missing user callback should return an error.
+  const char *clauses4[4] = {"transform", "nomp-api-50", NULL, 0};
+  err = nomp_jit(&id, valid_knl, clauses4);
+  nomp_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_NOT_PROVIDED);
+
+  err = nomp_get_log_str(&desc, err);
+  matched = match_log(
+      desc, "\\[Error\\] "
+            ".*libnomp\\/src\\/nomp.c:[0-9]* "
+            "\"transform\" clause should be followed by a file name and a "
+            "function name. At least one of them is not provided.");
   nomp_assert(matched);
   tfree(desc);
 
@@ -65,7 +92,7 @@ int main(int argc, char *argv[]) {
       "    a[i] = i                                                         \n"
       "}                                                                    \n";
 
-  err = nomp_jit(&id, invalid_knl, annotations, clauses0);
+  err = nomp_jit(&id, invalid_knl, clauses0);
   nomp_assert(nomp_get_log_no(err) == NOMP_LOOPY_CONVERSION_ERROR);
 
   err = nomp_get_log_str(&desc, err);
@@ -73,28 +100,6 @@ int main(int argc, char *argv[]) {
                             ".*"
                             "libnomp\\/src\\/loopy.c:[0-9]* C "
                             "to Loopy conversion failed.");
-  nomp_assert(matched);
-  tfree(desc);
-
-  // Missing file name should return an error.
-  err = nomp_jit(&id, valid_knl, annotations, clauses3);
-  nomp_assert(nomp_get_log_no(err) == NOMP_FILE_NAME_NOT_PROVIDED);
-
-  err = nomp_get_log_str(&desc, err);
-  matched = match_log(desc, "\\[Error\\] "
-                            ".*libnomp\\/src\\/nomp.c:[0-9]* "
-                            "File name is not provided.");
-  nomp_assert(matched);
-  tfree(desc);
-
-  // Missing user callback should return an error.
-  err = nomp_jit(&id, valid_knl, annotations, clauses4);
-  nomp_assert(nomp_get_log_no(err) == NOMP_USER_CALLBACK_NOT_PROVIDED);
-
-  err = nomp_get_log_str(&desc, err);
-  matched = match_log(desc, "\\[Error\\] "
-                            ".*libnomp\\/src\\/nomp.c:[0-9]* "
-                            "User callback function is not provided.");
   nomp_assert(matched);
   tfree(desc);
 

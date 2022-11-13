@@ -20,36 +20,33 @@ int main(int argc, char *argv[]) {
   nomp_chk(err);
 
   static int id = -1;
-  const char *annotations[1] = {0},
-             *clauses[4] = {"transform", "nomp-api-50", "transform", 0};
-  err = nomp_jit(&id, knl, annotations, clauses);
+  const char *clauses[4] = {"transform", "nomp-api-50", "transform", 0};
+  err = nomp_jit(&id, knl, clauses);
   nomp_chk(err);
 
   // Invoke with invalid kernel_id
   err = nomp_run(-1, 3, "a", NOMP_PTR, sizeof(int), a, "b", NOMP_PTR,
                  sizeof(int), b, "N", NOMP_INTEGER, sizeof(int), &n);
-  nomp_assert(nomp_get_log_no(err) == NOMP_INVALID_KNL);
+  nomp_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_NOT_VALID);
   char *desc;
   err = nomp_get_log_str(&desc, err);
-  int matched = match_log(desc, "\\[Error\\] "
-                                ".*libnomp\\/"
-                                "src\\/nomp.c:[0-9]* Invalid kernel -1.");
+  int matched = match_log(desc, "\\[Error\\] .*\\/src\\/nomp.c:[0-9]* Kernel "
+                                "id -1 passed to nomp_run is not valid.");
   nomp_assert(matched);
+  tfree(desc);
 
   // Invoke fails because b is not mapped
   err = nomp_run(id, 3, "a", NOMP_PTR, sizeof(int), a, "b", NOMP_PTR,
                  sizeof(int), b, "N", NOMP_INTEGER, sizeof(int), &n);
-  nomp_assert(nomp_get_log_no(err) == NOMP_KNL_RUN_ERROR);
+  nomp_assert(nomp_get_log_no(err) == NOMP_USER_MAP_PTR_NOT_VALID);
   err = nomp_get_log_str(&desc, err);
-  matched = match_log(desc, "\\[Error\\] "
-                            ".*\\/libnomp\\/"
-                            "src\\/nomp.c:[0-9]* Kernel 0 run failed.");
+  matched = match_log(desc, "\\[Error\\] .*\\/src\\/.*.c:[0-9]* Map pointer "
+                            "0[xX][0-9a-fA-F]* was not found on device.");
   nomp_assert(matched);
+  tfree(desc);
 
   err = nomp_finalize();
   nomp_chk(err);
-
-  tfree(desc);
 
   return 0;
 }

@@ -13,9 +13,8 @@ int nomp_api_220_aux(TEST_TYPE *a, TEST_TYPE *b, int N) {
   snprintf(knl, len, knl_fmt, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE));
 
   static int id = -1;
-  const char *annotations[1] = {0},
-             *clauses[4] = {"transform", "nomp-api-200", "transform", 0};
-  int err = nomp_jit(&id, knl, annotations, clauses);
+  const char *clauses[4] = {"transform", "nomp-api-200", "transform", 0};
+  int err = nomp_jit(&id, knl, clauses);
   nomp_chk(err);
 
   err = nomp_run(id, 3, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
