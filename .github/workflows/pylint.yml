@@ -1,36 +1,54 @@
-name: pylint check 
+name: pylint check
 on:
   pull_request:
     branches: [main]
   push:
-    branches: [main]
+    branches: [main, cmake_clang-format_pylint]
+
 env:
-  REQUIREMENTS_CACHE_NUMBER: 1  # increase to reset cache manually
+  CACHE_NUMBER: 0  # increase to reset cache manually
+
 jobs:
   pylint-check:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+    env:
+      BUILDDIR: build
     steps:
-      - name: Setup GitHub actions
+      - name: GitHub action setup
         uses: actions/checkout@v3
-      - name: Setup Python 3.10
-        uses: actions/setup-python@v4
+      - name: Setup Mambaforge
+        id: setup_conda
+        uses: conda-incubator/setup-miniconda@v2
         with:
-          python-version: '3.10'
-      - uses: actions/cache@v3
+          miniforge-variant: Mambaforge
+          miniforge-version: latest
+          activate-environment: libnomp-dev
+          use-mamba: true
+      - name: Cache conda environment
+        uses: actions/cache@v3
         with:
-          path: ${{ env.pythonLocation }}
-          key:  ${{ runner.os }}-build-requirements-${{ hashFiles('requirements.txt') }}-${{ env.REQUIREMENTS_CACHE_NUMBER }}
-        id: requirements_cache
-      - name: Install pip and packges in requirements.txt
-        id: install_requirements
+          path: ${{ env.CONDA }}/envs/libnomp-dev
+          key:  conda-${{ runner.os }}-${{ hashFiles('environment-dev.yml') }}-${{ env.CACHE_NUMBER }}
+        id: cache
+      - name: Update environment
+        id: update_env
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-        if: (steps.requirements_cache.outputs.cache-hit != 'true')
-      - name: Install pylint
+          mamba env update -n libnomp-dev -f environment-dev.yml
+        if: steps.cache.outputs.cache-hit != 'true'
+      - name: Generate Makefile
+        id: generate_makefile
         run: |
-          pip install pylint
-        if: (steps.requirements_cache.outputs.cache-hit != 'true')
-      - name: Run pylint check
-        run:
-          pylint --fail-under=8.95 ./python
+          mkdir -p ${BUILDDIR}
+          cd ${BUILDDIR}
+          cmake -DCMAKE_INSTALL_PREFIX=../install \
+            -DOpenCL_LIBRARY=${CONDA_PREFIX}/lib/libOpenCL.so \
+            -DOpenCL_INCLUDE_DIR=${CONDA_PREFIX}/include ..
+      - name: Run Pylint
+        id: run_pylint
+        run: |
+          cd ${BUILDDIR}
+          make pylint
+

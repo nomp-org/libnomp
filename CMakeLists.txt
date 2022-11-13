@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.22)
 project(libnomp VERSION 0.0.1 DESCRIPTION "nomp runtime library" LANGUAGES C)
+include(cmake/FindProgram.cmake)
+include(cmake/clang-format.cmake)
+include(cmake/pylint.cmake)
+
 
 # Treat compiler warnings as errors
 set(CMAKE_COMPILE_WARNING_AS_ERROR ON)

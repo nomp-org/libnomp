@@ -3,15 +3,51 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main]
+    branches: [main, cmake_clang-format_pylint]
+
+env:
+  CACHE_NUMBER: 0  # increase to reset cache manually
+
 jobs:
   clang-format-check:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+    env:
+      BUILDDIR: build
     steps:
-    - name: Setup GitHub actions
-      uses: actions/checkout@v3
-    - name: Run clang-format style check
-      uses: jidicula/clang-format-action@v4.9.0
-      with:
-        clang-format-version: '15'
-        check-path: ${{ matrix.path }}
+      - name: GitHub action setup
+        uses: actions/checkout@v3
+      - name: Setup Mambaforge
+        id: setup_conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniforge-variant: Mambaforge
+          miniforge-version: latest
+          activate-environment: libnomp-dev
+          use-mamba: true
+      - name: Cache conda environment
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.CONDA }}/envs/libnomp-dev
+          key:  conda-${{ runner.os }}-${{ hashFiles('environment-dev.yml') }}-${{ env.CACHE_NUMBER }}
+        id: cache
+      - name: Update environment
+        id: update_env
+        run: |
+          mamba env update -n libnomp-dev -f environment-dev.yml
+        if: steps.cache.outputs.cache-hit != 'true'
+      - name: Generate Makefile
+        id: generate_makefile
+        run: |
+          mkdir -p ${BUILDDIR}
+          cd ${BUILDDIR}
+          cmake -DCMAKE_INSTALL_PREFIX=../install \
+            -DOpenCL_LIBRARY=${CONDA_PREFIX}/lib/libOpenCL.so \
+            -DOpenCL_INCLUDE_DIR=${CONDA_PREFIX}/include ..
+      - name: Run clang-format
+        id: run_clang-format
+        run: |
+          cd ${BUILDDIR}
+          make clangformat
