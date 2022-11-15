@@ -270,7 +270,7 @@ size_t pathlen(const char *path);
 int check_null_input_(void *p, const char *func, unsigned line,
                       const char *file);
 #define check_null_input(p)                                                    \
-  check_null_input_((void *)(p), __func__, __LINE__, __FILE__)
+  return_on_err(check_null_input_((void *)(p), __func__, __LINE__, __FILE__))
 
 size_t pathlen(const char *path);
 /**
