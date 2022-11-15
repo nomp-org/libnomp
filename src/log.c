@@ -80,8 +80,8 @@ int nomp_get_log_str(char **log_str, int log_id) {
     return NOMP_USER_LOG_ID_NOT_VALID;
   }
   struct log lg = logs[log_id - 1];
-  size_t n_desc = strnlen(lg.description, BUFSIZ);
-  *log_str = tcalloc(char, n_desc + 1);
+  size_t n_desc = strnlen(lg.description, BUFSIZ) + 1;
+  *log_str = tcalloc(char, n_desc);
   strncpy(*log_str, lg.description, n_desc);
   return 0;
 }

@@ -42,8 +42,8 @@ static int check_env(struct backend *backend) {
   // like arguments parsing for nomp_init().
   tmp = get_if_env("NOMP_INSTALL_DIR");
   if (tmp != NULL) {
-    size_t size = pathlen(tmp);
-    backend->install_dir = tcalloc(char, size + 1);
+    size_t size = pathlen(tmp) + 1;
+    backend->install_dir = tcalloc(char, size);
     strncpy(backend->install_dir, tmp, size), tfree(tmp);
   } else {
     // Default to ${HOME}/.nomp. Also, there is a way to find the directory
@@ -63,15 +63,15 @@ static int check_env(struct backend *backend) {
 
   tmp = get_if_env("NOMP_ANNOTATE_SCRIPT");
   if (tmp) {
-    size_t size = pathlen(tmp);
-    backend->annts_script = tcalloc(char, size + 1);
+    size_t size = strnlen(tmp, NOMP_BUFSIZ) + 1;
+    backend->annts_script = tcalloc(char, size);
     strncpy(backend->annts_script, tmp, size), tfree(tmp);
   }
 
   tmp = get_if_env("NOMP_ANNOTATE_FUNCTION");
   if (tmp) {
-    size_t size = strnlen(tmp, NOMP_BUFSIZ);
-    backend->annts_func = tcalloc(char, size + 1);
+    size_t size = strnlen(tmp, NOMP_BUFSIZ) + 1;
+    backend->annts_func = tcalloc(char, size);
     strncpy(backend->annts_func, tmp, size), tfree(tmp);
   }
 
@@ -97,7 +97,7 @@ int nomp_init(const char *backend, int platform, int device) {
   int err = check_env(&nomp);
   return_on_err(err);
 
-  char name[MAX_BACKEND_NAME_SIZE];
+  char name[MAX_BACKEND_NAME_SIZE + 1];
   size_t n = strnlen(nomp.backend, MAX_BACKEND_NAME_SIZE);
   for (int i = 0; i < n; i++)
     name[i] = tolower(nomp.backend[i]);
