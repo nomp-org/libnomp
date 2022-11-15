@@ -20,7 +20,7 @@ def annotate(
             loop = annotations[key]
             if loop in inames:
                 knl = lp.tag_inames(knl, [(loop, "g.0")])
-        elif key == "grid_point_loop":
+        elif key == "grid_loop":
             loop = annotations[key]
             if loop in inames:
                 knl = lp.split_iname(knl, loop, 32)
