@@ -105,13 +105,10 @@ static int opencl_knl_build(struct backend *bnd, struct prog *prg,
 }
 
 static int opencl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
-  const int ndim = prg->ndim, nargs = prg->nargs;
-  const size_t *global = prg->global, *local = prg->local;
-
   struct opencl_prog *ocl_prg = (struct opencl_prog *)prg->bptr;
   struct mem *m;
   size_t size;
-  for (int i = 0; i < nargs; i++) {
+  for (int i = 0; i < prg->nargs; i++) {
     const char *var = va_arg(args, const char *);
     int type = va_arg(args, int);
     size = va_arg(args, size_t);
@@ -140,9 +137,14 @@ static int opencl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
                      ERR_STR_KNL_ARG_SET_ERROR);
   }
 
+  // FIXME: May be do this differently?
+  size_t global[3];
+  for (unsigned i = 0; i < prg->ndim; i++)
+    global[i] = prg->global[i] * prg->local[i];
+
   struct opencl_backend *ocl = (struct opencl_backend *)bnd->bptr;
-  cl_int err = clEnqueueNDRangeKernel(ocl->queue, ocl_prg->knl, ndim, NULL,
-                                      global, local, 0, NULL, NULL);
+  cl_int err = clEnqueueNDRangeKernel(ocl->queue, ocl_prg->knl, prg->ndim, NULL,
+                                      global, prg->local, 0, NULL, NULL);
   // FIXME: Wrong. Call set_log()
   return err != CL_SUCCESS;
 }

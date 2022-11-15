@@ -4,6 +4,9 @@
 TESTDIR=`cd ..; pwd`/build
 BACKEND=opencl
 
+export NOMP_ANNOTATE_SCRIPT=sem
+export NOMP_ANNOTATE_FUNCTION=annotate
+
 function print_help() {
   echo "./run-tests.sh [-h|--help] [-g|--group <list of test groups>] [-b|--backend <backend>]"
   echo "-h/--help: Print this help and exit."

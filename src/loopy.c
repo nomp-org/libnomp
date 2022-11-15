@@ -106,8 +106,10 @@ int py_user_annotate(PyObject **knl, PyObject *annts, const char *file,
 
 int py_user_transform(PyObject **knl, const char *file, const char *func) {
   check_null_input(*knl);
-  check_null_input(file);
-  check_null_input(func);
+
+  // If either file, or func are NULL, we don't have to do anything:
+  if (file == NULL || func == NULL)
+    return 0;
 
   PyObject *pfile = PyUnicode_FromString(file);
   if (pfile) {
@@ -151,7 +153,6 @@ int py_user_transform(PyObject **knl, const char *file, const char *func) {
 }
 
 int py_get_knl_name_and_src(char **name, char **src, PyObject *knl) {
-  // FIXME: This should be an error defined in nomp.h
   int err = 1;
 
   if (knl) {
@@ -176,15 +177,12 @@ int py_get_knl_name_and_src(char **name, char **src, PyObject *knl) {
       }
       Py_DECREF(epts);
     }
-    if (err) {
-      PyErr_Print();
+    if (err)
       return set_log(NOMP_LOOPY_KNL_NAME_NOT_FOUND, NOMP_ERROR,
                      ERR_STR_LOOPY_KNL_NAME_NOT_FOUND, *name);
-    }
-    return_on_err(err);
 
     // Get the kernel source
-    err = NOMP_LOOPY_CODEGEN_FAILED;
+    err = 1;
     PyObject *lpy = PyImport_ImportModule("loopy");
     if (lpy) {
       PyObject *gen_v2 = PyObject_GetAttrString(lpy, "generate_code_v2");
@@ -210,19 +208,16 @@ int py_get_knl_name_and_src(char **name, char **src, PyObject *knl) {
       Py_DECREF(lpy);
     }
   }
-  if (err) {
-    PyErr_Print();
+  if (err)
     return set_log(NOMP_LOOPY_CODEGEN_FAILED, NOMP_ERROR,
                    ERR_STR_LOOPY_CODEGEN_FAILED, *name);
-  }
-  return err;
+
+  return 0;
 }
 
 int py_get_grid_size(struct prog *prg, PyObject *knl) {
-  int err = NOMP_LOOPY_GET_GRIDSIZE_FAILED;
-
+  int err = 1;
   if (knl) {
-    // knl.callables_table
     PyObject *callables = PyObject_GetAttrString(knl, "callables_table");
     if (callables) {
       // knl.default_entrypoint.get_grid_size_upper_bounds_as_exprs
@@ -230,9 +225,11 @@ int py_get_grid_size(struct prog *prg, PyObject *knl) {
       if (entry) {
         PyObject *expr = PyObject_GetAttrString(
             entry, "get_grid_size_upper_bounds_as_exprs");
+        Py_DECREF(entry);
         if (expr) {
           PyObject *grid_size =
               PyObject_CallFunctionObjArgs(expr, callables, NULL);
+          Py_DECREF(expr);
           if (grid_size) {
             prg->py_global = PyTuple_GetItem(grid_size, 0);
             prg->py_local = PyTuple_GetItem(grid_size, 1);
@@ -241,9 +238,7 @@ int py_get_grid_size(struct prog *prg, PyObject *knl) {
               prg->ndim = PyTuple_Size(prg->py_local);
             err = 0;
           }
-          Py_DECREF(expr);
         }
-        Py_DECREF(entry);
       }
       Py_DECREF(callables);
     }
@@ -251,23 +246,23 @@ int py_get_grid_size(struct prog *prg, PyObject *knl) {
   if (err)
     return set_log(NOMP_LOOPY_GET_GRIDSIZE_FAILED, NOMP_ERROR,
                    ERR_STR_LOOPY_GRIDSIZE_FAILED);
-  return err;
+  return 0;
 }
 
 static int py_eval_grid_size_aux(size_t *out, PyObject *grid, unsigned dim,
                                  PyObject *evaluate, PyObject *dict) {
-  // FIXME: This should be an error defined in nomp.h
-  int err = 1;
-
   PyObject *py_dim = PyTuple_GetItem(grid, dim);
   if (py_dim) {
     PyObject *rslt = PyObject_CallFunctionObjArgs(evaluate, py_dim, dict, NULL);
     if (rslt) {
       out[dim] = PyLong_AsLong(rslt);
-      Py_DECREF(rslt), err = 0;
+      Py_DECREF(rslt);
+    } else {
+      return 1;
     }
   }
-  return err;
+
+  return 0;
 }
 
 int py_eval_grid_size(struct prog *prg, PyObject *dict) {
@@ -283,6 +278,7 @@ int py_eval_grid_size(struct prog *prg, PyObject *dict) {
     PyObject *mapper = PyImport_ImportModule("pymbolic.mapper.evaluator");
     if (mapper) {
       PyObject *evaluate = PyObject_GetAttrString(mapper, "evaluate");
+      Py_DECREF(mapper);
       if (evaluate) {
         // Iterate through grid sizes, evaluate and set `global` and `local`
         // sizes respectively.
@@ -293,15 +289,13 @@ int py_eval_grid_size(struct prog *prg, PyObject *dict) {
           err |= py_eval_grid_size_aux(prg->local, prg->py_local, i, evaluate,
                                        dict);
         Py_DECREF(evaluate);
-        err = (err != 0) * NOMP_LOOPY_EVAL_GRIDSIZE_FAILED;
+        if (err)
+          return set_log(NOMP_LOOPY_EVAL_GRIDSIZE_FAILED, NOMP_ERROR,
+                         "libnomp was unable to evaluate the kernel launch "
+                         "parameters using pymbolic.");
       }
-      Py_DECREF(mapper);
     }
-    if (err)
-      return set_log(NOMP_LOOPY_EVAL_GRIDSIZE_FAILED, NOMP_ERROR,
-                     "libnomp was unable to evaluate the kernel launch "
-                     "parameters using pymbolic.");
   }
 
-  return err;
+  return 0;
 }

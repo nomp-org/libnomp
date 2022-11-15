@@ -229,6 +229,7 @@ static int parse_clauses(char **usr_file, char **usr_func, PyObject **dict_,
           PyUnicode_FromStringAndSize(val, strnlen(val, NOMP_BUFSIZ));
       PyDict_SetItem(dict, pkey, pval);
       Py_XDECREF(pkey), Py_XDECREF(pval);
+      i = i + 3;
     } else {
       return set_log(
           NOMP_USER_INPUT_NOT_VALID, NOMP_ERROR,
