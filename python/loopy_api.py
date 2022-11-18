@@ -55,8 +55,17 @@ class IdentityMapper:
     __call__ = rec
 
     def map_integer_literal(self, expr: cindex.CursorKind):
-        """Maps int variable"""
-        (val,) = expr.get_tokens()
+        """Maps int constant"""
+        val, = expr.get_tokens()
+        return (
+            dtype_to_ctype_registry()
+            .get_or_register_dtype(expr.type.kind.spelling.lower())
+            .type
+        )(val.spelling)
+
+    def map_floating_literal(self, expr: cindex.CursorKind):
+        """Maps float constant"""
+        val, = expr.get_tokens()
         return (
             dtype_to_ctype_registry()
             .get_or_register_dtype(expr.type.kind.spelling.lower())
