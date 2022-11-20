@@ -180,21 +180,15 @@ class CToLoopyLoopBoundMapper(CToLoopyExpressionMapper):
 # Helper function for parsing for loop kernels
 def check_and_parse_for(expr: c_ast.For):
     """Parse for loop to retrieve loop variable, lower bound and upper bound"""
-    (init_decl,) = expr.init.decls
-    iname = init_decl.name
-
-    # Sanity checks
     if len(expr.init.decls) != 1:
         raise NotImplementedError(
             "More than one initialization declarations not yet supported."
         )
 
-    if not (
-        isinstance(expr.cond, c_ast.BinaryOp)
-        and expr.cond.op == "<"
-        and isinstance(expr.cond.left, c_ast.ID)
-        and expr.cond.left.name == iname
-    ):
+    (init_decl,) = expr.init.decls
+    iname = init_decl.name
+
+    if not (isinstance(expr.cond, c_ast.BinaryOp) and expr.cond.op == "<"):
         raise NotImplementedError("Only increasing domains are supported")
 
     if isinstance(expr.next, c_ast.UnaryOp) and expr.next.op in {"p++", "++p"}:
@@ -202,6 +196,16 @@ def check_and_parse_for(expr: c_ast.For):
         ubound_expr = CToLoopyLoopBoundMapper()(expr.cond.right)
     else:
         raise NotImplementedError("Only increments by 1 are supported")
+
+    if not (
+        isinstance(expr.cond.left, c_ast.ID) and expr.cond.left.name == iname
+    ) or not (
+        isinstance(expr.next.expr, c_ast.ID) and expr.next.expr.name == iname
+    ):
+        raise SyntaxError(
+            "Loop variable has to be the same in for condition and next"
+            " operation"
+        )
 
     return (iname, lbound_expr, ubound_expr)
 
@@ -447,7 +451,7 @@ def c_to_loopy(c_str: str, backend: str) -> lp.translation_unit.TranslationUnit:
         for unique_domain in unique_domains:
             if unique_domain == domain:
                 new = False
-                for (i, j) in zip(
+                for i, j in zip(
                     unique_domain.get_id_dict().keys(),
                     domain.get_id_dict().keys(),
                 ):

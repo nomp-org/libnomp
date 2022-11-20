@@ -4,7 +4,7 @@
 int nomp_api_251_aux(TEST_TYPE *a, TEST_TYPE *b, int E, int N) {
   const char *knl_fmt =
       "void foo(%s *a, %s *b, int E, int N) {                 \n"
-      "  for (int e = 0; e < E; i++)                          \n"
+      "  for (int e = 0; e < E; e++)                          \n"
       "    for (int i = 0; i < N; i++)                        \n"
       "      a[e * N + i] = a[e * N + i] + b[e * N + i];      \n"
       "}                                                      \n";
