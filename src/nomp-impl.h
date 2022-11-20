@@ -126,7 +126,7 @@ int py_c_to_loopy(PyObject **knl, const char *c_src, const char *backend);
  * @brief Apply transformations on a loopy kernel based on annotations.
  *
  * Apply the transformations defined in function \p func in file \p file on the
- * loopy kernel \p knl based on the key value paris (annotations) passed in \p
+ * loopy kernel \p knl based on the key value pairs (annotations) passed in \p
  * annts. \p knl will be modified based on the transformations. Function will
  * return a non-zero value if there was an error after registering a log.
  *
@@ -272,7 +272,6 @@ int check_null_input_(void *p, const char *func, unsigned line,
 #define check_null_input(p)                                                    \
   return_on_err(check_null_input_((void *)(p), __func__, __LINE__, __FILE__))
 
-size_t pathlen(const char *path);
 /**
  * @ingroup nomp_log_utils
  * @brief Free log variables.
