@@ -62,8 +62,8 @@ int set_log_(const char *description, int logno, nomp_log_type type,
   char *desc = strndup(buf, BUFSIZ), *file = strndup(fname, pathlen(fname));
   const char *type_str = LOG_TYPE_STRING[type];
 
-  size_t len = strnlen(desc, BUFSIZ) + strnlen(file, BUFSIZ);
-  len += strnlen(type_str, BUFSIZ) + 10 + 5 + 1; // 10 for UINT_MAX
+  // 10 for UINT_MAX, 5 for `[] : ` 5 characters and 1 for `\0`.
+  size_t len = strlen(desc) + strlen(file) + strlen(type_str) + 10 + 5 + 1;
 
   logs[logs_n].description = tcalloc(char, len);
   snprintf(logs[logs_n].description, len, "[%s] %s:%u %s", type_str, fname,
