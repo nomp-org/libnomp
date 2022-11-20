@@ -164,15 +164,36 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv416py_user_callbackPP8PyObjectPKcPKc">
-<span id="_CPPv316py_user_callbackPP8PyObjectPKcPKc"></span><span id="_CPPv216py_user_callbackPP8PyObjectPKcPKc"></span><span id="py_user_callback__PyObjectPP.cCP.cCP"></span><span class="target" id="group__nomp__py__utils_1ga652e54f19770e4d77c31136b7448df21"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">py_user_callback</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">knl</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">func</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416py_user_callbackPP8PyObjectPKcPKc" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Calls the user callback function <code class="docutils literal notranslate"><span class="pre">func</span></code> in file <code class="docutils literal notranslate"><span class="pre">file</span></code>. </p>
+<dt class="sig sig-object cpp" id="_CPPv416py_user_annotatePP8PyObjectP8PyObjectPKcPKc">
+<span id="_CPPv316py_user_annotatePP8PyObjectP8PyObjectPKcPKc"></span><span id="_CPPv216py_user_annotatePP8PyObjectP8PyObjectPKcPKc"></span><span id="py_user_annotate__PyObjectPP.PyObjectP.cCP.cCP"></span><span class="target" id="group__nomp__py__utils_1ga9fdc2860584db7325c14c7f8d19366b1"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">py_user_annotate</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">knl</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">annts</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">func</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416py_user_annotatePP8PyObjectP8PyObjectPKcPKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Apply transformations on a loopy kernel based on annotations. </p>
+<p>Apply the transformations defined in function <code class="docutils literal notranslate"><span class="pre">func</span></code> in file <code class="docutils literal notranslate"><span class="pre">file</span></code> on the loopy kernel <code class="docutils literal notranslate"><span class="pre">knl</span></code> based on the key value pairs (annotations) passed in <code class="docutils literal notranslate"><span class="pre">annts</span></code>. <code class="docutils literal notranslate"><span class="pre">knl</span></code> will be modified based on the transformations. Function will return a non-zero value if there was an error after registering a log.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>knl</strong> – <strong>[inout]</strong> Python kernal object. </p></li>
-<li><p><strong>file</strong> – <strong>[in]</strong> File with the callback function. </p></li>
-<li><p><strong>func</strong> – <strong>[in]</strong> Callback function name. </p></li>
+<li><p><strong>knl</strong> – <strong>[inout]</strong> Pointer to loopy kernal object. </p></li>
+<li><p><strong>annts</strong> – <strong>[in]</strong> Annotations (as a PyDict) to specify which transformations to apply. </p></li>
+<li><p><strong>file</strong> – <strong>[in]</strong> Path to the file containing transform function <code class="docutils literal notranslate"><span class="pre">func</span></code>. </p></li>
+<li><p><strong>func</strong> – <strong>[in]</strong> Transform function. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417py_user_transformPP8PyObjectPKcPKc">
+<span id="_CPPv317py_user_transformPP8PyObjectPKcPKc"></span><span id="_CPPv217py_user_transformPP8PyObjectPKcPKc"></span><span id="py_user_transform__PyObjectPP.cCP.cCP"></span><span class="target" id="group__nomp__py__utils_1gaed394708835180bd105ec04f1894f24a"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">py_user_transform</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">knl</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">func</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417py_user_transformPP8PyObjectPKcPKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Apply kernel specific user transformations on a loopy kernel. </p>
+<p>Call the user transform function <code class="docutils literal notranslate"><span class="pre">func</span></code> in file <code class="docutils literal notranslate"><span class="pre">file</span></code> on the loopy kernel <code class="docutils literal notranslate"><span class="pre">knl</span></code>. <code class="docutils literal notranslate"><span class="pre">knl</span></code> will be modified based on the transformations. Function will return a non-zero value if there was an error after registering a log.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>knl</strong> – <strong>[inout]</strong> Pointer to loopy kernal object. </p></li>
+<li><p><strong>file</strong> – <strong>[in]</strong> Path to the file containing transform function <code class="docutils literal notranslate"><span class="pre">func</span></code>. </p></li>
+<li><p><strong>func</strong> – <strong>[in]</strong> Transform function. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -449,8 +470,8 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv47strntoiPKc6size_t">
-<span id="_CPPv37strntoiPKc6size_t"></span><span id="_CPPv27strntoiPKc6size_t"></span><span id="strntoi__cCP.s"></span><span class="target" id="group__nomp__other__utils_1ga916eb9d5e8e9ec82207092cb4dd7a730"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">strntoi</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">str</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47strntoiPKc6size_t" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv48strntouiPKc6size_t">
+<span id="_CPPv38strntouiPKc6size_t"></span><span id="_CPPv28strntouiPKc6size_t"></span><span id="strntoui__cCP.s"></span><span class="target" id="group__nomp__other__utils_1gad7c0a21627bc758beaeff7ad6b5d48be"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">strntoui</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">str</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48strntouiPKc6size_t" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Convert a string to int. </p>
 <p>Convert input string <code class="docutils literal notranslate"><span class="pre">str</span></code> to int. Returns converted int if given str successfully converted, otherwise return -1.</p>
 <dl class="field-list simple">
