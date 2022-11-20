@@ -61,32 +61,6 @@
 
 /**
  * @ingroup nomp_errors
- * @brief libnomp is already initialized.
- */
-#define NOMP_RUNTIME_ALREADY_INITIALIZED -256
-/**
- * @ingroup nomp_errors
- * @brief libnomp is not initialized.
- */
-#define NOMP_RUNTIME_NOT_INITIALIZED -257
-/**
- * @ingroup nomp_errors
- * @brief Failed to finalize libnomp.
- */
-#define NOMP_RUNTIME_FAILED_TO_FINALIZE -258
-/**
- * @ingroup nomp_errors
- * @brief libnomp malloc failed
- */
-#define NOMP_RUNTIME_MEMORY_ALLOCATION_FAILED -259
-/**
- * @ingroup nomp_errors
- * @brief One of the inputs to a libnomp function call are not valid.
- */
-#define NOMP_RUNTIME_NULL_INPUT_ENCOUNTERED -260
-
-/**
- * @ingroup nomp_errors
  * @brief One of the inputs to a libnomp function call are not provided.
  */
 #define NOMP_USER_INPUT_NOT_PROVIDED -128
@@ -117,67 +91,81 @@
 #define NOMP_USER_MAP_OP_IS_INVALID -133
 /**
  * @ingroup nomp_errors
- * @brief libnomp invalid log id
+ * @brief Log id provided to libnomp is not valid.
  */
 #define NOMP_USER_LOG_ID_IS_INVALID -134
 /**
  * @ingroup nomp_errors
- * @brief User callback function failed
+ * @brief User callback function failed during execution.
  */
 #define NOMP_USER_CALLBACK_FAILURE -135
+/**
+ * @ingroup nomp_errors
+ * @brief Kernel argument type provided to libnomp is not valid.
+ */
+#define NOMP_USER_KNL_ARG_TYPE_IS_INVALID -136
 
 /**
  * @ingroup nomp_errors
- * @brief libnomp python initialization failed
+ * @brief libnomp is already initialized.
  */
-#define NOMP_PY_INITIALIZE_ERROR -383
+#define NOMP_RUNTIME_ALREADY_INITIALIZED -256
+/**
+ * @ingroup nomp_errors
+ * @brief libnomp is not initialized.
+ */
+#define NOMP_RUNTIME_NOT_INITIALIZED -257
+/**
+ * @ingroup nomp_errors
+ * @brief Failed to finalize libnomp.
+ */
+#define NOMP_RUNTIME_FAILED_TO_FINALIZE -258
+/**
+ * @ingroup nomp_errors
+ * @brief Memory allocation on host by libnomp failed.
+ */
+#define NOMP_RUNTIME_MEMORY_ALLOCATION_FAILED -259
+/**
+ * @ingroup nomp_errors
+ * @brief One of the inputs to a libnomp function call are not valid.
+ */
+#define NOMP_RUNTIME_NULL_INPUT_ENCOUNTERED -260
+
+/**
+ * @ingroup nomp_errors
+ * @brief libnomp python initialization failed.
+ */
+#define NOMP_PY_INITIALIZE_ERROR -384
 /**
  * @ingroup nomp_errors
  * @brief A python call made by libnomp failed.
  */
-#define NOMP_PY_CALL_FAILED -384
-
+#define NOMP_PY_CALL_FAILED -385
 /**
  * @ingroup nomp_errors
- * @brief Loopy conversion failed
+ * @brief Loopy conversion failed.
  */
 #define NOMP_LOOPY_CONVERSION_ERROR -387
 /**
  * @ingroup nomp_errors
- * @brief Failed to find loopy kernel
+ * @brief Failed to find loopy kernel.
  */
 #define NOMP_LOOPY_KNL_NAME_NOT_FOUND -388
 /**
  * @ingroup nomp_errors
- * @brief Code generation from loopy kernel failed
+ * @brief Code generation from loopy kernel failed.
  */
 #define NOMP_LOOPY_CODEGEN_FAILED -389
 /**
  * @ingroup nomp_errors
- * @brief Code generation from loopy kernel failed
+ * @brief Code generation from loopy kernel failed.
  */
 #define NOMP_LOOPY_GET_GRIDSIZE_FAILED -390
 /**
  * @ingroup nomp_errors
- * @brief Grid size calculation failed
+ * @brief Grid size calculation failed.
  */
 #define NOMP_LOOPY_EVAL_GRIDSIZE_FAILED -391
-
-/**
- * @ingroup nomp_errors
- * @brief Invalid libnomp kernel argument type
- */
-#define NOMP_KNL_ARG_TYPE_IS_INVALID -513
-/**
- * @ingroup nomp_errors
- * @brief Setting libnomp kernel argument failed
- */
-#define NOMP_KNL_ARG_SET_ERROR -514
-/**
- * @ingroup nomp_errors
- * @brief libnomp kernel run failed
- */
-#define NOMP_KNL_RUN_ERROR -515
 
 /**
  * @ingroup nomp_errors

@@ -3,18 +3,15 @@
 #include "nomp.h"
 #include <stddef.h>
 
-extern const char *ERR_STR_RUNTIME_MEMORY_ALLOCATION_FAILURE;
-
 extern const char *ERR_STR_USER_MAP_PTR_IS_INVALID;
 extern const char *ERR_STR_USER_DEVICE_IS_INVALID;
 
+extern const char *ERR_STR_RUNTIME_MEMORY_ALLOCATION_FAILURE;
+
 extern const char *ERR_STR_KNL_ARG_TYPE_IS_INVALID;
-extern const char *ERR_STR_KNL_ARG_SET_ERROR;
 
-extern const char *ERR_STR_USER_CALLBACK_NOT_PROVIDED;
-extern const char *ERR_STR_USER_CALLBACK_NOT_FOUND;
-extern const char *ERR_STR_USER_CALLBACK_FAILURE;
-
+// FIXME: We can get rid of these loopy errors as they are
+// only used once.
 extern const char *ERR_STR_LOOPY_CONVERSION_ERROR;
 extern const char *ERR_STR_LOOPY_KNL_NAME_NOT_FOUND;
 extern const char *ERR_STR_LOOPY_CODEGEN_FAILED;

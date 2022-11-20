@@ -126,15 +126,18 @@ static int opencl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
       size = sizeof(cl_mem);
       break;
     default:;
-      return set_log(NOMP_KNL_ARG_TYPE_IS_INVALID, NOMP_ERROR,
-                     ERR_STR_KNL_ARG_TYPE_IS_INVALID, type);
+      return set_log(NOMP_USER_KNL_ARG_TYPE_IS_INVALID, NOMP_ERROR,
+                     "Kernel argument type %d passed to libnomp is not valid.",
+                     type);
       break;
     }
 
     cl_int err = clSetKernelArg(ocl_prg->knl, i, size, p);
     if (err != CL_SUCCESS)
-      return set_log(NOMP_KNL_ARG_SET_ERROR, NOMP_ERROR,
-                     ERR_STR_KNL_ARG_SET_ERROR);
+      return set_log(
+          NOMP_OPENCL_FAILURE, NOMP_ERROR,
+          "OpenCL clSetKernelArg() failed for argument %d (pointer = %p).", i,
+          p);
   }
 
   // FIXME: May be do this differently?
