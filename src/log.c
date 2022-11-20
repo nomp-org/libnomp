@@ -59,7 +59,7 @@ int set_log_(const char *description, int logno, nomp_log_type type,
   vsnprintf(buf, BUFSIZ, description, vargs);
   va_end(vargs);
 
-  char *desc = strndup(buf, BUFSIZ), *file = strndup(fname, BUFSIZ);
+  char *desc = strndup(buf, BUFSIZ), *file = strndup(fname, pathlen(fname));
   const char *type_str = LOG_TYPE_STRING[type];
 
   size_t len = strnlen(desc, BUFSIZ) + strnlen(file, BUFSIZ);
