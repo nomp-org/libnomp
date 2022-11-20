@@ -38,7 +38,7 @@ int nomp_api_300(int row, int col) {
 
   int err = nomp_update(a, 0, row * col, sizeof(TEST_TYPE), NOMP_TO);
   nomp_chk(err);
-  err = nomp_update(b, 0, row * col, sizeof(TEST_TYPE), NOMP_TO);
+  err = nomp_update(b, 0, row * col, sizeof(TEST_TYPE), NOMP_ALLOC);
   nomp_chk(err);
 
   nomp_api_300_aux(a, b, row, col);
