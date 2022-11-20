@@ -94,32 +94,32 @@
  * @ingroup nomp_errors
  * @brief One of the inputs to a libnomp function call are not valid.
  */
-#define NOMP_USER_INPUT_NOT_VALID -129
+#define NOMP_USER_INPUT_IS_INVALID -129
 /**
  * @ingroup nomp_errors
  * @brief Device id provided to a libnomp function call is not valid.
  */
-#define NOMP_USER_DEVICE_NOT_VALID -130
+#define NOMP_USER_DEVICE_IS_INVALID -130
 /**
  * @ingroup nomp_errors
  * @brief Platform id provided to a libnomp function call is not valid.
  */
-#define NOMP_USER_PLATFORM_NOT_VALID -131
+#define NOMP_USER_PLATFORM_IS_INVALID -131
 /**
  * @ingroup nomp_errors
  * @brief Map pointer provided to libnomp is not valid.
  */
-#define NOMP_USER_MAP_PTR_NOT_VALID -132
+#define NOMP_USER_MAP_PTR_IS_INVALID -132
 /**
  * @ingroup nomp_errors
  * @brief Map operation provided to libnomp is not applicable.
  */
-#define NOMP_USER_MAP_OP_NOT_VALID -133
+#define NOMP_USER_MAP_OP_IS_INVALID -133
 /**
  * @ingroup nomp_errors
  * @brief libnomp invalid log id
  */
-#define NOMP_USER_LOG_ID_NOT_VALID -134
+#define NOMP_USER_LOG_ID_IS_INVALID -134
 /**
  * @ingroup nomp_errors
  * @brief User callback function failed
@@ -167,7 +167,7 @@
  * @ingroup nomp_errors
  * @brief Invalid libnomp kernel argument type
  */
-#define NOMP_KNL_ARG_TYPE_NOT_VALID -513
+#define NOMP_KNL_ARG_TYPE_IS_INVALID -513
 /**
  * @ingroup nomp_errors
  * @brief Setting libnomp kernel argument failed
@@ -345,7 +345,7 @@ int nomp_get_log_str(char **log, int log_id);
  * @brief Return log number.
  *
  * @details Returns the log number given the log_id. If log_id
- * is invalid return NOMP_USER_LOG_ID_NOT_VALID.
+ * is invalid return NOMP_USER_LOG_ID_IS_INVALID.
  * @param[in] log_id id of the log.
  * @return int
  */

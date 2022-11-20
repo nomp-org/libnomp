@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
   // Set environment variable with invalid backend
   setenv("NOMP_BACKEND", "invalid", 1);
   err = nomp_init(backend, platform, device);
-  nomp_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_NOT_VALID);
+  nomp_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
   err = nomp_finalize();
   nomp_assert(nomp_get_log_no(err) == NOMP_RUNTIME_NOT_INITIALIZED);
 
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
 
   // If both are invalid should return an error
   err = nomp_init(backend, INT_MAX, device);
-  nomp_assert(nomp_get_log_no(err) == NOMP_USER_PLATFORM_NOT_VALID);
+  nomp_assert(nomp_get_log_no(err) == NOMP_USER_PLATFORM_IS_INVALID);
   err = nomp_finalize();
   nomp_assert(nomp_get_log_no(err) == NOMP_RUNTIME_NOT_INITIALIZED);
 
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
   // priority.
   setenv("NOMP_PLATFORM_ID", int_max_str, 1);
   err = nomp_init(backend, platform, device);
-  nomp_assert(nomp_get_log_no(err) == NOMP_USER_PLATFORM_NOT_VALID);
+  nomp_assert(nomp_get_log_no(err) == NOMP_USER_PLATFORM_IS_INVALID);
   err = nomp_finalize();
   nomp_assert(nomp_get_log_no(err) == NOMP_RUNTIME_NOT_INITIALIZED);
 
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
 
   // If both are invalid should return an error
   err = nomp_init(backend, platform, INT_MAX);
-  nomp_assert(nomp_get_log_no(err) == NOMP_USER_DEVICE_NOT_VALID);
+  nomp_assert(nomp_get_log_no(err) == NOMP_USER_DEVICE_IS_INVALID);
   err = nomp_finalize();
   nomp_assert(nomp_get_log_no(err) == NOMP_RUNTIME_NOT_INITIALIZED);
 
@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
   // priority.
   setenv("NOMP_DEVICE_ID", int_max_str, 1);
   err = nomp_init(backend, platform, device);
-  nomp_assert(nomp_get_log_no(err) == NOMP_USER_DEVICE_NOT_VALID);
+  nomp_assert(nomp_get_log_no(err) == NOMP_USER_DEVICE_IS_INVALID);
   err = nomp_finalize();
   nomp_assert(nomp_get_log_no(err) == NOMP_RUNTIME_NOT_INITIALIZED);
 

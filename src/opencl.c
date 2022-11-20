@@ -120,14 +120,14 @@ static int opencl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
     case NOMP_PTR:
       m = mem_if_mapped(p);
       if (m == NULL)
-        return set_log(NOMP_USER_MAP_PTR_NOT_VALID, NOMP_ERROR,
-                       ERR_STR_USER_MAP_PTR_NOT_VALID, p);
+        return set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
+                       ERR_STR_USER_MAP_PTR_IS_INVALID, p);
       p = m->bptr;
       size = sizeof(cl_mem);
       break;
     default:;
-      return set_log(NOMP_KNL_ARG_TYPE_NOT_VALID, NOMP_ERROR,
-                     ERR_STR_KNL_ARG_TYPE_NOT_VALID, type);
+      return set_log(NOMP_KNL_ARG_TYPE_IS_INVALID, NOMP_ERROR,
+                     ERR_STR_KNL_ARG_TYPE_IS_INVALID, type);
       break;
     }
 
@@ -184,7 +184,7 @@ int opencl_init(struct backend *bnd, const int platform_id,
   cl_uint num_platforms;
   cl_int err = clGetPlatformIDs(0, NULL, &num_platforms);
   if (platform_id < 0 | platform_id >= num_platforms)
-    return set_log(NOMP_USER_PLATFORM_NOT_VALID, NOMP_ERROR,
+    return set_log(NOMP_USER_PLATFORM_IS_INVALID, NOMP_ERROR,
                    "Platform id %d provided to libnomp is not valid.",
                    platform_id);
   cl_platform_id *cl_platforms = tcalloc(cl_platform_id, num_platforms);
@@ -197,8 +197,8 @@ int opencl_init(struct backend *bnd, const int platform_id,
   cl_uint num_devices;
   err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 0, NULL, &num_devices);
   if (device_id < 0 || device_id >= num_devices)
-    return set_log(NOMP_USER_DEVICE_NOT_VALID, NOMP_ERROR,
-                   ERR_STR_USER_DEVICE_NOT_VALID, device_id);
+    return set_log(NOMP_USER_DEVICE_IS_INVALID, NOMP_ERROR,
+                   ERR_STR_USER_DEVICE_IS_INVALID, device_id);
 
   cl_device_id *cl_devices = tcalloc(cl_device_id, num_devices);
   if (cl_devices == NULL)

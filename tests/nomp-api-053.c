@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
   // Invoke with invalid kernel_id
   err = nomp_run(-1, 3, "a", NOMP_PTR, sizeof(int), a, "b", NOMP_PTR,
                  sizeof(int), b, "N", NOMP_INTEGER, sizeof(int), &n);
-  nomp_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_NOT_VALID);
+  nomp_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
   char *desc;
   err = nomp_get_log_str(&desc, err);
   int matched = match_log(desc, "\\[Error\\] .*\\/src\\/nomp.c:[0-9]* Kernel "
@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
   // Invoke fails because b is not mapped
   err = nomp_run(id, 3, "a", NOMP_PTR, sizeof(int), a, "b", NOMP_PTR,
                  sizeof(int), b, "N", NOMP_INTEGER, sizeof(int), &n);
-  nomp_assert(nomp_get_log_no(err) == NOMP_USER_MAP_PTR_NOT_VALID);
+  nomp_assert(nomp_get_log_no(err) == NOMP_USER_MAP_PTR_IS_INVALID);
   err = nomp_get_log_str(&desc, err);
   matched = match_log(desc, "\\[Error\\] .*\\/src\\/.*.c:[0-9]* Map pointer "
                             "0[xX][0-9a-fA-F]* was not found on device.");
