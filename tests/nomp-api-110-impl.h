@@ -12,11 +12,11 @@ int nomp_api_110(const char *backend, int device, int platform, unsigned s,
 
   // Free'ing before mapping should return an error
   err = nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FREE);
-  nomp_assert(nomp_get_log_no(err) == NOMP_USER_MAP_OP_NOT_VALID);
+  nomp_assert(nomp_get_log_no(err) == NOMP_USER_MAP_OP_IS_INVALID);
 
   // D2H before H2D should return an error
   err = nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FROM);
-  nomp_assert(nomp_get_log_no(err) == NOMP_USER_MAP_OP_NOT_VALID);
+  nomp_assert(nomp_get_log_no(err) == NOMP_USER_MAP_OP_IS_INVALID);
 
   // Mapping H2D multiple times is not an error
   err = nomp_update(b, s, e, sizeof(TEST_TYPE), NOMP_TO);

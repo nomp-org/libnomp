@@ -8,12 +8,12 @@
 const char *ERR_STR_RUNTIME_MEMORY_ALLOCATION_FAILURE =
     "libnomp host memory allocation failed.";
 
-const char *ERR_STR_USER_MAP_PTR_NOT_VALID =
+const char *ERR_STR_USER_MAP_PTR_IS_INVALID =
     "Map pointer %p was not found on device.";
-const char *ERR_STR_USER_DEVICE_NOT_VALID =
+const char *ERR_STR_USER_DEVICE_IS_INVALID =
     "Device id %d passed into libnomp is not valid.";
 
-const char *ERR_STR_KNL_ARG_TYPE_NOT_VALID =
+const char *ERR_STR_KNL_ARG_TYPE_IS_INVALID =
     "Invalid libnomp kernel argument type %d.";
 const char *ERR_STR_KNL_ARG_SET_ERROR =
     "Setting libnomp kernel argument failed.";
@@ -77,7 +77,7 @@ int set_log_(const char *description, int logno, nomp_log_type type,
 int nomp_get_log_str(char **log_str, int log_id) {
   if (log_id <= 0 || log_id > logs_n) {
     *log_str = NULL;
-    return NOMP_USER_LOG_ID_NOT_VALID;
+    return NOMP_USER_LOG_ID_IS_INVALID;
   }
   struct log lg = logs[log_id - 1];
   size_t n_desc = strnlen(lg.description, BUFSIZ) + 1;
@@ -88,7 +88,7 @@ int nomp_get_log_str(char **log_str, int log_id) {
 
 int nomp_get_log_no(int log_id) {
   if (log_id <= 0 || log_id > logs_n)
-    return NOMP_USER_LOG_ID_NOT_VALID;
+    return NOMP_USER_LOG_ID_IS_INVALID;
   return logs[log_id - 1].logno;
 }
 

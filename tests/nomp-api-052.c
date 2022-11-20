@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
   // Calling nomp_jit with invalid clauses shoud return an error.
   const char *clauses2[4] = {"invalid-clause", "nomp-api-50", "transform", 0};
   err = nomp_jit(&id, valid_knl, clauses2);
-  nomp_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_NOT_VALID);
+  nomp_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
   err = nomp_get_log_str(&desc, err);
   matched = match_log(

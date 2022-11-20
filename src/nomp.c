@@ -112,7 +112,7 @@ int nomp_init(const char *backend, int platform, int device) {
     err = cuda_init(&nomp, nomp.platform_id, nomp.device_id);
 #endif
   } else {
-    err = set_log(NOMP_USER_INPUT_NOT_VALID, NOMP_ERROR,
+    err = set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                   "Failed to initialized libnomp. Invalid backend: %s", name);
   }
   return_on_err(err);
@@ -174,7 +174,7 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
   if (idx == mems_n) {
     // A new entry can't be created with NOMP_FREE or NOMP_FROM
     if (op == NOMP_FROM || op == NOMP_FREE)
-      return set_log(NOMP_USER_MAP_OP_NOT_VALID, NOMP_ERROR,
+      return set_log(NOMP_USER_MAP_OP_IS_INVALID, NOMP_ERROR,
                      "NOMP_FREE or NOMP_FROM can only be called on a pointer "
                      "which is already on the device.");
     op |= NOMP_ALLOC;
@@ -232,7 +232,7 @@ static int parse_clauses(char **usr_file, char **usr_func, PyObject **dict_,
       i = i + 3;
     } else {
       return set_log(
-          NOMP_USER_INPUT_NOT_VALID, NOMP_ERROR,
+          NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
           "Clause \"%s\" passed into nomp_jit is not a valid caluse.",
           clauses[i]);
     }
@@ -324,7 +324,7 @@ int nomp_run(int id, int nargs, ...) {
 
     return 0;
   }
-  return set_log(NOMP_USER_INPUT_NOT_VALID, NOMP_ERROR,
+  return set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                  "Kernel id %d passed to nomp_run is not valid.", id);
 }
 

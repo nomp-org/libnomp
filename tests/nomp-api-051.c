@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
 
   // Free'ing before mapping should return an error
   err = nomp_update(a, 0, 10, sizeof(int), NOMP_FREE);
-  nomp_assert(nomp_get_log_no(err) == NOMP_USER_MAP_OP_NOT_VALID);
+  nomp_assert(nomp_get_log_no(err) == NOMP_USER_MAP_OP_IS_INVALID);
 
   char *desc;
   err = nomp_get_log_str(&desc, err);
@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
 
   // D2H before H2D should return an error
   err = nomp_update(a, 0, 10, sizeof(int), NOMP_FROM);
-  nomp_assert(nomp_get_log_no(err) == NOMP_USER_MAP_OP_NOT_VALID);
+  nomp_assert(nomp_get_log_no(err) == NOMP_USER_MAP_OP_IS_INVALID);
 
   err = nomp_get_log_str(&desc, err);
   matched = match_log(
