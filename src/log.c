@@ -5,24 +5,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-const char *ERR_STR_RUNTIME_MEMORY_ALLOCATION_FAILURE =
-    "libnomp host memory allocation failed.";
-
 const char *ERR_STR_USER_MAP_PTR_IS_INVALID =
     "Map pointer %p was not found on device.";
 const char *ERR_STR_USER_DEVICE_IS_INVALID =
     "Device id %d passed into libnomp is not valid.";
 
+const char *ERR_STR_RUNTIME_MEMORY_ALLOCATION_FAILURE =
+    "libnomp host memory allocation failed.";
+
 const char *ERR_STR_KNL_ARG_TYPE_IS_INVALID =
     "Invalid libnomp kernel argument type %d.";
-const char *ERR_STR_KNL_ARG_SET_ERROR =
-    "Setting libnomp kernel argument failed.";
-
-const char *ERR_STR_USER_CALLBACK_NOT_PROVIDED =
-    "User callback function is not provided.";
-const char *ERR_STR_USER_CALLBACK_NOT_FOUND =
-    "Specified user callback function not found in file %s.";
-const char *ERR_STR_USER_CALLBACK_FAILURE = "User callback function %s failed.";
 
 const char *ERR_STR_LOOPY_CONVERSION_ERROR = "C to Loopy conversion failed.";
 const char *ERR_STR_LOOPY_KNL_NAME_NOT_FOUND =
