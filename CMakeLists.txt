@@ -3,6 +3,8 @@ project(libnomp VERSION 0.0.1 DESCRIPTION "nomp runtime library" LANGUAGES C)
 
 # Treat compiler warnings as errors
 set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
 
 option(ENABLE_OPENCL "Build OpenCL backend" ON)
 option(ENABLE_CUDA "Build Cuda backend" OFF)
