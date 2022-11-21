@@ -5,7 +5,7 @@ NOMP_SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 NOMP_LNSTATE_PATH="${NOMP_SOURCE_DIR}/.lnstate"
 
 : "${NOMP_INSTALL_DIR:="${HOME}/.nomp"}"
-: "${NOMP_OPENCL_LIBRARY:="/lib/x86_64-linux-gnu/libOpenCL.so.1"}"
+: "${NOMP_OPENCL_LIBRARY:=""}"
 : "${NOMP_BUILD_TYPE:="RelWithDebInfo"}"
 : "${NOMP_ENABLE_DOCS:="OFF"}"
 : "${NOMP_BUILD_DIR:="${NOMP_SOURCE_DIR}/build"}"
@@ -50,10 +50,12 @@ done
 
 # update the cmake opts
 NOMP_CMAKE_OPTS=()
-NOMP_CMAKE_OPTS+=("-DOpenCL_LIBRARY=${NOMP_OPENCL_LIBRARY}")
 NOMP_CMAKE_OPTS+=("-DCMAKE_INSTALL_PREFIX=${NOMP_INSTALL_DIR}")
 NOMP_CMAKE_OPTS+=("-DENABLE_DOCS=${NOMP_ENABLE_DOCS}")
 NOMP_CMAKE_OPTS+=("-DCMAKE_BUILD_TYPE=${NOMP_BUILD_TYPE}")
+
+[[ -n ${NOMP_OPENCL_LIBRARY} ]] &&
+  NOMP_CMAKE_OPTS+=("-DOpenCL_LIBRARY=${NOMP_OPENCL_LIBRARY}")
 
 # update lnstate variables
 echo -e "NOMP_INSTALL_DIR=${NOMP_INSTALL_DIR}\nNOMP_BUILD_DIR=${NOMP_BUILD_DIR}" >"${NOMP_LNSTATE_PATH}"
@@ -64,8 +66,7 @@ echo -e "NOMP_INSTALL_DIR=${NOMP_INSTALL_DIR}\nNOMP_BUILD_DIR=${NOMP_BUILD_DIR}"
 # configure cmake
 NOMP_CONFIGURE_SUCCESS=false
 echo "Configuring build files for libnomp..."
-cd "${NOMP_BUILD_DIR}" &&
-  cmake "${NOMP_SOURCE_DIR}" "${NOMP_CMAKE_OPTS[@]}" &&
+cmake -B "${NOMP_BUILD_DIR}" -S "${NOMP_SOURCE_DIR}" "${NOMP_CMAKE_OPTS[@]}" &&
   NOMP_CONFIGURE_SUCCESS=true
 
 if [[ ${NOMP_CONFIGURE_SUCCESS} = true ]]; then

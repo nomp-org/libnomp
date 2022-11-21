@@ -83,6 +83,9 @@ function print_help_docs() {
 }
 
 function run_tests() {
+  export NOMP_ANNOTATE_SCRIPT=sem
+  export NOMP_ANNOTATE_FUNCTION=annotate
+
   [[ ${NOMP_TEST_GROUPS} == *"*"* ]] &&
     TESTS="${NOMP_TEST_DIR}/nomp-api-${NOMP_TEST_GROUPS}[^.py]" ||
     TESTS="${NOMP_TEST_DIR}/nomp-api-${NOMP_TEST_GROUPS}"
@@ -92,7 +95,7 @@ function run_tests() {
     exit 1
   fi
 
-  echo -e "\nRunning tests..."
+  echo -e "Running tests..."
   ERR=0
   cd "${NOMP_TEST_DIR}" &&
     for t in $(ls ${TESTS}); do
@@ -123,14 +126,8 @@ function debug_test() {
 }
 
 function open_docs() {
-  echo -e "Starting web browser..." &&
-    if command -v "${NOMP_BROWSER}" &>/dev/null; then
-      nohup "${NOMP_BROWSER}" "${NOMP_INSTALL_DIR}/docs/index.html" 1>/dev/null 2>/dev/null &
-      exit 0
-    else
-      echo "${red}Browser not found: ${NOMP_BROWSER}${reset}"
-      exit 1
-    fi
+  echo -e "Starting web browser..."
+  "${NOMP_BROWSER}" "${NOMP_INSTALL_DIR}/docs/index.html"
 }
 
 # parse the command
