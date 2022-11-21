@@ -56,7 +56,7 @@ class IdentityMapper:
 
     def map_integer_literal(self, expr: cindex.CursorKind):
         """Maps int constant"""
-        val, = expr.get_tokens()
+        (val,) = expr.get_tokens()
         return (
             dtype_to_ctype_registry()
             .get_or_register_dtype(expr.type.kind.spelling.lower())
@@ -65,7 +65,7 @@ class IdentityMapper:
 
     def map_floating_literal(self, expr: cindex.CursorKind):
         """Maps float constant"""
-        val, = expr.get_tokens()
+        (val,) = expr.get_tokens()
         return (
             dtype_to_ctype_registry()
             .get_or_register_dtype(expr.type.kind.spelling.lower())
@@ -225,41 +225,39 @@ def check_and_parse_for(
     expr: cindex.CursorKind, context: CToLoopyMapperContext
 ):
     """Parse for loop to retrieve loop variable, lower bound and upper bound"""
-    decl_stmt, cond, ex, *_ = expr.get_children()
-    (var_decl,) = decl_stmt.get_children()
-    iname = var_decl.spelling
-
-    # Sanity checks
     if not expr:
         raise NotImplementedError(
             "More than one initialization declarations not yet supported."
         )
 
+    decl_stmt, cond, updt_stmt, *_ = expr.get_children()
+    (var_decl,) = decl_stmt.get_children()
+    iname = var_decl.spelling
     ops = []
-    for i in cond.get_tokens():
-        ops.append(i.spelling)
+    for token in cond.get_tokens():
+        ops.append(token.spelling)
     exs = []
-    for i in ex.get_tokens():
-        exs.append(i.spelling)
+    for token in updt_stmt.get_tokens():
+        exs.append(token.spelling)
 
-    if not (
-        cond.kind == cindex.CursorKind.BINARY_OPERATOR
-        and "<" in ops
-        and ops[0] == iname
-    ):
+    if not (cond.kind == cindex.CursorKind.BINARY_OPERATOR and "<" in ops):
         raise NotImplementedError("Only increasing domains are supported")
 
-    _, right = cond.get_children()
-    if ex.kind == cindex.CursorKind.UNARY_OPERATOR and "++" in exs:
+    left, right = cond.get_children()
+    if updt_stmt.kind == cindex.CursorKind.UNARY_OPERATOR and "++" in exs:
         lbound_expr = CToLoopyLoopBoundMapper()(var_decl)
         ubound_expr = CToLoopyLoopBoundMapper()(right)
     else:
         raise NotImplementedError("Only increments by 1 are supported")
 
+    (left_body,) = left.get_children()
+    (next_body,) = updt_stmt.get_children()
     if not (
-        isinstance(expr.cond.left, c_ast.ID) and expr.cond.left.name == iname
+        left_body.kind == cindex.CursorKind.DECL_REF_EXPR
+        and left_body.spelling == iname
     ) or not (
-        isinstance(expr.next.expr, c_ast.ID) and expr.next.expr.name == iname
+        next_body.kind == cindex.CursorKind.DECL_REF_EXPR
+        and next_body.spelling == iname
     ):
         raise SyntaxError(
             "Loop variable has to be the same in for condition and next"
@@ -443,6 +441,7 @@ class CToLoopyMapper(IdentityMapper):
 @dataclass
 class ExternalContext:
     "Maintain information on variable declaration in a function"
+
     function_name: Optional[str]
     var_to_decl: Dict[str, cindex.Cursor]
 
