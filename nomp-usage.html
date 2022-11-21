@@ -84,7 +84,7 @@ the <a class="reference internal" href="build.html"><span class="doc">Build inst
 
 <span class="n">void</span> <span class="n">foo</span><span class="p">(</span><span class="n">double</span> <span class="o">*</span><span class="n">a</span><span class="p">)</span> <span class="p">{</span>
 <span class="c1">#pragma nomp update(to : a[0, 10])</span>
-<span class="c1">#pragma nomp for transform(&quot;transforms:foo&quot;)</span>
+<span class="c1">#pragma nomp for transform(&quot;transforms&quot;, &quot;foo&quot;)</span>
     <span class="k">for</span><span class="p">(</span><span class="nb">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="mi">10</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
         <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
 <span class="c1">#pragma nomp update(from : a[0, 10])</span>
