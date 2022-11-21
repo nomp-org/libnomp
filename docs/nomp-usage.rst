@@ -14,7 +14,7 @@ The `foo.c` file contains the example with nomp pragmas.
 
     void foo(double *a) {
     #pragma nomp update(to : a[0, 10])
-    #pragma nomp for transform("transforms:foo")
+    #pragma nomp for transform("transforms", "foo")
         for(int i = 0; i<10; i++)
             a[i] = i;
     #pragma nomp update(from : a[0, 10])
