@@ -16,3 +16,10 @@ add_custom_target(
         -i
         ${SRCS} ${TESTS}
 )
+
+add_custom_target(
+        clangformat_test
+        COMMAND clang-format
+        --dry-run --Werror
+        ${SRCS} ${TESTS}
+)

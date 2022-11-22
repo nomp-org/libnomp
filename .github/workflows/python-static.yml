@@ -1,15 +1,15 @@
-name: pylint check
+name: python static checks
 on:
   pull_request:
     branches: [main]
   push:
-    branches: [main, cmake_clang-format_pylint]
+    branches: [main]
 
 env:
   CACHE_NUMBER: 0  # increase to reset cache manually
 
 jobs:
-  pylint-check:
+  python-static-checks:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -17,7 +17,7 @@ jobs:
     env:
       BUILDDIR: build
     steps:
-      - name: GitHub action setup
+      - name: Setup GitHub actions
         uses: actions/checkout@v3
       - name: Setup Mambaforge
         id: setup_conda
@@ -51,4 +51,9 @@ jobs:
         run: |
           cd ${BUILDDIR}
           make pylint
+      - name: Run Flake8
+        id: run_flake8
+        run: |
+          cd ${BUILDDIR}
+          make flake8
 

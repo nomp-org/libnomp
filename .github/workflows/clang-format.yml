@@ -3,7 +3,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main, cmake_clang-format_pylint]
+    branches: [main]
 
 env:
   CACHE_NUMBER: 0  # increase to reset cache manually
@@ -17,7 +17,7 @@ jobs:
     env:
       BUILDDIR: build
     steps:
-      - name: GitHub action setup
+      - name: Setup GitHub actions
         uses: actions/checkout@v3
       - name: Setup Mambaforge
         id: setup_conda
@@ -50,4 +50,4 @@ jobs:
         id: run_clang-format
         run: |
           cd ${BUILDDIR}
-          make clangformat
+          make clangformat_test
