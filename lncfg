@@ -17,32 +17,29 @@ cyan=$(tput setaf 6)
 reset=$(tput sgr0)
 
 function print_help() {
-  echo -e "usage: ./lncfg [-h|--help] [-v|--verbose] [-d|--debug] [-D|--docs]\n" \
+  echo -e "Usage: ${0} [-h|--help] [-v|--verbose] [-d|--debug] [-D|--docs]\n" \
     "\t[-i|--install-dir <install directory>] [-B|--build-dir <build directory>\n" \
     "\t[-o|--opencl-lib <opencl library>]\n\n" \
-    "${cyan}-h/--help:${reset} Print help for libnomp configuration.\n" \
-    "${cyan}-b/--build-type:${reset} Specify the build type for cmake." \
-    "Accepted values: Debug, Release, RelWithDebInfo and MinSizeRel.\n" \
+    "${cyan}-h/--help:${reset} Print help for libnomp configuration script.\n" \
+    "${cyan}-b/--build-type:${reset} Specify the build type for cmake (Default: ${NOMP_BUILD_TYPE}, " \
+    "Allowed: Debug, Release, RelWithDebInfo and MinSizeRel).\n" \
     "${cyan}-d/--enable-docs:${reset} Build with user documentation (Default: false).\n" \
     "${cyan}-i/--install-dir:${reset} Specify installation directory for libnomp (Default: ${NOMP_INSTALL_DIR}).\n" \
     "${cyan}-B/--build-dir:${reset} Specify build directory for libnomp (Default: ${NOMP_BUILD_DIR}).\n" \
-    "${cyan}-o/--opencl-lib:${reset} Specify OpenCL library path (Default: ${NOMP_OPENCL_LIBRARY}).\n"
+    "${cyan}-o/--opencl-lib:${reset} Specify OpenCL library path.\n"
 }
 
 # parse the options
 while [ $# -gt 0 ]; do
   case $1 in
-  -h | --help)
-    print_help
-    exit 0
-    ;;
+  -h | --help) print_help && exit 0 ;;
   -b | --build-type) shift && NOMP_BUILD_TYPE=${1^^} ;;
   -d | --enable-docs) NOMP_ENABLE_DOCS="ON" ;;
   -i | --install-dir) shift && NOMP_INSTALL_DIR=$(realpath "${1}") ;;
   -B | --build-dir) shift && NOMP_BUILD_DIR=$(realpath "${1}") ;;
   -o | --opencl-lib) shift && NOMP_OPENCL_LIBRARY=$(realpath "${1}") ;;
-  *) echo "${red}Invalid argument: ${1}${reset}" &&
-    echo "See ${cyan}./lncfg -h${reset} or ${cyan}./lncfg --help${reset} for the accepted commands" &&
+  *) echo "${red}Invalid argument: ${1}${reset}"
+    echo "See ${cyan}./lncfg -h${reset} or ${cyan}./lncfg --help${reset} for the accepted commands"
     exit 1 ;;
   esac
   shift

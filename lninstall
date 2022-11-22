@@ -16,7 +16,7 @@ reset=$(tput sgr0)
 if [[ -f "${NOMP_LNSTATE_PATH}" ]]; then
   source "${NOMP_LNSTATE_PATH}"
 else
-  echo "${red}You should run ./lncfg before running ./lninstall${reset}"
+  echo "${red}You should run ./lncfg before running ./${0}${reset}"
   exit 1
 fi
 NOMP_BIN_PATH="${NOMP_INSTALL_DIR}/bin"
@@ -34,11 +34,22 @@ function update_bashrc() {
     echo "${green}Successfully exported variables to ${NOMP_SHELL_CONFIG_FILE}${reset}"
 }
 
+function print_help() {
+  echo -e "Usage: ${0} [-h|--help] [-y|--yes] [-n|--no]\n" \
+    "${cyan}-h/--help:${reset} Print help for libnomp install.\n" \
+    "${cyan}-y/--yes:${reset} Yes to all prompts.\n"
+    "${cyan}-n/--no:${reset} No to all prompts.\n"
+}
+
 # check for default prompt
 if [[ $# -gt 0 ]]; then
   case $1 in
-  -y | --yes) NOMP_DEFAULT_PROMPT="y" ;;
-  -n | --no) NOMP_DEFAULT_PROMPT="n" ;;
+    -h | --help) print_help  && exit 0 ;;
+    -y | --yes) NOMP_DEFAULT_PROMPT="y" ;;
+    -n | --no) NOMP_DEFAULT_PROMPT="n" ;;
+    *) echo "${red}Invalid argument: ${1}${reset}."
+    echo "See ${cyan}./${0} -h${reset} or ${cyan}./${0} --help${reset} for the accepted commands."
+    exit 1 ;;
   esac
 fi
 
