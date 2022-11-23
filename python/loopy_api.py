@@ -411,11 +411,13 @@ def decl_to_knl_arg(decl: c_ast.Decl, dtype):
     decl_type = decl.type
     if isinstance(decl_type, c_ast.TypeDecl):
         return lp.ValueArg(decl.name, dtype=dtype)
-    if isinstance(decl_type, c_ast.PtrDecl):
+    if isinstance(decl_type, (c_ast.PtrDecl, c_ast.ArrayDecl)):
         return lp.ArrayArg(
             decl.name, dtype=dtype, address_space=AddressSpace.GLOBAL
         )
-    raise NotImplementedError(f"decl_to_knl_arg: {decl} is invalid.")
+    raise NotImplementedError(
+        f"decl_to_knl_arg: {decl} is of invalid type: {decl_type}."
+    )
 
 
 def c_to_loopy(c_str: str, backend: str) -> lp.translation_unit.TranslationUnit:
