@@ -8,10 +8,9 @@ const char *valid_knl =
     "}                                                                    \n";
 
 // Calling nomp_jit with invalid functions should return an error.
-static int test_call_jit_with_invalid_function(char *backend, int platform,
-                                               int device) {
+static int test_call_jit_with_invalid_function(int argc, const char **argv) {
 
-  int err = nomp_init(backend, platform, device);
+  int err = nomp_init(argc, argv);
   nomp_test_chk(err);
 
   static int id = -1;
@@ -132,14 +131,11 @@ static int test_syntax_error_kernel() {
   return 0;
 }
 
-int main(int argc, char *argv[]) {
-  char *backend;
-  int device, platform;
-  parse_input(argc, argv, &backend, &device, &platform);
+int main(int argc,const char *argv[]) {
   int err = 0;
 
   err |=
-      SUBTEST(test_call_jit_with_invalid_function, backend, device, platform);
+      SUBTEST(test_call_jit_with_invalid_function, argc, argv);
   err |= SUBTEST(test_invalid_transform_function);
   err |= SUBTEST(test_invalid_clause);
   err |= SUBTEST(test_missing_filename);

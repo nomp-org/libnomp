@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
   int device, platform;
   parse_input(argc, argv, &backend, &device, &platform);
 
-  int err = nomp_init(backend, platform, device);
+  int err = nomp_init(&argc, &argv);
   nomp_chk(err);
 
   TEST_BUILTIN_TYPES(100, 0, 10)
