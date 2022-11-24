@@ -12,8 +12,8 @@ on:
         required: false
         default: false
 env:
-  # Increase to reset cache
-  CACHE_NUMBER: 1
+  # Increase to reset cache manually
+  CACHE_NUMBER: 0
   POCL_CACHE_NUMBER: 0
 jobs:
   ci:
@@ -47,7 +47,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ env.CONDA }}/envs/libnomp
-          key:  conda-${{ runner.os }}-${{ hashFiles('environment.yml') }}-${{ env.CACHE_NUMBER }}
+          key:  conda-${{ runner.os }}-${{ hashFiles('environment.yml') }}-${{ hashFiles('requirements.txt') }}-${{ env.CACHE_NUMBER }}
         id: cache
       - name: Update environment
         id: update_env
