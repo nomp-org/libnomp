@@ -2,12 +2,9 @@
 #include "nomp-generate-tests.h"
 #undef TEST_IMPL_H
 
-int main(int argc, char *argv[]) {
-  char *backend;
-  int device, platform;
-  parse_input(argc, argv, &backend, &device, &platform);
+int main(int argc,const char *argv[]) {
 
-  TEST_BUILTIN_TYPES(231, backend, device, platform)
+  TEST_BUILTIN_TYPES(231, argc, argv)
 
   return 0;
 }

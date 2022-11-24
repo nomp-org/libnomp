@@ -115,7 +115,7 @@ function run_tests() {
   ERR=0
   cd "${NOMP_TEST_DIR}" &&
     for t in $(ls ${TESTS}); do
-      OUTPUT=$($t ${NOMP_BACKEND} ${NOMP_DEVICE} ${NOMP_PLATFORM})
+      OUTPUT=$($t -b ${NOMP_BACKEND} -d ${NOMP_DEVICE} -p ${NOMP_PLATFORM})
       if [ $? -eq 0 ]; then
         echo "${t}: ${green}Passed${reset}"
       else

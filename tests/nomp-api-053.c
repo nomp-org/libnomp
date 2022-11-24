@@ -4,14 +4,14 @@
 const int n = 10;
 
 // Invoke with invalid kernel_id
-static int test_invalid_kernel_id(char *backend, int platform, int device,
+static int test_invalid_kernel_id(int argc,const char **argv,
                                   int *id, int *a, int *b) {
   const char *knl = "void foo(int *a, int *b, int N) {                      \n"
                     "  for (int i = 0; i < N; i++)                          \n"
                     "    a[i] = a[i] * b[i];                                \n"
                     "}                                                      \n";
 
-  int err = nomp_init(backend, platform, device);
+  int err = nomp_init(argc, argv);
   nomp_test_chk(err);
   err = nomp_update(a, 0, n, sizeof(int), NOMP_TO);
   nomp_test_chk(err);
@@ -51,9 +51,6 @@ static int test_unmapped_variable(int id, int *a, int *b) {
 }
 
 int main(int argc, char *argv[]) {
-  char *backend;
-  int device, platform;
-  parse_input(argc, argv, &backend, &device, &platform);
   static int a[10], b[10];
   static int id = -1;
   int err = 0;
@@ -62,7 +59,7 @@ int main(int argc, char *argv[]) {
     a[i] = n - i, b[i] = i;
   }
 
-  err |= SUBTEST(test_invalid_kernel_id, backend, device, platform, &id, a, b);
+  err |= SUBTEST(test_invalid_kernel_id, argc, argv, &id, a, b);
   err |= SUBTEST(test_unmapped_variable, id, a, b);
 
   return err;

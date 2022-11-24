@@ -29,8 +29,8 @@ int nomp_api_230_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {
 }
 
 #define nomp_api_230 TOKEN_PASTE(nomp_api_230, TEST_SUFFIX)
-int nomp_api_230(const char *backend, int device, int platform) {
-  int err = nomp_init(backend, platform, device);
+int nomp_api_230(int argc , char *argv[]) {
+  int err = nomp_init(&argc, &argv);
   nomp_chk(err);
 
   int n = 10;
