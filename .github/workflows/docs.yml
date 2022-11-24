@@ -12,7 +12,8 @@ on:
         required: false
         default: false
 env:
-  CACHE_NUMBER: 0  # increase to reset cache manually
+  # Increase to reset cache manually
+  CACHE_NUMBER: 0
 jobs:
   docs:
     runs-on: ubuntu-latest
@@ -41,7 +42,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ env.CONDA }}/envs/libnomp-dev
-          key:  conda-${{ runner.os }}-${{ hashFiles('environment-dev.yml') }}-${{ env.CACHE_NUMBER }}
+          key:  conda-${{ runner.os }}-${{ hashFiles('environment-dev.yml') }}-${{ hashFiles('requirements.txt') }}-${{ env.CACHE_NUMBER }}
         id: cache
       - name: Update environment
         id: update_env
