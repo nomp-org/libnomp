@@ -1,6 +1,6 @@
 #include "nomp.h"
 
-#define TEST_IMPL_H "nomp-api-222-impl.h"
+#define TEST_IMPL_H "nomp-api-223-impl.h"
 #include "nomp-generate-tests.h"
 #undef TEST_IMPL_H
 
@@ -12,12 +12,12 @@ int main(int argc, char *argv[]) {
   int err = nomp_init(backend, platform, device);
   nomp_chk(err);
 
-  nomp_api_222_int();
-  nomp_api_222_long();
-  nomp_api_222_unsigned();
-  nomp_api_222_unsigned_long();
-  nomp_api_222_float();
-  nomp_api_222_double();
+  nomp_api_223_int();
+  nomp_api_223_long();
+  nomp_api_223_unsigned();
+  nomp_api_223_unsigned_long();
+  nomp_api_223_float();
+  nomp_api_223_double();
 
   err = nomp_finalize();
   nomp_chk(err);
