@@ -349,8 +349,15 @@ class CToLoopyMapper(IdentityMapper):
         lhs = CToLoopyExpressionMapper()(expr.lvalue)
         rhs = CToLoopyExpressionMapper()(expr.rvalue)
 
-        # FIXME: This could be sharpened so that other instruction types are
-        # also emitted.
+        if expr.op == "+=":
+            rhs = lhs + rhs
+        elif expr.op == "-=":
+            rhs = lhs - rhs
+        elif expr.op == "*=":
+            rhs = lhs * rhs
+        elif expr.op != "=":
+            raise NotImplementedError(f"Mapping not implemented for {expr.op}")
+
         return CToLoopyMapperAccumulator(
             [],
             [
@@ -484,7 +491,7 @@ if __name__ == "__main__":
     KNL_STR = """
           void foo(double *a, int N) {
             for (int i = 0; i < N; i++)
-              a[i] = i;
+              a[i] *= i + 1;
           }
           """
     lp_knl = c_to_loopy(KNL_STR, "cuda")
