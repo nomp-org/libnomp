@@ -41,7 +41,8 @@ mamba env create -f environment-dev.yml
 mamba activate libnomp-dev
 ```
 
-Use `lncfg` to configure cmake for libnomp and `lninstall` to install libnomp. For the available options, you can check `lncfg -h`. To 
+Use `lncfg` to configure cmake for libnomp and `lninstall` to install libnomp. 
+For the available options, you can check `lncfg -h`.
 
 ```bash
 cd libnomp
@@ -64,7 +65,7 @@ using conda.
 ./lninstall
 ```
 
-Use `lnrun` to open the user documentation locally, To open the documentation in chrome, 
+Use `lnrun` to open the user documentation locally. To open the documentation in chrome, 
 
 ```bash
 lnrun docs
