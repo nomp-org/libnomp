@@ -4,7 +4,7 @@ Build instructions
 libnomp
 -------
 
-Clone the libnomp repo first::
+Clone the repo first::
 
     git clone https://github.com/nomp-org/libnomp.git
 
@@ -13,25 +13,32 @@ Install dependencies using conda to build and run `libnomp`::
     conda env create -f environment.yml
     conda activate libnomp
 
+You can use mamba to install the dependencies faster::
+
+    mamba env create -f environment.yml
+    mamba activate libnomp
+
 If you are planning on contributing to `libnomp`, install the dev dependencies
 instead::
 
     conda env create -f environment-dev.yml
     conda activate libnomp-dev
 
-Use `cmake` to build the repo after installing the dependencies::
+Similarly, you can install the dev dependencies with mamba as well::
+
+    mamba env create -f environment-dev.yml
+    mamba activate libnomp-dev
+
+Use `lncfg` to configure cmake for libnomp and `lninstall` to install libnomp. For the available options, you can check `lncfg -h`. To::
 
     cd libnomp
-    mkdir build; cd build
-    export NOMP_INSTALL_DIR=${HOME}/.nomp
-    cmake .. -DCMAKE_INSTALL_PREFIX=${NOMP_INSTALL_DIR}
-    make install
-    cd ..
+    ./lncfg
+    ./lninstall
 
 You might additionally want to specify OpenCL libray path like below if CMake
 can't find OpenCL::
 
-    cmake .. -DCMAKE_INSTALL_PREFIX=${HOME}/.nomp -DOpenCL_LIBRARY=/lib/x86_64-linux-gnu/libOpenCL.so.1
+    ./lncfg -o /lib/x86_64-linux-gnu/libOpenCL.so.1
 
 Clang frontend
 --------------
