@@ -82,43 +82,39 @@ static struct backend nomp;
 static int initialized = 0;
 static const char *py_dir = "python";
 
-int check_args(int argc, char **argv){
-  char *backend="opencl";
-  int device=0;
-  int platform=0;
+int check_args(int argc, char **argv) {
+  char *backend = "opencl";
+  int device = 0;
+  int platform = 0;
 
   nomp.backend = tcalloc(char, MAX_BACKEND_NAME_SIZE);
 
-  if(argc < 1 || argv == NULL){
+  if (argc < 1 || argv == NULL) {
     strncpy(nomp.backend, backend, MAX_BACKEND_NAME_SIZE);
     nomp.platform_id = platform, nomp.device_id = device;
 
     return 0;
-  } 
-  int i=1;
-  while (i<argc)
-  {
-    if (!strncmp("-b", argv[i],sizeof(char)*2) || !strncmp("--backend", argv[i],sizeof(char)*9) ) {
-            backend = argv[i + 1];
-            i += 2;
-    }
-    else if (!strncmp("-p", argv[i],sizeof(char)*2) || !strncmp("--platform", argv[i],sizeof(char)*10) ) {
-            platform = atoi(argv[i + 1]);
-            i += 2;
-    }
-    else if (!strncmp("-d", argv[i],sizeof(char)*2) || !strncmp("--device", argv[i],sizeof(char)*8) ) {
-            device = atoi(argv[i + 1]);
-            i += 2;
-    }
-    else if (!strncmp("-p", argv[i],sizeof(char)*2) || !strncmp("--platform", argv[i],sizeof(char)*10) ) {
-            platform = atoi(argv[i + 1]);
-            i += 2;
-    }
-    else
-      return set_log(
-          NOMP_USER_ARGS_IS_INVALID, NOMP_ERROR,
-          "Invalid argument");
-    
+  }
+  int i = 1;
+  while (i < argc) {
+    if (!strncmp("-b", argv[i], sizeof(char) * 2) ||
+        !strncmp("--backend", argv[i], sizeof(char) * 9)) {
+      backend = argv[i + 1];
+      i += 2;
+    } else if (!strncmp("-p", argv[i], sizeof(char) * 2) ||
+               !strncmp("--platform", argv[i], sizeof(char) * 10)) {
+      platform = atoi(argv[i + 1]);
+      i += 2;
+    } else if (!strncmp("-d", argv[i], sizeof(char) * 2) ||
+               !strncmp("--device", argv[i], sizeof(char) * 8)) {
+      device = atoi(argv[i + 1]);
+      i += 2;
+    } else if (!strncmp("-p", argv[i], sizeof(char) * 2) ||
+               !strncmp("--platform", argv[i], sizeof(char) * 10)) {
+      platform = atoi(argv[i + 1]);
+      i += 2;
+    } else
+      return set_log(NOMP_USER_ARGS_IS_INVALID, NOMP_ERROR, strcatn(2, "Invalid argument : ", argv[i]));
   }
   strncpy(nomp.backend, backend, MAX_BACKEND_NAME_SIZE);
   nomp.platform_id = platform, nomp.device_id = device;
@@ -135,9 +131,9 @@ int nomp_init(int *argc, char ***argv) {
         "calling nomp_init() again.",
         nomp.name);
 
-  int err = check_args(*argc,*argv);
+  int err = check_args(*argc, *argv);
   return_on_err(err);
-  err=check_env(&nomp);
+  err = check_env(&nomp);
   return_on_err(err);
 
   char name[MAX_BACKEND_NAME_SIZE + 1];

@@ -4,11 +4,7 @@
 #include "nomp-generate-tests.h"
 #undef TEST_IMPL_H
 
-int main(int argc, char *argv[]) {
-  char *backend;
-  int device, platform;
-  parse_input(argc, argv, &backend, &device, &platform);
-
+int main(int argc,const char *argv[]) {
   int err = nomp_init(&argc, &argv);
   nomp_chk(err);
 

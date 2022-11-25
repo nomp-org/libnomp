@@ -103,7 +103,7 @@ function run_tests() {
   export NOMP_ANNOTATE_FUNCTION=annotate
 
   [[ ${NOMP_TEST_GROUPS} == *"*"* ]] &&
-    TESTS="${NOMP_TEST_DIR}/nomp-api-${NOMP_TEST_GROUPS}[^.py]" ||
+    TESTS="${NOMP_TEST_DIR}/nomp-api-${NOMP_TEST_GROUPS}[^.py][^.txt]" ||
     TESTS="${NOMP_TEST_DIR}/nomp-api-${NOMP_TEST_GROUPS}"
 
   if ! compgen -G "${TESTS}" >/dev/null; then
@@ -114,8 +114,13 @@ function run_tests() {
   echo -e "Running tests..."
   ERR=0
   cd "${NOMP_TEST_DIR}" &&
-    for t in $(ls ${TESTS}); do
-      OUTPUT=$($t -b ${NOMP_BACKEND} -d ${NOMP_DEVICE} -p ${NOMP_PLATFORM})
+    for t in $(ls  ${TESTS} -I "*.txt"); do
+      if [ -f "${t}.txt" ]; then
+        OUTPUT=$($t $(< ${t}.txt))
+      else
+        OUTPUT=$($t -b ${NOMP_BACKEND} -d ${NOMP_DEVICE} -p ${NOMP_PLATFORM})
+      fi  
+      
       if [ $? -eq 0 ]; then
         echo "${t}: ${green}Passed${reset}"
       else
