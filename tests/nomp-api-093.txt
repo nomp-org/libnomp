@@ -1,0 +1,1 @@
+-b opencl -d -1 -p 0

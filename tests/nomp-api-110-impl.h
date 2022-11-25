@@ -2,8 +2,7 @@
 #include "nomp.h"
 
 #define nomp_api_110 TOKEN_PASTE(nomp_api_110, TEST_SUFFIX)
-int nomp_api_110(int argc,char *argv[], unsigned s,
-                 unsigned e) {
+int nomp_api_110(int argc, char *argv[], unsigned s, unsigned e) {
   nomp_assert(e <= 10);
 
   TEST_TYPE a[10] = {0}, b[10] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};

@@ -29,7 +29,7 @@ int nomp_api_231_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {
 }
 
 #define nomp_api_231 TOKEN_PASTE(nomp_api_231, TEST_SUFFIX)
-int nomp_api_231(int argc , char *argv[]) {
+int nomp_api_231(int argc, char *argv[]) {
   int err = nomp_init(&argc, &argv);
   nomp_chk(err);
 

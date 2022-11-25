@@ -50,7 +50,7 @@ static int test_unmapped_variable(int id, int *a, int *b) {
   return 0;
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc,const char *argv[]) {
   static int a[10], b[10];
   static int id = -1;
   int err = 0;
