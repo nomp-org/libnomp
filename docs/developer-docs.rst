@@ -1,4 +1,4 @@
-Developer documentation
+Developer Documentation
 =======================
 
 Variable names
@@ -70,13 +70,13 @@ conda
     black **/*.py; isort **/*.py
     flake8
 
-Debguging github actions
+Debugging github actions
 ------------------------
 
 `tmate` can be used to `ssh` into a github runner instance when the workflow is
 launched manually from github.
 
-Select the relevant worflow under `Actions` tab and then click `run workflow`
+Select the relevant workflow under `Actions` tab and then click `run workflow`
 button and select run with `tmate`. This will run `tmate` action in the very
 beginning of the selected workflow and you will see a `ssh` address that can
 be used to connect to the runner instance.
@@ -89,7 +89,33 @@ type the following in the `libnomp` project directory
     touch continue
 
 Then the workflow will continue and you can monitor the progress on GitHub.
-If the worflow fails at some point, you can use the session you are connected
+If the workflow fails at some point, you can use the session you are connected
 for debugging. Session will be kept alive for 30 minutes after failure.
 
 More info on tmate can be found [here](https://mxschmitt.github.io/action-tmate/).
+
+Debugging libnomp tests
+------------------------
+After installing libnomp, you can debug the test cases using the `lnrun` script.
+As a prerequisite you have to install the `gdbserver` which you can install with,
+
+.. code-block:: bash
+
+    sudo apt install gdbserver
+
+Use :code:`lnrun debug` command to host the debugging session. If you want to debug the
+test case `nomp-api-200`,
+
+.. code-block:: bash
+
+    lnrun debug 200
+
+Additionally, you can set the port and the target device for the specific session.
+You can view the available options by :code:`lnrun -h debug`.
+
+By default the test starts on `localhost:5005`, and a debug viewer should be connected
+to this target address. For example, the following figure shows how clion connects to
+the test case using remote debug.
+
+.. image:: figures/clion_debug.png
+   :alt: clion_debug
