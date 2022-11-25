@@ -1,4 +1,4 @@
-How to use nomp
+How to Use Nomp
 ===============
 
 Make sure both `NOMP_INSTALL_DIR` and `NOMP_CLANG_DIR` are set and follow

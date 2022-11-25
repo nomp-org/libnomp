@@ -1,4 +1,4 @@
-Build instructions
+Build Instructions
 ==================
 
 libnomp
