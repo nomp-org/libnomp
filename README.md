@@ -50,6 +50,13 @@ cd libnomp
 ./lninstall 
 ```
 
+`lninstall` prompts you to update your `.bashrc` to set the `PATH` and 
+`NOMP_INSTALL_DIR` variables. This will allow you to use `lnrun` command to 
+open the documentation, run the tests, and debug the provided test.
+
+You might additionally want to specify OpenCL libray path like below if CMake
+can't find OpenCL:
+
 ```bash
 ./lncfg -o /lib/x86_64-linux-gnu/libOpenCL.so.1
 ```
@@ -58,22 +65,26 @@ cd libnomp
 
 We use `Doxygen` for in source documentations and render those with `Sphinx` and
 `Breathe`. These packages should be available if you install the dev dependencies
-using conda.
+using conda. You can enable docs by passing either `-d` or `--enable-docs` option
+to the `lncfg` script.
 
 ```bash
 ./lncfg -d
 ./lninstall
 ```
 
-Use `lnrun` to open the user documentation locally. To open the documentation in chrome, 
-
+Use `lnrun` to open the user documentation locally. You can specify the browser by
+providing it after `-B`. For example, to open the documentation in firefox, 
+    
 ```bash
-lnrun docs
+lnrun docs -B firefox
 ```
+
+If you do not specify the browser, it opens the documentation in chrome by default.
 
 ## Run tests
 
-After building, you can run tests in `tests/` directory.
+After building, you can run all the tests in `tests/` directory.
 
 ```bash
 lnrun test

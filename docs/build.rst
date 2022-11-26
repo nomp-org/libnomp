@@ -4,20 +4,20 @@ Build Instructions
 libnomp
 -------
 
-Clone the repo first
+Clone the repo first:
 
 .. code-block:: bash
 
     git clone https://github.com/nomp-org/libnomp.git
 
-Install dependencies using conda to build and run `libnomp`
+Install dependencies using conda to build and run `libnomp`:
 
 .. code-block:: bash
 
     conda env create -f environment.yml
     conda activate libnomp
 
-You can use mamba to install the dependencies faster
+You can use mamba to install the dependencies faster.
 
 .. code-block:: bash
 
@@ -25,21 +25,21 @@ You can use mamba to install the dependencies faster
     mamba activate libnomp
 
 If you are planning on contributing to `libnomp`, install the dev dependencies
-instead
+instead:
 
 .. code-block:: bash
 
     conda env create -f environment-dev.yml
     conda activate libnomp-dev
 
-Similarly, you can install the dev dependencies with mamba as well
+Similarly, you can install the dev dependencies with mamba as well:
 
 .. code-block:: bash
 
     mamba env create -f environment-dev.yml
     mamba activate libnomp-dev
 
-Use `lncfg` to configure cmake for libnomp and `lninstall` to install libnomp.
+Use `lncfg` to configure cmake for `libnomp` and `lninstall` to install `libnomp`.
 For the available options, you can check `lncfg -h`.
 
 .. code-block:: bash
@@ -48,8 +48,12 @@ For the available options, you can check `lncfg -h`.
     ./lncfg
     ./lninstall
 
+`lninstall` prompts you to update your `.bashrc` to set the `PATH` and
+`NOMP_INSTALL_DIR` variables. This will allow you to use `lnrun` command to
+open the documentation, run the tests, and debug the provided test.
+
 You might additionally want to specify OpenCL libray path like below if CMake
-can't find OpenCL
+can't find OpenCL:
 
 .. code-block:: bash
 
@@ -58,13 +62,13 @@ can't find OpenCL
 Clang frontend
 --------------
 
-Clone the llvm-project repo first
+Clone the llvm-project repo first:
 
 .. code-block:: bash
 
     git clone https://github.com/nomp-org/llvm-project.git
 
-If you are using Linux, build the llvm-project as follows
+If you are using Linux, build the llvm-project as follows:
 
 .. code-block:: bash
 
@@ -81,7 +85,7 @@ If you are using Linux, build the llvm-project as follows
                        -DBUILD_SHARED_LIBS=on
     make -j${nprocs}
 
-If you are using OSX with Apple silicon, build the llvm-project as follows
+If you are using OSX with Apple silicon, build the llvm-project as follows:
 
 .. code-block:: bash
 
@@ -101,7 +105,7 @@ If you are using OSX with Apple silicon, build the llvm-project as follows
     make -j${nprocs}
 
 This will build clang compiler in `bin/clang`. Set `NOMP_CLANG_DIR` to point to
-this clang binary directory
+this clang binary directory:
 
 .. code-block:: bash
 
