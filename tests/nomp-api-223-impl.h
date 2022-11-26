@@ -26,9 +26,9 @@ int nomp_api_223_add_aux(TEST_TYPE *a, TEST_TYPE *b, int N) {
 }
 
 #define nomp_api_223_add TOKEN_PASTE(nomp_api_223_add, TEST_SUFFIX)
-int nomp_api_223_add() {
-  int n = 10;
-  TEST_TYPE a[10], b[10];
+int nomp_api_223_add(int n) {
+  nomp_assert(n <= 20);
+  TEST_TYPE a[20], b[20];
   for (unsigned i = 0; i < n; i++)
     a[i] = n - i, b[i] = i;
 
@@ -86,9 +86,9 @@ int nomp_api_223_sub_aux(TEST_TYPE *a, TEST_TYPE *b, int N) {
 }
 
 #define nomp_api_223_sub TOKEN_PASTE(nomp_api_223_sub, TEST_SUFFIX)
-int nomp_api_223_sub() {
-  int n = 10;
-  TEST_TYPE a[10], b[10];
+int nomp_api_223_sub(int n) {
+  nomp_assert(n <= 20);
+  TEST_TYPE a[20], b[20];
   for (unsigned i = 0; i < n; i++)
     a[i] = n + i, b[i] = i;
 
@@ -146,9 +146,9 @@ int nomp_api_223_mul_aux(TEST_TYPE *a, TEST_TYPE *b, int N) {
 }
 
 #define nomp_api_223_mul TOKEN_PASTE(nomp_api_223_mul, TEST_SUFFIX)
-int nomp_api_223_mul() {
-  int n = 10;
-  TEST_TYPE a[10], b[10];
+int nomp_api_223_mul(int n) {
+  nomp_assert(n <= 20);
+  TEST_TYPE a[20], b[20];
   for (unsigned i = 0; i < n; i++)
     a[i] = n - i, b[i] = i;
 

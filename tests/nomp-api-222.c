@@ -12,12 +12,19 @@ int main(int argc, char *argv[]) {
   int err = nomp_init(backend, platform, device);
   nomp_chk(err);
 
-  nomp_api_222_int();
-  nomp_api_222_long();
-  nomp_api_222_unsigned();
-  nomp_api_222_unsigned_long();
-  nomp_api_222_float();
-  nomp_api_222_double();
+  nomp_api_222_int(10);
+  nomp_api_222_long(10);
+  nomp_api_222_unsigned(10);
+  nomp_api_222_unsigned_long(10);
+  nomp_api_222_float(10);
+  nomp_api_222_double(10);
+
+  nomp_api_222_int(20);
+  nomp_api_222_long(20);
+  nomp_api_222_unsigned(20);
+  nomp_api_222_unsigned_long(20);
+  nomp_api_222_float(20);
+  nomp_api_222_double(20);
 
   err = nomp_finalize();
   nomp_chk(err);
