@@ -7,7 +7,7 @@ on:
 
 env:
   CACHE_NUMBER: 0  # increase to reset cache manually
-
+  POCL_CACHE_NUMBER: 1
 jobs:
   clang-format-check:
     runs-on: ubuntu-latest
@@ -31,21 +31,28 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ env.CONDA }}/envs/libnomp-dev
-          key:  conda-${{ runner.os }}-${{ hashFiles('environment-dev.yml') }}-${{ env.CACHE_NUMBER }}
+          key:  conda-${{ runner.os }}-${{ hashFiles('environment-dev.yml') }}-${{ hashFiles('requirements.txt') }}-${{ env.CACHE_NUMBER }}
         id: cache
       - name: Update environment
         id: update_env
         run: |
           mamba env update -n libnomp-dev -f environment-dev.yml
         if: steps.cache.outputs.cache-hit != 'true'
+      - uses: actions/cache@v3
+        with:
+          path: ~/conda_pkgs_dir/pocl
+          key:  ${{ runner.os }}-build-pocl-${{ env.POCL_CACHE_NUMBER }}
+        id: pocl_cache
+      - name: Install pocl
+        id: install_pocl
+        run: |
+          mamba install -c conda-forge pocl
+        if: (steps.pocl_cache.outputs.cache-hit != 'true') || (steps.cache.outputs.cache-hit != 'true')
       - name: Generate Makefile
         id: generate_makefile
         run: |
-          mkdir -p ${BUILDDIR}
-          cd ${BUILDDIR}
-          cmake -DCMAKE_INSTALL_PREFIX=../install \
-            -DOpenCL_LIBRARY=${CONDA_PREFIX}/lib/libOpenCL.so \
-            -DOpenCL_INCLUDE_DIR=${CONDA_PREFIX}/include ..
+          echo "NOMP_INSTALL_DIR=${PWD}/../install" >> $GITHUB_ENV
+          ./lncfg -i ../install -o "${CONDA_PREFIX}/lib/libOpenCL.so"
       - name: Run clang-format
         id: run_clang-format
         run: |
