@@ -5,11 +5,8 @@
 #undef TEST_IMPL_H
 
 int main(int argc, char *argv[]) {
-  char *backend = argc > 1 ? argv[1] : "opencl";
-  int device = argc > 2 ? atoi(argv[2]) : 0;
-  int platform = argc > 3 ? atoi(argv[3]) : 0;
 
-  int err = nomp_init(backend, platform, device);
+  int err = nomp_init(&argc, &argv);
   nomp_chk(err);
 
   TEST_BUILTIN_TYPES(223_add, 10)
