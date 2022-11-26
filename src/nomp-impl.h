@@ -210,10 +210,11 @@ void py_print(PyObject *obj);
  * resulting string.
  *
  * @param nstr Number of strings to concatenate.
+ * @param max_len Maximum string length of nstr.
  * @param ... Strings to concatenate.
  * @return char*
  */
-char *strcatn(int nstr, ...);
+char *strcatn(int nstr, int max_len, ...);
 
 /**
  * @ingroup nomp_other_utils

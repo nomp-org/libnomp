@@ -1,20 +1,19 @@
 #include "nomp-impl.h"
 
-// FIXME: This should take max string size as the input.
-char *strcatn(int nstr, ...) {
+char *strcatn(int nstr, int max_len, ...) {
   unsigned n = 0, max = NOMP_BUFSIZ;
   char *out = tcalloc(char, max);
 
   va_list vargs;
-  va_start(vargs, nstr);
+  va_start(vargs, max_len);
   for (int i = 0; i < nstr; i++) {
     const char *s = va_arg(vargs, const char *);
-    if (max <= n + strlen(s)) {
-      max = 3 * (n + strlen(s)) / 2 + 1;
+    if (max <= n + strnlen(s, max_len)) {
+      max = 3 * (n + strnlen(s, max_len)) / 2 + 1;
       out = trealloc(out, char, max);
     }
-    strncpy(out + n, s, strlen(s));
-    n += strlen(s);
+    strncpy(out + n, s, strnlen(s, max_len));
+    n += strnlen(s, max_len);
   }
   va_end(vargs);
   out[n] = '\0';

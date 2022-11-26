@@ -51,7 +51,7 @@ static int check_env(struct backend *backend) {
     // so in a portable manner.
     const char *home = getenv("HOME");
     if (home)
-      backend->install_dir = strcatn(2, home, "/.nomp");
+      backend->install_dir = strcatn(2, 64, home, "/.nomp");
     else
       return set_log(
           NOMP_USER_INPUT_NOT_PROVIDED, NOMP_ERROR,
@@ -127,7 +127,7 @@ int nomp_init(const char *backend, int platform, int device) {
     // Append current working dir
     py_append_to_sys_path(".");
     // nomp.install_dir should be set and we use it here.
-    char *abs_dir = strcatn(3, nomp.install_dir, "/", py_dir);
+    char *abs_dir = strcatn(3, 64, nomp.install_dir, "/", py_dir);
     py_append_to_sys_path(abs_dir);
     err = tfree(abs_dir);
   } else {

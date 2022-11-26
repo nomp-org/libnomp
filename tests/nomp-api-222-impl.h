@@ -26,9 +26,9 @@ int nomp_api_222_aux(TEST_TYPE *a, TEST_TYPE *b, int N) {
 }
 
 #define nomp_api_222 TOKEN_PASTE(nomp_api_222, TEST_SUFFIX)
-int nomp_api_222() {
-  int n = 10;
-  TEST_TYPE a[10], b[10];
+int nomp_api_222(int n) {
+  nomp_assert(n <= 20);
+  TEST_TYPE a[20], b[20];
   for (unsigned i = 0; i < n; i++)
     a[i] = n - i, b[i] = i;
 
