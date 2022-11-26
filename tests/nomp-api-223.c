@@ -12,26 +12,47 @@ int main(int argc, char *argv[]) {
   int err = nomp_init(backend, platform, device);
   nomp_chk(err);
 
-  nomp_api_223_add_int();
-  nomp_api_223_add_long();
-  nomp_api_223_add_unsigned();
-  nomp_api_223_add_unsigned_long();
-  nomp_api_223_add_float();
-  nomp_api_223_add_double();
+  nomp_api_223_add_int(10);
+  nomp_api_223_add_long(10);
+  nomp_api_223_add_unsigned(10);
+  nomp_api_223_add_unsigned_long(10);
+  nomp_api_223_add_float(10);
+  nomp_api_223_add_double(10);
 
-  nomp_api_223_sub_int();
-  nomp_api_223_sub_long();
-  nomp_api_223_sub_unsigned();
-  nomp_api_223_sub_unsigned_long();
-  nomp_api_223_sub_float();
-  nomp_api_223_sub_double();
+  nomp_api_223_add_int(20);
+  nomp_api_223_add_long(20);
+  nomp_api_223_add_unsigned(20);
+  nomp_api_223_add_unsigned_long(20);
+  nomp_api_223_add_float(20);
+  nomp_api_223_add_double(20);
 
-  nomp_api_223_mul_int();
-  nomp_api_223_mul_long();
-  nomp_api_223_mul_unsigned();
-  nomp_api_223_mul_unsigned_long();
-  nomp_api_223_mul_float();
-  nomp_api_223_mul_double();
+  nomp_api_223_sub_int(10);
+  nomp_api_223_sub_long(10);
+  nomp_api_223_sub_unsigned(10);
+  nomp_api_223_sub_unsigned_long(10);
+  nomp_api_223_sub_float(10);
+  nomp_api_223_sub_double(10);
+
+  nomp_api_223_sub_int(20);
+  nomp_api_223_sub_long(20);
+  nomp_api_223_sub_unsigned(20);
+  nomp_api_223_sub_unsigned_long(20);
+  nomp_api_223_sub_float(20);
+  nomp_api_223_sub_double(20);
+
+  nomp_api_223_mul_int(10);
+  nomp_api_223_mul_long(10);
+  nomp_api_223_mul_unsigned(10);
+  nomp_api_223_mul_unsigned_long(10);
+  nomp_api_223_mul_float(10);
+  nomp_api_223_mul_double(10);
+
+  nomp_api_223_mul_int(20);
+  nomp_api_223_mul_long(20);
+  nomp_api_223_mul_unsigned(20);
+  nomp_api_223_mul_unsigned_long(20);
+  nomp_api_223_mul_float(20);
+  nomp_api_223_mul_double(20);
 
   err = nomp_finalize();
   nomp_chk(err);
