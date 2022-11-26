@@ -4,6 +4,7 @@
 : "${NOMP_BACKEND:="opencl"}"
 : "${NOMP_DEVICE:=0}"
 : "${NOMP_PLATFORM:=0}"
+: "${NOMP_VERBOSE:=0}"
 : "${NOMP_PORT:=5005}"
 : "${NOMP_BROWSER:="google-chrome"}"
 : "${NOMP_TEST_GROUPS:="*"}"
@@ -42,7 +43,9 @@ function print_help_test() {
     "\t lnrun t|test \t[-g|--groups <group-pattern>] " \
     "[-t|--test-dir <test-directory>\n" \
     "\t\t\t[-b|--backend <backend-name>] [-d|--device <device-index>] " \
-    "[-p|--platform <platform-index>]\n\n" \
+    "[-p|--platform <platform-index>]" \
+    "[-v|--verbose <verbose-level>] [-i|--install-dir <libnomp-directory>] "\
+    "[-as|--annts-script <annotation-script>] [-af|--annts-func <annotation-function>]\n\n" \
     "OPTIONS\n" \
     "\t${cyan}-g/--group${reset}\t Pattern to filter the tests to be run " \
     "(Default: ${NOMP_TEST_GROUPS}).\n" \
@@ -53,7 +56,11 @@ function print_help_test() {
     "\t${cyan}-p/--platform${reset}\t Platform to run the tests, case " \
     "insensitive (Default: ${NOMP_PLATFORM}).\n" \
     "\t${cyan}-d/--device${reset}\t Device to run the tests, case " \
-    "insensitive (Default: ${NOMP_DEVICE}).\n\n" \
+    "insensitive (Default: ${NOMP_DEVICE}).\n" \
+    "\t${cyan}-v/--verbose${reset}\t Specify verbose level (Default: ${NOMP_VERBOSE}).\n" \
+    "\t${cyan}-i/--install-dir${reset}\t Specify the directory which the libnomp resides (Default: ${NOMP_INSTALL_DIR}).\n" \
+    "\t${cyan}-as/--annts-script${reset}\t Specify the directory which the annotation script resides.\n" \
+    "\t${cyan}-af/--annts-func${reset}\t Specify the annotation funtion name.\n\n" \
     "EXAMPLES\n" \
     "\t Running all the tests:\n" \
     "\t\t $ ${cyan}lnrun test${reset}\n\n" \
@@ -75,7 +82,11 @@ function print_help_debug() {
     "\t${cyan}-p/--platform${reset}\t Platform to run the tests, case " \
     "insensitive (Default: ${NOMP_PLATFORM}).\n" \
     "\t${cyan}-d/--device${reset}\t Device to run the tests, case " \
-    "insensitive (Default: ${NOMP_DEVICE}).\n\n" \
+    "insensitive (Default: ${NOMP_DEVICE}).\n" \
+    "\t${cyan}-v/--verbose${reset}\t Specify verbose level (Default: ${NOMP_VERBOSE}).\n" \
+    "\t${cyan}-i/--install-dir${reset}\t Specify the directory which the libnomp resides (Default: ${NOMP_INSTALL_DIR}).\n" \
+    "\t${cyan}-as/--annts-script${reset}\t Specify the directory which the annotation script resides.\n" \
+    "\t${cyan}-af/--annts-func${reset}\t Specify the annotation funtion name.\n\n" \
     "EXAMPLES\n" \
     "\t Debugging the test 240 on port 5005\n" \
     "\t\t $ ${cyan}lnrun debug 240 ${reset}\n\n" \
@@ -99,8 +110,6 @@ function print_help_docs() {
 }
 
 function run_tests() {
-  export NOMP_ANNOTATE_SCRIPT=sem
-  export NOMP_ANNOTATE_FUNCTION=annotate
 
   [[ ${NOMP_TEST_GROUPS} == *"*"* ]] &&
     TESTS="${NOMP_TEST_DIR}/nomp-api-${NOMP_TEST_GROUPS}[^.py][^.txt]" ||
@@ -118,7 +127,7 @@ function run_tests() {
       if [ -f "${t}.txt" ]; then
         OUTPUT=$($t $(< ${t}.txt))
       else
-        OUTPUT=$($t -b ${NOMP_BACKEND} -d ${NOMP_DEVICE} -p ${NOMP_PLATFORM})
+        OUTPUT=$($t -b ${NOMP_BACKEND} -d ${NOMP_DEVICE} -p ${NOMP_PLATFORM} -i ${NOMP_INSTALL_DIR} -v ${NOMP_VERBOSE})
       fi  
       
       if [ $? -eq 0 ]; then
