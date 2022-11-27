@@ -30,7 +30,7 @@ int nomp_api_232_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {
 
 #define nomp_api_232 TOKEN_PASTE(nomp_api_232, TEST_SUFFIX)
 int nomp_api_232(int argc, char *argv[]) {
-  int err = nomp_init(&argc, &argv);
+  int err = nomp_init(argc, (const char **)argv);
   nomp_chk(err);
 
   int n = 10;
