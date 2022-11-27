@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>How to use nomp &mdash; libnomp  documentation</title>
+  <title>How to Use Nomp &mdash; libnomp  documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/main_stylesheet.css" type="text/css" />
@@ -21,7 +21,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="User API" href="user-api.html" />
-    <link rel="prev" title="Build instructions" href="build.html" /> 
+    <link rel="prev" title="Build Instructions" href="build.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -42,11 +42,11 @@
               <p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="build.html">Build instructions</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">How to use nomp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build.html">Build Instructions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">How to Use Nomp</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user-api.html">User API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="internal-api.html">Internal API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developer-docs.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer-docs.html">Developer Documentation</a></li>
 </ul>
 
         </div>
@@ -63,7 +63,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>How to use nomp</li>
+      <li>How to Use Nomp</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/nomp-usage.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -74,39 +74,42 @@
            <div itemprop="articleBody">
              
   <section id="how-to-use-nomp">
-<h1>How to use nomp<a class="headerlink" href="#how-to-use-nomp" title="Permalink to this heading"></a></h1>
+<h1>How to Use Nomp<a class="headerlink" href="#how-to-use-nomp" title="Permalink to this heading"></a></h1>
 <p>Make sure both <cite>NOMP_INSTALL_DIR</cite> and <cite>NOMP_CLANG_DIR</cite> are set and follow
-the <a class="reference internal" href="build.html"><span class="doc">Build instructions</span></a> correctly.</p>
+the <a class="reference internal" href="build.html"><span class="doc">Build Instructions</span></a> correctly.</p>
 <p>Create new folder(<cite>nomp-test</cite>) and add following files in the folder.</p>
 <p>The <cite>foo.c</cite> file contains the example with nomp pragmas.</p>
-<p><cite>foo.c</cite>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#include &lt;stdio.h&gt;</span>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">foo.c</span><a class="headerlink" href="#id1" title="Permalink to this code"></a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
 
-<span class="n">void</span> <span class="n">foo</span><span class="p">(</span><span class="n">double</span> <span class="o">*</span><span class="n">a</span><span class="p">)</span> <span class="p">{</span>
-<span class="c1">#pragma nomp update(to : a[0, 10])</span>
-<span class="c1">#pragma nomp for transform(&quot;transforms&quot;, &quot;foo&quot;)</span>
-    <span class="k">for</span><span class="p">(</span><span class="nb">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="mi">10</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
-        <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
-<span class="c1">#pragma nomp update(from : a[0, 10])</span>
-<span class="c1">#pragma nomp update(free : a[0,10])</span>
-<span class="p">}</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">foo</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="o">*</span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="cp">#pragma nomp update(to : a[0, 10])</span>
+<span class="cp">#pragma nomp for transform(&quot;transforms&quot;, &quot;foo&quot;)</span>
+<span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">&lt;</span><span class="mi">10</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+<span class="cp">#pragma nomp update(from : a[0, 10])</span>
+<span class="cp">#pragma nomp update(free : a[0,10])</span>
+<span class="p">}</span><span class="w"></span>
 
-<span class="nb">int</span> <span class="n">main</span><span class="p">(</span><span class="nb">int</span> <span class="n">argc</span><span class="p">,</span> <span class="n">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[]){</span>
-<span class="c1">#pragma nomp init(&quot;opencl&quot;, 0, 0)</span>
-    <span class="n">double</span> <span class="n">a</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
-    <span class="k">for</span> <span class="p">(</span><span class="nb">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="mi">10</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
-        <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;a[</span><span class="si">%d</span><span class="s2">] = </span><span class="si">%f</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
-    <span class="n">foo</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
-    <span class="k">for</span> <span class="p">(</span><span class="nb">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="mi">10</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
-        <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;a[</span><span class="si">%d</span><span class="s2">] = </span><span class="si">%f</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
-<span class="c1">#pragma nomp finalize</span>
-    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[]){</span><span class="w"></span>
+<span class="cp">#pragma nomp init(&quot;opencl&quot;, 0, 0)</span>
+<span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">};</span><span class="w"></span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">&lt;</span><span class="mi">10</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;a[%d] = %f </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span><span class="w"></span>
+<span class="w">    </span><span class="n">foo</span><span class="p">(</span><span class="n">a</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">&lt;</span><span class="mi">10</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;a[%d] = %f </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span><span class="w"></span>
+<span class="cp">#pragma nomp finalize</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
+</div>
 <p>The <cite>transforms.py</cite> file contains the <cite>foo</cite> function that creates the loopy kernel.</p>
-<p><cite>transforms.py</cite>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">loopy</span> <span class="k">as</span> <span class="nn">lp</span>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">transforms.py</span><a class="headerlink" href="#id2" title="Permalink to this code"></a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">loopy</span> <span class="k">as</span> <span class="nn">lp</span>
 
 <span class="n">LOOPY_LANG_VERSION</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2018</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
@@ -116,27 +119,30 @@ the <a class="reference internal" href="build.html"><span class="doc">Build inst
     <span class="k">return</span> <span class="n">knl</span>
 </pre></div>
 </div>
+</div>
 <p><cite>nompcc</cite> contains the script that link libnomp installation to the clang compiler.</p>
-<p><cite>nompcc</cite>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>#!/bin/bash
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">nompcc</span><a class="headerlink" href="#id3" title="Permalink to this code"></a></div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
 
-if [ -z &quot;${NOMP_INSTALL_DIR}&quot; ]; then
-    echo &quot;Error: NOMP_INSTALL_DIR is not defined !&quot;
-    exit 1
-fi
-if [ -z &quot;${NOMP_CLANG_DIR}&quot; ]; then
-    echo &quot;Error: NOMP_CLANG_DIR is not defined !&quot;
-    exit 1
-fi
+<span class="k">if</span> <span class="o">[</span> -z <span class="s2">&quot;</span><span class="si">${</span><span class="nv">NOMP_INSTALL_DIR</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;Error: NOMP_INSTALL_DIR is not defined !&quot;</span>
+    <span class="nb">exit</span> <span class="m">1</span>
+<span class="k">fi</span>
+<span class="k">if</span> <span class="o">[</span> -z <span class="s2">&quot;</span><span class="si">${</span><span class="nv">NOMP_CLANG_DIR</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;Error: NOMP_CLANG_DIR is not defined !&quot;</span>
+    <span class="nb">exit</span> <span class="m">1</span>
+<span class="k">fi</span>
 
-NOMP_LIB_DIR=${NOMP_INSTALL_DIR}/lib
-NOMP_INC_DIR=${NOMP_INSTALL_DIR}/include
+<span class="nv">NOMP_LIB_DIR</span><span class="o">=</span><span class="si">${</span><span class="nv">NOMP_INSTALL_DIR</span><span class="si">}</span>/lib
+<span class="nv">NOMP_INC_DIR</span><span class="o">=</span><span class="si">${</span><span class="nv">NOMP_INSTALL_DIR</span><span class="si">}</span>/include
 
-${NOMP_CLANG_DIR}/clang -fnomp -include nomp.h -I${NOMP_INC_DIR} &quot;$@&quot; -Wl,-rpath,${NOMP_LIB_DIR} -L${NOMP_LIB_DIR} -lnomp
+<span class="si">${</span><span class="nv">NOMP_CLANG_DIR</span><span class="si">}</span>/clang -fnomp -include nomp.h -I<span class="si">${</span><span class="nv">NOMP_INC_DIR</span><span class="si">}</span> <span class="s2">&quot;</span><span class="nv">$@</span><span class="s2">&quot;</span> -Wl,-rpath,<span class="si">${</span><span class="nv">NOMP_LIB_DIR</span><span class="si">}</span> -L<span class="si">${</span><span class="nv">NOMP_LIB_DIR</span><span class="si">}</span> -lnomp
 </pre></div>
 </div>
-<p>To compile any file containing <cite>nomp</cite> pragmas, use <cite>nompcc</cite> as below:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">nompcc</span> <span class="n">foo</span><span class="o">.</span><span class="n">c</span>
+</div>
+<p>To compile any file containing <cite>nomp</cite> pragmas, use <cite>nompcc</cite> as follows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./nompcc foo.c
 </pre></div>
 </div>
 </section>
@@ -145,7 +151,7 @@ ${NOMP_CLANG_DIR}/clang -fnomp -include nomp.h -I${NOMP_INC_DIR} &quot;$@&quot; 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="build.html" class="btn btn-neutral float-left" title="Build instructions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="build.html" class="btn btn-neutral float-left" title="Build Instructions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="user-api.html" class="btn btn-neutral float-right" title="User API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

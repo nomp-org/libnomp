@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Build instructions &mdash; libnomp  documentation</title>
+  <title>Build Instructions &mdash; libnomp  documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/main_stylesheet.css" type="text/css" />
@@ -20,7 +20,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="How to use nomp" href="nomp-usage.html" />
+    <link rel="next" title="How to Use Nomp" href="nomp-usage.html" />
     <link rel="prev" title="Introduction" href="index.html" /> 
 </head>
 
@@ -42,15 +42,15 @@
               <p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Build instructions</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Build Instructions</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#libnomp">libnomp</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#clang-frontend">Clang frontend</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="nomp-usage.html">How to use nomp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nomp-usage.html">How to Use Nomp</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user-api.html">User API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="internal-api.html">Internal API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developer-docs.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer-docs.html">Developer Documentation</a></li>
 </ul>
 
         </div>
@@ -67,7 +67,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Build instructions</li>
+      <li>Build Instructions</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/build.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -78,80 +78,91 @@
            <div itemprop="articleBody">
              
   <section id="build-instructions">
-<h1>Build instructions<a class="headerlink" href="#build-instructions" title="Permalink to this heading"></a></h1>
+<h1>Build Instructions<a class="headerlink" href="#build-instructions" title="Permalink to this heading"></a></h1>
 <section id="libnomp">
 <h2>libnomp<a class="headerlink" href="#libnomp" title="Permalink to this heading"></a></h2>
-<p>Clone the libnomp repo first:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">nomp</span><span class="o">-</span><span class="n">org</span><span class="o">/</span><span class="n">libnomp</span><span class="o">.</span><span class="n">git</span>
+<p>Clone the repo first:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/nomp-org/libnomp.git
 </pre></div>
 </div>
 <p>Install dependencies using conda to build and run <cite>libnomp</cite>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">env</span> <span class="n">create</span> <span class="o">-</span><span class="n">f</span> <span class="n">environment</span><span class="o">.</span><span class="n">yml</span>
-<span class="n">conda</span> <span class="n">activate</span> <span class="n">libnomp</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda env create -f environment.yml
+conda activate libnomp
+</pre></div>
+</div>
+<p>You can use mamba to install the dependencies faster.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mamba env create -f environment.yml
+mamba activate libnomp
 </pre></div>
 </div>
 <p>If you are planning on contributing to <cite>libnomp</cite>, install the dev dependencies
 instead:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">env</span> <span class="n">create</span> <span class="o">-</span><span class="n">f</span> <span class="n">environment</span><span class="o">-</span><span class="n">dev</span><span class="o">.</span><span class="n">yml</span>
-<span class="n">conda</span> <span class="n">activate</span> <span class="n">libnomp</span><span class="o">-</span><span class="n">dev</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda env create -f environment-dev.yml
+conda activate libnomp-dev
 </pre></div>
 </div>
-<p>Use <cite>cmake</cite> to build the repo after installing the dependencies:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>cd libnomp
-mkdir build; cd build
-export NOMP_INSTALL_DIR=${HOME}/.nomp
-cmake .. -DCMAKE_INSTALL_PREFIX=${NOMP_INSTALL_DIR}
-make install
-cd ..
+<p>Similarly, you can install the dev dependencies with mamba as well:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mamba env create -f environment-dev.yml
+mamba activate libnomp-dev
 </pre></div>
 </div>
+<p>Use <cite>lncfg</cite> to configure cmake for <cite>libnomp</cite> and <cite>lninstall</cite> to install <cite>libnomp</cite>.
+For the available options, you can check <cite>lncfg -h</cite>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> libnomp
+./lncfg
+./lninstall
+</pre></div>
+</div>
+<p><cite>lninstall</cite> prompts you to update your <cite>.bashrc</cite> to set the <cite>PATH</cite> and
+<cite>NOMP_INSTALL_DIR</cite> variables. This will allow you to use <cite>lnrun</cite> command to
+open the documentation, run the tests, and debug the provided test.</p>
 <p>You might additionally want to specify OpenCL libray path like below if CMake
 can’t find OpenCL:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>cmake .. -DCMAKE_INSTALL_PREFIX=${HOME}/.nomp -DOpenCL_LIBRARY=/lib/x86_64-linux-gnu/libOpenCL.so.1
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./lncfg -o /lib/x86_64-linux-gnu/libOpenCL.so.1
 </pre></div>
 </div>
 </section>
 <section id="clang-frontend">
 <h2>Clang frontend<a class="headerlink" href="#clang-frontend" title="Permalink to this heading"></a></h2>
 <p>Clone the llvm-project repo first:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">nomp</span><span class="o">-</span><span class="n">org</span><span class="o">/</span><span class="n">llvm</span><span class="o">-</span><span class="n">project</span><span class="o">.</span><span class="n">git</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/nomp-org/llvm-project.git
 </pre></div>
 </div>
 <p>If you are using Linux, build the llvm-project as follows:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>nprocs=$(grep -c ^processor /proc/cpuinfo)
-cd llvm-project
-mkdir build; cd build
-cmake -G &quot;Unix Makefiles&quot; ../llvm                    \
-                   -DLLVM_ENABLE_PROJECTS=&quot;clang&quot;    \
-                   -DLLVM_TARGETS_TO_BUILD=&quot;X86&quot;     \
-                   -DLLVM_OPTIMIZED_TABLEGEN=ON      \
-                   -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-                   -DCMAKE_C_COMPILER=`which gcc`    \
-                   -DCMAKE_CXX_COMPILER=`which g++`  \
-                   -DBUILD_SHARED_LIBS=on
-make -j${nprocs}
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">nprocs</span><span class="o">=</span><span class="k">$(</span>grep -c ^processor /proc/cpuinfo<span class="k">)</span>
+<span class="nb">cd</span> llvm-project
+mkdir build<span class="p">;</span> <span class="nb">cd</span> build
+cmake -G <span class="s2">&quot;Unix Makefiles&quot;</span> ../llvm                    <span class="se">\</span>
+                   -DLLVM_ENABLE_PROJECTS<span class="o">=</span><span class="s2">&quot;clang&quot;</span>    <span class="se">\</span>
+                   -DLLVM_TARGETS_TO_BUILD<span class="o">=</span><span class="s2">&quot;X86&quot;</span>     <span class="se">\</span>
+                   -DLLVM_OPTIMIZED_TABLEGEN<span class="o">=</span>ON      <span class="se">\</span>
+                   -DCMAKE_BUILD_TYPE<span class="o">=</span>RelWithDebInfo <span class="se">\</span>
+                   -DCMAKE_C_COMPILER<span class="o">=</span><span class="sb">`</span>which gcc<span class="sb">`</span>    <span class="se">\</span>
+                   -DCMAKE_CXX_COMPILER<span class="o">=</span><span class="sb">`</span>which g++<span class="sb">`</span>  <span class="se">\</span>
+                   -DBUILD_SHARED_LIBS<span class="o">=</span>on
+make -j<span class="si">${</span><span class="nv">nprocs</span><span class="si">}</span>
 </pre></div>
 </div>
 <p>If you are using OSX with Apple silicon, build the llvm-project as follows:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>nprocs=$(sysctl -n hw.ncpu)
-cd llvm-project
-mkdir build; cd build
-cmake -G &quot;Unix Makefiles&quot; ../llvm                                \
-                    -DLLVM_ENABLE_PROJECTS=&quot;clang&quot;               \
-                    -DLLVM_TARGETS_TO_BUILD=&quot;AArch64&quot;            \
-                    -DLLVM_OPTIMIZED_TABLEGEN=ON                 \
-                    -DCMAKE_BUILD_TYPE=RelWithDebInfo            \
-                    -DCMAKE_C_COMPILER=`which clang`             \
-                    -DCMAKE_CXX_COMPILER=`which clang++`         \
-                    -DCMAKE_OSX_ARCHITECTURES=&#39;arm64&#39;            \
-                    -DDEFAULT_SYSROOT=&quot;$(xcrun --show-sdk-path)&quot; \
-                    -DBUILD_SHARED_LIBS=on
-make -j${nprocs}
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">nprocs</span><span class="o">=</span><span class="k">$(</span>sysctl -n hw.ncpu<span class="k">)</span>
+<span class="nb">cd</span> llvm-project
+mkdir build<span class="p">;</span> <span class="nb">cd</span> build
+cmake -G <span class="s2">&quot;Unix Makefiles&quot;</span> ../llvm                                <span class="se">\</span>
+                    -DLLVM_ENABLE_PROJECTS<span class="o">=</span><span class="s2">&quot;clang&quot;</span>               <span class="se">\</span>
+                    -DLLVM_TARGETS_TO_BUILD<span class="o">=</span><span class="s2">&quot;AArch64&quot;</span>            <span class="se">\</span>
+                    -DLLVM_OPTIMIZED_TABLEGEN<span class="o">=</span>ON                 <span class="se">\</span>
+                    -DCMAKE_BUILD_TYPE<span class="o">=</span>RelWithDebInfo            <span class="se">\</span>
+                    -DCMAKE_C_COMPILER<span class="o">=</span><span class="sb">`</span>which clang<span class="sb">`</span>             <span class="se">\</span>
+                    -DCMAKE_CXX_COMPILER<span class="o">=</span><span class="sb">`</span>which clang++<span class="sb">`</span>         <span class="se">\</span>
+                    -DCMAKE_OSX_ARCHITECTURES<span class="o">=</span><span class="s1">&#39;arm64&#39;</span>            <span class="se">\</span>
+                    -DDEFAULT_SYSROOT<span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span>xcrun --show-sdk-path<span class="k">)</span><span class="s2">&quot;</span> <span class="se">\</span>
+                    -DBUILD_SHARED_LIBS<span class="o">=</span>on
+make -j<span class="si">${</span><span class="nv">nprocs</span><span class="si">}</span>
 </pre></div>
 </div>
 <p>This will build clang compiler in <cite>bin/clang</cite>. Set <cite>NOMP_CLANG_DIR</cite> to point to
 this clang binary directory:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>export NOMP_CLANG_DIR=`pwd`/bin
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">NOMP_CLANG_DIR</span><span class="o">=</span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>/bin
 </pre></div>
 </div>
 </section>
@@ -162,7 +173,7 @@ this clang binary directory:</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="index.html" class="btn btn-neutral float-left" title="Introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="nomp-usage.html" class="btn btn-neutral float-right" title="How to use nomp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="nomp-usage.html" class="btn btn-neutral float-right" title="How to Use Nomp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
