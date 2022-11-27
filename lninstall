@@ -37,14 +37,15 @@ function update_bashrc() {
 function print_help() {
   echo -e "Usage: ${0} [-h|--help] [-y|--yes] [-n|--no]\n" \
     "${cyan}-h/--help:${reset} Print help for libnomp install.\n" \
-    "${cyan}-y/--yes:${reset} Yes to all prompts.\n"
-    "${cyan}-n/--no:${reset} No to all prompts.\n"
+    "${cyan}-y/--yes:${reset} Yes to all prompts.\n" \
+    "${cyan}-n/--no:${reset} No to all prompts."
+  exit 0
 }
 
 # check for default prompt
 if [[ $# -gt 0 ]]; then
   case $1 in
-    -h | --help) print_help  && exit 0 ;;
+    -h | --help) print_help ;;
     -y | --yes) NOMP_DEFAULT_PROMPT="y" ;;
     -n | --no) NOMP_DEFAULT_PROMPT="n" ;;
     *) echo "${red}Invalid argument: ${1}${reset}."
