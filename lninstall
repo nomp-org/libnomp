@@ -61,27 +61,27 @@ cmake --build "${NOMP_BUILD_DIR}" --target install &&
 
 if [[ ${NOMP_INSTALL_SUCCESS} = true ]]; then
   echo "${green}Successfully installed libnomp${reset}"
-  echo "See ${cyan}lnrun -h${reset} or ${cyan}lnrun --help${reset} for available commands"
+  echo "See ${cyan}lnrun -h${reset} or ${cyan}lnrun --help${reset} for " \
+    "available commands."
 
   [[ ${NOMP_DEFAULT_PROMPT} = "n" ]] && exit 0
-  NOMP_ENVIRONMENT=""
 
-  # add nomp install dir to env
-  { grep -xFq "export NOMP_INSTALL_DIR=${NOMP_INSTALL_DIR}" "${NOMP_SHELL_CONFIG_FILE}" ||
-    NOMP_ENVIRONMENT="# Setup nomp environment variables\nexport NOMP_INSTALL_DIR=${NOMP_INSTALL_DIR}\n"; }
+  # Add nomp install dir to env
+  NOMP_ENVIRONMENT=$(cat <<-END
+# Setup nomp environment variables
+export NOMP_INSTALL_DIR=${NOMP_INSTALL_DIR}
+END
+)
 
-  # add lnrun script to path
-  { grep -xFq "export PATH=${NOMP_BIN_PATH}:\${PATH}" "${NOMP_SHELL_CONFIG_FILE}" ||
-    NOMP_ENVIRONMENT+="export PATH=${NOMP_BIN_PATH}:\${PATH}\n"; }
+  # Add lnrun script to path
+  NOMP_ENVIRONMENT+="\nexport PATH=${NOMP_BIN_PATH}:\${PATH}\n"
 
   # set the libnomp env variables if not
-  if [[ -n ${NOMP_ENVIRONMENT} ]]; then
-    [[ ${NOMP_DEFAULT_PROMPT} = "y" ]] && update_bashrc && exit 0
-    read -p "Do you wish to add libnomp variables to .bashrc? [Y|n]: " -n 1 -r
-    echo
-    [[ $REPLY =~ ^[Yy]$ ]] && update_bashrc
-    exit 0
-  fi
+  [[ ${NOMP_DEFAULT_PROMPT} = "y" ]] && update_bashrc && exit 0
+  read -p "Do you wish to add libnomp variables to .bashrc? [Y|n]: " -n 1
+  echo
+  [[ $REPLY =~ ^[Yy]$ ]] && update_bashrc
+  exit 0
 else
   echo "${red}Failed to install libnomp${reset}"
   exit 1

@@ -130,6 +130,11 @@ function open_docs() {
   "${NOMP_BROWSER}" "${NOMP_INSTALL_DIR}/docs/index.html"
 }
 
+if [ $# -eq 0 ]; then
+  echo "No arguments were provided to ${cyan}lnrun${reset} script. Exitting ..."
+  exit 0
+fi
+
 # parse the command
 while [ $# -gt 0 ]; do
   case $1 in
