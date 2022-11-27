@@ -204,8 +204,9 @@ extern "C" {
  * return an error (but not segfault). Currently only supports Cuda and OpenCL
  * backends.
  *
- * @param[in] argc Target backend for code generation.
- * @param[in] argv Target platform id (only used for OpenCL backend).
+ * @param[in] argc The number of command line arguments.
+ * @param[in] argv the command lines arguments as passed to a C main function
+ * by the operating system.
  * @return int
  *
  * <b>Example usage:</b>
@@ -213,7 +214,7 @@ extern "C" {
  * int err = nomp_init("OpenCL", 0, 0);
  * @endcode
  */
-int nomp_init(int *argc, char ***argv);
+int nomp_init(int argc, const char **argv);
 
 /**
  * @ingroup nomp_user_api

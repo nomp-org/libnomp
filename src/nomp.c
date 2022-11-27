@@ -82,7 +82,7 @@ static struct backend nomp;
 static int initialized = 0;
 static const char *py_dir = "python";
 
-int check_args(int argc, char **argv) {
+int check_args(int argc, const char **argv) {
   char *backend = "opencl";
   int device = 0, platform = 0, verbose = 0;
 
@@ -91,51 +91,48 @@ int check_args(int argc, char **argv) {
   if (argc < 1 || argv == NULL) {
     strncpy(nomp.backend, backend, MAX_BACKEND_NAME_SIZE);
     nomp.platform_id = platform, nomp.device_id = device;
-
     return 0;
   }
+
   int i = 1;
   while (i < argc) {
-    if (i == argc)
-      return set_log(NOMP_USER_ARGS_IS_INVALID, NOMP_ERROR,
-                     strcatn(2, "Invalid argument : ", argv[i]));
-    if (!strncmp("-b", argv[i], sizeof(char) * 2) ||
-        !strncmp("--backend", argv[i], sizeof(char) * 9)) {
-      backend = argv[i + 1];
+    if (!strncmp("-b", argv[i], NOMP_BUFSIZ) ||
+        !strncmp("--backend", argv[i], NOMP_BUFSIZ)) {
+      backend = (char *)argv[i + 1];
       i += 2;
-    } else if (!strncmp("-p", argv[i], sizeof(char) * 2) ||
-               !strncmp("--platform", argv[i], sizeof(char) * 10)) {
+    } else if (!strncmp("-p", argv[i], NOMP_BUFSIZ) ||
+               !strncmp("--platform", argv[i], NOMP_BUFSIZ)) {
       platform = strntoui(argv[i + 1], NOMP_BUFSIZ);
       i += 2;
-    } else if (!strncmp("-d", argv[i], sizeof(char) * 2) ||
-               !strncmp("--device", argv[i], sizeof(char) * 8)) {
+    } else if (!strncmp("-d", argv[i], NOMP_BUFSIZ) ||
+               !strncmp("--device", argv[i], NOMP_BUFSIZ)) {
       device = strntoui(argv[i + 1], NOMP_BUFSIZ);
       i += 2;
-    } else if (!strncmp("-v", argv[i], sizeof(char) * 2) ||
-               !strncmp("--verbose", argv[i], sizeof(char) * 9)) {
+    } else if (!strncmp("-v", argv[i], NOMP_BUFSIZ) ||
+               !strncmp("--verbose", argv[i], NOMP_BUFSIZ)) {
       verbose = strntoui(argv[i + 1], NOMP_BUFSIZ);
       i += 2;
-    } else if (!strncmp("-i", argv[i], sizeof(char) * 2) ||
-               !strncmp("--install-dir", argv[i], sizeof(char) * 13)) {
-      char *install_dir = argv[i + 1];
+    } else if (!strncmp("-i", argv[i], NOMP_BUFSIZ) ||
+               !strncmp("--install-dir", argv[i], NOMP_BUFSIZ)) {
+      char *install_dir = (char *)argv[i + 1];
       if (install_dir != NULL) {
         size_t size = pathlen(install_dir) + 1;
         nomp.install_dir = tcalloc(char, size);
         strncpy(nomp.install_dir, install_dir, size);
       }
       i += 2;
-    } else if (!strncmp("-as", argv[i], sizeof(char) * 3) ||
-               !strncmp("--annts-script", argv[i], sizeof(char) * 14)) {
-      char *annts_script = argv[i + 1];
+    } else if (!strncmp("-as", argv[i], NOMP_BUFSIZ) ||
+               !strncmp("--annts-script", argv[i], NOMP_BUFSIZ)) {
+      char *annts_script = (char *)argv[i + 1];
       if (annts_script != NULL) {
         size_t size = strnlen(annts_script, NOMP_BUFSIZ) + 1;
         nomp.annts_script = tcalloc(char, size);
         strncpy(nomp.annts_script, annts_script, size);
       }
       i += 2;
-    } else if (!strncmp("-af", argv[i], sizeof(char) * 3) ||
-               !strncmp("--annts-func", argv[i], sizeof(char) * 12)) {
-      char *annts_func = argv[i + 1];
+    } else if (!strncmp("-af", argv[i], NOMP_BUFSIZ) ||
+               !strncmp("--annts-func", argv[i], NOMP_BUFSIZ)) {
+      char *annts_func = (char *)argv[i + 1];
       if (annts_func != NULL) {
         size_t size = strnlen(annts_func, NOMP_BUFSIZ) + 1;
         nomp.annts_func = tcalloc(char, size);
@@ -152,7 +149,7 @@ int check_args(int argc, char **argv) {
   return 0;
 }
 
-int nomp_init(int *argc, char ***argv) {
+int nomp_init(int argc, const char **argv) {
 
   if (initialized)
     return set_log(
@@ -161,7 +158,7 @@ int nomp_init(int *argc, char ***argv) {
         "calling nomp_init() again.",
         nomp.name);
 
-  int err = check_args(*argc, *argv);
+  int err = check_args(argc, argv);
   return_on_err(err);
   err = check_env(&nomp);
   return_on_err(err);

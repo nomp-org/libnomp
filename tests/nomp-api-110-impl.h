@@ -7,7 +7,7 @@ int nomp_api_110(int argc, char *argv[], unsigned s, unsigned e) {
 
   TEST_TYPE a[10] = {0}, b[10] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 
-  int err = nomp_init(&argc, &argv);
+  int err = nomp_init(argc, (const char **)argv);
   nomp_chk(err);
 
   // Free'ing before mapping should return an error
