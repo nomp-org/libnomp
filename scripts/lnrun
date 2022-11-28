@@ -19,49 +19,63 @@ cyan=$(tput setaf 6)
 reset=$(tput sgr0)
 
 function print_help_main() {
-  echo -e " NAME\n\t The runner tool for libnomp\n\n" \
+  echo -e " NAME\n\t The runner tool for libnomp.\n\n" \
     "SYNOPSIS\n" \
     "\t lnrun <command> [args]\n" \
     "\t lnrun [options]\n\n" \
     "OPTIONS\n" \
     "\t ${cyan}-h${reset}, ${cyan}--help${reset}" \
-    "\t Print the usage details of each command of libnomp\n\n" \
+    "\t Print the usage details of each command of libnomp.\n\n" \
     "COMMANDS\n" \
-    "\t${cyan}t${reset}, ${cyan}test${reset} \t Run all the tests\n" \
-    "\t${cyan}d${reset}, ${cyan}debug${reset} \t Debug a provided test case\n" \
-    "\t${cyan}D${reset}, ${cyan}docs${reset} \t Open the user documentation on the web browser\n\n" \
-    "To view the usage of each command, execute ${cyan}lnrun -h <command>${reset} or" \
-    "${cyan}lnrun --help <command>${reset}"
+    "\t${cyan}t${reset}, ${cyan}test${reset} \t Run all the tests.\n" \
+    "\t${cyan}d${reset}, ${cyan}debug${reset} \t Debug a provided test " \
+    "case.\n" \
+    "\t${cyan}D${reset}, ${cyan}docs${reset} \t Open the user documentation " \
+    "on the web browser.\n\n" \
+    "To view the usage of each command, execute ${cyan}lnrun -h " \
+    "<command>${reset} or ${cyan}lnrun --help <command>${reset}."
 }
 
 function print_help_test() {
-  echo -e " NAME\n\t Running the tests of libnomp\n\n" \
+  echo -e " NAME\n\t Running the tests of libnomp.\n\n" \
     "SYNOPSIS\n" \
-    "\t lnrun t|test \t[-g|--groups <group-pattern>] [-t|--test-dir <test-directory>\n" \
-    "\t\t\t[-b|--backend <backend-name>] [-d|--device <device-index>] [-p|--platform <platform-index>]\n\n" \
+    "\t lnrun t|test \t[-g|--groups <group-pattern>] " \
+    "[-t|--test-dir <test-directory>\n" \
+    "\t\t\t[-b|--backend <backend-name>] [-d|--device <device-index>] " \
+    "[-p|--platform <platform-index>]\n\n" \
     "OPTIONS\n" \
-    "\t${cyan}-g/--group${reset}\t Pattern to filter the tests to be run (Default: ${NOMP_TEST_GROUPS}).\n" \
-    "\t${cyan}-t/--test-dir${reset}\t Specify the directory which the libnomp test resides (Default: ${NOMP_TEST_DIR}).\n" \
-    "\t${cyan}-b/--backend${reset}\t Backend to run the tests, case insensitive (Default: ${NOMP_BACKEND}).\n" \
-    "\t${cyan}-p/--platform${reset}\t Platform to run the tests, case insensitive (Default: ${NOMP_PLATFORM}).\n" \
-    "\t${cyan}-d/--device${reset}\t Device to run the tests, case insensitive (Default: ${NOMP_DEVICE}).\n\n" \
+    "\t${cyan}-g/--group${reset}\t Pattern to filter the tests to be run " \
+    "(Default: ${NOMP_TEST_GROUPS}).\n" \
+    "\t${cyan}-t/--test-dir${reset}\t Specify the directory which the " \
+    "libnomp test resides (Default: ${NOMP_TEST_DIR}).\n" \
+    "\t${cyan}-b/--backend${reset}\t Backend to run the tests, case " \
+    "insensitive (Default: ${NOMP_BACKEND}).\n" \
+    "\t${cyan}-p/--platform${reset}\t Platform to run the tests, case " \
+    "insensitive (Default: ${NOMP_PLATFORM}).\n" \
+    "\t${cyan}-d/--device${reset}\t Device to run the tests, case " \
+    "insensitive (Default: ${NOMP_DEVICE}).\n\n" \
     "EXAMPLES\n" \
-    "\t Running all the tests\n" \
+    "\t Running all the tests:\n" \
     "\t\t $ ${cyan}lnrun test${reset}\n\n" \
-    "\t Running tests with the pattern 23* along with the CUDA backend\n" \
+    "\t Running tests with the pattern 23* along with the CUDA backend:\n" \
     "\t\t $ ${cyan}lnrun test -g 23* -b cuda${reset}"
 }
 
 function print_help_debug() {
   echo -e " NAME\n\t Debug the specified test\n\n" \
     "SYNOPSIS\n" \
-    "\t lnrun d|debug \t[-P|--port <port-number>] [-b|--backend <backend-name>]\n" \
+    "\t lnrun d|debug \t[-P|--port <port-number>] " \
+    "[-b|--backend <backend-name>]\n" \
     "\t\t\t[-d|--device <device-index>] [-p|--platform <platform-index>]\n\n" \
     "OPTIONS\n" \
-    "\t${cyan}-P/--port${reset}\t Port for which gdbserver host the test case (Default: ${NOMP_PORT}).\n" \
-    "\t${cyan}-b/--backend${reset}\t Backend to run the tests, case insensitive (Default: ${NOMP_BACKEND}).\n" \
-    "\t${cyan}-p/--platform${reset}\t Platform to run the tests, case insensitive (Default: ${NOMP_PLATFORM}).\n" \
-    "\t${cyan}-d/--device${reset}\t Device to run the tests, case insensitive (Default: ${NOMP_DEVICE}).\n\n" \
+    "\t${cyan}-P/--port${reset}\t Port for which gdbserver host the test " \
+    "case (Default: ${NOMP_PORT}).\n" \
+    "\t${cyan}-b/--backend${reset}\t Backend to run the tests, case " \
+    "insensitive (Default: ${NOMP_BACKEND}).\n" \
+    "\t${cyan}-p/--platform${reset}\t Platform to run the tests, case " \
+    "insensitive (Default: ${NOMP_PLATFORM}).\n" \
+    "\t${cyan}-d/--device${reset}\t Device to run the tests, case " \
+    "insensitive (Default: ${NOMP_DEVICE}).\n\n" \
     "EXAMPLES\n" \
     "\t Debugging the test 240 on port 5005\n" \
     "\t\t $ ${cyan}lnrun debug 240 ${reset}\n\n" \
@@ -70,15 +84,17 @@ function print_help_debug() {
 }
 
 function print_help_docs() {
-  echo -e " NAME\n\t Opening the user documentation of libnomp in a web browser\n\n" \
+  echo -e " NAME\n\t Opening the user documentation of libnomp in a web " \
+    "browser.\n\n" \
     "SYNOPSIS\n" \
     "\t lnrun d|docs \t[-B|--browser <browser-name>]\n\n" \
     "OPTIONS\n" \
-    "\t${cyan}-B/--browser${reset}\t Specifies the web browser to display the documentation (Default: ${NOMP_BROWSER}).\n\n" \
+    "\t${cyan}-B/--browser${reset}\t Specifies the web browser to display " \
+    "the documentation (Default: ${NOMP_BROWSER}).\n\n" \
     "EXAMPLES\n" \
-    "\t Opening the user documentation on google chrome\n" \
+    "\t Opening the user documentation on google chrome:\n" \
     "\t\t $ ${cyan}lnrun docs${reset}\n\n" \
-    "\t Opening the user documentation on firefox\n" \
+    "\t Opening the user documentation on firefox:\n" \
     "\t\t $ ${cyan}lnrun docs -B firefox${reset}"
 }
 
@@ -117,7 +133,8 @@ function debug_test() {
   BUILD_TEST="${NOMP_TEST_DIR}/${TEST_NAME}"
   if [[ -f "$BUILD_TEST" ]]; then
     echo -e "\nDebugging session started for: ${cyan}${TEST_NAME}${reset}"
-    gdbserver "localhost:${NOMP_PORT}" "${BUILD_TEST}" "${NOMP_BACKEND}" "${NOMP_DEVICE}" "${NOMP_PLATFORM}"
+    gdbserver "localhost:${NOMP_PORT}" "${BUILD_TEST}" "${NOMP_BACKEND}" \
+      "${NOMP_DEVICE}" "${NOMP_PLATFORM}"
     echo "Debugging session ended"
   else
     echo -e "\n${red}Test not found: nomp-api-${DEBUG_TEST}${reset}"
@@ -131,7 +148,7 @@ function open_docs() {
 }
 
 if [ $# -eq 0 ]; then
-  echo "No arguments were provided to ${cyan}lnrun${reset} script. Exitting ..."
+  echo "No arguments were provided to ${cyan}lnrun${reset} script."
   exit 0
 fi
 
@@ -159,7 +176,8 @@ while [ $# -gt 0 ]; do
       -p | --platform) shift && NOMP_PLATFORM="${1}" ;;
       -d | --device) shift && NOMP_DEVICE="${1}" ;;
       *) echo "${red}Invalid argument: ${1}${reset}" &&
-        echo "See ${cyan}lnrun -h t|test ${reset} or ${cyan}lnrun --help t|test ${reset} for the accepted commands" &&
+        echo "See ${cyan}lnrun -h t|test ${reset} or ${cyan}lnrun" \
+          "--help t|test ${reset} for the accepted commands."
         exit 1 ;;
       esac
       shift
@@ -177,7 +195,8 @@ while [ $# -gt 0 ]; do
       -p | --platform) shift && NOMP_PLATFORM="${1}" ;;
       -d | --device) shift && NOMP_DEVICE="${1}" ;;
       *) echo "${red}Invalid argument: ${1}${reset}" &&
-        echo "See ${cyan}lnrun -h d|debug ${reset} or ${cyan}lnrun --help d|debug ${reset} for the accepted commands" &&
+        echo "See ${cyan}lnrun -h d|debug ${reset} or ${cyan}lnrun" \
+          "--help d|debug ${reset} for the accepted commands."
         exit 1 ;;
       esac
       shift
@@ -190,7 +209,8 @@ while [ $# -gt 0 ]; do
       case $1 in
       -B | --browser) shift && NOMP_BROWSER="${1}" ;;
       *) echo "${red}Invalid argument: ${1}${reset}" &&
-        echo "See ${cyan}lnrun -h D|docs ${reset} or ${cyan}lnrun --help D|docs ${reset} for the accepted commands" &&
+        echo "See ${cyan}lnrun -h D|docs ${reset} or ${cyan}lnrun" \
+          "--help D|docs ${reset} for the accepted commands."
         exit 1 ;;
       esac
       shift
@@ -198,7 +218,8 @@ while [ $# -gt 0 ]; do
     open_docs
     ;;
   *) echo "${red}Invalid argument: ${1}${reset}" &&
-    echo "See ${cyan}lnrun -h${reset} or ${cyan}lnrun --help${reset} for the accepted commands" &&
+    echo "See ${cyan}lnrun -h${reset} or ${cyan}lnrun --help${reset} for" \
+      "the accepted commands."
     exit 1 ;;
   esac
   shift
