@@ -25,6 +25,12 @@
       return (err);                                                            \
   } while (0)
 
+struct meta {
+  char *file, *func;
+  char *red_op, *red_var;
+  PyObject *dict;
+};
+
 struct prog {
   unsigned narg, ndim;
   PyObject *py_global, *py_local, *py_dict;
@@ -154,6 +160,23 @@ int py_user_annotate(PyObject **knl, PyObject *annts, const char *file,
  * @return int
  */
 int py_user_transform(PyObject **knl, const char *file, const char *func);
+
+/**
+ * @ingroup nomp_py_utils
+ * @brief Handle reductions (if present) in a loopy kernel.
+ *
+ * Handle the reduction in the loopy kernel \p knl. \p knl will be modified
+ * in the process. Function will return a non-zero value if there was an error
+ * after registering a log.
+ *
+ * @param[in,out] knl Pointer to loopy kernal object.
+ * @param[in] red_op Reduction operation.
+ * @param[in] red_var Accumulator variable for the reduction. This should
+ * appear only once in the kernel and will be initialized based on \p red_op.
+ * @return int
+ */
+int py_handle_reductions(PyObject **knl, const char *red_op,
+                         const char *red_var);
 
 /**
  * @ingroup nomp_py_utils

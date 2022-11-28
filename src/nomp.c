@@ -273,10 +273,16 @@ static struct prog **progs = NULL;
 static int progs_n = 0;
 static int progs_max = 0;
 
-static int parse_clauses(char **usr_file, char **usr_func, PyObject **dict_,
-                         const char **clauses) {
-  // Currently, we only support `transform` and `annotate` and `jit`.
-  PyObject *dict = *dict_ = PyDict_New();
+static void free_meta(struct meta *info) {
+  tfree(info->file), tfree(info->func);
+  tfree(info->red_op), tfree(info->red_var);
+  Py_XDECREF(info->dict);
+}
+
+static int parse_clauses(struct meta *info, const char **clauses) {
+  info->file = info->func = info->red_op = info->red_var = NULL;
+  info->dict = PyDict_New();
+
   unsigned i = 0;
   while (clauses[i]) {
     if (strncmp(clauses[i], "transform", NOMP_BUFSIZ) == 0) {
@@ -287,11 +293,11 @@ static int parse_clauses(char **usr_file, char **usr_func, PyObject **dict_,
             "\"transform\" clause should be followed by a file name and a "
             "function name. At least one of them is not provided.");
       }
-      *usr_file = strndup(clauses[i + 1], pathlen(clauses[i + 1]));
-      *usr_func = strndup(clauses[i + 2], NOMP_BUFSIZ);
+      info->file = strndup(clauses[i + 1], pathlen(clauses[i + 1]));
+      info->func = strndup(clauses[i + 2], NOMP_BUFSIZ);
       i = i + 3;
     } else if (strncmp(clauses[i], "annotate", NOMP_BUFSIZ) == 0) {
-      // Syntax "annotate", <key>, <value>
+      // Syntax: "annotate", <key>, <value>
       if (!clauses[i + 1] || !clauses[i + 2]) {
         return set_log(NOMP_USER_INPUT_NOT_PROVIDED, NOMP_ERROR,
                        "\"annotate\" clause should be followed by a key value "
@@ -302,17 +308,20 @@ static int parse_clauses(char **usr_file, char **usr_func, PyObject **dict_,
           PyUnicode_FromStringAndSize(key, strnlen(key, NOMP_BUFSIZ));
       PyObject *pval =
           PyUnicode_FromStringAndSize(val, strnlen(val, NOMP_BUFSIZ));
-      PyDict_SetItem(dict, pkey, pval);
+      PyDict_SetItem(info->dict, pkey, pval);
       Py_XDECREF(pkey), Py_XDECREF(pval);
       i = i + 3;
     } else if (strncmp(clauses[i], "reduce", NOMP_BUFSIZ) == 0) {
-      // Syntax "reduce", <operator>, <accumulator>
+      // Syntax: "reduce", <operator>, <accumulator>
       if (!clauses[i + 1] || !clauses[i + 2]) {
         return set_log(NOMP_USER_INPUT_NOT_PROVIDED, NOMP_ERROR,
                        "\"reduce\" clause should be followed by an operation "
                        "and the accumulator variable name. At least one of "
                        "them is not provided.");
       }
+      info->red_op = strndup(clauses[i + 1], NOMP_BUFSIZ);
+      info->red_var = strndup(clauses[i + 2], NOMP_BUFSIZ);
+      i = i + 3;
     } else {
       return set_log(
           NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
@@ -337,22 +346,25 @@ int nomp_jit(int *id, const char *c_src, const char **clauses) {
     return_on_err(err);
 
     // Parse the clauses
-    char *usr_file = NULL, *usr_func = NULL;
-    PyObject *annts;
-    err = parse_clauses(&usr_file, &usr_func, &annts, clauses);
+    struct meta info;
+    err = parse_clauses(&info, clauses);
     return_on_err(err);
 
     // Handle annotate clauses if the exist
-    err = py_user_annotate(&knl, annts, nomp.annts_script, nomp.annts_func);
+    err = py_user_annotate(&knl, info.dict, nomp.annts_script, nomp.annts_func);
     return_on_err(err);
 
-    // Handle transform clauase
-    err = py_user_transform(&knl, usr_file, usr_func);
-    tfree(usr_file), tfree(usr_func);
+    // Handle transform clause
+    err = py_user_transform(&knl, info.file, info.func);
     return_on_err(err);
+
+    // Handle reduction clause
+    err = py_handle_reductions(&knl, info.red_op, info.red_var);
+
+    // TODO: Autotuning
 
     // Get OpenCL, CUDA, etc. source and name from the loopy kernel
-    char *name, *src;
+    char *name = NULL, *src = NULL;
     err = py_get_knl_name_and_src(&name, &src, knl);
     return_on_err(err);
 
@@ -369,6 +381,8 @@ int nomp_jit(int *id, const char *c_src, const char **clauses) {
     err = py_get_grid_size(prg, knl);
     Py_XDECREF(knl);
     return_on_err(err);
+
+    free_meta(&info);
 
     *id = progs_n++;
   }

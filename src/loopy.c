@@ -152,6 +152,11 @@ int py_user_transform(PyObject **knl, const char *file, const char *func) {
   return 0;
 }
 
+int py_handle_reductions(PyObject **knl, const char *red_op,
+                         const char *red_var) {
+  return 0;
+}
+
 int py_get_knl_name_and_src(char **name, char **src, PyObject *knl) {
   int err = 1;
 
