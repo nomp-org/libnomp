@@ -88,16 +88,16 @@ int check_args(int argc, const char **argv) {
 
   nomp.backend = tcalloc(char, MAX_BACKEND_NAME_SIZE);
 
-  if (argc < 1 || argv == NULL) {
+  if (argc <= 1 || argv == NULL) {
     strncpy(nomp.backend, backend, MAX_BACKEND_NAME_SIZE);
     nomp.platform_id = platform, nomp.device_id = device;
     return 0;
   }
 
-  int i = 1;
+  unsigned i = 1;
   while (i < argc) {
-    if (!strncmp("-b", argv[i], NOMP_BUFSIZ) ||
-        !strncmp("--backend", argv[i], NOMP_BUFSIZ)) {
+    if (!strncmp("-b", argv[i], MAX_BACKEND_NAME_SIZE) ||
+        !strncmp("--backend", argv[i], MAX_BACKEND_NAME_SIZE)) {
       backend = (char *)argv[i + 1];
       i += 2;
     } else if (!strncmp("-p", argv[i], NOMP_BUFSIZ) ||
@@ -139,9 +139,10 @@ int check_args(int argc, const char **argv) {
         strncpy(nomp.annts_func, annts_func, size);
       }
       i += 2;
-    } else
+    } else {
       return set_log(NOMP_USER_ARGS_IS_INVALID, NOMP_ERROR,
                      strcatn(2, "Invalid argument : ", argv[i]));
+    }
   }
   strncpy(nomp.backend, backend, MAX_BACKEND_NAME_SIZE);
   nomp.platform_id = platform, nomp.device_id = device;

@@ -106,7 +106,7 @@
 #define NOMP_USER_KNL_ARG_TYPE_IS_INVALID -136
 /**
  * @ingroup nomp_errors
- * @brief Kernel argument type provided to libnomp is not valid.
+ * @brief User options type provided to libnomp is not valid.
  */
 #define NOMP_USER_ARGS_IS_INVALID -137
 
