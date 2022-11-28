@@ -359,7 +359,7 @@ int nomp_jit(int *id, const char *c_src, const char **clauses) {
     return_on_err(err);
 
     // Handle reduction clause
-    err = py_handle_reductions(&knl, info.red_op, info.red_var);
+    err = py_handle_reduction(&knl, info.red_op, info.red_var);
 
     // TODO: Autotuning
 

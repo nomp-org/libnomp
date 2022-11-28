@@ -1,5 +1,7 @@
 #include "nomp-impl.h"
 
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+
 static const char *loopy_api = "loopy_api";
 static const char *c_to_loopy = "c_to_loopy";
 
@@ -152,16 +154,17 @@ int py_user_transform(PyObject **knl, const char *file, const char *func) {
   return 0;
 }
 
-int py_handle_reductions(PyObject **knl, const char *red_op,
-                         const char *red_var) {
+int py_handle_reduction(PyObject **knl, const char *red_op,
+                        const char *red_var) {
   return 0;
 }
 
 int py_get_knl_name_and_src(char **name, char **src, PyObject *knl) {
   int err = 1;
+  Py_ssize_t size;
 
+  // Get the kernel name
   if (knl) {
-    err = NOMP_LOOPY_KNL_NAME_NOT_FOUND;
     PyObject *epts = PyObject_GetAttrString(knl, "entrypoints");
     if (epts) {
       Py_ssize_t len = PySet_Size(epts);
@@ -172,19 +175,18 @@ int py_get_knl_name_and_src(char **name, char **src, PyObject *knl) {
         PyObject *entry = PyIter_Next(iter);
         PyObject *py_name = PyObject_Str(entry);
         if (py_name) {
-          Py_ssize_t size;
           const char *name_ = PyUnicode_AsUTF8AndSize(py_name, &size);
-          *name = tcalloc(char, size + 1);
-          strncpy(*name, name_, size + 1);
+          *name = strndup(name_, size + 1);
           Py_DECREF(py_name), err = 0;
         }
         Py_XDECREF(entry), Py_DECREF(iter);
       }
       Py_DECREF(epts);
     }
-    if (err)
+    if (err) {
       return set_log(NOMP_LOOPY_KNL_NAME_NOT_FOUND, NOMP_ERROR,
                      ERR_STR_LOOPY_KNL_NAME_NOT_FOUND, *name);
+    }
 
     // Get the kernel source
     err = 1;
@@ -198,10 +200,8 @@ int py_get_knl_name_and_src(char **name, char **src, PyObject *knl) {
           if (py_device) {
             PyObject *py_src = PyObject_CallFunctionObjArgs(py_device, NULL);
             if (py_src) {
-              Py_ssize_t size;
               const char *src_ = PyUnicode_AsUTF8AndSize(py_src, &size);
-              *src = tcalloc(char, size + 1);
-              strncpy(*src, src_, size + 1);
+              *src = strndup(src_, size + 1);
               Py_DECREF(py_src), err = 0;
             }
             Py_DECREF(py_device);
@@ -213,15 +213,17 @@ int py_get_knl_name_and_src(char **name, char **src, PyObject *knl) {
       Py_DECREF(lpy);
     }
   }
-  if (err)
+  if (err) {
     return set_log(NOMP_LOOPY_CODEGEN_FAILED, NOMP_ERROR,
                    ERR_STR_LOOPY_CODEGEN_FAILED, *name);
+  }
 
   return 0;
 }
 
 int py_get_grid_size(struct prog *prg, PyObject *knl) {
   int err = 1;
+
   if (knl) {
     PyObject *callables = PyObject_GetAttrString(knl, "callables_table");
     if (callables) {
@@ -238,9 +240,8 @@ int py_get_grid_size(struct prog *prg, PyObject *knl) {
           if (grid_size) {
             prg->py_global = PyTuple_GetItem(grid_size, 0);
             prg->py_local = PyTuple_GetItem(grid_size, 1);
-            prg->ndim = PyTuple_Size(prg->py_global);
-            if (PyTuple_Size(prg->py_local) > prg->ndim)
-              prg->ndim = PyTuple_Size(prg->py_local);
+            prg->ndim =
+                MAX(PyTuple_Size(prg->py_global), PyTuple_Size(prg->py_local));
             err = 0;
           }
         }
@@ -248,9 +249,10 @@ int py_get_grid_size(struct prog *prg, PyObject *knl) {
       Py_DECREF(callables);
     }
   }
-  if (err)
+  if (err) {
     return set_log(NOMP_LOOPY_GET_GRIDSIZE_FAILED, NOMP_ERROR,
                    ERR_STR_LOOPY_GRIDSIZE_FAILED);
+  }
   return 0;
 }
 
@@ -305,3 +307,5 @@ int py_eval_grid_size(struct prog *prg, PyObject *dict) {
   }
   return 0;
 }
+
+#undef MAX

@@ -175,8 +175,8 @@ int py_user_transform(PyObject **knl, const char *file, const char *func);
  * appear only once in the kernel and will be initialized based on \p red_op.
  * @return int
  */
-int py_handle_reductions(PyObject **knl, const char *red_op,
-                         const char *red_var);
+int py_handle_reduction(PyObject **knl, const char *red_op,
+                        const char *red_var);
 
 /**
  * @ingroup nomp_py_utils
