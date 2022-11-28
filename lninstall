@@ -31,7 +31,9 @@ fi
 function update_bashrc() {
   [[ -n ${NOMP_SHELL_CONFIG_FILE} ]] &&
     echo -e "${NOMP_ENVIRONMENT}" >>"${NOMP_SHELL_CONFIG_FILE}" &&
-    echo "${green}Successfully exported variables to ${NOMP_SHELL_CONFIG_FILE}${reset}"
+    echo "${green}Successfully exported variables to" \
+    "${NOMP_SHELL_CONFIG_FILE}${reset}."
+  exit 0
 }
 
 function print_help() {
@@ -49,7 +51,8 @@ if [[ $# -gt 0 ]]; then
     -y | --yes) NOMP_DEFAULT_PROMPT="y" ;;
     -n | --no) NOMP_DEFAULT_PROMPT="n" ;;
     *) echo "${red}Invalid argument: ${1}${reset}."
-    echo "See ${cyan}./${0} -h${reset} or ${cyan}./${0} --help${reset} for the accepted commands."
+    echo "See ${cyan}./${0} -h${reset} or ${cyan}./${0} --help${reset} for" \
+      "the accepted commands."
     exit 1 ;;
   esac
 fi
@@ -70,14 +73,13 @@ if [[ ${NOMP_INSTALL_SUCCESS} = true ]]; then
   NOMP_ENVIRONMENT=$(cat <<-END
 # Setup nomp environment variables
 export NOMP_INSTALL_DIR=${NOMP_INSTALL_DIR}
+# Add lnrun script to path
+export PATH=${NOMP_BIN_PATH}:\${PATH}
 END
 )
 
-  # Add lnrun script to path
-  NOMP_ENVIRONMENT+="\nexport PATH=${NOMP_BIN_PATH}:\${PATH}\n"
-
   # set the libnomp env variables if not
-  [[ ${NOMP_DEFAULT_PROMPT} = "y" ]] && update_bashrc && exit 0
+  [[ ${NOMP_DEFAULT_PROMPT} = "y" ]] && update_bashrc
   read -p "Do you wish to add libnomp variables to .bashrc? [Y|n]: " -n 1
   echo
   [[ $REPLY =~ ^[Yy]$ ]] && update_bashrc
