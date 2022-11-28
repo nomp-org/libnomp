@@ -44,8 +44,8 @@ function print_help_test() {
     "[-t|--test-dir <test-directory>\n" \
     "\t\t\t[-b|--backend <backend-name>] [-d|--device <device-index>] " \
     "[-p|--platform <platform-index>]\n" \
-    "\t\t\t[[-v|--verbose <verbose-level>] [-i|--install-dir <libnomp-directory>] \n"\
-    "\t\t\t[[-as|--annts-script <annotation-script>] [-af|--annts-func <annotation-function>]\n\n" \
+    "\t\t\t[-v|--verbose <verbose-level>] [-i|--install-dir <libnomp-directory>] \n"\
+    "\t\t\t[-as|--annts-script <annotation-script>] [-af|--annts-func <annotation-function>]\n\n" \
     "OPTIONS\n" \
     "\t${cyan}-g/--group${reset}\t Pattern to filter the tests to be run " \
     "(Default: ${NOMP_TEST_GROUPS}).\n" \
@@ -74,8 +74,8 @@ function print_help_debug() {
     "\t lnrun d|debug \t[-P|--port <port-number>] " \
     "[-b|--backend <backend-name>]\n" \
     "\t\t\t[-d|--device <device-index>] [-p|--platform <platform-index>]\n" \
-    "\t\t\t[[-v|--verbose <verbose-level>] [-i|--install-dir <libnomp-directory>] \n"\
-    "\t\t\t[[-as|--annts-script <annotation-script>] [-af|--annts-func <annotation-function>]\n\n" \
+    "\t\t\t[-v|--verbose <verbose-level>] [-i|--install-dir <libnomp-directory>] \n"\
+    "\t\t\t[-as|--annts-script <annotation-script>] [-af|--annts-func <annotation-function>]\n\n" \
     "OPTIONS\n" \
     "\t${cyan}-P/--port${reset}\t Port for which gdbserver host the test " \
     "case (Default: ${NOMP_PORT}).\n" \
@@ -124,20 +124,21 @@ function run_tests() {
 
   echo -e "Running tests..."
   ERR=0
-  cd "${NOMP_TEST_DIR}" &&
-    for t in $(ls  ${TESTS}); do
-      OUTPUT=$($t -b ${NOMP_BACKEND} -d ${NOMP_DEVICE} -p ${NOMP_PLATFORM} \
-              -i ${NOMP_INSTALL_DIR} -v ${NOMP_VERBOSE})
-        
-      if [ $? -eq 0 ]; then
-        echo "${t}: ${green}Passed${reset}"
-      else
-        echo "${t}: ${red}Failed${reset}"
-        ERR=$((ERR + 1))
-      fi
-      [[ -n ${OUTPUT} ]] && echo -e "${OUTPUT}\n"
-    done
+  cd "${NOMP_TEST_DIR}" 
+  for t in $(ls  ${TESTS}); do
+    OUTPUT=$($t -b ${NOMP_BACKEND} -d ${NOMP_DEVICE} -p ${NOMP_PLATFORM} \
+            -i ${NOMP_INSTALL_DIR} -v ${NOMP_VERBOSE})
+      
+    if [ $? -eq 0 ]; then
+      echo "${t}: ${green}Passed${reset}"
+    else
+      echo "${t}: ${red}Failed${reset}"
+      ERR=$((ERR + 1))
+    fi
+    [[ -n ${OUTPUT} ]] && echo -e "${OUTPUT}\n"
+  done
   [ $ERR -gt 0 ] && echo -e "\n${red}There are test failures${reset}"
+  cd -
   exit ${ERR}
 }
 

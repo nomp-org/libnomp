@@ -2,27 +2,27 @@
 #include "nomp.h"
 #include <limits.h>
 
-int main(int argc, char *argv[]) {
+int main(int argc, const char *argv[]) {
 
   int length = snprintf(NULL, 0, "%d", INT_MAX);
   char *int_max_str = tcalloc(char, length + 1);
   snprintf(int_max_str, length + 1, "%d", INT_MAX);
 
   // Start with initially passed values
-  int err = nomp_init(argc, (const char **)argv);
+  int err = nomp_init(argc, argv);
   nomp_chk(err);
   err = nomp_finalize();
 
   // Set environment variable with invalid backend
   setenv("NOMP_BACKEND", "invalid", 1);
-  err = nomp_init(argc, (const char **)argv);
+  err = nomp_init(argc, argv);
   nomp_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
   err = nomp_finalize();
   nomp_assert(nomp_get_log_no(err) == NOMP_RUNTIME_NOT_INITIALIZED);
 
   // Setting environment variable with valid backend
   setenv("NOMP_BACKEND", "opencl", 1);
-  err = nomp_init(argc, (const char **)argv);
+  err = nomp_init(argc, argv);
   nomp_chk(err);
   err = nomp_finalize();
   nomp_chk(err);
@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
 
   // Environment variable case does not matter
   setenv("NOMP_BACKEND", "oPenCl", 1);
-  err = nomp_init(argc, (const char **)argv);
+  err = nomp_init(argc, argv);
   nomp_chk(err);
   err = nomp_finalize();
   nomp_chk(err);
@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
 
   // For invalid platform-id environment variable, passed value is used
   setenv("NOMP_PLATFORM_ID", "invalid", 1);
-  err = nomp_init(argc, (const char **)argv);
+  err = nomp_init(argc, argv);
   nomp_chk(err);
   err = nomp_finalize();
   nomp_chk(err);
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
   // If platform-id environment variable is positive, it should have higher
   // priority.
   setenv("NOMP_PLATFORM_ID", int_max_str, 1);
-  err = nomp_init(argc, (const char **)argv);
+  err = nomp_init(argc, argv);
   nomp_assert(nomp_get_log_no(err) == NOMP_USER_PLATFORM_IS_INVALID);
   err = nomp_finalize();
   nomp_assert(nomp_get_log_no(err) == NOMP_RUNTIME_NOT_INITIALIZED);
@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
 
   // For invalid device-id environment variable, passed value is used
   setenv("NOMP_DEVICE_ID", "invalid", 1);
-  err = nomp_init(argc, (const char **)argv);
+  err = nomp_init(argc, argv);
   nomp_chk(err);
   err = nomp_finalize();
   nomp_chk(err);
@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
   // If device-id environment variable is positive, it should have higher
   // priority.
   setenv("NOMP_DEVICE_ID", int_max_str, 1);
-  err = nomp_init(argc, (const char **)argv);
+  err = nomp_init(argc, argv);
   nomp_assert(nomp_get_log_no(err) == NOMP_USER_DEVICE_IS_INVALID);
   err = nomp_finalize();
   nomp_assert(nomp_get_log_no(err) == NOMP_RUNTIME_NOT_INITIALIZED);

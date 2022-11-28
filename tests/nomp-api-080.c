@@ -2,7 +2,7 @@
 #include "nomp.h"
 #include <limits.h>
 
-int main(int argc, char *argv[]) {
+int main(int argc, const char *argv[]) {
 
   // Missing flag should return an error
   const char *args[] = {" ", "opencl", "-d", "0", "-p", "0"};

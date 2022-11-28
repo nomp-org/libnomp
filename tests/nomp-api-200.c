@@ -7,7 +7,7 @@
 
 int main(int argc,const char *argv[]) {
 
-  int err = nomp_init(argc, (const char **)argv);
+  int err = nomp_init(argc, argv);
   nomp_chk(err);
 
   TEST_BUILTIN_TYPES(200)
