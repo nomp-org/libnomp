@@ -26,7 +26,7 @@
   } while (0)
 
 struct prog {
-  unsigned nargs, ndim;
+  unsigned narg, ndim;
   PyObject *py_global, *py_local, *py_dict;
   size_t global[3], local[3];
   void *bptr;

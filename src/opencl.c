@@ -108,7 +108,7 @@ static int opencl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
   struct opencl_prog *ocl_prg = (struct opencl_prog *)prg->bptr;
   struct mem *m;
   size_t size;
-  for (int i = 0; i < prg->nargs; i++) {
+  for (int i = 0; i < prg->narg; i++) {
     const char *var = va_arg(args, const char *);
     int type = va_arg(args, int);
     size = va_arg(args, size_t);

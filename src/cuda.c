@@ -133,12 +133,12 @@ static int cuda_knl_build(struct backend *bnd, struct prog *prg,
 }
 
 static int cuda_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
-  const int ndim = prg->ndim, nargs = prg->nargs;
+  const int ndim = prg->ndim, narg = prg->narg;
   const size_t *global = prg->global, *local = prg->local;
 
   struct mem *m;
   void *vargs[NARGS_MAX];
-  for (int i = 0; i < nargs; i++) {
+  for (int i = 0; i < narg; i++) {
     const char *var = va_arg(args, const char *);
     int type = va_arg(args, int);
     size_t size = va_arg(args, size_t);

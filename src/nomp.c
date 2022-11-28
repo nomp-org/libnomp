@@ -280,19 +280,23 @@ static int parse_clauses(char **usr_file, char **usr_func, PyObject **dict_,
   unsigned i = 0;
   while (clauses[i]) {
     if (strncmp(clauses[i], "transform", NOMP_BUFSIZ) == 0) {
-      if (clauses[i + 1] == NULL || clauses[i + 2] == NULL)
+      // Syntax: "transform", <script-name>, <function-name>
+      if (!clauses[i + 1] || !clauses[i + 2]) {
         return set_log(
             NOMP_USER_INPUT_NOT_PROVIDED, NOMP_ERROR,
             "\"transform\" clause should be followed by a file name and a "
             "function name. At least one of them is not provided.");
+      }
       *usr_file = strndup(clauses[i + 1], pathlen(clauses[i + 1]));
       *usr_func = strndup(clauses[i + 2], NOMP_BUFSIZ);
       i = i + 3;
     } else if (strncmp(clauses[i], "annotate", NOMP_BUFSIZ) == 0) {
-      if (clauses[i + 1] == NULL || clauses[i + 2] == NULL)
+      // Syntax "annotate", <key>, <value>
+      if (!clauses[i + 1] || !clauses[i + 2]) {
         return set_log(NOMP_USER_INPUT_NOT_PROVIDED, NOMP_ERROR,
                        "\"annotate\" clause should be followed by a key value "
                        "pair. At least one of them is not provided.");
+      }
       const char *key = clauses[i + 1], *val = clauses[i + 2];
       PyObject *pkey =
           PyUnicode_FromStringAndSize(key, strnlen(key, NOMP_BUFSIZ));
@@ -301,6 +305,14 @@ static int parse_clauses(char **usr_file, char **usr_func, PyObject **dict_,
       PyDict_SetItem(dict, pkey, pval);
       Py_XDECREF(pkey), Py_XDECREF(pval);
       i = i + 3;
+    } else if (strncmp(clauses[i], "reduce", NOMP_BUFSIZ) == 0) {
+      // Syntax "reduce", <operator>, <accumulator>
+      if (!clauses[i + 1] || !clauses[i + 2]) {
+        return set_log(NOMP_USER_INPUT_NOT_PROVIDED, NOMP_ERROR,
+                       "\"reduce\" clause should be followed by an operation "
+                       "and the accumulator variable name. At least one of "
+                       "them is not provided.");
+      }
     } else {
       return set_log(
           NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
@@ -313,7 +325,6 @@ static int parse_clauses(char **usr_file, char **usr_func, PyObject **dict_,
 }
 
 int nomp_jit(int *id, const char *c_src, const char **clauses) {
-  int err;
   if (*id == -1) {
     if (progs_n == progs_max) {
       progs_max += progs_max / 2 + 1;
@@ -365,14 +376,14 @@ int nomp_jit(int *id, const char *c_src, const char **clauses) {
   return 0;
 }
 
-int nomp_run(int id, int nargs, ...) {
+int nomp_run(int id, int narg, ...) {
   if (id >= 0) {
     struct prog *prg = progs[id];
-    prg->nargs = nargs;
+    prg->narg = narg;
 
     va_list args;
-    va_start(args, nargs);
-    for (int i = 0; i < nargs; i++) {
+    va_start(args, narg);
+    for (int i = 0; i < narg; i++) {
       const char *var = va_arg(args, const char *);
       int type = va_arg(args, int);
       size_t size = va_arg(args, size_t);
@@ -388,7 +399,7 @@ int nomp_run(int id, int nargs, ...) {
     int err = py_eval_grid_size(prg, prg->py_dict);
     return_on_err(err);
 
-    va_start(args, nargs);
+    va_start(args, narg);
     err = nomp.knl_run(&nomp, prg, args);
     va_end(args);
     return_on_err(err);

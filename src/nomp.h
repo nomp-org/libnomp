@@ -300,12 +300,12 @@ int nomp_jit(int *id, const char *c_src, const char **clauses);
  * the fourth is the pointer to the actual argument itself.
  *
  * @param[in] id Id of the kernel to be run.
- * @param[in] nargs Number of arguments to the kernel.
+ * @param[in] narg Number of arguments to the kernel.
  * @param[in] ...  Four values mentioned above for each argument.
  *
  * @return int
  */
-int nomp_run(int id, int nargs, ...);
+int nomp_run(int id, int narg, ...);
 
 void nomp_assert_(int cond, const char *file, unsigned line);
 #define nomp_assert(cond) nomp_assert_(cond, __FILE__, __LINE__)
