@@ -7,7 +7,7 @@ import loopy as lp
 import pymbolic.primitives as prim
 from loopy.isl_helpers import make_slab
 from loopy.kernel.data import AddressSpace
-from loopy.symbolic import aff_from_expr
+from loopy.symbolic import Reduction, aff_from_expr
 from loopy.target.c.compyte.dtypes import (
     DTypeRegistry,
     fill_registry_with_c_types,
@@ -34,6 +34,11 @@ _C_BIN_OPS_TO_PYMBOLIC_OPS = {
 }
 
 _BACKEND_TO_TARGET = {"opencl": lp.OpenCLTarget(), "cuda": lp.CudaTarget()}
+
+_C_REDN_TO_LOOPY_REDN = {
+    "+=": lp.library.reduction.SumReductionOperation(),
+    "*=": lp.library.reduction.ProductReductionOperation(),
+}
 
 
 class IdentityMapper:
@@ -147,6 +152,7 @@ class CToLoopyMapperContext:
     value_args: FrozenSet[str]
     predicates: FrozenSet[Union[prim.Comparison, prim.LogicalNot]]
     name_gen: UniqueNameGenerator
+    reduction: str
 
     def copy(self, **kwargs) -> "CToLoopyMapperContext":
         """Update class variables"""
@@ -349,7 +355,16 @@ class CToLoopyMapper(IdentityMapper):
         lhs = CToLoopyExpressionMapper()(expr.lvalue)
         rhs = CToLoopyExpressionMapper()(expr.rvalue)
 
-        if expr.op == "+=":
+        if str(lhs) == context.reduction:
+            try:
+                rhs = Reduction(
+                    _C_REDN_TO_LOOPY_REDN[expr.op], tuple(context.inames), rhs
+                )
+            except Exception as ex:
+                raise NotImplementedError(
+                    f"{expr.op} is not supported."
+                ) from ex
+        elif expr.op == "+=":
             rhs = lhs + rhs
         elif expr.op == "-=":
             rhs = lhs - rhs
@@ -427,11 +442,12 @@ def decl_to_knl_arg(decl: c_ast.Decl, dtype):
     )
 
 
-def c_to_loopy(c_str: str, backend: str) -> lp.translation_unit.TranslationUnit:
+def c_to_loopy(
+    c_str: str, backend: str, reduction: str = ""
+) -> lp.translation_unit.TranslationUnit:
     """Map C kernel to Loopy"""
     # Parse the function
-    ast = c_parser.CParser().parse(c_str)
-    node = ast.ext[0]
+    node = c_parser.CParser().parse(c_str).ext[0]
 
     # Init `var_to_decl` based on function parameters
     context = ExternalContext(function_name=node.decl.name, var_to_decl={})
@@ -451,6 +467,7 @@ def c_to_loopy(c_str: str, backend: str) -> lp.translation_unit.TranslationUnit:
             context.get_typedecl().keys(),
             frozenset(),
             UniqueNameGenerator(),
+            reduction,
         ),
     )
 
@@ -491,8 +508,9 @@ if __name__ == "__main__":
     KNL_STR = """
           void foo(double *a, int N) {
             for (int i = 0; i < N; i++)
-              a[i] *= i + 1;
+              sum += a[i] + 1;
           }
           """
-    lp_knl = c_to_loopy(KNL_STR, "cuda")
-    print(lp.generate_code_v2(lp_knl).device_code())
+    lp_knl = c_to_loopy(KNL_STR, "cuda", "sum")
+    print(lp_knl)
+    # print(lp.generate_code_v2(lp_knl).device_code())
