@@ -2,14 +2,16 @@
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
-static const char *loopy_api = "loopy_api";
-static const char *c_to_loopy = "c_to_loopy";
+static const char *lpy_api = "loopy_api";
+static const char *c_to_lpy = "c_to_loopy";
+static const char *redn = "reduction";
+static const char *rlze_redn = "realize_reduction";
 
-void py_print(PyObject *obj) {
+void py_print(const char *msg, PyObject *obj) {
   PyObject *repr = PyObject_Repr(obj);
   PyObject *py_str = PyUnicode_AsEncodedString(repr, "utf-8", "~E~");
   const char *str = PyBytes_AS_STRING(py_str);
-  printf("%s", str);
+  printf("%s: %s\n", msg, str);
   Py_XDECREF(repr), Py_XDECREF(py_str);
 }
 
@@ -32,29 +34,36 @@ int py_append_to_sys_path(const char *path) {
   return 0;
 }
 
-int py_c_to_loopy(PyObject **knl, const char *src, const char *backend) {
-  int err = NOMP_LOOPY_CONVERSION_ERROR;
-  PyObject *lpy_api = PyUnicode_FromString(loopy_api);
-  if (lpy_api) {
-    PyObject *module = PyImport_Import(lpy_api);
+int py_c_to_loopy(PyObject **knl, const char *src, const char *backend,
+                  const char *redn_var) {
+  check_null_input(src);
+  check_null_input(backend);
+
+  int err = 1;
+  PyObject *string = PyUnicode_FromString(lpy_api);
+  if (string) {
+    PyObject *module = PyImport_Import(string);
     if (module) {
-      PyObject *c_to_lpy = PyObject_GetAttrString(module, c_to_loopy);
-      if (c_to_lpy) {
-        PyObject *py_src = PyUnicode_FromString(src);
-        PyObject *py_backend = PyUnicode_FromString(backend);
-        *knl = PyObject_CallFunctionObjArgs(c_to_lpy, py_src, py_backend, NULL);
-        if (*knl)
-          err = 0;
-        Py_XDECREF(py_src), Py_XDECREF(py_backend), Py_DECREF(c_to_lpy);
+      PyObject *function = PyObject_GetAttrString(module, c_to_lpy);
+      if (function) {
+        PyObject *psrc = PyUnicode_FromString(src);
+        PyObject *pbnd = PyUnicode_FromString(backend);
+        PyObject *pvar = PyUnicode_FromString(redn_var);
+        *knl = PyObject_CallFunctionObjArgs(function, psrc, pbnd, pvar, NULL);
+        err = (*knl == NULL);
+        Py_XDECREF(psrc), Py_XDECREF(pbnd), Py_XDECREF(pvar);
+        Py_DECREF(function);
       }
       Py_DECREF(module);
     }
-    Py_DECREF(lpy_api);
+    Py_DECREF(string);
   }
-  if (err)
+  if (err) {
     return set_log(NOMP_LOOPY_CONVERSION_ERROR, NOMP_ERROR,
                    ERR_STR_LOOPY_CONVERSION_ERROR);
-  return err;
+  }
+
+  return 0;
 }
 
 int py_user_annotate(PyObject **knl, PyObject *annts, const char *file,
@@ -65,44 +74,55 @@ int py_user_annotate(PyObject **knl, PyObject *annts, const char *file,
   if (file == NULL || func == NULL)
     return 0;
 
-  PyObject *pfile = PyUnicode_FromString(file);
-  if (pfile) {
-    PyObject *module = PyImport_Import(pfile);
-    Py_DECREF(pfile);
+  int err = 1;
+  PyObject *string = PyUnicode_FromString(file), *tk = NULL;
+  if (string) {
+    PyObject *module = PyImport_Import(string);
+    Py_DECREF(string);
     if (module) {
-      PyObject *pfunc = PyObject_GetAttrString(module, func);
+      PyObject *function = PyObject_GetAttrString(module, func);
       Py_DECREF(module);
-      if (pfunc && PyCallable_Check(pfunc)) {
-        PyObject *tknl = PyObject_CallFunctionObjArgs(pfunc, *knl, annts, NULL);
-        Py_DECREF(pfunc);
-        if (tknl)
-          Py_DECREF(*knl), *knl = tknl;
-        else
-          return set_log(
-              NOMP_PY_CALL_FAILED, NOMP_ERROR,
-              "PyObject_CallFunctionObjArgs() failed when calling user "
-              "annotate function: %s.",
-              func);
-      } else {
-        return set_log(NOMP_PY_CALL_FAILED, NOMP_ERROR,
-                       "PyObject_GetAttrString() failed when importing user "
-                       "annotate function: %s.",
-                       func);
+      if (function && PyCallable_Check(function)) {
+        tk = PyObject_CallFunctionObjArgs(function, *knl, annts, NULL);
+        Py_DECREF(function);
+        err = (tk == NULL);
       }
-    } else {
-      return set_log(
-          NOMP_PY_CALL_FAILED, NOMP_ERROR,
-          "PyImport_Import() failed when importing user annotate file: %s.",
-          file);
     }
-  } else {
+  }
+  if (err) {
     return set_log(NOMP_PY_CALL_FAILED, NOMP_ERROR,
-                   "PyUnicode_FromString() failed when converting user "
-                   "annotate file name \"%s\""
-                   "to a python string.",
-                   file);
+                   "Calling user annotate function: %s failed.", func);
   }
 
+  Py_DECREF(*knl), *knl = tk;
+  return 0;
+}
+
+int py_handle_reduction(PyObject **knl, const char *backend) {
+  check_null_input(*knl);
+
+  int err = 1;
+  PyObject *string = PyUnicode_FromString(redn), *tk = NULL;
+  if (string) {
+    PyObject *module = PyImport_Import(string);
+    Py_DECREF(string);
+    if (module) {
+      PyObject *function = PyObject_GetAttrString(module, rlze_redn);
+      Py_DECREF(module);
+      if (function && PyCallable_Check(function)) {
+        PyObject *pbackend = PyUnicode_FromString(backend);
+        tk = PyObject_CallFunctionObjArgs(function, *knl, pbackend, NULL);
+        err = (tk == NULL);
+        Py_XDECREF(pbackend), Py_DECREF(function);
+      }
+    }
+  }
+  if (err) {
+    return set_log(NOMP_PY_CALL_FAILED, NOMP_ERROR,
+                   "Calling realize_reduction failed.");
+  }
+
+  Py_DECREF(*knl), *knl = tk;
   return 0;
 }
 
@@ -113,57 +133,34 @@ int py_user_transform(PyObject **knl, const char *file, const char *func) {
   if (file == NULL || func == NULL)
     return 0;
 
-  PyObject *pfile = PyUnicode_FromString(file);
-  if (pfile) {
-    PyObject *module = PyImport_Import(pfile);
-    Py_DECREF(pfile);
+  int err = 1;
+  PyObject *string = PyUnicode_FromString(file), *tk = NULL;
+  if (string) {
+    PyObject *module = PyImport_Import(string);
+    Py_DECREF(string);
     if (module) {
-      PyObject *pfunc = PyObject_GetAttrString(module, func);
+      PyObject *function = PyObject_GetAttrString(module, func);
       Py_DECREF(module);
-      if (pfunc && PyCallable_Check(pfunc)) {
-        PyObject *tknl = PyObject_CallFunctionObjArgs(pfunc, *knl, NULL);
-        Py_DECREF(pfunc);
-        if (tknl)
-          Py_DECREF(*knl), *knl = tknl;
-        else
-          return set_log(
-              NOMP_PY_CALL_FAILED, NOMP_ERROR,
-              "PyObject_CallFunctionObjArgs() failed when calling user "
-              "transform function: %s.",
-              func);
-      } else {
-        return set_log(NOMP_PY_CALL_FAILED, NOMP_ERROR,
-                       "PyObject_GetAttrString() failed when importing user "
-                       "transform function: %s.",
-                       func);
+      if (function && PyCallable_Check(function)) {
+        tk = PyObject_CallFunctionObjArgs(function, *knl, NULL);
+        Py_DECREF(function);
+        err = (tk == NULL);
       }
-    } else {
-      return set_log(
-          NOMP_PY_CALL_FAILED, NOMP_ERROR,
-          "PyImport_Import() failed when importing user transform file: %s.",
-          file);
     }
-  } else {
+  }
+  if (err) {
     return set_log(NOMP_PY_CALL_FAILED, NOMP_ERROR,
-                   "PyUnicode_FromString() failed when converting user "
-                   "transform file name \"%s\""
-                   "to a python string.",
-                   file);
+                   "Calling user transform function: \"%s\" failed.", func);
   }
 
-  return 0;
-}
-
-int py_handle_reduction(PyObject **knl, const char *red_op,
-                        const char *red_var) {
+  Py_DECREF(*knl), *knl = tk;
   return 0;
 }
 
 int py_get_knl_name_and_src(char **name, char **src, PyObject *knl) {
+  // Get the kernel name
   int err = 1;
   Py_ssize_t size;
-
-  // Get the kernel name
   if (knl) {
     PyObject *epts = PyObject_GetAttrString(knl, "entrypoints");
     if (epts) {

@@ -26,8 +26,7 @@
   } while (0)
 
 struct meta {
-  char *file, *func;
-  char *red_op, *red_var;
+  char *file, *func, *redn_var;
   PyObject *dict;
 };
 
@@ -123,9 +122,11 @@ int py_append_to_sys_path(const char *path);
  * @param[out] knl Loopy kernal object.
  * @param[in] c_src C kernal source.
  * @param[in] backend Backend name.
+ * @param[in] redn_var Name of the reduction variable if present.
  * @return int
  */
-int py_c_to_loopy(PyObject **knl, const char *c_src, const char *backend);
+int py_c_to_loopy(PyObject **knl, const char *c_src, const char *backend,
+                  const char *redn_var);
 
 /**
  * @ingroup nomp_py_utils
@@ -170,13 +171,12 @@ int py_user_transform(PyObject **knl, const char *file, const char *func);
  * after registering a log.
  *
  * @param[in,out] knl Pointer to loopy kernal object.
- * @param[in] red_op Reduction operation.
- * @param[in] red_var Accumulator variable for the reduction. This should
- * appear only once in the kernel and will be initialized based on \p red_op.
+ * @param[in] redn_var Accumulator variable for the reduction. This should
+ * appear only once in the kernel and will be initialized based on the reduction
+ * operator.
  * @return int
  */
-int py_handle_reduction(PyObject **knl, const char *red_op,
-                        const char *red_var);
+int py_handle_reduction(PyObject **knl, const char *redn_var);
 
 /**
  * @ingroup nomp_py_utils
@@ -216,10 +216,11 @@ int py_eval_grid_size(struct prog *prg, PyObject *dict);
  * @ingroup nomp_py_utils
  * @brief Get the representation of python object.
  *
+ * @param msg Debug message before printing the object.
  * @param obj Python object.
  * @return void
  */
-void py_print(PyObject *obj);
+void py_print(const char *msg, PyObject *obj);
 
 /**
  * @defgroup nomp_other_utils Other helper functions.

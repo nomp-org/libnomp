@@ -512,5 +512,4 @@ if __name__ == "__main__":
           }
           """
     lp_knl = c_to_loopy(KNL_STR, "cuda", "sum")
-    print(lp_knl)
     # print(lp.generate_code_v2(lp_knl).device_code())

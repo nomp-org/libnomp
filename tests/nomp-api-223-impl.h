@@ -13,7 +13,7 @@ int nomp_api_223_add_aux(TEST_TYPE *a, TEST_TYPE *b, int N) {
   snprintf(knl, len, knl_fmt, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE));
 
   static int id = -1;
-  const char *clauses[4] = {"transform", "nomp-api-200", "transform", 0};
+  const char *clauses[4] = {"transform", "nomp-api-200", "foo", 0};
   int err = nomp_jit(&id, knl, clauses);
   nomp_chk(err);
 
@@ -73,7 +73,7 @@ int nomp_api_223_sub_aux(TEST_TYPE *a, TEST_TYPE *b, int N) {
   snprintf(knl, len, knl_fmt, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE));
 
   static int id = -1;
-  const char *clauses[4] = {"transform", "nomp-api-200", "transform", 0};
+  const char *clauses[4] = {"transform", "nomp-api-200", "foo", 0};
   int err = nomp_jit(&id, knl, clauses);
   nomp_chk(err);
 
@@ -133,7 +133,7 @@ int nomp_api_223_mul_aux(TEST_TYPE *a, TEST_TYPE *b, int N) {
   snprintf(knl, len, knl_fmt, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE));
 
   static int id = -1;
-  const char *clauses[4] = {"transform", "nomp-api-200", "transform", 0};
+  const char *clauses[4] = {"transform", "nomp-api-200", "foo", 0};
   int err = nomp_jit(&id, knl, clauses);
   nomp_chk(err);
 

@@ -274,13 +274,12 @@ static int progs_n = 0;
 static int progs_max = 0;
 
 static void free_meta(struct meta *info) {
-  tfree(info->file), tfree(info->func);
-  tfree(info->red_op), tfree(info->red_var);
+  tfree(info->file), tfree(info->func), tfree(info->redn_var);
   Py_XDECREF(info->dict);
 }
 
 static int parse_clauses(struct meta *info, const char **clauses) {
-  info->file = info->func = info->red_op = info->red_var = NULL;
+  info->file = info->func = info->redn_var = NULL;
   info->dict = PyDict_New();
 
   unsigned i = 0;
@@ -313,15 +312,13 @@ static int parse_clauses(struct meta *info, const char **clauses) {
       i = i + 3;
     } else if (strncmp(clauses[i], "reduce", NOMP_BUFSIZ) == 0) {
       // Syntax: "reduce", <operator>, <accumulator>
-      if (!clauses[i + 1] || !clauses[i + 2]) {
+      if (!clauses[i + 1]) {
         return set_log(NOMP_USER_INPUT_NOT_PROVIDED, NOMP_ERROR,
-                       "\"reduce\" clause should be followed by an operation "
-                       "and the accumulator variable name. At least one of "
-                       "them is not provided.");
+                       "\"reduce\" clause should be followed by the "
+                       "accumulator variable name.");
       }
-      info->red_op = strndup(clauses[i + 1], NOMP_BUFSIZ);
-      info->red_var = strndup(clauses[i + 2], NOMP_BUFSIZ);
-      i = i + 3;
+      info->redn_var = strndup(clauses[i + 1], NOMP_BUFSIZ);
+      i = i + 2;
     } else {
       return set_log(
           NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
@@ -329,6 +326,9 @@ static int parse_clauses(struct meta *info, const char **clauses) {
           clauses[i]);
     }
   }
+
+  if (info->redn_var == NULL)
+    info->redn_var = strndup("", 1);
 
   return 0;
 }
@@ -340,28 +340,27 @@ int nomp_jit(int *id, const char *c_src, const char **clauses) {
       progs = trealloc(progs, struct prog *, progs_max);
     }
 
-    // Create loopy kernel from C source
-    PyObject *knl = NULL;
-    int err = py_c_to_loopy(&knl, c_src, nomp.name);
-    return_on_err(err);
-
     // Parse the clauses
     struct meta info;
-    err = parse_clauses(&info, clauses);
+    int err = parse_clauses(&info, clauses);
     return_on_err(err);
 
-    // Handle annotate clauses if the exist
+    // Create loopy kernel from C source
+    PyObject *knl = NULL;
+    err = py_c_to_loopy(&knl, c_src, nomp.name, info.redn_var);
+    return_on_err(err);
+
+    // Handle annotate clauses if they exist
     err = py_user_annotate(&knl, info.dict, nomp.annts_script, nomp.annts_func);
+    return_on_err(err);
+
+    // Handle reduction clause
+    err = py_handle_reduction(&knl, nomp.backend);
     return_on_err(err);
 
     // Handle transform clause
     err = py_user_transform(&knl, info.file, info.func);
     return_on_err(err);
-
-    // Handle reduction clause
-    err = py_handle_reduction(&knl, info.red_op, info.red_var);
-
-    // TODO: Autotuning
 
     // Get OpenCL, CUDA, etc. source and name from the loopy kernel
     char *name = NULL, *src = NULL;

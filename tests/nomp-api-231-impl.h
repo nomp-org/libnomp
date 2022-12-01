@@ -15,7 +15,7 @@ int nomp_api_231_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {
            TOSTRING(TEST_TYPE));
 
   static int id = -1;
-  const char *clauses[4] = {"transform", "nomp-api-200", "transform", 0};
+  const char *clauses[4] = {"transform", "nomp-api-200", "foo", 0};
   int err = nomp_jit(&id, knl, clauses);
   nomp_chk(err);
 
