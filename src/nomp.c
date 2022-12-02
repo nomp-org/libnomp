@@ -350,6 +350,10 @@ int nomp_jit(int *id, const char *c_src, const char **clauses) {
     err = py_c_to_loopy(&knl, c_src, nomp.name, info.redn_var);
     return_on_err(err);
 
+    char *name = NULL;
+    err = py_get_knl_name(&name, knl);
+    return_on_err(err);
+
     // Handle annotate clauses if they exist
     err = py_user_annotate(&knl, info.dict, nomp.annts_script, nomp.annts_func);
     return_on_err(err);
@@ -362,9 +366,9 @@ int nomp_jit(int *id, const char *c_src, const char **clauses) {
     err = py_user_transform(&knl, info.file, info.func);
     return_on_err(err);
 
-    // Get OpenCL, CUDA, etc. source and name from the loopy kernel
-    char *name = NULL, *src = NULL;
-    err = py_get_knl_name_and_src(&name, &src, knl);
+    // Get OpenCL, CUDA, etc. source from the loopy kernel
+    char *src = NULL;
+    err = py_get_knl_src(&src, knl);
     return_on_err(err);
 
     // Build the kernel

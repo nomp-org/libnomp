@@ -13,8 +13,6 @@ extern const char *ERR_STR_KNL_ARG_TYPE_IS_INVALID;
 // FIXME: We can get rid of these loopy errors as they are
 // only used once.
 extern const char *ERR_STR_LOOPY_CONVERSION_ERROR;
-extern const char *ERR_STR_LOOPY_KNL_NAME_NOT_FOUND;
-extern const char *ERR_STR_LOOPY_CODEGEN_FAILED;
 extern const char *ERR_STR_LOOPY_GRIDSIZE_FAILED;
 
 extern const char *ERR_STR_CUDA_FAILURE;

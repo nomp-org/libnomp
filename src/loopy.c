@@ -157,62 +157,63 @@ int py_user_transform(PyObject **knl, const char *file, const char *func) {
   return 0;
 }
 
-int py_get_knl_name_and_src(char **name, char **src, PyObject *knl) {
-  // Get the kernel name
+int py_get_knl_name(char **name, PyObject *knl) {
   int err = 1;
   Py_ssize_t size;
-  if (knl) {
-    PyObject *epts = PyObject_GetAttrString(knl, "entrypoints");
-    if (epts) {
-      Py_ssize_t len = PySet_Size(epts);
-      // FIXME: This doesn't require iterator API
-      // Iterator C API: https://docs.python.org/3/c-api/iter.html
-      PyObject *iter = PyObject_GetIter(epts);
-      if (iter) {
-        PyObject *entry = PyIter_Next(iter);
-        PyObject *py_name = PyObject_Str(entry);
-        if (py_name) {
-          const char *name_ = PyUnicode_AsUTF8AndSize(py_name, &size);
-          *name = strndup(name_, size + 1);
-          Py_DECREF(py_name), err = 0;
-        }
-        Py_XDECREF(entry), Py_DECREF(iter);
+  PyObject *epts = PyObject_GetAttrString(knl, "entrypoints");
+  if (epts) {
+    Py_ssize_t len = PySet_Size(epts);
+    // FIXME: This doesn't require iterator API
+    // Iterator C API: https://docs.python.org/3/c-api/iter.html
+    PyObject *iter = PyObject_GetIter(epts);
+    if (iter) {
+      PyObject *entry = PyIter_Next(iter);
+      PyObject *py_name = PyObject_Str(entry);
+      if (py_name) {
+        const char *name_ = PyUnicode_AsUTF8AndSize(py_name, &size);
+        *name = strndup(name_, size + 1);
+        Py_DECREF(py_name), err = 0;
       }
-      Py_DECREF(epts);
+      Py_XDECREF(entry), Py_DECREF(iter);
     }
-    if (err) {
-      return set_log(NOMP_LOOPY_KNL_NAME_NOT_FOUND, NOMP_ERROR,
-                     ERR_STR_LOOPY_KNL_NAME_NOT_FOUND, *name);
-    }
+    Py_DECREF(epts);
+  }
+  if (err) {
+    return set_log(NOMP_LOOPY_KNL_NAME_NOT_FOUND, NOMP_ERROR,
+                   "Failed to find loopy kernel name for kernel = %p.\n", knl);
+  }
 
-    // Get the kernel source
-    err = 1;
-    PyObject *lpy = PyImport_ImportModule("loopy");
-    if (lpy) {
-      PyObject *gen_v2 = PyObject_GetAttrString(lpy, "generate_code_v2");
-      if (gen_v2) {
-        PyObject *code = PyObject_CallFunctionObjArgs(gen_v2, knl, NULL);
-        if (code) {
-          PyObject *py_device = PyObject_GetAttrString(code, "device_code");
-          if (py_device) {
-            PyObject *py_src = PyObject_CallFunctionObjArgs(py_device, NULL);
-            if (py_src) {
-              const char *src_ = PyUnicode_AsUTF8AndSize(py_src, &size);
-              *src = strndup(src_, size + 1);
-              Py_DECREF(py_src), err = 0;
-            }
-            Py_DECREF(py_device);
+  return 0;
+}
+
+int py_get_knl_src(char **src, PyObject *knl) {
+  int err = 1;
+  Py_ssize_t size;
+  PyObject *lpy = PyImport_ImportModule("loopy");
+  if (lpy) {
+    PyObject *gen_v2 = PyObject_GetAttrString(lpy, "generate_code_v2");
+    if (gen_v2) {
+      PyObject *code = PyObject_CallFunctionObjArgs(gen_v2, knl, NULL);
+      if (code) {
+        PyObject *py_device = PyObject_GetAttrString(code, "device_code");
+        if (py_device) {
+          PyObject *py_src = PyObject_CallFunctionObjArgs(py_device, NULL);
+          if (py_src) {
+            const char *src_ = PyUnicode_AsUTF8AndSize(py_src, &size);
+            *src = strndup(src_, size + 1);
+            Py_DECREF(py_src), err = 0;
           }
-          Py_DECREF(code);
+          Py_DECREF(py_device);
         }
-        Py_DECREF(gen_v2);
+        Py_DECREF(code);
       }
-      Py_DECREF(lpy);
+      Py_DECREF(gen_v2);
     }
+    Py_DECREF(lpy);
   }
   if (err) {
     return set_log(NOMP_LOOPY_CODEGEN_FAILED, NOMP_ERROR,
-                   ERR_STR_LOOPY_CODEGEN_FAILED, *name);
+                   "Failed to generate code from loopy kernel %p.", knl);
   }
 
   return 0;

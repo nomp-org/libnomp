@@ -17,10 +17,6 @@ const char *ERR_STR_KNL_ARG_TYPE_IS_INVALID =
     "Invalid libnomp kernel argument type %d.";
 
 const char *ERR_STR_LOOPY_CONVERSION_ERROR = "C to Loopy conversion failed.";
-const char *ERR_STR_LOOPY_KNL_NAME_NOT_FOUND =
-    "Failed to find loopy kernel %s.";
-const char *ERR_STR_LOOPY_CODEGEN_FAILED =
-    "Code generation from loopy kernel %s failed.";
 const char *ERR_STR_LOOPY_GRIDSIZE_FAILED = "Loopy grid size failure.";
 
 const char *ERR_STR_CUDA_FAILURE = "Cuda %s failed: %s.";
