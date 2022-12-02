@@ -7,9 +7,9 @@ int main(int argc, char *argv[]) {
   int device, platform;
   parse_input(argc, argv, &backend, &device, &platform);
 
-  TEST_SUITE(110, backend, device, platform, 0, 10)
-  TEST_SUITE(110, backend, device, platform, 5, 10)
-  TEST_SUITE(110, backend, device, platform, 2, 8)
+  TEST_BUILTIN_TYPES(110, backend, device, platform, 0, 10)
+  TEST_BUILTIN_TYPES(110, backend, device, platform, 5, 10)
+  TEST_BUILTIN_TYPES(110, backend, device, platform, 2, 8)
 
   return 0;
 }
