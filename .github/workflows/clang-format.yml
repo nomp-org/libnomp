@@ -56,5 +56,4 @@ jobs:
       - name: Run clang-format
         id: run_clang-format
         run: |
-          cd ${BUILDDIR}
-          make clangformat_test
+          ./lnmake format --c
