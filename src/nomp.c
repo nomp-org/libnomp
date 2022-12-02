@@ -158,8 +158,7 @@ int nomp_init(int argc, const char **argv) {
         NOMP_RUNTIME_ALREADY_INITIALIZED, NOMP_ERROR,
         "libnomp is already initialized to use %s. Call nomp_finalize() before "
         "calling nomp_init() again.",
-        nomp.name);
-  }
+        nomp.backend);
 
   int err = check_args(argc, argv, &nomp);
   return_on_err(err);
@@ -185,8 +184,6 @@ int nomp_init(int argc, const char **argv) {
                   "Failed to initialized libnomp. Invalid backend: %s", name);
   }
   return_on_err(err);
-
-  strncpy(nomp.name, name, MAX_BACKEND_NAME_SIZE);
 
   if (!Py_IsInitialized()) {
     // May be we need the isolated configuration listed here:
@@ -347,7 +344,7 @@ int nomp_jit(int *id, const char *c_src, const char **clauses) {
 
     // Create loopy kernel from C source
     PyObject *knl = NULL;
-    err = py_c_to_loopy(&knl, c_src, nomp.name, info.redn_var);
+    err = py_c_to_loopy(&knl, c_src, nomp.backend, info.redn_var);
     return_on_err(err);
 
     char *name = NULL;
@@ -358,12 +355,12 @@ int nomp_jit(int *id, const char *c_src, const char **clauses) {
     err = py_user_annotate(&knl, info.dict, nomp.annts_script, nomp.annts_func);
     return_on_err(err);
 
-    // Handle reduction clause
-    err = py_handle_reduction(&knl, nomp.backend);
-    return_on_err(err);
-
     // Handle transform clause
     err = py_user_transform(&knl, info.file, info.func);
+    return_on_err(err);
+
+    // Handle reduction clause
+    err = py_handle_reduction(&knl, nomp.backend, info.redn_var);
     return_on_err(err);
 
     // Get OpenCL, CUDA, etc. source from the loopy kernel
@@ -407,9 +404,12 @@ int nomp_run(int id, int narg, ...) {
       void *val = va_arg(args, void *);
       if (type == NOMP_INTEGER) {
         PyObject *py_key = PyUnicode_FromStringAndSize(var, strlen(var));
+        // FIXME: This is wrong. Val should be converted to a pointer which
+        // match the size given by `size`.
         PyObject *py_val = PyLong_FromLong(*((int *)val));
         PyDict_SetItem(prg->py_dict, py_key, py_val);
         Py_XDECREF(py_key), Py_XDECREF(py_val);
+      } else if (type == NOMP_FLOAT) {
       }
     }
     va_end(args);

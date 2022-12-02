@@ -4,6 +4,7 @@ from typing import Dict, FrozenSet, List, Optional, Union
 
 import islpy as isl
 import loopy as lp
+import numpy as np
 import pymbolic.primitives as prim
 from loopy.isl_helpers import make_slab
 from loopy.kernel.data import AddressSpace
@@ -152,7 +153,7 @@ class CToLoopyMapperContext:
     value_args: FrozenSet[str]
     predicates: FrozenSet[Union[prim.Comparison, prim.LogicalNot]]
     name_gen: UniqueNameGenerator
-    reduction: str
+    redn_var: str
 
     def copy(self, **kwargs) -> "CToLoopyMapperContext":
         """Update class variables"""
@@ -355,15 +356,19 @@ class CToLoopyMapper(IdentityMapper):
         lhs = CToLoopyExpressionMapper()(expr.lvalue)
         rhs = CToLoopyExpressionMapper()(expr.rvalue)
 
-        if str(lhs) == context.reduction:
+        inames = context.inames
+        if (
+            isinstance(lhs, prim.Subscript)
+            and isinstance(lhs.aggregate, prim.Variable)
+            and str(lhs.aggregate) == context.redn_var
+        ):
             try:
                 rhs = Reduction(
                     _C_REDN_TO_LOOPY_REDN[expr.op], tuple(context.inames), rhs
                 )
             except Exception as ex:
-                raise NotImplementedError(
-                    f"{expr.op} is not supported."
-                ) from ex
+                raise NotImplementedError(f"{expr.op} is not valid!") from ex
+            inames = frozenset()
         elif expr.op == "+=":
             rhs = lhs + rhs
         elif expr.op == "-=":
@@ -379,7 +384,7 @@ class CToLoopyMapper(IdentityMapper):
                 lp.Assignment(
                     lhs,
                     expression=rhs,
-                    within_inames=context.inames,
+                    within_inames=inames,
                     predicates=context.predicates,
                     id=context.name_gen(LOOPY_INSN_PREFIX),
                 )
@@ -435,7 +440,11 @@ def decl_to_knl_arg(decl: c_ast.Decl, dtype):
         return lp.ValueArg(decl.name, dtype=dtype)
     if isinstance(decl_type, (c_ast.PtrDecl, c_ast.ArrayDecl)):
         return lp.ArrayArg(
-            decl.name, dtype=dtype, address_space=AddressSpace.GLOBAL
+            decl.name,
+            dtype=dtype,
+            address_space=AddressSpace.GLOBAL,
+            dim_tags="N0:stride:1",
+            shape=lp.auto,
         )
     raise NotImplementedError(
         f"decl_to_knl_arg: {decl} is of invalid type: {decl_type}."
@@ -443,7 +452,7 @@ def decl_to_knl_arg(decl: c_ast.Decl, dtype):
 
 
 def c_to_loopy(
-    c_str: str, backend: str, reduction: str = ""
+    c_str: str, backend: str, redn_var: str = ""
 ) -> lp.translation_unit.TranslationUnit:
     """Map C kernel to Loopy"""
     # Parse the function
@@ -467,7 +476,7 @@ def c_to_loopy(
             context.get_typedecl().keys(),
             frozenset(),
             UniqueNameGenerator(),
-            reduction,
+            redn_var,
         ),
     )
 
@@ -505,11 +514,23 @@ if __name__ == "__main__":
     import sys
 
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+    from reduction import realize_reduction, test_global_parallel_reduction
+
+    knl0 = lp.make_kernel(
+        "{[i]: 0 <= i < n }",
+        """
+        z[0] = sum(i, a[i])
+        """,
+    )
+    knl0 = lp.add_and_infer_dtypes(knl0, {"a": np.float32})
+
     KNL_STR = """
-          void foo(double *a, int N) {
+          void foo(double *a, double *bb, int N) {
             for (int i = 0; i < N; i++)
-              sum += a[i] + 1;
+              bb[0] += a[i];
           }
           """
-    lp_knl = c_to_loopy(KNL_STR, "cuda", "sum")
-    # print(lp.generate_code_v2(lp_knl).device_code())
+    knl1 = c_to_loopy(KNL_STR, "cuda", "bb")
+
+    knl1 = realize_reduction(knl1, "cuda", "bb")
+    print(lp.generate_code_v2(knl1).device_code())

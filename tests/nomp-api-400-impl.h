@@ -1,12 +1,12 @@
 #include "nomp-test.h"
 
 #define nomp_api_400_aux TOKEN_PASTE(nomp_api_400_aux, TEST_SUFFIX)
-int nomp_api_400_aux(TEST_TYPE *a, int N, TEST_TYPE sum) {
+int nomp_api_400_aux(TEST_TYPE *a, TEST_TYPE *z, int N) {
   const char *knl_fmt =
-      "void foo(%s *a, int N, %s sum) {                       \n"
-      "  for (int i = 0; i < N; i++)                          \n"
-      "    a[i] += i;                                         \n"
-      "    sum += a[i];                                       \n"
+      "void foo(%s *a, %s *z, int N) {                        \n"
+      "  for (int i = 0; i < N; i++) {                        \n"
+      "    z[0] += a[i];                                      \n"
+      "  }                                                    \n"
       "}                                                      \n";
 
   size_t len = strlen(knl_fmt) + 2 * strlen(TOSTRING(TEST_TYPE)) + 1;
@@ -15,12 +15,13 @@ int nomp_api_400_aux(TEST_TYPE *a, int N, TEST_TYPE sum) {
            TOSTRING(TEST_TYPE));
 
   static int id = -1;
-  const char *clauses[4] = {"transform", "nomp-api-200", "foo", 0};
+  const char *clauses[3] = {"reduce", "z", 0};
   int err = nomp_jit(&id, knl, clauses);
   nomp_chk(err);
 
-  err = nomp_run(id, 3, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "N", NOMP_INTEGER,
-                 sizeof(int), &N, "sum", NOMP_INTEGER, sizeof(TEST_TYPE), &sum);
+  err =
+      nomp_run(id, 3, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "z", NOMP_PTR,
+               sizeof(TEST_TYPE), z, "N", NOMP_INTEGER, sizeof(TEST_TYPE), &N);
   nomp_chk(err);
 
   tfree(knl);
@@ -40,7 +41,7 @@ int nomp_api_400(const char *backend, int device, int platform) {
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO);
   nomp_chk(err);
 
-  nomp_api_400_aux(a, n, sum);
+  nomp_api_400_aux(a, &sum, n);
 
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM);
   nomp_chk(err);

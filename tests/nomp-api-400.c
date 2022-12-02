@@ -10,11 +10,6 @@ int main(int argc, char *argv[]) {
   int platform = argc > 3 ? atoi(argv[3]) : 0;
 
   nomp_api_400_int(backend, device, platform);
-  nomp_api_400_long(backend, device, platform);
-  nomp_api_400_unsigned(backend, device, platform);
-  nomp_api_400_unsigned_long(backend, device, platform);
-  nomp_api_400_float(backend, device, platform);
-  nomp_api_400_double(backend, device, platform);
 
   return 0;
 }

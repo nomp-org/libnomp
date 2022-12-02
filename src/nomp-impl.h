@@ -45,7 +45,6 @@ struct mem {
 struct backend {
   char *backend, *install_dir, *annts_script, *annts_func;
   int platform_id, device_id, verbose;
-  char name[NOMP_BUFSIZ];
   int (*update)(struct backend *, struct mem *, const int);
   int (*knl_build)(struct backend *, struct prog *, const char *, const char *);
   int (*knl_run)(struct backend *, struct prog *, va_list);
@@ -171,12 +170,14 @@ int py_user_transform(PyObject **knl, const char *file, const char *func);
  * after registering a log.
  *
  * @param[in,out] knl Pointer to loopy kernel object.
+ * @param[in] backend Backend for the reduction.
  * @param[in] redn_var Accumulator variable for the reduction. This should
  * appear only once in the kernel and will be initialized based on the reduction
  * operator.
  * @return int
  */
-int py_handle_reduction(PyObject **knl, const char *redn_var);
+int py_handle_reduction(PyObject **knl, const char *backend,
+                        const char *redn_var);
 
 /**
  * @ingroup nomp_py_utils

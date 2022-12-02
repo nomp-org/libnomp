@@ -98,7 +98,7 @@ int py_user_annotate(PyObject **knl, PyObject *annts, const char *file,
   return 0;
 }
 
-int py_handle_reduction(PyObject **knl, const char *backend) {
+int py_handle_reduction(PyObject **knl, const char *backend, const char *var) {
   check_null_input(*knl);
 
   int err = 1;
@@ -111,9 +111,10 @@ int py_handle_reduction(PyObject **knl, const char *backend) {
       Py_DECREF(module);
       if (function && PyCallable_Check(function)) {
         PyObject *pbackend = PyUnicode_FromString(backend);
-        tk = PyObject_CallFunctionObjArgs(function, *knl, pbackend, NULL);
+        PyObject *pvar = PyUnicode_FromString(var);
+        tk = PyObject_CallFunctionObjArgs(function, *knl, pbackend, pvar, NULL);
         err = (tk == NULL);
-        Py_XDECREF(pbackend), Py_DECREF(function);
+        Py_XDECREF(pbackend), Py_XDECREF(pvar), Py_DECREF(function);
       }
     }
   }
