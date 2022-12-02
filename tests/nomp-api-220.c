@@ -12,8 +12,8 @@ int main(int argc, char *argv[]) {
   int err = nomp_init(backend, platform, device);
   nomp_chk(err);
 
-  TEST_SUITE(220, 10)
-  TEST_SUITE(220, 20)
+  TEST_BUILTIN_TYPES(220, 10)
+  TEST_BUILTIN_TYPES(220, 20)
 
   err = nomp_finalize();
   nomp_chk(err);

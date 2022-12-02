@@ -7,7 +7,7 @@ int main(int argc, char *argv[]) {
   int device, platform;
   parse_input(argc, argv, &backend, &device, &platform);
 
-  TEST_SUITE(231, backend, device, platform)
+  TEST_BUILTIN_TYPES(231, backend, device, platform)
 
   return 0;
 }

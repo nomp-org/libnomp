@@ -6,7 +6,7 @@ int main(int argc, char *argv[]) {
   int device, platform;
   parse_input(argc, argv, &backend, &device, &platform);
 
-  // Calling `nomp_finalize` before `nomp_init` should retrun an error
+  // Calling `nomp_finalize` before `nomp_init` should return an error
   int err = nomp_finalize();
   nomp_assert(nomp_get_log_no(err) == NOMP_RUNTIME_NOT_INITIALIZED);
 
