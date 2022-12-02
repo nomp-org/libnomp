@@ -122,7 +122,7 @@ function run_tests() {
         echo "${t}: ${red}Failed${reset}"
         ERR=$((ERR + 1))
       fi
-      [[ -n ${OUTPUT} ]] && echo -e "\t${OUTPUT}\n"
+      [[ -n ${OUTPUT} ]] && echo -e "${OUTPUT}\n"
     done
   [ $ERR -gt 0 ] && echo -e "\n${red}There are test failures${reset}"
   exit ${ERR}
