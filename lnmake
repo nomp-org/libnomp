@@ -37,25 +37,25 @@ function update_bashrc() {
 }
 
 function print_help() {
-  echo -e " NAME\n\t Make utility tools for libnomp.\n\n" \
-    "SYNOPSIS\n" \
-    "\t lnrun <command> [options]\n\n" \
-    "OPTIONS\n" \
-    "\t${cyan}-h${reset}, ${cyan}--help${reset}" \
-    "\tPrint the usage details of ${0}.\n" \
+  echo -e " NAME\n\t Utility tools for installing and formatting libnomp.\n\n" \
+    "INSTALL\n" \
+    "\tlnmake i|install [--yes|--no]\n" \
+    "\tInstall libnomp.\n\n" \
     "\t${cyan}-y${reset}, ${cyan}--yes${reset}" \
     "\tYes to all prompts.\n" \
     "\t${cyan}-n${reset}, ${cyan}--no${reset}" \
     "\tNo to all prompts.\n\n" \
-    "COMMANDS\n" \
-    "\t${cyan}i${reset}, ${cyan}install${reset} " \
-    "\tInstall libnomp.\n" \
-    "\t${cyan}f${reset}, ${cyan}format${reset}" \
-    "\tFormat the source files of libnomp."
+    "FORMAT\n" \
+    "\tlnmake f|format [--py] [--c]\n" \
+    "\tFormat the source files of libnomp.\n\n" \
+    "\t${cyan}--c${reset}\t" \
+    "\tFormat c source files.\n" \
+    "\t${cyan}--py${reset}\t" \
+    "\tFormat python source files."
   exit 0
 }
 
-function make_install() {
+function install() {
   NOMP_INSTALL_SUCCESS=false
   cmake --build "${NOMP_BUILD_DIR}" --target install &&
     NOMP_INSTALL_SUCCESS=true
@@ -89,18 +89,29 @@ END
   fi
 }
 
-function make_format() {
+function format_python() {
   NOMP_FORMAT_SUCCESS=false
-  cmake --build "${NOMP_BUILD_DIR}" --target clangformat &&
-    cmake --build "${NOMP_BUILD_DIR}" --target pylint &&
+  cmake --build "${NOMP_BUILD_DIR}" --target pylint &&
     cmake --build "${NOMP_BUILD_DIR}" --target flake8 &&
     NOMP_FORMAT_SUCCESS=true
 
   if [[ ${NOMP_FORMAT_SUCCESS} = true ]]; then
-    echo "${green}Successfully formatted source files${reset}"
-    exit 0
+    echo "${green}Successfully formatted python source files${reset}"
   else
-    echo "${red}Failed to format source files${reset}"
+    echo "${red}Failed to format python source files${reset}"
+    exit 1
+  fi
+}
+
+function format_c() {
+  NOMP_FORMAT_SUCCESS=false
+  cmake --build "${NOMP_BUILD_DIR}" --target clangformat &&
+    NOMP_FORMAT_SUCCESS=true
+
+  if [[ ${NOMP_FORMAT_SUCCESS} = true ]]; then
+    echo "${green}Successfully formatted c-lang source files${reset}"
+  else
+    echo "${red}Failed to format c-lang source files${reset}"
     exit 1
   fi
 }
@@ -123,20 +134,39 @@ if [[ $# -gt 0 ]]; then
       -n | --no) NOMP_DEFAULT_PROMPT="n" ;;
       *)
         echo "${red}Invalid argument: ${1}${reset}."
-        echo "See ${cyan}./${0} -h${reset} or ${cyan}./${0} --help${reset} for" \
-          "the accepted commands."
+        echo "See ${cyan}./${0} -h|--help${reset} for the accepted commands."
         exit 1
         ;;
       esac
     fi
-    make_install
+    install
     ;;
-  f | format) make_format ;;
+  f | format)
+    shift
+    if [ $# -eq 0 ]; then
+      echo "No arguments were provided to ${cyan}lnmake f|format${reset}."
+      exit 0
+    fi
+    while [ $# -gt 0 ]; do
+      case $1 in
+      --py) NOMP_FORMAT_PYTHON=true ;;
+      --c) NOMP_FORMAT_C=true ;;
+      *)
+        echo "${red}Invalid argument: ${1}${reset}"
+        echo "See ${cyan}${0} -h|--help f|format ${reset} for the accepted commands."
+        exit 1
+        ;;
+      esac
+      shift
+    done
+    [[ ${NOMP_FORMAT_PYTHON} = true ]] && format_python
+    [[ ${NOMP_FORMAT_C} = true ]] && format_c
+    exit 0
+    ;;
   -h | --help) print_help ;;
   *)
     echo "${red}Invalid argument: ${1}${reset}."
-    echo "See ${cyan}./${0} -h${reset} or ${cyan}./${0} --help${reset} for" \
-      "the accepted commands."
+    echo "See ${cyan}./${0} -h|--help${reset} for the accepted commands."
     exit 1
     ;;
   esac
