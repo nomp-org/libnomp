@@ -523,6 +523,7 @@ if __name__ == "__main__":
         """,
     )
     knl0 = lp.add_and_infer_dtypes(knl0, {"a": np.float32})
+    knl0 = test_global_parallel_reduction(knl0)
 
     KNL_STR = """
           void foo(double *a, double *bb, int N) {
@@ -531,6 +532,5 @@ if __name__ == "__main__":
           }
           """
     knl1 = c_to_loopy(KNL_STR, "cuda", "bb")
-
     knl1 = realize_reduction(knl1, "cuda", "bb")
     print(lp.generate_code_v2(knl1).device_code())

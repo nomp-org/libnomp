@@ -19,8 +19,8 @@ int nomp_api_300_aux(TEST_TYPE *a, TEST_TYPE *b, int row, int col) {
   nomp_chk(err);
 
   err = nomp_run(id, 4, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
-                 sizeof(TEST_TYPE), b, "row", NOMP_INTEGER, sizeof(int), &row,
-                 "col", NOMP_INTEGER, sizeof(int), &col);
+                 sizeof(TEST_TYPE), b, "row", NOMP_INT, sizeof(int), &row,
+                 "col", NOMP_INT, sizeof(int), &col);
   nomp_chk(err);
 
   tfree(knl);

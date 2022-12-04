@@ -27,7 +27,7 @@ int nomp_api_210() {
   tfree(knl);
 
   err = nomp_run(id, 3, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
-                 sizeof(TEST_TYPE), b, "N", NOMP_INTEGER, sizeof(int), &N);
+                 sizeof(TEST_TYPE), b, "N", NOMP_INT, sizeof(int), &N);
   nomp_chk(err);
 
   err = nomp_update(a, 0, 20, sizeof(TEST_TYPE), NOMP_FROM);

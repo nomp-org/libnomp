@@ -144,7 +144,8 @@ static int cuda_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
     size_t size = va_arg(args, size_t);
     void *p = va_arg(args, void *);
     switch (type) {
-    case NOMP_INTEGER:
+    case NOMP_INT:
+    case NOMP_UINT:
     case NOMP_FLOAT:
       break;
     case NOMP_PTR:

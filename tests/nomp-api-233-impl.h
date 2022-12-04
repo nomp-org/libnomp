@@ -21,7 +21,7 @@ int nomp_api_233_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {
 
   err = nomp_run(id, 4, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
                  sizeof(TEST_TYPE), b, "c", NOMP_PTR, sizeof(TEST_TYPE), c, "N",
-                 NOMP_INTEGER, sizeof(int), &N);
+                 NOMP_INT, sizeof(int), &N);
   nomp_chk(err);
 
   tfree(knl);

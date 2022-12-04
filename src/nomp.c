@@ -402,26 +402,27 @@ int nomp_run(int id, int narg, ...) {
       int type = va_arg(args, int);
       size_t size = va_arg(args, size_t);
       void *val = va_arg(args, void *);
-      if (type == NOMP_INTEGER) {
-        PyObject *py_key = PyUnicode_FromStringAndSize(var, strlen(var));
+
+      if (type == NOMP_INT || type == NOMP_UINT || type == NOMP_FLOAT) {
         // FIXME: This is wrong. Val should be converted to a pointer which
-        // match the size given by `size`.
+        // match the size given by `size`. Not sure if we should pass `float`
+        // vlaues to this dict as well.
+        PyObject *py_key = PyUnicode_FromStringAndSize(var, strlen(var));
         PyObject *py_val = PyLong_FromLong(*((int *)val));
         PyDict_SetItem(prg->py_dict, py_key, py_val);
-        Py_XDECREF(py_key), Py_XDECREF(py_val);
-      } else if (type == NOMP_FLOAT) {
+        Py_XDECREF(py_key);
+        Py_XDECREF(py_val);
       }
     }
     va_end(args);
+
     int err = py_eval_grid_size(prg, prg->py_dict);
     return_on_err(err);
 
     va_start(args, narg);
     err = nomp.knl_run(&nomp, prg, args);
     va_end(args);
-    return_on_err(err);
-
-    return 0;
+    return err;
   }
   return set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                  "Kernel id %d passed to nomp_run is not valid.", id);

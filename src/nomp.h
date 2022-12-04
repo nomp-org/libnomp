@@ -2,6 +2,48 @@
 #define _LIB_NOMP_H_
 
 #include <stddef.h>
+
+/**
+ * @defgroup nomp_types Kernel argument types.
+ *
+ * @brief Defines argument types for a nomp kernel. Currently, only integer,
+ * float or pointer types are supported.
+ */
+
+/**
+ * @ingroup nomp_types
+ * @brief Signed integer argument type.
+ */
+#define NOMP_INT 1
+/**
+ * @ingroup nomp_types
+ * @brief Unsigned integer argument type.
+ */
+#define NOMP_UINT 2
+/**
+ * @ingroup nomp_types Data Types
+ * @brief Floating point argument type.
+ */
+#define NOMP_FLOAT 3
+/**
+ * @ingroup nomp_types
+ * @brief Pointer argument type.
+ */
+#define NOMP_PTR 4
+
+/**
+ * @defgroup nomp_attributes Kernel argument attributes.
+ *
+ * @brief Defines additional attributes for nomp kernel arguments. For example,
+ * if the argument is a reduction variable.
+ */
+
+/**
+ * @ingroup nomp_attributes
+ * @brief Nomp kernel argument is part of a reduction.
+ */
+#define NOMP_ATTR_REDN 1024
+
 /**
  * @defgroup nomp_update_direction Update Direction
  *
@@ -29,29 +71,6 @@
  * @brief Free memory allocated on the device.
  */
 #define NOMP_FREE 8
-
-/**
- * @defgroup nomp_types Data Types
- *
- * @brief Defines argument type in a kernel. Currently, only integer, float or
- * pointer types are supported.
- */
-
-/**
- * @ingroup nomp_types
- * @brief Integer argument type.
- */
-#define NOMP_INTEGER 1
-/**
- * @ingroup nomp_types Data Types
- * @brief Floating point argument type.
- */
-#define NOMP_FLOAT 2
-/**
- * @ingroup nomp_types
- * @brief Pointer argument type.
- */
-#define NOMP_PTR 4
 
 /**
  * @defgroup nomp_errors Errors
