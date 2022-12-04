@@ -187,45 +187,54 @@ int opencl_init(struct backend *bnd, const int platform_id,
                 const int device_id) {
   cl_uint num_platforms;
   cl_int err = clGetPlatformIDs(0, NULL, &num_platforms);
-  if (platform_id < 0 | platform_id >= num_platforms)
+  // TODO: Check for err
+  if (platform_id < 0 | platform_id >= num_platforms) {
     return set_log(NOMP_USER_PLATFORM_IS_INVALID, NOMP_ERROR,
                    "Platform id %d provided to libnomp is not valid.",
                    platform_id);
+  }
+
   cl_platform_id *cl_platforms = tcalloc(cl_platform_id, num_platforms);
-  if (cl_platforms == NULL)
+  if (cl_platforms == NULL) {
     return set_log(NOMP_RUNTIME_MEMORY_ALLOCATION_FAILED, NOMP_ERROR,
                    ERR_STR_RUNTIME_MEMORY_ALLOCATION_FAILURE);
+  }
+
   err = clGetPlatformIDs(num_platforms, cl_platforms, &num_platforms);
   cl_platform_id platform = cl_platforms[platform_id];
 
   cl_uint num_devices;
   err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 0, NULL, &num_devices);
-  if (device_id < 0 || device_id >= num_devices)
+  if (device_id < 0 || device_id >= num_devices) {
+    tfree(cl_platforms);
     return set_log(NOMP_USER_DEVICE_IS_INVALID, NOMP_ERROR,
                    ERR_STR_USER_DEVICE_IS_INVALID, device_id);
+  }
 
   cl_device_id *cl_devices = tcalloc(cl_device_id, num_devices);
-  if (cl_devices == NULL)
+  if (cl_devices == NULL) {
+    tfree(cl_platforms);
     return set_log(NOMP_RUNTIME_MEMORY_ALLOCATION_FAILED, NOMP_ERROR,
                    ERR_STR_RUNTIME_MEMORY_ALLOCATION_FAILURE);
+  }
 
   err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, num_devices, cl_devices,
                        &num_devices);
   cl_device_id device = cl_devices[device_id];
 
-  struct opencl_backend *ocl = bnd->bptr = tcalloc(struct opencl_backend, 1);
+  struct opencl_backend *ocl = tcalloc(struct opencl_backend, 1);
   ocl->device_id = device;
   ocl->ctx = clCreateContext(NULL, 1, &device, NULL, NULL, &err);
   ocl->queue = clCreateCommandQueueWithProperties(ocl->ctx, device, 0, &err);
 
-  tfree(cl_devices);
-  tfree(cl_platforms);
-
+  bnd->bptr = (void *)ocl;
   bnd->update = opencl_update;
   bnd->knl_build = opencl_knl_build;
   bnd->knl_run = opencl_knl_run;
   bnd->knl_free = opencl_knl_free;
   bnd->finalize = opencl_finalize;
+
+  tfree(cl_devices), tfree(cl_platforms);
 
   return 0;
 }

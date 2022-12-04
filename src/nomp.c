@@ -65,8 +65,8 @@ static int check_env(struct backend *backend) {
   tmp = get_if_env("NOMP_ANNOTATE_SCRIPT");
   if (tmp) {
     size_t size = strnlen(tmp, NOMP_BUFSIZ) + 1;
-    backend->annts_script = tcalloc(char, size);
-    strncpy(backend->annts_script, tmp, size), tfree(tmp);
+    backend->script = tcalloc(char, size);
+    strncpy(backend->script, tmp, size), tfree(tmp);
   }
 
   tmp = get_if_env("NOMP_ANNOTATE_FUNCTION");
@@ -352,7 +352,7 @@ int nomp_jit(int *id, const char *c_src, const char **clauses) {
     return_on_err(err);
 
     // Handle annotate clauses if they exist
-    err = py_user_annotate(&knl, info.dict, nomp.annts_script, nomp.annts_func);
+    err = py_user_annotate(&knl, info.dict, nomp.script, nomp.annts_func);
     return_on_err(err);
 
     // Handle transform clause
@@ -471,7 +471,7 @@ int nomp_finalize(void) {
   tfree(progs), progs = NULL, progs_n = progs_max = 0;
 
   tfree(nomp.backend), tfree(nomp.install_dir);
-  tfree(nomp.annts_script), tfree(nomp.annts_func);
+  tfree(nomp.script), tfree(nomp.annts_func);
 
   initialized = nomp.finalize(&nomp);
   if (initialized)

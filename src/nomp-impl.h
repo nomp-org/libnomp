@@ -43,7 +43,8 @@ struct mem {
 };
 
 struct backend {
-  char *backend, *install_dir, *annts_script, *annts_func;
+  char *backend, *install_dir, *script, *annts_func;
+  struct mem *buffer;
   int platform_id, device_id, verbose;
   int (*update)(struct backend *, struct mem *, const int);
   int (*knl_build)(struct backend *, struct prog *, const char *, const char *);
