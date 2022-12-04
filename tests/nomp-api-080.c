@@ -24,7 +24,7 @@ int main(int argc, const char *argv[]) {
   const char *args3[] = {" ", "-b", "opencl", "-d", "0", "-p"};
   argc = 6;
   err = nomp_init(argc, args3);
-  nomp_assert(nomp_get_log_no(err) == NOMP_USER_PLATFORM_IS_INVALID);
+  nomp_assert(nomp_get_log_no(err) == NOMP_USER_ARGS_IS_INVALID);
   err = nomp_finalize();
   nomp_assert(nomp_get_log_no(err) == NOMP_RUNTIME_NOT_INITIALIZED);
 

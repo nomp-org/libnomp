@@ -85,43 +85,50 @@ static const char *py_dir = "python";
 int check_args(int argc, const char **argv, struct backend *backend) {
   backend->backend = "opencl";
   backend->device_id = 0, backend->platform_id = 0, backend->verbose = 0;
-
-  if (argc <= 1 || argv == NULL) {
+  if (argc <= 1 || argv == NULL)
     return 0;
-  }
 
   unsigned i = 1;
   while (i < argc) {
+    if (i + 1 == argc) {
+      return set_log(NOMP_USER_ARGS_IS_INVALID, NOMP_ERROR,
+                     strcatn(2, "Missing argument value: ", argv[i]));
+    }
+
     if (!strncmp("-b", argv[i], MAX_BACKEND_NAME_SIZE) ||
         !strncmp("--backend", argv[i], MAX_BACKEND_NAME_SIZE)) {
-      backend->backend = strndup((char *)argv[i + 1], MAX_BACKEND_NAME_SIZE);
+      backend->backend = strndup(argv[i + 1], MAX_BACKEND_NAME_SIZE);
       i += 2;
     } else if (!strncmp("-p", argv[i], NOMP_BUFSIZ) ||
                !strncmp("--platform", argv[i], NOMP_BUFSIZ)) {
-      backend->platform_id = strntoui(argv[i + 1], NOMP_BUFSIZ);
+      int platform_id = strntoui(argv[i + 1], NOMP_BUFSIZ);
+      if (platform_id >= 0)
+        backend->platform_id = platform_id;
       i += 2;
     } else if (!strncmp("-d", argv[i], NOMP_BUFSIZ) ||
                !strncmp("--device", argv[i], NOMP_BUFSIZ)) {
-      backend->device_id = strntoui(argv[i + 1], NOMP_BUFSIZ);
+      int device_id = strntoui(argv[i + 1], NOMP_BUFSIZ);
+      if (device_id >= 0)
+        backend->device_id = device_id;
       i += 2;
     } else if (!strncmp("-v", argv[i], NOMP_BUFSIZ) ||
                !strncmp("--verbose", argv[i], NOMP_BUFSIZ)) {
-      backend->verbose = strntoui(argv[i + 1], NOMP_BUFSIZ);
+      int verbose = strntoui(argv[i + 1], NOMP_BUFSIZ);
+      if (verbose >= 0)
+        backend->verbose = strntoui(argv[i + 1], NOMP_BUFSIZ);
       i += 2;
     } else if (!strncmp("-i", argv[i], NOMP_BUFSIZ) ||
                !strncmp("--install-dir", argv[i], NOMP_BUFSIZ)) {
       char *install_dir = (char *)argv[i + 1];
       size_t size = pathlen(install_dir) + 1;
-      if (install_dir != NULL) {
+      if (install_dir != NULL)
         backend->install_dir = strndup(install_dir, size);
-      }
       i += 2;
     } else if (!strncmp("-as", argv[i], NOMP_BUFSIZ) ||
                !strncmp("--annts-script", argv[i], NOMP_BUFSIZ)) {
       char *annts_script = (char *)argv[i + 1];
-      if (annts_script != NULL) {
+      if (annts_script != NULL)
         backend->annts_script = strndup(annts_script, NOMP_BUFSIZ);
-      }
       i += 2;
     } else if (!strncmp("-af", argv[i], NOMP_BUFSIZ) ||
                !strncmp("--annts-func", argv[i], NOMP_BUFSIZ)) {
