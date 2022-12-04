@@ -55,10 +55,9 @@ int main(int argc, const char *argv[]) {
   argsc = 7;
   err = nomp_init(argsc, args2);
 
-  nomp_assert(nomp_get_log_no(err) == NOMP_USER_PLATFORM_IS_INVALID);
+  nomp_chk(err);
   err = nomp_finalize();
-  nomp_assert(nomp_get_log_no(err) == NOMP_RUNTIME_NOT_INITIALIZED);
-
+  nomp_chk(err);
   // If platform-id environment variable is positive, it should have higher
   // priority.
   setenv("NOMP_PLATFORM_ID", int_max_str, 1);
@@ -88,10 +87,9 @@ int main(int argc, const char *argv[]) {
   const char *args4[] = {" ", "-b", "opencl", "-d", "-1", "-p", "0"};
   argsc = 7;
   err = nomp_init(argsc, args4);
-  nomp_assert(nomp_get_log_no(err) == NOMP_USER_DEVICE_IS_INVALID);
+  nomp_chk(err);
   err = nomp_finalize();
-  nomp_assert(nomp_get_log_no(err) == NOMP_RUNTIME_NOT_INITIALIZED);
-
+  nomp_chk(err);
   // If device-id environment variable is positive, it should have higher
   // priority.
   setenv("NOMP_DEVICE_ID", int_max_str, 1);
