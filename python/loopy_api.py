@@ -480,6 +480,7 @@ def c_to_loopy(
         ),
     )
 
+    # This is ugly, neeeds to be fixed.
     unique_domains = frozenset()
     for domain in acc.domains:
         new = True
@@ -521,6 +522,7 @@ if __name__ == "__main__":
         """
         z[0] = sum(i, a[i])
         """,
+        lang_version=LOOPY_LANG_VERSION,
     )
     knl0 = lp.add_and_infer_dtypes(knl0, {"a": np.float32})
     knl0 = test_global_parallel_reduction(knl0)

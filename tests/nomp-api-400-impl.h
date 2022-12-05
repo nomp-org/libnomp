@@ -15,10 +15,10 @@ int nomp_api_400_aux(TEST_TYPE *a, TEST_TYPE *z, int N) {
   snprintf(knl, len, KNL_FMT, TYPE_STR, TYPE_STR);
 
   static int id = -1;
-  const char *clauses[3] = {"reduce", "z", 0};
-  int err =
-      nomp_jit(&id, knl, clauses, 3, "a", NOMP_PTR, sizeof(TEST_TYPE), "z",
-               NOMP_PTR, sizeof(TEST_TYPE), "N", NOMP_INT, sizeof(int));
+  const char *clauses[1] = {0};
+  int err = nomp_jit(&id, knl, clauses, 3, "a", NOMP_PTR, sizeof(TEST_TYPE),
+                     "z", NOMP_PTR | NOMP_ATTR_REDN, sizeof(TEST_TYPE), "N",
+                     NOMP_INT, sizeof(int));
   tfree(knl);
   nomp_chk(err);
 
