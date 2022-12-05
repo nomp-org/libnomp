@@ -4,34 +4,6 @@
 #include <stddef.h>
 
 /**
- * @defgroup nomp_types Kernel argument types.
- *
- * @brief Defines argument types for a nomp kernel. Currently, only integer,
- * float or pointer types are supported.
- */
-
-/**
- * @ingroup nomp_types
- * @brief Signed integer argument type.
- */
-#define NOMP_INT 1
-/**
- * @ingroup nomp_types
- * @brief Unsigned integer argument type.
- */
-#define NOMP_UINT 2
-/**
- * @ingroup nomp_types Data Types
- * @brief Floating point argument type.
- */
-#define NOMP_FLOAT 3
-/**
- * @ingroup nomp_types
- * @brief Pointer argument type.
- */
-#define NOMP_PTR 4
-
-/**
  * @defgroup nomp_attributes Kernel argument attributes.
  *
  * @brief Defines additional attributes for nomp kernel arguments. For example,
@@ -42,7 +14,42 @@
  * @ingroup nomp_attributes
  * @brief Nomp kernel argument is part of a reduction.
  */
-#define NOMP_ATTR_REDN 1024
+#define NOMP_ATTR_REDN 1
+/**
+ * @ingroup nomp_attributes
+ * @brief Nomp kernel argument should be pinned.
+ */
+#define NOMP_ATTR_PINNED 2
+
+#define NOMP_ATTR_MASK 2047
+
+/**
+ * @defgroup nomp_types Kernel argument types.
+ *
+ * @brief Defines argument types for a nomp kernel. Currently, only integer,
+ * float or pointer types are supported.
+ */
+
+/**
+ * @ingroup nomp_types
+ * @brief Signed integer argument type.
+ */
+#define NOMP_INT 2048
+/**
+ * @ingroup nomp_types
+ * @brief Unsigned integer argument type.
+ */
+#define NOMP_UINT 4096
+/**
+ * @ingroup nomp_types Data Types
+ * @brief Floating point argument type.
+ */
+#define NOMP_FLOAT 6144
+/**
+ * @ingroup nomp_types
+ * @brief Pointer argument type.
+ */
+#define NOMP_PTR 8192
 
 /**
  * @defgroup nomp_update_direction Update Direction
@@ -298,15 +305,19 @@ int nomp_update(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
  * const char *knl = "for (unsigned i = 0; i < N; i++) a[i] += b[i];"
  * static int id = -1;
  * const char *clauses[4] = {"transform", "file", "function", 0};
- * int err = nomp_jit(&id, knl, clauses);
+ * int err = nomp_jit(&id, knl, clauses, 3, "a", sizeof(a), NOMP_PTR, "b",
+ *   sizeof(b), NOMP_PTR, "N", sizeof(int), NOMP_INT);
  * @endcode
  *
  * @param[out] id Id of the generated kernel.
- * @param[in] c_src Kernel source in C.
+ * @param[in] src Kernel source in C.
  * @param[in] clauses Clauses to provide meta information about the kernel.
+ * @param[in] narg Number of arguments to the kernel.
+ * @param[in] ... Three values for each argument: identifier, sizeof(argument)
+ * and argument type.
  * @return int
  */
-int nomp_jit(int *id, const char *c_src, const char **clauses);
+int nomp_jit(int *id, const char *src, const char **clauses, int narg, ...);
 
 /**
  * @ingroup nomp_user_api
@@ -319,12 +330,11 @@ int nomp_jit(int *id, const char *c_src, const char **clauses);
  * the fourth is the pointer to the actual argument itself.
  *
  * @param[in] id Id of the kernel to be run.
- * @param[in] narg Number of arguments to the kernel.
- * @param[in] ...  Four values mentioned above for each argument.
+ * @param[in] ... Pointer for each argument.
  *
  * @return int
  */
-int nomp_run(int id, int narg, ...);
+int nomp_run(int id, ...);
 
 void nomp_assert_(int cond, const char *file, unsigned line);
 #define nomp_assert(cond) nomp_assert_(cond, __FILE__, __LINE__)

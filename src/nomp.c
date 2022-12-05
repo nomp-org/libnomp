@@ -308,7 +308,7 @@ static int parse_clauses(struct meta *info, const char **clauses) {
       Py_XDECREF(pkey), Py_XDECREF(pval);
       i = i + 3;
     } else if (strncmp(clauses[i], "reduce", NOMP_BUFSIZ) == 0) {
-      // Syntax: "reduce", <operator>, <accumulator>
+      // Syntax: "reduce", <accumulator>
       if (!clauses[i + 1]) {
         return set_log(NOMP_USER_INPUT_NOT_PROVIDED, NOMP_ERROR,
                        "\"reduce\" clause should be followed by the "
@@ -330,19 +330,37 @@ static int parse_clauses(struct meta *info, const char **clauses) {
   return 0;
 }
 
-int nomp_jit(int *id, const char *c_src, const char **clauses) {
+int nomp_jit(int *id, const char *c_src, const char **clauses, int narg, ...) {
   if (*id == -1) {
     if (progs_n == progs_max) {
       progs_max += progs_max / 2 + 1;
       progs = trealloc(progs, struct prog *, progs_max);
     }
 
+    struct prog *prg = progs[progs_n] = tcalloc(struct prog, 1);
+    prg->args = tcalloc(struct arg, narg);
+
+    // Set kernel argument meta data.
+    va_list args;
+    va_start(args, narg);
+    for (unsigned i = 0; i < narg; i++) {
+      strncpy(prg->args[i].name, va_arg(args, const char *), MAX_ARG_NAME_SIZE);
+      int type_and_attrs = va_arg(args, int);
+      prg->args[i].size = va_arg(args, size_t);
+      int attrs = type_and_attrs & NOMP_ATTR_MASK;
+      prg->args[i].type = type_and_attrs - attrs;
+      prg->args[i].redn = attrs & NOMP_ATTR_REDN;
+      prg->args[i].pinned = attrs & NOMP_ATTR_PINNED;
+    }
+    va_end(args);
+    prg->narg = narg;
+
     // Parse the clauses
     struct meta info;
     int err = parse_clauses(&info, clauses);
     return_on_err(err);
 
-    // Create loopy kernel from C source
+    // Create loopy kernel from C source.
     PyObject *knl = NULL;
     err = py_c_to_loopy(&knl, c_src, nomp.backend, info.redn_var);
     return_on_err(err);
@@ -351,25 +369,24 @@ int nomp_jit(int *id, const char *c_src, const char **clauses) {
     err = py_get_knl_name(&name, knl);
     return_on_err(err);
 
-    // Handle annotate clauses if they exist
+    // Handle annotate clauses if they exist.
     err = py_user_annotate(&knl, info.dict, nomp.script, nomp.annts_func);
     return_on_err(err);
 
-    // Handle transform clause
+    // Handle transform clause.
     err = py_user_transform(&knl, info.file, info.func);
     return_on_err(err);
 
-    // Handle reduction clause
+    // Handle reduction clause.
     err = py_handle_reduction(&knl, nomp.backend, info.redn_var);
     return_on_err(err);
 
-    // Get OpenCL, CUDA, etc. source from the loopy kernel
+    // Get OpenCL, CUDA, etc. source from the loopy kernel.
     char *src = NULL;
     err = py_get_knl_src(&src, knl);
     return_on_err(err);
 
     // Build the kernel
-    struct prog *prg = progs[progs_n] = tcalloc(struct prog, 1);
     err = nomp.knl_build(&nomp, prg, src, name);
     tfree(src), tfree(name);
     return_on_err(err);
@@ -390,28 +407,30 @@ int nomp_jit(int *id, const char *c_src, const char **clauses) {
   return 0;
 }
 
-int nomp_run(int id, int narg, ...) {
-  if (id >= 0) {
+int nomp_run(int id, ...) {
+  if (id >= 0 && id < progs_n && progs[id] != NULL) {
     struct prog *prg = progs[id];
-    prg->narg = narg;
 
     va_list args;
-    va_start(args, narg);
-    for (int i = 0; i < narg; i++) {
-      const char *var = va_arg(args, const char *);
-      int type = va_arg(args, int);
-      size_t size = va_arg(args, size_t);
+    va_start(args, id);
+    for (int i = 0; i < prg->narg; i++) {
+      // Get the pointer from user
       void *val = va_arg(args, void *);
 
+      // Get meta data we stored during nomp_jit()
+      const char *name = prg->args[i].name;
+      int type = prg->args[i].type;
+      size_t size = prg->args[i].size;
+
+      // Should we update the dict?
       if (type == NOMP_INT || type == NOMP_UINT || type == NOMP_FLOAT) {
         // FIXME: This is wrong. Val should be converted to a pointer which
         // match the size given by `size`. Not sure if we should pass `float`
         // vlaues to this dict as well.
-        PyObject *py_key = PyUnicode_FromStringAndSize(var, strlen(var));
+        PyObject *py_key = PyUnicode_FromStringAndSize(name, strlen(name));
         PyObject *py_val = PyLong_FromLong(*((int *)val));
         PyDict_SetItem(prg->py_dict, py_key, py_val);
-        Py_XDECREF(py_key);
-        Py_XDECREF(py_val);
+        Py_XDECREF(py_key), Py_XDECREF(py_val);
       }
     }
     va_end(args);
@@ -419,9 +438,13 @@ int nomp_run(int id, int narg, ...) {
     int err = py_eval_grid_size(prg, prg->py_dict);
     return_on_err(err);
 
-    va_start(args, narg);
+    va_start(args, id);
     err = nomp.knl_run(&nomp, prg, args);
     va_end(args);
+
+    // Check for reductions and copy back the array to host. Perform the host
+    // reduction and set the releavant input argument.
+
     return err;
   }
   return set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,

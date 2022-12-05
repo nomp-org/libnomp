@@ -11,14 +11,15 @@ const char *valid_knl =
 static int test_call_jit_with_invalid_function() {
   const char *clauses[4] = {"transform", "invalid_file", "invalid_func", 0};
   static int id = -1;
-  int err = nomp_jit(&id, valid_knl, clauses);
+  err = nomp_jit(&id, valid_knl, clauses, 2, "a", NOMP_PTR, sizeof(int), "N",
+                 NOMP_INT, sizeof(int));
   nomp_test_assert(nomp_get_log_no(err) == NOMP_PY_CALL_FAILED);
 
   char *desc;
   nomp_get_log_str(&desc, err);
   int matched = match_log(desc, "\\[Error\\] .*src\\/loopy.c:[0-9]* Calling "
                       "user transform function: \"invalid_func\" failed.");
-  nomp_assert(matched);
+  nomp_test_assert(matched);
   tfree(desc);
 
   return 0;
@@ -28,7 +29,8 @@ static int test_call_jit_with_invalid_function() {
 static int test_invalid_clause() {
   const char *clauses[4] = {"invalid-clause", "nomp-api-50", "transform", 0};
   static int id = -1;
-  int err = nomp_jit(&id, valid_knl, clauses);
+  int err = nomp_jit(&id, valid_knl, clauses2, 2, "a", NOMP_PTR, sizeof(int), "N",
+                 NOMP_INT, sizeof(int));
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
   char *desc;
@@ -40,15 +42,14 @@ static int test_invalid_clause() {
       "Clause \"invalid-clause\" passed into nomp_jit is not a valid caluse.");
   nomp_test_assert(matched);
   tfree(desc);
-
-  return 0;
 }
 
 // Missing file name should return an error.
 static int test_missing_filename() {
   const char *clauses[4] = {"transform", NULL, "transform", 0};
   static int id = -1;
-  int err = nomp_jit(&id, valid_knl, clauses);
+  int err = nomp_jit(&id, valid_knl, clauses, 2, "a", NOMP_PTR, sizeof(int), "N",
+                 NOMP_INT, sizeof(int));
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_NOT_PROVIDED);
 
   char *desc;
@@ -58,7 +59,6 @@ static int test_missing_filename() {
             ".*libnomp\\/src\\/nomp.c:[0-9]* "
             "\"transform\" clause should be followed by a file name and a "
             "function name. At least one of them is not provided.");
-
   nomp_test_assert(matched);
   tfree(desc);
 
@@ -66,10 +66,11 @@ static int test_missing_filename() {
 }
 
 // Missing user callback should return an error.
-static int tset_missing_user_callback() {
+static int test_missing_user_callback() {
   const char *clauses[4] = {"transform", "nomp-api-50", NULL, 0};
   static int id = -1;
-  int err = nomp_jit(&id, valid_knl, clauses);
+  int err = nomp_jit(&id, valid_knl, clauses, 2, "a", NOMP_PTR, sizeof(int), "N",
+                 NOMP_INT, sizeof(int));
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_NOT_PROVIDED);
 
   char *desc;
@@ -81,6 +82,7 @@ static int tset_missing_user_callback() {
             "function name. At least one of them is not provided.");
   nomp_test_assert(matched);
   tfree(desc);
+
   return 0;
 }
 
@@ -93,7 +95,8 @@ static int test_syntax_error_kernel() {
       "}                                                                    \n";
   static int id = -1;
   const char *clauses[4] = {"transform", "invalid-file", "invalid", 0};
-  int err = nomp_jit(&id, invalid_knl, clauses);
+  int err = nomp_jit(&id, invalid_knl, clauses, 2, "a", NOMP_PTR, sizeof(int), "N",
+                 NOMP_INT, sizeof(int));
   nomp_test_assert(nomp_get_log_no(err) == NOMP_LOOPY_CONVERSION_ERROR);
 
   char *desc;
@@ -107,6 +110,7 @@ static int test_syntax_error_kernel() {
 
   err = nomp_finalize();
   nomp_test_chk(err);
+
   return 0;
 }
 

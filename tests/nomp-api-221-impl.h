@@ -2,26 +2,28 @@
 
 #define nomp_api_221_aux TOKEN_PASTE(nomp_api_221_aux, TEST_SUFFIX)
 int nomp_api_221_aux(TEST_TYPE *a, TEST_TYPE *b, int N) {
-  const char *knl_fmt =
+  const char *KNL_FMT =
       "void foo(%s *a, %s *b, int N) {                        \n"
       "  for (int i = 0; i < N; i++)                          \n"
       "    a[i] = a[i] * b[i];                                \n"
       "}                                                      \n";
 
-  size_t len = strlen(knl_fmt) + 2 * strlen(TOSTRING(TEST_TYPE)) + 1;
+  const char *TYPE_STR = TOSTRING(TEST_TYPE);
+  size_t len = strlen(KNL_FMT) + 2 * strlen(TYPE_STR) + 1;
   char *knl = tcalloc(char, len);
-  snprintf(knl, len, knl_fmt, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE));
+  snprintf(knl, len, KNL_FMT, TYPE_STR, TYPE_STR);
 
   static int id = -1;
   const char *clauses[4] = {"transform", "nomp-api-200", "foo", 0};
-  int err = nomp_jit(&id, knl, clauses);
-  nomp_chk(err);
-
-  err = nomp_run(id, 3, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
-                 sizeof(TEST_TYPE), b, "N", NOMP_INT, sizeof(int), &N);
-  nomp_chk(err);
-
+  int err =
+      nomp_jit(&id, knl, clauses, 3, "a", NOMP_PTR, sizeof(TEST_TYPE), "b",
+               NOMP_PTR, sizeof(TEST_TYPE), "N", NOMP_INT, sizeof(int));
   tfree(knl);
+  nomp_chk(err);
+
+  err = nomp_run(id, a, b, &N);
+  nomp_chk(err);
+
   return 0;
 }
 

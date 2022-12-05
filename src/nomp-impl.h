@@ -17,6 +17,8 @@
 #include "nomp.h"
 
 #define NOMP_BUFSIZ 64
+#define MAX_ARG_NAME_SIZE 128
+#define MAX_DIM 3
 #define MAX_BACKEND_NAME_SIZE 32
 
 #define return_on_err(err)                                                     \
@@ -30,10 +32,24 @@ struct meta {
   PyObject *dict;
 };
 
+struct arg {
+  char name[MAX_ARG_NAME_SIZE];
+  size_t size;
+  unsigned type;
+  unsigned redn, pinned;
+};
+
 struct prog {
-  unsigned narg, ndim;
-  PyObject *py_global, *py_local, *py_dict;
-  size_t global[3], local[3];
+  // Number of arguments and argument specific information.
+  unsigned narg;
+  struct arg *args;
+  // Number of dimensions and the expressions and evaluated values
+  // of each dimenions.
+  unsigned ndim;
+  PyObject *py_global, *py_local;
+  size_t global[MAX_DIM], local[MAX_DIM];
+  // Dictionary used to evaluate dimensions.
+  PyObject *py_dict;
   void *bptr;
 };
 

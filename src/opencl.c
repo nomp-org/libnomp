@@ -109,10 +109,10 @@ static int opencl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
   struct mem *m;
   size_t size;
   for (int i = 0; i < prg->narg; i++) {
-    const char *var = va_arg(args, const char *);
-    int type = va_arg(args, int);
-    size = va_arg(args, size_t);
     void *p = va_arg(args, void *);
+
+    int type = prg->args[i].type;
+    size = prg->args[i].size;
     switch (type) {
     case NOMP_INT:
     case NOMP_UINT:
@@ -137,8 +137,7 @@ static int opencl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
     if (err != CL_SUCCESS)
       return set_log(
           NOMP_OPENCL_FAILURE, NOMP_ERROR,
-          "OpenCL clSetKernelArg() failed for argument %d (pointer = %p).", i,
-          p);
+          "OpenCL clSetKernelArg() failed for argument %d (ptr = %p).", i, p);
   }
 
   // FIXME: May be do this differently?

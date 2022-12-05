@@ -3,9 +3,14 @@
 
 // Invoke with invalid kernel_id
 static int test_invalid_kernel_id(int *a, int *b, int n) {
-  err = nomp_run(-1, 3, "a", NOMP_PTR, sizeof(int), a, "b", NOMP_PTR,
-                 sizeof(int), b, "N", NOMP_INT, sizeof(int), &n);
-  nomp_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
+  const char *clauses[4] = {"transform", "nomp-api-50", "foo", 0};
+  static int id = -1;
+  int err = nomp_jit(&id, knl, clauses, 3, "a", NOMP_PTR, sizeof(int), "b",
+                 NOMP_PTR, sizeof(int), "N", NOMP_INT, sizeof(int));
+  nomp_chk(err);
+
+  err = nomp_run(-1, a, b, &n);
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
   char *desc;
   nomp_get_log_str(&desc, err);
@@ -19,15 +24,14 @@ static int test_invalid_kernel_id(int *a, int *b, int n) {
 
 // Invoke fails because b is not mapped
 static int test_unmapped_variable(int id, int *a, int *b, int n) {
-  int err = nomp_run(id, 3, "a", NOMP_PTR, sizeof(int), a, "b", NOMP_PTR,
-                 sizeof(int), b, "N", NOMP_INT, sizeof(int), &n);
-  nomp_assert(nomp_get_log_no(err) == NOMP_USER_MAP_PTR_IS_INVALID);
+  int err = nomp_run(id, a, b, &n);
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_MAP_PTR_IS_INVALID);
 
   char *desc;
   err = nomp_get_log_str(&desc, err);
   matched = match_log(desc, "\\[Error\\] .*\\/src\\/.*.c:[0-9]* Map pointer "
                             "0[xX][0-9a-fA-F]* was not found on device.");
-  nomp_assert(matched);
+  nomp_test_assert(matched);
   tfree(desc);
 
   err = nomp_finalize();
@@ -56,7 +60,7 @@ int main(int argc, const char *argv[]) {
   static int id = -1;
   const char *clauses[4] = {"transform", "nomp-api-50", "foo", 0};
   err = nomp_jit(&id, knl, clauses);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   err |= SUBTEST(test_invalid_kernel_id, a, b, n);
   err |= SUBTEST(test_unmapped_variable, id, a, b, n);
