@@ -271,12 +271,12 @@ static int progs_n = 0;
 static int progs_max = 0;
 
 static void free_meta(struct meta *info) {
-  tfree(info->file), tfree(info->func), tfree(info->redn_var);
+  tfree(info->file), tfree(info->func);
   Py_XDECREF(info->dict);
 }
 
 static int parse_clauses(struct meta *info, const char **clauses) {
-  info->file = info->func = info->redn_var = NULL;
+  info->file = info->func = NULL;
   info->dict = PyDict_New();
 
   unsigned i = 0;
@@ -307,15 +307,6 @@ static int parse_clauses(struct meta *info, const char **clauses) {
       PyDict_SetItem(info->dict, pkey, pval);
       Py_XDECREF(pkey), Py_XDECREF(pval);
       i = i + 3;
-    } else if (strncmp(clauses[i], "reduce", NOMP_BUFSIZ) == 0) {
-      // Syntax: "reduce", <accumulator>
-      if (!clauses[i + 1]) {
-        return set_log(NOMP_USER_INPUT_NOT_PROVIDED, NOMP_ERROR,
-                       "\"reduce\" clause should be followed by the "
-                       "accumulator variable name.");
-      }
-      info->redn_var = strndup(clauses[i + 1], NOMP_BUFSIZ);
-      i = i + 2;
     } else {
       return set_log(
           NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
@@ -323,9 +314,6 @@ static int parse_clauses(struct meta *info, const char **clauses) {
           clauses[i]);
     }
   }
-
-  if (info->redn_var == NULL)
-    info->redn_var = strndup("", 1);
 
   return 0;
 }
@@ -362,7 +350,7 @@ int nomp_jit(int *id, const char *c_src, const char **clauses, int narg, ...) {
 
     // Create loopy kernel from C source.
     PyObject *knl = NULL;
-    err = py_c_to_loopy(&knl, c_src, nomp.backend, info.redn_var);
+    err = py_c_to_loopy(&knl, c_src, nomp.backend);
     return_on_err(err);
 
     char *name = NULL;
@@ -378,7 +366,7 @@ int nomp_jit(int *id, const char *c_src, const char **clauses, int narg, ...) {
     return_on_err(err);
 
     // Handle reduction clause.
-    err = py_handle_reduction(&knl, nomp.backend, info.redn_var);
+    err = py_handle_reduction(&knl, nomp.backend);
     return_on_err(err);
 
     // Get OpenCL, CUDA, etc. source from the loopy kernel.

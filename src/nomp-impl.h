@@ -28,7 +28,7 @@
   } while (0)
 
 struct meta {
-  char *file, *func, *redn_var;
+  char *file, *func;
   PyObject *dict;
 };
 
@@ -138,11 +138,9 @@ int py_append_to_sys_path(const char *path);
  * @param[out] knl Loopy kernel object.
  * @param[in] c_src C kernel source.
  * @param[in] backend Backend name.
- * @param[in] redn_var Name of the reduction variable if present.
  * @return int
  */
-int py_c_to_loopy(PyObject **knl, const char *c_src, const char *backend,
-                  const char *redn_var);
+int py_c_to_loopy(PyObject **knl, const char *c_src, const char *backend);
 
 /**
  * @ingroup nomp_py_utils
@@ -188,13 +186,9 @@ int py_user_transform(PyObject **knl, const char *file, const char *func);
  *
  * @param[in,out] knl Pointer to loopy kernel object.
  * @param[in] backend Backend for the reduction.
- * @param[in] redn_var Accumulator variable for the reduction. This should
- * appear only once in the kernel and will be initialized based on the reduction
- * operator.
  * @return int
  */
-int py_handle_reduction(PyObject **knl, const char *backend,
-                        const char *redn_var);
+int py_handle_reduction(PyObject **knl, const char *backend);
 
 /**
  * @ingroup nomp_py_utils

@@ -34,8 +34,7 @@ int py_append_to_sys_path(const char *path) {
   return 0;
 }
 
-int py_c_to_loopy(PyObject **knl, const char *src, const char *backend,
-                  const char *redn_var) {
+int py_c_to_loopy(PyObject **knl, const char *src, const char *backend) {
   check_null_input(src);
   check_null_input(backend);
 
@@ -48,11 +47,9 @@ int py_c_to_loopy(PyObject **knl, const char *src, const char *backend,
       if (function) {
         PyObject *psrc = PyUnicode_FromString(src);
         PyObject *pbnd = PyUnicode_FromString(backend);
-        PyObject *pvar = PyUnicode_FromString(redn_var);
-        *knl = PyObject_CallFunctionObjArgs(function, psrc, pbnd, pvar, NULL);
+        *knl = PyObject_CallFunctionObjArgs(function, psrc, pbnd, NULL);
         err = (*knl == NULL);
-        Py_XDECREF(psrc), Py_XDECREF(pbnd), Py_XDECREF(pvar);
-        Py_DECREF(function);
+        Py_XDECREF(psrc), Py_XDECREF(pbnd), Py_DECREF(function);
       }
       Py_DECREF(module);
     }
@@ -98,7 +95,7 @@ int py_user_annotate(PyObject **knl, PyObject *annts, const char *file,
   return 0;
 }
 
-int py_handle_reduction(PyObject **knl, const char *backend, const char *var) {
+int py_handle_reduction(PyObject **knl, const char *backend) {
   check_null_input(*knl);
 
   int err = 1;
@@ -111,10 +108,9 @@ int py_handle_reduction(PyObject **knl, const char *backend, const char *var) {
       Py_DECREF(module);
       if (function && PyCallable_Check(function)) {
         PyObject *pbackend = PyUnicode_FromString(backend);
-        PyObject *pvar = PyUnicode_FromString(var);
-        tk = PyObject_CallFunctionObjArgs(function, *knl, pbackend, pvar, NULL);
+        tk = PyObject_CallFunctionObjArgs(function, *knl, pbackend, NULL);
         err = (tk == NULL);
-        Py_XDECREF(pbackend), Py_XDECREF(pvar), Py_DECREF(function);
+        Py_XDECREF(pbackend), Py_DECREF(function);
       }
     }
   }

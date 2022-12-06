@@ -45,6 +45,8 @@ _C_REDN_TO_LOOPY_REDN = {
 class IdentityMapper:
     """AST node mapper"""
 
+    redn = 0
+
     def rec(self, node, *args, **kwargs):
         """Visit a node."""
         try:
@@ -142,7 +144,6 @@ class CToLoopyExpressionMapper(IdentityMapper):
         raise SyntaxError
 
 
-# @dataclass automatically adds special methods like __init__ and __repr__
 @dataclass
 class CToLoopyMapperContext:
     """Record expression context information"""
@@ -153,7 +154,6 @@ class CToLoopyMapperContext:
     value_args: FrozenSet[str]
     predicates: FrozenSet[Union[prim.Comparison, prim.LogicalNot]]
     name_gen: UniqueNameGenerator
-    redn_var: str
 
     def copy(self, **kwargs) -> "CToLoopyMapperContext":
         """Update class variables"""
@@ -182,39 +182,6 @@ class CToLoopyLoopBoundMapper(CToLoopyExpressionMapper):
     def map_BinaryOp(self, expr: c_ast.BinaryOp):
         bin_op = _C_BIN_OPS_TO_PYMBOLIC_OPS["//" if expr.op == "/" else expr.op]
         return bin_op(self.rec(expr.left), self.rec(expr.right))
-
-
-# Helper function for parsing for loop kernels
-def check_and_parse_for(expr: c_ast.For):
-    """Parse for loop to retrieve loop variable, lower bound and upper bound"""
-    if len(expr.init.decls) != 1:
-        raise NotImplementedError(
-            "More than one initialization declarations not yet supported."
-        )
-
-    (init_decl,) = expr.init.decls
-    iname = init_decl.name
-
-    if not (isinstance(expr.cond, c_ast.BinaryOp) and expr.cond.op == "<"):
-        raise NotImplementedError("Only increasing domains are supported")
-
-    if isinstance(expr.next, c_ast.UnaryOp) and expr.next.op in {"p++", "++p"}:
-        lbound_expr = CToLoopyLoopBoundMapper()(init_decl.init)
-        ubound_expr = CToLoopyLoopBoundMapper()(expr.cond.right)
-    else:
-        raise NotImplementedError("Only increments by 1 are supported")
-
-    if not (
-        isinstance(expr.cond.left, c_ast.ID) and expr.cond.left.name == iname
-    ) or not (
-        isinstance(expr.next.expr, c_ast.ID) and expr.next.expr.name == iname
-    ):
-        raise SyntaxError(
-            "Loop variable has to be the same in for condition and next"
-            " operation"
-        )
-
-    return (iname, lbound_expr, ubound_expr)
 
 
 class CToLoopyMapper(IdentityMapper):
@@ -268,6 +235,48 @@ class CToLoopyMapper(IdentityMapper):
 
     def map_For(self, expr: c_ast.For, context: CToLoopyMapperContext):
         """Map C for loop"""
+
+        def check_and_parse_for(expr: c_ast.For):
+            """Parse for loop to get loop variable, lower and upper bound"""
+            if len(expr.init.decls) != 1:
+                raise NotImplementedError(
+                    "More than one initialization declarations not yet"
+                    " supported."
+                )
+
+            (init_decl,) = expr.init.decls
+            iname = init_decl.name
+
+            if not (
+                isinstance(expr.cond, c_ast.BinaryOp) and expr.cond.op == "<"
+            ):
+                raise NotImplementedError(
+                    "Only increasing domains are supported"
+                )
+
+            if isinstance(expr.next, c_ast.UnaryOp) and expr.next.op in {
+                "p++",
+                "++p",
+            }:
+                lbound_expr = CToLoopyLoopBoundMapper()(init_decl.init)
+                ubound_expr = CToLoopyLoopBoundMapper()(expr.cond.right)
+            else:
+                raise NotImplementedError("Only increments by 1 are supported")
+
+            if not (
+                isinstance(expr.cond.left, c_ast.ID)
+                and expr.cond.left.name == iname
+            ) or not (
+                isinstance(expr.next.expr, c_ast.ID)
+                and expr.next.expr.name == iname
+            ):
+                raise SyntaxError(
+                    "Loop variable has to be the same in for condition and next"
+                    " operation"
+                )
+
+            return (iname, lbound_expr, ubound_expr)
+
         (iname, lbound_expr, ubound_expr) = check_and_parse_for(expr)
 
         space = isl.Space.create_from_names(
@@ -289,22 +298,24 @@ class CToLoopyMapper(IdentityMapper):
 
     def map_Decl(self, expr: c_ast.Decl, context: CToLoopyMapperContext):
         """Map C variable declaration"""
-        name = expr.name
-        if isinstance(expr.type, c_ast.TypeDecl):
-            shape = ()
-        # In case expr is an array
-        elif isinstance(expr.type, c_ast.ArrayDecl):
-            # 1D array
-            dims = [expr.type.dim]
-            # 2D array
-            if isinstance(expr.type.type, c_ast.ArrayDecl):
-                dims += [expr.type.type.dim]
-            elif not isinstance(expr.type.type, c_ast.TypeDecl):
-                raise NotImplementedError
-            shape = tuple(CToLoopyExpressionMapper()(dim) for dim in dims)
-        else:
-            raise NotImplementedError
 
+        def get_decl_shape(expr):
+            if isinstance(expr.type, c_ast.TypeDecl):
+                # Not an array type
+                return ()
+            if isinstance(expr.type, c_ast.ArrayDecl):
+                # In case expr is an 1D array
+                dims = [expr.type.dim]
+                # 2D array
+                if isinstance(expr.type.type, c_ast.ArrayDecl):
+                    dims += [expr.type.type.dim]
+                return tuple(CToLoopyExpressionMapper()(dim) for dim in dims)
+            raise NotImplementedError(
+                f"get_decl_shape() failed for unknown decl type: {expr}"
+            )
+
+        name = expr.name
+        shape = get_decl_shape(expr)
         if expr.init is not None:
             lhs = CToLoopyExpressionMapper()(c_ast.ID(name))
             rhs = CToLoopyExpressionMapper()(expr.init)
@@ -349,6 +360,17 @@ class CToLoopyMapper(IdentityMapper):
             )
         return CToLoopyMapperAccumulator([], [], [])
 
+    def map_FuncCall(self, func: c_ast.FuncCall, ctx: CToLoopyMapperContext):
+        """Map Function Call"""
+        if func.name.name == "nomp_reduce":
+            self.redn = 1
+        else:
+            raise NotImplementedError(
+                "General function calls are not supported inside nomp kernels"
+                " yet !"
+            )
+        return CToLoopyMapperAccumulator([], [], [])
+
     def map_Assignment(
         self, expr: c_ast.Assignment, context: CToLoopyMapperContext
     ):
@@ -360,15 +382,21 @@ class CToLoopyMapper(IdentityMapper):
         if (
             isinstance(lhs, prim.Subscript)
             and isinstance(lhs.aggregate, prim.Variable)
-            and str(lhs.aggregate) == context.redn_var
+            and self.redn == 1
         ):
+            if len(context.inames) > 1:
+                raise NotImplementedError(
+                    "Reductions over multiple inames are not supported yet !"
+                )
             try:
                 rhs = Reduction(
                     _C_REDN_TO_LOOPY_REDN[expr.op], tuple(context.inames), rhs
                 )
             except Exception as ex:
                 raise NotImplementedError(f"{expr.op} is not valid!") from ex
+            # FIXME: This is not correct.
             inames = frozenset()
+            self.redn = 0
         elif expr.op == "+=":
             rhs = lhs + rhs
         elif expr.op == "-=":
@@ -396,7 +424,7 @@ class CToLoopyMapper(IdentityMapper):
         self, expr: c_ast.InitList, context: CToLoopyMapperContext
     ):
         """Maps C list initialization"""
-        raise SyntaxError
+        raise NotImplementedError("Init lists are not supported yet !")
 
 
 @dataclass
@@ -451,9 +479,7 @@ def decl_to_knl_arg(decl: c_ast.Decl, dtype):
     )
 
 
-def c_to_loopy(
-    c_str: str, backend: str, redn_var: str = ""
-) -> lp.translation_unit.TranslationUnit:
+def c_to_loopy(c_str: str, backend: str) -> lp.translation_unit.TranslationUnit:
     """Map C kernel to Loopy"""
     # Parse the function
     node = c_parser.CParser().parse(c_str).ext[0]
@@ -476,7 +502,6 @@ def c_to_loopy(
             context.get_typedecl().keys(),
             frozenset(),
             UniqueNameGenerator(),
-            redn_var,
         ),
     )
 
@@ -529,10 +554,12 @@ if __name__ == "__main__":
 
     KNL_STR = """
           void foo(double *a, double *bb, int N) {
-            for (int i = 0; i < N; i++)
+            for (int i = 0; i < N; i++) {
+              nomp_reduce();
               bb[0] += a[i];
+            }
           }
           """
-    knl1 = c_to_loopy(KNL_STR, "cuda", "bb")
-    knl1 = realize_reduction(knl1, "cuda", "bb")
+    knl1 = c_to_loopy(KNL_STR, "cuda")
+    knl1 = realize_reduction(knl1, "cuda")
     print(lp.generate_code_v2(knl1).device_code())

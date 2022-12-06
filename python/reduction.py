@@ -1,20 +1,29 @@
 import loopy as lp
+import pymbolic.primitives as prim
 from loopy.transform.data import reduction_arg_to_subst_rule
 
 _BACKEND_TO_TARGET = {"opencl": lp.OpenCLTarget(), "cuda": lp.CudaTarget()}
 
 
 def realize_reduction(
-    knl: lp.translation_unit.TranslationUnit, backend: str, redn_var: str
+    knl: lp.translation_unit.TranslationUnit, backend: str
 ) -> lp.translation_unit.TranslationUnit:
-    if redn_var == "":
-        return knl
-
     if len(knl.callables_table.keys()) > 1:
         raise NotImplementedError(
             "Don't know how to handle more than 1 callable in TU!"
         )
     (knl_name,) = knl.callables_table.keys()
+
+    redn_var = None
+    for insn in knl.default_entrypoint.instructions:
+        if isinstance(insn, lp.Assignment):
+            if isinstance(insn.assignee, prim.Subscript) and isinstance(
+                insn.expression, lp.symbolic.Reduction
+            ):
+                if isinstance(insn.assignee.aggregate, prim.Variable):
+                    redn_var = insn.assignee.aggregate.name
+    if redn_var is None:
+        return knl
 
     if len(knl.default_entrypoint.inames.keys()) > 1:
         raise NotImplementedError(
