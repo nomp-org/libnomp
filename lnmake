@@ -29,10 +29,11 @@ elif [[ -f ~/.zshrc ]]; then
 fi
 
 function update_bashrc() {
-  [[ -n ${NOMP_SHELL_CONFIG_FILE} ]] &&
-    echo -e "${NOMP_ENVIRONMENT}" >>"${NOMP_SHELL_CONFIG_FILE}" &&
+  if [[ -n ${NOMP_SHELL_CONFIG_FILE} ]]; then
+    echo -e "${NOMP_ENVIRONMENT}" >>"${NOMP_SHELL_CONFIG_FILE}"
     echo "${green}Successfully exported variables to" \
       "${NOMP_SHELL_CONFIG_FILE}${reset}."
+  fi
   exit 0
 }
 
@@ -46,12 +47,17 @@ function print_help() {
     "\t${cyan}-n${reset}, ${cyan}--no${reset}" \
     "\tNo to all prompts.\n\n" \
     "FORMAT\n" \
-    "\tlnmake f|format [--py] [--c]\n" \
-    "\tFormat the source files of libnomp.\n\n" \
-    "\t${cyan}--c${reset}\t" \
-    "\tFormat c source files.\n" \
-    "\t${cyan}--py${reset}\t" \
-    "\tFormat python source files."
+    "\tlnmake f|format [--pylint] [--flake8] [--c] [--ctest]\n" \
+    "\tFormat the source files of libnomp.\n" \
+    "\tIf no arguments are provided, all source files are formatted.\n\n" \
+    "\t${cyan}--pylint${reset}\t" \
+    "Format python source files with pylint.\n" \
+    "\t${cyan}--flake8${reset}\t" \
+    "Format python source files with flake8.\n" \
+    "\t${cyan}--c${reset}     \t" \
+    "Format c source files with clangformat.\n" \
+    "\t${cyan}--ctest${reset} \t" \
+    "Check if c source files adhere to clangformat.\n"
   exit 0
 }
 
@@ -89,29 +95,15 @@ END
   fi
 }
 
-function format_python() {
+function format() {
   NOMP_FORMAT_SUCCESS=false
-  cmake --build "${NOMP_BUILD_DIR}" --target pylint &&
-    cmake --build "${NOMP_BUILD_DIR}" --target flake8 &&
+  cmake --build "${NOMP_BUILD_DIR}" --target "${1}" &&
     NOMP_FORMAT_SUCCESS=true
 
   if [[ ${NOMP_FORMAT_SUCCESS} = true ]]; then
-    echo "${green}Successfully formatted python source files${reset}"
+    echo "${green}Successfully formatted source files with ${1}${reset}"
   else
-    echo "${red}Failed to format python source files${reset}"
-    exit 1
-  fi
-}
-
-function format_c() {
-  NOMP_FORMAT_SUCCESS=false
-  cmake --build "${NOMP_BUILD_DIR}" --target clangformat &&
-    NOMP_FORMAT_SUCCESS=true
-
-  if [[ ${NOMP_FORMAT_SUCCESS} = true ]]; then
-    echo "${green}Successfully formatted c-lang source files${reset}"
-  else
-    echo "${red}Failed to format c-lang source files${reset}"
+    echo "${red}Failed to format source file with ${1}${reset}"
     exit 1
   fi
 }
@@ -121,11 +113,9 @@ if [ $# -eq 0 ]; then
   exit 0
 fi
 
-# check for default prompt
 if [[ $# -gt 0 ]]; then
   case $1 in
   i | install)
-    # check for default prompt
     shift
     if [[ $# -gt 0 ]]; then
       case $1 in
@@ -143,14 +133,13 @@ if [[ $# -gt 0 ]]; then
     ;;
   f | format)
     shift
-    if [ $# -eq 0 ]; then
-      echo "No arguments were provided to ${cyan}lnmake f|format${reset}."
-      exit 0
-    fi
+    NOMP_FORMAT_PARAMETER=()
     while [ $# -gt 0 ]; do
       case $1 in
-      --py) NOMP_FORMAT_PYTHON=true ;;
-      --c) NOMP_FORMAT_C=true ;;
+      --pylint) NOMP_FORMAT_PARAMETER+=('pylint') ;;
+      --flake8) NOMP_FORMAT_PARAMETER+=('flake8') ;;
+      --c) NOMP_FORMAT_PARAMETER+=('clangformat') ;;
+      --ctest) NOMP_FORMAT_PARAMETER+=('clangformat_test') ;;
       *)
         echo "${red}Invalid argument: ${1}${reset}"
         echo "See ${cyan}${0} -h|--help f|format ${reset} for the accepted commands."
@@ -159,8 +148,15 @@ if [[ $# -gt 0 ]]; then
       esac
       shift
     done
-    [[ ${NOMP_FORMAT_PYTHON} = true ]] && format_python
-    [[ ${NOMP_FORMAT_C} = true ]] && format_c
+    if [[ ${#NOMP_FORMAT_PARAMETER[@]} -eq 0 ]]; then
+      format "pylint"
+      format "flake8"
+      format "clangformat"
+    else
+      for param in "${NOMP_FORMAT_PARAMETER[@]}"; do
+        format "${param}"
+      done
+    fi
     exit 0
     ;;
   -h | --help) print_help ;;
