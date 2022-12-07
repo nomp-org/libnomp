@@ -33,7 +33,7 @@ function print_help_main() {
     "\t${cyan}D${reset}, ${cyan}docs${reset} \t Open the user documentation " \
     "on the web browser.\n\n" \
     "To view the usage of each command, execute ${cyan}lnrun -h " \
-    "<command>${reset} or ${cyan}lnrun --help <command>${reset}."
+    "<command>${reset} or ${cyan}lnrun help <command>${reset}."
 }
 
 function print_help_test() {
@@ -155,7 +155,7 @@ fi
 # parse the command
 while [ $# -gt 0 ]; do
   case $1 in
-  -h | --help)
+  h | help)
     shift
     case $1 in
     t | test) print_help_test ;;
@@ -175,10 +175,12 @@ while [ $# -gt 0 ]; do
       -b | --backend) shift && NOMP_BACKEND="${1}" ;;
       -p | --platform) shift && NOMP_PLATFORM="${1}" ;;
       -d | --device) shift && NOMP_DEVICE="${1}" ;;
-      *) echo "${red}Invalid argument: ${1}${reset}" &&
-        echo "See ${cyan}lnrun -h t|test ${reset} or ${cyan}lnrun" \
-          "--help t|test ${reset} for the accepted commands."
-        exit 1 ;;
+      *)
+        echo "${red}Invalid argument: ${1}${reset}" &&
+          echo "See ${cyan}lnrun h t|test ${reset} or ${cyan}lnrun" \
+            "help t|test ${reset} for the accepted commands."
+        exit 1
+        ;;
       esac
       shift
     done
@@ -194,10 +196,11 @@ while [ $# -gt 0 ]; do
       -b | --backend) shift && NOMP_BACKEND="${1}" ;;
       -p | --platform) shift && NOMP_PLATFORM="${1}" ;;
       -d | --device) shift && NOMP_DEVICE="${1}" ;;
-      *) echo "${red}Invalid argument: ${1}${reset}" &&
-        echo "See ${cyan}lnrun -h d|debug ${reset} or ${cyan}lnrun" \
-          "--help d|debug ${reset} for the accepted commands."
-        exit 1 ;;
+      *)
+        echo "${red}Invalid argument: ${1}${reset}" &&
+          echo "See ${cyan}lnrun h|help d|debug${reset} for the accepted commands."
+        exit 1
+        ;;
       esac
       shift
     done
@@ -208,19 +211,21 @@ while [ $# -gt 0 ]; do
     while [ $# -gt 0 ]; do
       case $1 in
       -B | --browser) shift && NOMP_BROWSER="${1}" ;;
-      *) echo "${red}Invalid argument: ${1}${reset}" &&
-        echo "See ${cyan}lnrun -h D|docs ${reset} or ${cyan}lnrun" \
-          "--help D|docs ${reset} for the accepted commands."
-        exit 1 ;;
+      *)
+        echo "${red}Invalid argument: ${1}${reset}" &&
+          echo "See ${cyan}lnrun h|help D|docs${reset} for the accepted commands."
+        exit 1
+        ;;
       esac
       shift
     done
     open_docs
     ;;
-  *) echo "${red}Invalid argument: ${1}${reset}" &&
-    echo "See ${cyan}lnrun -h${reset} or ${cyan}lnrun --help${reset} for" \
-      "the accepted commands."
-    exit 1 ;;
+  *)
+    echo "${red}Invalid argument: ${1}${reset}" &&
+      echo "See ${cyan}lnrun h|help${reset} for the accepted commands."
+    exit 1
+    ;;
   esac
   shift
 done

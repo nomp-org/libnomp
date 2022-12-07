@@ -119,12 +119,12 @@ if [[ $# -gt 0 ]]; then
     shift
     if [[ $# -gt 0 ]]; then
       case $1 in
-      -h | --help) print_help ;;
+      h | help) print_help ;;
       -y | --yes) NOMP_DEFAULT_PROMPT="y" ;;
       -n | --no) NOMP_DEFAULT_PROMPT="n" ;;
       *)
         echo "${red}Invalid argument: ${1}${reset}."
-        echo "See ${cyan}./${0} -h|--help${reset} for the accepted commands."
+        echo "See ${cyan}./${0} h|--help${reset} for the accepted commands."
         exit 1
         ;;
       esac
@@ -142,7 +142,7 @@ if [[ $# -gt 0 ]]; then
       --ctest) NOMP_FORMAT_PARAMETER+=('clangformat_test') ;;
       *)
         echo "${red}Invalid argument: ${1}${reset}"
-        echo "See ${cyan}${0} -h|--help f|format ${reset} for the accepted commands."
+        echo "See ${cyan}${0} h|help f|format ${reset} for the accepted commands."
         exit 1
         ;;
       esac
@@ -159,10 +159,10 @@ if [[ $# -gt 0 ]]; then
     fi
     exit 0
     ;;
-  -h | --help) print_help ;;
+  h | help) print_help ;;
   *)
     echo "${red}Invalid argument: ${1}${reset}."
-    echo "See ${cyan}./${0} -h|--help${reset} for the accepted commands."
+    echo "See ${cyan}./${0} h|--help${reset} for the accepted commands."
     exit 1
     ;;
   esac

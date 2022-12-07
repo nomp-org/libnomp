@@ -17,11 +17,11 @@ cyan=$(tput setaf 6)
 reset=$(tput sgr0)
 
 function print_help() {
-  echo -e "Usage: ${0} [-h|--help] [-v|--verbose] [-d|--debug] [-D|--docs]\n" \
-    "\t[-i|--install-dir <install directory>] " \
-    "[-B|--build-dir <build directory>\n" \
+  echo -e "Usage: ${0} [h|help] [-b|--build-type] <build-type>\n" \
+    "\t[-e|--enable-docs]\n\t[-i|--install-dir <install directory>]\n" \
+    "\t[-B|--build-dir <build directory>\n" \
     "\t[-o|--opencl-lib <opencl library>]\n" \
-    "${cyan}-h/--help:${reset} Print help for libnomp configuration script.\n" \
+    "${cyan}h/help:${reset} Print help for libnomp configuration script.\n" \
     "${cyan}-b/--build-type:${reset} Specify the build type for cmake " \
     "(Default: ${NOMP_BUILD_TYPE}, Allowed: Debug, Release, RelWithDebInfo " \
     "and MinSizeRel).\n" \
@@ -38,16 +38,17 @@ function print_help() {
 # parse the options
 while [ $# -gt 0 ]; do
   case $1 in
-  -h | --help) print_help ;;
+  h | help) print_help ;;
   -b | --build-type) shift && NOMP_BUILD_TYPE=${1^^} ;;
   -d | --enable-docs) NOMP_ENABLE_DOCS="ON" ;;
   -i | --install-dir) shift && NOMP_INSTALL_DIR=$(realpath "${1}") ;;
   -B | --build-dir) shift && NOMP_BUILD_DIR=$(realpath "${1}") ;;
   -o | --opencl-lib) shift && NOMP_OPENCL_LIBRARY=$(realpath "${1}") ;;
-  *) echo "${red}Invalid argument: ${1}${reset}"
-    echo "See ${cyan}./lncfg -h${reset} or ${cyan}./lncfg --help${reset} for " \
-      "the accepted commands."
-    exit 1 ;;
+  *)
+    echo "${red}Invalid argument: ${1}${reset}"
+    echo "See ${cyan}lnrun h|help${reset} for the accepted commands."
+    exit 1
+    ;;
   esac
   shift
 done
