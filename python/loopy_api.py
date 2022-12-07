@@ -46,15 +46,13 @@ _CLANG_TYPE_TO_C_TYPE = {
     "double": "double",
     "uchar": "unsigned char",
     "schar": "signed char",
-    "uchar": "unsigned char",
-    "schar": "signed char",
 }
 _BACKEND_TO_TARGET = {"opencl": lp.OpenCLTarget(), "cuda": lp.CudaTarget()}
 _ARRAY_TYPES = [cindex.TypeKind.CONSTANTARRAY, cindex.TypeKind.INCOMPLETEARRAY]
 _ARRAY_TYPES_W_P = _ARRAY_TYPES + [cindex.TypeKind.POINTER]
 
 
-dtype_reg = None
+DTYPE_REG = None
 
 
 class IdentityMapper:
@@ -78,9 +76,7 @@ class IdentityMapper:
         (val,) = expr.get_tokens()
         ctype = expr.type.kind.spelling.lower()
         return (
-            dtype_reg
-            .get_or_register_dtype(_CLANG_TYPE_TO_C_TYPE[ctype])
-            .type
+            DTYPE_REG.get_or_register_dtype(_CLANG_TYPE_TO_C_TYPE[ctype]).type
         )(val.spelling)
 
     def map_floating_literal(self, expr: cindex.CursorKind):
@@ -88,9 +84,7 @@ class IdentityMapper:
         (val,) = expr.get_tokens()
         ctype = expr.type.kind.spelling.lower()
         return (
-            dtype_reg
-            .get_or_register_dtype(_CLANG_TYPE_TO_C_TYPE[ctype])
-            .type
+            DTYPE_REG.get_or_register_dtype(_CLANG_TYPE_TO_C_TYPE[ctype]).type
         )(val.spelling)
 
     def map_init_list_expr(self, expr: cindex.CursorKind):
@@ -108,16 +102,12 @@ def _get_dtype_from_decl_type(decl):
         and isinstance(decl.get_pointee().kind, cindex.TypeKind)
     ):
         ctype = decl.get_pointee().kind.spelling.lower()
-        return dtype_reg.get_or_register_dtype(
-            _CLANG_TYPE_TO_C_TYPE[ctype]
-        )
+        return DTYPE_REG.get_or_register_dtype(_CLANG_TYPE_TO_C_TYPE[ctype])
     if decl.kind in _ARRAY_TYPES:
         return _get_dtype_from_decl_type(decl.get_array_element_type())
     if isinstance(decl.kind, cindex.TypeKind):
         ctype = decl.kind.spelling.lower()
-        return dtype_reg.get_or_register_dtype(
-            _CLANG_TYPE_TO_C_TYPE[ctype]
-        )
+        return DTYPE_REG.get_or_register_dtype(_CLANG_TYPE_TO_C_TYPE[ctype])
     raise NotImplementedError(f"_get_dtype_from_decl: {decl}")
 
 
@@ -131,13 +121,16 @@ class CToLoopyExpressionMapper(IdentityMapper):
 
     def map_array_subscript_expr(self, expr: cindex.CursorKind):
         """Maps C array reference"""
-        if expr.kind == cindex.CursorKind.ARRAY_SUBSCRIPT_EXPR:
-            var_name, index = expr.get_children()
-            return prim.Subscript(self.rec(var_name), self.rec(index))
-        if isinstance(expr.name, cindex.CursorKind):
+        unexpsd_expr, index = expr.get_children()
+        (child,) = unexpsd_expr.get_children()
+        if child.kind == cindex.CursorKind.DECL_REF_EXPR:
+            return prim.Subscript(self.rec(child), self.rec(index))
+        if child.kind == cindex.CursorKind.ARRAY_SUBSCRIPT_EXPR:
+            unexpsd_expr_2, index_2 = child.get_children()
+            (child_2,) = unexpsd_expr_2.get_children()
             return prim.Subscript(
-                self.rec(expr.name.name),
-                (self.rec(expr.name.subscript), self.rec(expr.subscript)),
+                self.rec(child_2),
+                (self.rec(index_2), self.rec(index)),
             )
         raise NotImplementedError
 
@@ -411,8 +404,40 @@ class CToLoopyMapper(IdentityMapper):
         lhs = CToLoopyExpressionMapper()(left)
         rhs = CToLoopyExpressionMapper()(right)
 
-        # FIXME: This could be sharpened so that other instruction types are
-        # also emitted.
+        return CToLoopyMapperAccumulator(
+            [],
+            [
+                lp.Assignment(
+                    lhs,
+                    expression=rhs,
+                    within_inames=context.inames,
+                    predicates=context.predicates,
+                    id=context.name_gen(LOOPY_INSN_PREFIX),
+                )
+            ],
+            [],
+        )
+
+    def map_compound_assignment_operator(
+        self, expr: cindex.CursorKind, context: CToLoopyMapperContext
+    ):
+        """Maps C binary operation"""
+        left, right = expr.get_children()
+
+        lhs = CToLoopyExpressionMapper()(left)
+        rhs = CToLoopyExpressionMapper()(right)
+
+        left_offset = len(list(left.get_tokens()))
+        op_str = list(expr.get_tokens())[left_offset].spelling
+        if op_str == "+=":
+            rhs = lhs + rhs
+        elif op_str == "-=":
+            rhs = lhs - rhs
+        elif op_str == "*=":
+            rhs = lhs * rhs
+        elif op_str != "=":
+            raise NotImplementedError(f"Mapping not implemented for {op_str}")
+
         return CToLoopyMapperAccumulator(
             [],
             [
@@ -485,9 +510,9 @@ def c_to_loopy(c_str: str, backend: str) -> lp.translation_unit.TranslationUnit:
 
     # Init `var_to_decl` based on function parameters
     context = ExternalContext(function_name=node.spelling, var_to_decl={})
-    global dtype_reg 
-    dtype_reg = DTypeRegistry()
-    fill_registry_with_c_types(dtype_reg, True)
+    global DTYPE_REG
+    DTYPE_REG = DTypeRegistry()
+    fill_registry_with_c_types(DTYPE_REG, True)
     knl_args = []
     body = None
     for arg in node.get_children():
@@ -545,11 +570,12 @@ if __name__ == "__main__":
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
     KNL_STR = """
           void foo(double *a, int N) {
+            int c[2][2];
+            c[1][0] = 4;
             int b[2];
-            int c;
-            b[1] = 4;
+            b[1] = 5;
             for (int i = 0; i < N; i++)
-              a[i] = i <= 7;
+              a[i] *= i;
           }
           """
     lp_knl = c_to_loopy(KNL_STR, "cuda")
