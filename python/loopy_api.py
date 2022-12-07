@@ -4,7 +4,6 @@ from typing import Dict, FrozenSet, List, Optional, Union
 
 import islpy as isl
 import loopy as lp
-import numpy as np
 import pymbolic.primitives as prim
 from loopy.isl_helpers import make_slab
 from loopy.kernel.data import AddressSpace
@@ -540,17 +539,7 @@ if __name__ == "__main__":
     import sys
 
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-    from reduction import realize_reduction, test_global_parallel_reduction
-
-    knl0 = lp.make_kernel(
-        "{[i]: 0 <= i < n }",
-        """
-        z[0] = sum(i, a[i])
-        """,
-        lang_version=LOOPY_LANG_VERSION,
-    )
-    knl0 = lp.add_and_infer_dtypes(knl0, {"a": np.float32})
-    knl0 = test_global_parallel_reduction(knl0)
+    from reduction import realize_reduction
 
     KNL_STR = """
           void foo(double *a, double *bb, int N) {
@@ -560,6 +549,6 @@ if __name__ == "__main__":
             }
           }
           """
-    knl1 = c_to_loopy(KNL_STR, "cuda")
-    knl1 = realize_reduction(knl1, "cuda")
-    print(lp.generate_code_v2(knl1).device_code())
+    knl = c_to_loopy(KNL_STR, "cuda")
+    knl = realize_reduction(knl, "cuda")
+    print(lp.generate_code_v2(knl).device_code())

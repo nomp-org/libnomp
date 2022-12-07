@@ -1,21 +1,25 @@
+"""Module to do reductions with using Loopy."""
 import loopy as lp
 import pymbolic.primitives as prim
 from loopy.transform.data import reduction_arg_to_subst_rule
+from loopy_api import LOOPY_LANG_VERSION
 
-_BACKEND_TO_TARGET = {"opencl": lp.OpenCLTarget(), "cuda": lp.CudaTarget()}
+_BACKEND_TO_BLOCK_SIZE = {"cuda": 32, "opencl": 32}
 
 
 def realize_reduction(
-    knl: lp.translation_unit.TranslationUnit, backend: str
+    tunit: lp.translation_unit.TranslationUnit, backend: str
 ) -> lp.translation_unit.TranslationUnit:
-    if len(knl.callables_table.keys()) > 1:
+    """Perform transformations to realize reduction."""
+
+    if len(tunit.callables_table.keys()) > 1:
         raise NotImplementedError(
             "Don't know how to handle more than 1 callable in TU!"
         )
-    (knl_name,) = knl.callables_table.keys()
+    (knl_name,) = tunit.callables_table.keys()
 
     redn_var = None
-    for insn in knl.default_entrypoint.instructions:
+    for insn in tunit.default_entrypoint.instructions:
         if isinstance(insn, lp.Assignment):
             if isinstance(insn.assignee, prim.Subscript) and isinstance(
                 insn.expression, lp.symbolic.Reduction
@@ -23,34 +27,40 @@ def realize_reduction(
                 if isinstance(insn.assignee.aggregate, prim.Variable):
                     redn_var = insn.assignee.aggregate.name
     if redn_var is None:
-        return knl
+        return tunit
 
-    if len(knl.default_entrypoint.inames.keys()) > 1:
+    if len(tunit.default_entrypoint.inames.keys()) > 1:
         raise NotImplementedError(
             "Don't know how to handle more than 1 iname in redcution !"
         )
 
-    (iname,) = knl.default_entrypoint.inames
+    (iname,) = tunit.default_entrypoint.inames
     i_inner, i_outer = f"{iname}_inner", f"{iname}_outer"
-    knl = lp.split_iname(
-        knl, iname, 32, inner_iname=i_inner, outer_iname=i_outer
+    tunit = lp.split_iname(
+        tunit,
+        iname,
+        _BACKEND_TO_BLOCK_SIZE[backend],
+        inner_iname=i_inner,
+        outer_iname=i_outer,
     )
-    knl = lp.split_reduction_outward(knl, i_outer)
-    knl = lp.split_reduction_inward(knl, i_inner)
+    tunit = lp.split_reduction_outward(tunit, i_outer)
+    tunit = lp.split_reduction_inward(tunit, i_inner)
 
     redn_tmp = f"{redn_var}_tmp"
-    knl = reduction_arg_to_subst_rule(knl, i_outer, subst_rule_name=redn_tmp)
-    knl = lp.precompute(
-        knl,
+    tunit = reduction_arg_to_subst_rule(
+        tunit, i_outer, subst_rule_name=redn_tmp
+    )
+    tunit = lp.precompute(
+        tunit,
         redn_tmp,
         i_outer,
         temporary_address_space=lp.AddressSpace.GLOBAL,
         default_tag="l.auto",
     )
-    knl = lp.realize_reduction(knl)
+    tunit = lp.realize_reduction(tunit)
 
-    p = knl[knl_name]
-    args, tmp_vars, redn_arg = p.args, p.temporary_variables, None
+    knl = tunit[knl_name]
+    args, tmp_vars, redn_arg = knl.args, knl.temporary_variables, None
     for arg in args:
         if arg.name == redn_var:
             redn_arg = arg
@@ -71,38 +81,13 @@ def realize_reduction(
     )
     args.sort(key=lambda arg: arg.name.lower())
 
-    knl = lp.make_kernel(
-        p.domains, p.instructions, args + list(tmp_vars.values())
+    tunit = lp.make_kernel(
+        knl.domains,
+        knl.instructions,
+        args + list(tmp_vars.values()),
+        lang_version=LOOPY_LANG_VERSION,
     )
 
-    knl = lp.tag_inames(knl, {i_inner: "l.0"})
-    knl = lp.tag_inames(knl, {f"{i_outer}_0": "g.0"})
-    return knl
-
-
-def test_global_parallel_reduction(knl):
-    gsize = 128
-    knl = lp.split_iname(knl, "i", gsize * 20)
-    knl = lp.split_iname(knl, "i_inner", gsize, inner_tag="l.0")
-    knl = lp.split_reduction_outward(knl, "i_outer")
-    knl = lp.split_reduction_inward(knl, "i_inner_outer")
-
-    knl = reduction_arg_to_subst_rule(knl, "i_outer")
-
-    knl = lp.precompute(
-        knl,
-        "red_i_outer_arg",
-        "i_outer",
-        temporary_address_space=lp.AddressSpace.GLOBAL,
-        default_tag="l.auto",
-    )
-    knl = lp.realize_reduction(knl)
-    knl = lp.tag_inames(knl, "i_outer_0:g.0")
-
-    # Keep the i_outer accumulator on the  correct (lower) side of the barrier,
-    # otherwise there will be useless save/reload code generated.
-    knl = lp.add_dependency(
-        knl, "writes:acc_i_outer", "id:red_i_outer_arg_barrier"
-    )
-
-    return knl
+    tunit = lp.tag_inames(tunit, {i_inner: "l.0"})
+    tunit = lp.tag_inames(tunit, {f"{i_outer}_0": "g.0"})
+    return tunit
