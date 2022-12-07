@@ -61,11 +61,11 @@ int main(int argc, char *argv[]) {
   char *backend;
   int device, platform;
   parse_input(argc, argv, &backend, &device, &platform);
-  int output = 0;
+  int err = 0;
 
-  PRINT_SUBTEST(output, test_first_nomp_finalize)
-  PRINT_SUBTEST(output, test_nomp_init_twice, backend, device, platform);
-  PRINT_SUBTEST(output, test_nomp_finalize_twice);
+  err |= SUBTEST(test_first_nomp_finalize);
+  err |= SUBTEST(test_nomp_init_twice, backend, device, platform);
+  err |= SUBTEST(test_nomp_finalize_twice);
 
-  return output;
+  return err;
 }
