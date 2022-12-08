@@ -14,7 +14,7 @@ find_package_handle_standard_args(pylint
 find_package_handle_standard_args(flake8
                                   "Failed to find flake8 executable"
                                   FLAKE8_EXECUTABLE)
-file(GLOB SRCS python/*.py )
+file(GLOB SRCS python/*.py tests/*.py)
 
 add_custom_target(
         pylint

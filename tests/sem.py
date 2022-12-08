@@ -1,3 +1,4 @@
+"""Kernel Annotation function"""
 from typing import Dict
 
 import loopy as lp
@@ -8,6 +9,7 @@ LOOPY_LANG_VERSION = (2018, 2)
 def annotate(
     knl: lp.translation_unit.TranslationUnit, annotations: Dict[str, str]
 ) -> lp.translation_unit.TranslationUnit:
+    """Annotate loops using group_ids and local_ids"""
     inames = knl.default_entrypoint.all_inames()
     dof_axis = 0
     for key in annotations:
