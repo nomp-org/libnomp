@@ -7,7 +7,6 @@ on:
 
 env:
   CACHE_NUMBER: 0  # increase to reset cache manually
-  POCL_CACHE_NUMBER: 1
 jobs:
   clang-format-check:
     runs-on: ubuntu-latest
@@ -38,11 +37,6 @@ jobs:
         run: |
           mamba env update -n libnomp-dev -f environment-dev.yml
         if: steps.cache.outputs.cache-hit != 'true'
-      - name: Generate Makefile
-        id: generate_makefile
-        run: |
-          echo "NOMP_INSTALL_DIR=${PWD}/../install" >> $GITHUB_ENV
-          ./lncfg -i ../install -o ${CONDA_PREFIX}/lib/libOpenCL.so
       - name: Run clang-format
         id: run_clang-format
         run: |

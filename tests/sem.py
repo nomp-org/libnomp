@@ -9,8 +9,8 @@ LOOPY_LANG_VERSION = (2018, 2)
 def annotate(
     knl: lp.translation_unit.TranslationUnit, annotations: Dict[str, str]
 ) -> lp.translation_unit.TranslationUnit:
-    """Tag loops based on the annotations from the Spectral Element Methods domain.
-    """
+    """Tag loops based on the annotations from the Spectral Element Methods
+    domain."""
     inames = knl.default_entrypoint.all_inames()
     dof_axis = 0
     for key in annotations:

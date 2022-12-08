@@ -1,8 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
 project(libnomp VERSION 0.0.1 DESCRIPTION "nomp runtime library" LANGUAGES C)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
-include(clangformat)
-include(python-static)
 
 # Treat compiler warnings as errors
 set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
@@ -53,6 +50,7 @@ target_include_directories(nomp PRIVATE src)
 
 option(ENABLE_DOCS "Enable Documentation" OFF)
 if (ENABLE_DOCS)
+  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
   add_subdirectory ("docs")
 endif()
 

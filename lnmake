@@ -5,6 +5,11 @@ NOMP_SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 NOMP_DEFAULT_PROMPT=""
 NOMP_LNSTATE_PATH="${NOMP_SOURCE_DIR}/.lnstate"
 NOMP_SHELL_CONFIG_FILE=""
+PYLINT_CMD="pylint --fail-under=8.95 python/*.py tests/*.py"
+FLAKE8_CMD="flake8 python/*.py tests/*.py"
+CLANG_FORMAT_TEST_CMD="clang-format --dry-run --Werror src/*.[ch] tests/*.[ch]"
+CLANG_FORMAT_CMD="clang-format -i src/*.[ch] tests/*.[ch]"
+NOMP_SUPPORTED_FORMAT_CMDS=("${PYLINT_CMD}" "${FLAKE8_CMD}" "${CLANG_FORMAT_CMD}" "${CLANG_FORMAT_TEST_CMD}")
 
 # colors
 red=$(tput setaf 1)
@@ -15,7 +20,7 @@ reset=$(tput sgr0)
 # read state variables of lncfg
 if [[ -f "${NOMP_LNSTATE_PATH}" ]]; then
   source "${NOMP_LNSTATE_PATH}"
-else
+elif [[ "${1}" != "f" && "${1}" != "format" ]]; then
   echo "${red}You should run ./lncfg before running ./${0}${reset}"
   exit 1
 fi
@@ -97,8 +102,7 @@ END
 
 function format() {
   NOMP_FORMAT_SUCCESS=false
-  cmake --build "${NOMP_BUILD_DIR}" --target "${1}" &&
-    NOMP_FORMAT_SUCCESS=true
+  ${1} && NOMP_FORMAT_SUCCESS=true
 
   if [[ ${NOMP_FORMAT_SUCCESS} = true ]]; then
     echo "${green}Successfully formatted source files with ${1}${reset}"
@@ -133,13 +137,13 @@ if [[ $# -gt 0 ]]; then
     ;;
   f | format)
     shift
-    NOMP_FORMAT_PARAMETER=()
+    NOMP_FORMAT_CMDS=()
     while [ $# -gt 0 ]; do
       case $1 in
-      --pylint) NOMP_FORMAT_PARAMETER+=('pylint') ;;
-      --flake8) NOMP_FORMAT_PARAMETER+=('flake8') ;;
-      --c) NOMP_FORMAT_PARAMETER+=('clangformat') ;;
-      --ctest) NOMP_FORMAT_PARAMETER+=('clangformat_test') ;;
+      --pylint) NOMP_FORMAT_CMDS+=("${NOMP_SUPPORTED_FORMAT_CMDS[0]}") ;;
+      --flake8) NOMP_FORMAT_CMDS+=("${NOMP_SUPPORTED_FORMAT_CMDS[1]}") ;;
+      --c) NOMP_FORMAT_CMDS+=("${NOMP_SUPPORTED_FORMAT_CMDS[2]}") ;;
+      --ctest) NOMP_FORMAT_CMDS+=("${NOMP_SUPPORTED_FORMAT_CMDS[3]}") ;;
       *)
         echo "${red}Invalid argument: ${1}${reset}"
         echo "See ${cyan}${0} h|help f|format ${reset} for the accepted commands."
@@ -148,13 +152,13 @@ if [[ $# -gt 0 ]]; then
       esac
       shift
     done
-    if [[ ${#NOMP_FORMAT_PARAMETER[@]} -eq 0 ]]; then
-      format "pylint"
-      format "flake8"
-      format "clangformat"
+    if [[ ${#NOMP_FORMAT_CMDS[@]} -eq 0 ]]; then
+      for cmd in "${NOMP_SUPPORTED_FORMAT_CMDS[@]}"; do
+        format "${cmd}"
+      done
     else
-      for param in "${NOMP_FORMAT_PARAMETER[@]}"; do
-        format "${param}"
+      for cmd in "${NOMP_FORMAT_CMDS[@]}"; do
+        format "${cmd}"
       done
     fi
     exit 0
