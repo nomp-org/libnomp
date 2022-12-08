@@ -12,47 +12,12 @@ int main(int argc, char *argv[]) {
   int err = nomp_init(backend, platform, device);
   nomp_chk(err);
 
-  nomp_api_223_add_int(10);
-  nomp_api_223_add_long(10);
-  nomp_api_223_add_unsigned(10);
-  nomp_api_223_add_unsigned_long(10);
-  nomp_api_223_add_float(10);
-  nomp_api_223_add_double(10);
-
-  nomp_api_223_add_int(20);
-  nomp_api_223_add_long(20);
-  nomp_api_223_add_unsigned(20);
-  nomp_api_223_add_unsigned_long(20);
-  nomp_api_223_add_float(20);
-  nomp_api_223_add_double(20);
-
-  nomp_api_223_sub_int(10);
-  nomp_api_223_sub_long(10);
-  nomp_api_223_sub_unsigned(10);
-  nomp_api_223_sub_unsigned_long(10);
-  nomp_api_223_sub_float(10);
-  nomp_api_223_sub_double(10);
-
-  nomp_api_223_sub_int(20);
-  nomp_api_223_sub_long(20);
-  nomp_api_223_sub_unsigned(20);
-  nomp_api_223_sub_unsigned_long(20);
-  nomp_api_223_sub_float(20);
-  nomp_api_223_sub_double(20);
-
-  nomp_api_223_mul_int(10);
-  nomp_api_223_mul_long(10);
-  nomp_api_223_mul_unsigned(10);
-  nomp_api_223_mul_unsigned_long(10);
-  nomp_api_223_mul_float(10);
-  nomp_api_223_mul_double(10);
-
-  nomp_api_223_mul_int(20);
-  nomp_api_223_mul_long(20);
-  nomp_api_223_mul_unsigned(20);
-  nomp_api_223_mul_unsigned_long(20);
-  nomp_api_223_mul_float(20);
-  nomp_api_223_mul_double(20);
+  TEST_BUILTIN_TYPES(223_add, 10)
+  TEST_BUILTIN_TYPES(223_add, 20)
+  TEST_BUILTIN_TYPES(223_sub, 10)
+  TEST_BUILTIN_TYPES(223_sub, 20)
+  TEST_BUILTIN_TYPES(223_mul, 20)
+  TEST_BUILTIN_TYPES(223_mul, 20)
 
   err = nomp_finalize();
   nomp_chk(err);
