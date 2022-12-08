@@ -1,16 +1,5 @@
 #include "nomp-impl.h"
 
-int check_null_input_(void *p, const char *func, unsigned line,
-                      const char *file) {
-  if (!p) {
-    return set_log(NOMP_RUNTIME_NULL_INPUT_ENCOUNTERED, NOMP_ERROR,
-                   "Input pointer passed to function \"%s\" at line %d in file "
-                   "%s is NULL.",
-                   func, line, file);
-  }
-  return 0;
-}
-
 static char *get_if_env(const char *name) {
   const char *tmp = getenv(name);
   if (tmp != NULL) {
@@ -202,9 +191,19 @@ int nomp_init(int argc, const char **argv) {
     // Python is already initialized.
     err = 0;
   }
-  if (err)
+  if (err) {
     return set_log(NOMP_PY_INITIALIZE_ERROR, NOMP_ERROR,
                    "Unable to initialize python during initializing libnomp.");
+  }
+
+  // Allocate buffer for use as temporary arguments for kernels (e.g., like
+  // reductions).
+  struct mem *m = nomp.buffer = tcalloc(struct mem, 1);
+  m->idx0 = 0, m->idx1 = 1024, m->usize = sizeof(char);
+  m->hptr = tmalloc(char, 1024);
+  m->bptr = NULL;
+  err = nomp.update(&nomp, m, NOMP_ALLOC);
+  return_on_err(err);
 
   initialized = 1;
   return 0;
@@ -324,24 +323,32 @@ int nomp_jit(int *id, const char *c_src, const char **clauses, int narg, ...) {
       progs_max += progs_max / 2 + 1;
       progs = trealloc(progs, struct prog *, progs_max);
     }
-
     struct prog *prg = progs[progs_n] = tcalloc(struct prog, 1);
+
+    prg->reduction_indx = prg->reduction_op = -1;
+    prg->narg = narg;
     prg->args = tcalloc(struct arg, narg);
 
     // Set kernel argument meta data.
     va_list args;
     va_start(args, narg);
+
     for (unsigned i = 0; i < narg; i++) {
       strncpy(prg->args[i].name, va_arg(args, const char *), MAX_ARG_NAME_SIZE);
       int type_and_attrs = va_arg(args, int);
       prg->args[i].size = va_arg(args, size_t);
       int attrs = type_and_attrs & NOMP_ATTR_MASK;
       prg->args[i].type = type_and_attrs - attrs;
-      prg->args[i].redn = attrs & NOMP_ATTR_REDN;
       prg->args[i].pinned = attrs & NOMP_ATTR_PINNED;
+      if (attrs & NOMP_ATTR_REDN) {
+        if (prg->reduction_indx >= 0) {
+          // FIXME: return set_log();
+        }
+        prg->reduction_indx = i;
+      }
     }
+
     va_end(args);
-    prg->narg = narg;
 
     // Parse the clauses
     struct meta info;
@@ -365,9 +372,11 @@ int nomp_jit(int *id, const char *c_src, const char **clauses, int narg, ...) {
     err = py_user_transform(&knl, info.file, info.func);
     return_on_err(err);
 
-    // Handle reduction clause.
-    err = py_handle_reduction(&knl, nomp.backend);
-    return_on_err(err);
+    // Handle reductions if present.
+    if (prg->reduction_indx >= 0) {
+      err = py_handle_reduction(&knl, &prg->reduction_op, nomp.backend);
+      return_on_err(err);
+    }
 
     // Get OpenCL, CUDA, etc. source from the loopy kernel.
     char *src = NULL;
@@ -398,42 +407,64 @@ int nomp_jit(int *id, const char *c_src, const char **clauses, int narg, ...) {
 int nomp_run(int id, ...) {
   if (id >= 0 && id < progs_n && progs[id] != NULL) {
     struct prog *prg = progs[id];
+    struct arg *args = prg->args;
 
-    va_list args;
-    va_start(args, id);
+    va_list vargs;
+    va_start(vargs, id);
+
+    struct mem *m;
     for (int i = 0; i < prg->narg; i++) {
-      // Get the pointer from user
-      void *val = va_arg(args, void *);
-
+      void *arg = args[i].hptr = va_arg(vargs, void *);
       // Get meta data we stored during nomp_jit()
-      const char *name = prg->args[i].name;
-      int type = prg->args[i].type;
-      size_t size = prg->args[i].size;
+      const char *name = args[i].name;
+      unsigned type = args[i].type;
+      size_t size = args[i].size;
 
-      // Should we update the dict?
-      if (type == NOMP_INT || type == NOMP_UINT || type == NOMP_FLOAT) {
-        // FIXME: This is wrong. Val should be converted to a pointer which
-        // match the size given by `size`. Not sure if we should pass `float`
-        // vlaues to this dict as well.
-        PyObject *py_key = PyUnicode_FromStringAndSize(name, strlen(name));
-        PyObject *py_val = PyLong_FromLong(*((int *)val));
-        PyDict_SetItem(prg->py_dict, py_key, py_val);
-        Py_XDECREF(py_key), Py_XDECREF(py_val);
+      PyObject *key, *val;
+      switch (type) {
+      case NOMP_INT:
+      case NOMP_UINT:
+      case NOMP_FLOAT:
+        // FIXME: Different types should be handled differently.
+        val = PyLong_FromLong(*((int *)arg));
+        key = PyUnicode_FromStringAndSize(name, strlen(name));
+        PyDict_SetItem(prg->py_dict, key, val);
+        Py_XDECREF(key), Py_XDECREF(val);
+        args[i].ptr = arg;
+        break;
+      case NOMP_PTR:
+        m = mem_if_mapped(arg);
+        if (m == NULL) {
+          if (prg->reduction_indx != i) {
+            return set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
+                           ERR_STR_USER_MAP_PTR_IS_INVALID, arg);
+          }
+          m = nomp.buffer;
+        }
+        args[i].ptr = (void *)&m->bptr;
+        break;
+      default:
+        return set_log(
+            NOMP_USER_KNL_ARG_TYPE_IS_INVALID, NOMP_ERROR,
+            "Kernel argument type %d passed to libnomp is not valid.", type);
+        break;
       }
     }
-    va_end(args);
+
+    va_end(vargs);
 
     int err = py_eval_grid_size(prg, prg->py_dict);
     return_on_err(err);
 
-    va_start(args, id);
-    err = nomp.knl_run(&nomp, prg, args);
-    va_end(args);
+    err = nomp.knl_run(&nomp, prg);
+    return_on_err(err);
 
-    // Check for reductions and copy back the array to host. Perform the host
-    // reduction and set the releavant input argument.
+    if (prg->reduction_indx >= 0) {
+      err = host_side_reduction(&nomp, prg, nomp.buffer);
+      return_on_err(err);
+    }
 
-    return err;
+    return 0;
   }
   return set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                  "Kernel id %d passed to nomp_run is not valid.", id);
@@ -459,14 +490,15 @@ void nomp_chk_(int err_id, const char *file, unsigned line) {
 }
 
 int nomp_finalize(void) {
-  if (!initialized)
+  if (!initialized) {
     return set_log(NOMP_RUNTIME_NOT_INITIALIZED, NOMP_ERROR,
                    "libnomp is not initialized.");
+  }
 
   for (unsigned i = 0; i < mems_n; i++) {
     if (mems[i]) {
       // FIXME: Check error returned form `nomp.update`
-      nomp.update(&nomp, mems[i], NOMP_FREE);
+      int err = nomp.update(&nomp, mems[i], NOMP_FREE);
       tfree(mems[i]), mems[i] = NULL;
     }
   }
@@ -474,20 +506,31 @@ int nomp_finalize(void) {
 
   for (unsigned i = 0; i < progs_n; i++) {
     if (progs[i]) {
-      // FIXME: Check error returned form `nomp.knl_free`
-      nomp.knl_free(progs[i]);
+      // FIXME: Check error returned form `nomp.knl_free`.
+      // FIXME: Free program arguments.
+      int err = nomp.knl_free(progs[i]);
       tfree(progs[i]), progs[i] = NULL;
     }
   }
   tfree(progs), progs = NULL, progs_n = progs_max = 0;
 
-  tfree(nomp.backend), tfree(nomp.install_dir);
-  tfree(nomp.script), tfree(nomp.annts_func);
+  // FIXME: Check error returned from `nomp_update`.
+  int err = nomp.update(&nomp, nomp.buffer, NOMP_FREE);
+  tfree(nomp.buffer->hptr);
+  tfree(nomp.buffer), nomp.buffer = NULL;
 
   initialized = nomp.finalize(&nomp);
-  if (initialized)
+  if (initialized) {
     return set_log(NOMP_RUNTIME_FAILED_TO_FINALIZE, NOMP_ERROR,
                    "Failed to initialize libnomp.");
+  }
+
+  tfree(nomp.backend), nomp.backend = NULL;
+  tfree(nomp.install_dir), nomp.install_dir = NULL;
+  tfree(nomp.script), nomp.script = NULL;
+  tfree(nomp.annts_func), nomp.annts_func = NULL;
+
+  finalize_logs();
 
   return 0;
 }

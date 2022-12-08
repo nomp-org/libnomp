@@ -550,5 +550,5 @@ if __name__ == "__main__":
           }
           """
     knl = c_to_loopy(KNL_STR, "cuda")
-    knl = realize_reduction(knl, "cuda")
+    (knl, op) = realize_reduction(knl, "cuda")
     print(lp.generate_code_v2(knl).device_code())

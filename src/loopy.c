@@ -1,13 +1,48 @@
 #include "nomp-impl.h"
 
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-
 static const char *lpy_api = "loopy_api";
 static const char *c_to_lpy = "c_to_loopy";
 static const char *redn = "reduction";
 static const char *rlze_redn = "realize_reduction";
 
-void py_print(const char *msg, PyObject *obj) {
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+
+/**
+ * @ingroup nomp_internal_api
+ * @brief Returns a non-zero error if the input is NULL.
+ *
+ * This function call set_log() to register an error if the input is NULL.
+ * Use the macro nomp_null_input() to automatically add last three arguments.
+ *
+ * @param[in] p Input pointer.
+ * @param[in] func Function in which the null check is done.
+ * @param[in] line Line number where the null check is done.
+ * @param[in] file File name in which the null check is done.
+ * @return int
+ */
+static int check_null_input_(void *p, const char *func, unsigned line,
+                             const char *file) {
+  if (!p) {
+    return set_log(NOMP_RUNTIME_NULL_INPUT_ENCOUNTERED, NOMP_ERROR,
+                   "Input pointer passed to function \"%s\" at line %d in file "
+                   "%s is NULL.",
+                   func, line, file);
+  }
+  return 0;
+}
+
+#define check_null_input(p)                                                    \
+  return_on_err(check_null_input_((void *)(p), __func__, __LINE__, __FILE__))
+
+/**
+ * @ingroup nomp_py_utils
+ * @brief Get the representation of python object.
+ *
+ * @param msg Debug message before printing the object.
+ * @param obj Python object.
+ * @return void
+ */
+static void py_print(const char *msg, PyObject *obj) {
   PyObject *repr = PyObject_Repr(obj);
   PyObject *py_str = PyUnicode_AsEncodedString(repr, "utf-8", "~E~");
   const char *str = PyBytes_AS_STRING(py_str);
@@ -95,11 +130,11 @@ int py_user_annotate(PyObject **knl, PyObject *annts, const char *file,
   return 0;
 }
 
-int py_handle_reduction(PyObject **knl, const char *backend) {
+int py_handle_reduction(PyObject **knl, int *rop, const char *backend) {
   check_null_input(*knl);
 
   int err = 1;
-  PyObject *string = PyUnicode_FromString(redn), *tk = NULL;
+  PyObject *string = PyUnicode_FromString(redn), *ret = NULL, *op = NULL;
   if (string) {
     PyObject *module = PyImport_Import(string);
     Py_DECREF(string);
@@ -108,8 +143,12 @@ int py_handle_reduction(PyObject **knl, const char *backend) {
       Py_DECREF(module);
       if (function && PyCallable_Check(function)) {
         PyObject *pbackend = PyUnicode_FromString(backend);
-        tk = PyObject_CallFunctionObjArgs(function, *knl, pbackend, NULL);
-        err = (tk == NULL);
+        ret = PyObject_CallFunctionObjArgs(function, *knl, pbackend, NULL);
+        if (PyTuple_Check(ret) && PyTuple_GET_SIZE(ret) == 2) {
+          Py_DECREF(*knl), *knl = PyTuple_GetItem(ret, 0);
+          op = PyTuple_GetItem(ret, 1), *rop = PyLong_AsLong(op), Py_DECREF(op);
+          err = 0;
+        }
         Py_XDECREF(pbackend), Py_DECREF(function);
       }
     }
@@ -119,7 +158,6 @@ int py_handle_reduction(PyObject **knl, const char *backend) {
                    "Calling realize_reduction failed.");
   }
 
-  Py_DECREF(*knl), *knl = tk;
   return 0;
 }
 
@@ -303,4 +341,5 @@ int py_eval_grid_size(struct prog *prg, PyObject *dict) {
   return 0;
 }
 
+#undef check_null_input
 #undef MAX

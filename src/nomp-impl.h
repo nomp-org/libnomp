@@ -35,20 +35,22 @@ struct meta {
 struct arg {
   char name[MAX_ARG_NAME_SIZE];
   size_t size;
-  unsigned type;
-  unsigned redn, pinned;
+  unsigned type, pinned;
+  void *ptr, *hptr;
 };
 
 struct prog {
   // Number of arguments and argument specific information.
   unsigned narg;
   struct arg *args;
-  // Number of dimensions and the expressions and evaluated values
-  // of each dimenions.
+  // Reduction variable index and operation if present.
+  int reduction_indx, reduction_op;
+  // Number of dimensions and their pymoblic expressions.
   unsigned ndim;
   PyObject *py_global, *py_local;
+  // Evaluated values of each dimenions.
   size_t global[MAX_DIM], local[MAX_DIM];
-  // Dictionary used to evaluate dimensions.
+  // Map of variables and their values used to evaluate dimensions.
   PyObject *py_dict;
   void *bptr;
 };
@@ -64,11 +66,39 @@ struct backend {
   int platform_id, device_id, verbose;
   int (*update)(struct backend *, struct mem *, const int);
   int (*knl_build)(struct backend *, struct prog *, const char *, const char *);
-  int (*knl_run)(struct backend *, struct prog *, va_list);
+  int (*knl_run)(struct backend *, struct prog *);
   int (*knl_free)(struct prog *);
   int (*finalize)(struct backend *);
   void *bptr;
 };
+
+/**
+ * @defgroup nomp_reduction_ops Reduction operations.
+ *
+ * @brief Defines reduction operations allowed in nomp kernels.
+ */
+
+/**
+ * @ingroup nomp_reduction_op
+ * @brief Sum reduction operation.
+ */
+#define NOMP_SUM 0
+/**
+ * @ingroup nomp_reduction_op
+ * @brief Product reduction operation.
+ */
+#define NOMP_PROD 1
+
+/**
+ * @ingroup nomp_reduction_utils
+ * @brief Perform host side reduction.
+ *
+ * @param[in] bnd Active backend instance.
+ * @param[in] prg Active program instance.
+ * @param[in] m Memory used to store device side partial reductions.
+ * @return int
+ */
+int host_side_reduction(struct backend *bnd, struct prog *prg, struct mem *m);
 
 /**
  * @ingroup nomp_other_utils
@@ -185,10 +215,11 @@ int py_user_transform(PyObject **knl, const char *file, const char *func);
  * after registering a log.
  *
  * @param[in,out] knl Pointer to loopy kernel object.
+ * @param[out] redn_op Reduction operation.
  * @param[in] backend Backend for the reduction.
  * @return int
  */
-int py_handle_reduction(PyObject **knl, const char *backend);
+int py_handle_reduction(PyObject **knl, int *redn_op, const char *backend);
 
 /**
  * @ingroup nomp_py_utils
@@ -232,16 +263,6 @@ int py_get_grid_size(struct prog *prg, PyObject *knl);
  * @return int
  */
 int py_eval_grid_size(struct prog *prg, PyObject *dict);
-
-/**
- * @ingroup nomp_py_utils
- * @brief Get the representation of python object.
- *
- * @param msg Debug message before printing the object.
- * @param obj Python object.
- * @return void
- */
-void py_print(const char *msg, PyObject *obj);
 
 /**
  * @defgroup nomp_other_utils Other helper functions.
@@ -333,10 +354,10 @@ int check_null_input_(void *p, const char *func, unsigned line,
 
 /**
  * @ingroup nomp_log_utils
- * @brief Free log variables.
+ * @brief Free variables used to keep track of logs.
  *
  * @return void
  */
-void nomp_finalize_logs();
+void finalize_logs();
 
 #endif // _LIB_NOMP_IMPL_H_

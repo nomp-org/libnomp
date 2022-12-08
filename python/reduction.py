@@ -5,6 +5,10 @@ from loopy.transform.data import reduction_arg_to_subst_rule
 from loopy_api import LOOPY_LANG_VERSION
 
 _BACKEND_TO_BLOCK_SIZE = {"cuda": 32, "opencl": 32}
+_LOOPY_REDN_TO_C_REDN = {
+    lp.library.reduction.SumReductionOperation(): 0,
+    lp.library.reduction.ProductReductionOperation(): 1,
+}
 
 
 def realize_reduction(
@@ -18,7 +22,7 @@ def realize_reduction(
         )
     (knl_name,) = tunit.callables_table.keys()
 
-    redn_var = None
+    redn_var, redn_op = None, None
     for insn in tunit.default_entrypoint.instructions:
         if isinstance(insn, lp.Assignment):
             if isinstance(insn.assignee, prim.Subscript) and isinstance(
@@ -26,8 +30,9 @@ def realize_reduction(
             ):
                 if isinstance(insn.assignee.aggregate, prim.Variable):
                     redn_var = insn.assignee.aggregate.name
-    if redn_var is None:
-        return tunit
+                redn_op = _LOOPY_REDN_TO_C_REDN[insn.expression.operation]
+    if redn_var is None or redn_op is None:
+        raise SyntaxError("Reduction variable or operation not found.")
 
     if len(tunit.default_entrypoint.inames.keys()) > 1:
         raise NotImplementedError(
@@ -85,9 +90,13 @@ def realize_reduction(
         knl.domains,
         knl.instructions,
         args + list(tmp_vars.values()),
+        name=knl.name,
         lang_version=LOOPY_LANG_VERSION,
     )
 
     tunit = lp.tag_inames(tunit, {i_inner: "l.0"})
     tunit = lp.tag_inames(tunit, {f"{i_outer}_0": "g.0"})
-    return tunit
+    tunit = lp.add_dependency(
+        tunit, "writes:acc_i_outer", f"id:{redn_tmp}_barrier"
+    )
+    return (tunit, redn_op)

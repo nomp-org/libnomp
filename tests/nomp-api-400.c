@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
   int device = argc > 2 ? atoi(argv[2]) : 0;
   int platform = argc > 3 ? atoi(argv[3]) : 0;
 
-  // nomp_api_400_int(backend, device, platform);
+  nomp_api_400_int(backend, device, platform);
 
   return 0;
 }

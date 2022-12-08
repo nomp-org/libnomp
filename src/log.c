@@ -86,7 +86,7 @@ nomp_log_type nomp_get_log_type(int log_id) {
   return logs[log_id - 1].type;
 }
 
-void nomp_finalize_logs() {
+void finalize_logs() {
   for (unsigned i = 0; i < logs_n; i++)
     tfree(logs[i].description);
   tfree(logs);

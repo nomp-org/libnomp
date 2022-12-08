@@ -26,9 +26,9 @@ static int opencl_update(struct backend *bnd, struct mem *m, const int op) {
   cl_int err;
   if (op & NOMP_ALLOC) {
     m->bptr = tcalloc(cl_mem, 1);
-    cl_mem *clm = (cl_mem *)m->bptr;
-    *clm = clCreateBuffer(ocl->ctx, CL_MEM_READ_WRITE,
-                          (m->idx1 - m->idx0) * m->usize, NULL, &err);
+    *((cl_mem *)m->bptr) =
+        clCreateBuffer(ocl->ctx, CL_MEM_READ_WRITE,
+                       (m->idx1 - m->idx0) * m->usize, NULL, &err);
     if (err != CL_SUCCESS) {
       tfree(m->bptr), m->bptr = NULL;
       return set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
@@ -104,40 +104,24 @@ static int opencl_knl_build(struct backend *bnd, struct prog *prg,
   return 0;
 }
 
-static int opencl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
-  struct opencl_prog *ocl_prg = (struct opencl_prog *)prg->bptr;
-  struct mem *m;
-  size_t size;
-  for (int i = 0; i < prg->narg; i++) {
-    void *p = va_arg(args, void *);
+static int opencl_knl_run(struct backend *bnd, struct prog *prg) {
+  struct opencl_prog *oprg = (struct opencl_prog *)prg->bptr;
 
-    int type = prg->args[i].type;
-    size = prg->args[i].size;
-    switch (type) {
-    case NOMP_INT:
-    case NOMP_UINT:
-    case NOMP_FLOAT:
-      break;
-    case NOMP_PTR:
-      m = mem_if_mapped(p);
-      if (m == NULL)
-        return set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
-                       ERR_STR_USER_MAP_PTR_IS_INVALID, p);
-      p = m->bptr;
+  for (int i = 0; i < prg->narg; i++) {
+    void *p = prg->args[i].ptr;
+    size_t size = prg->args[i].size;
+    unsigned type = prg->args[i].type;
+    if (type == NOMP_PTR) {
       size = sizeof(cl_mem);
-      break;
-    default:;
-      return set_log(NOMP_USER_KNL_ARG_TYPE_IS_INVALID, NOMP_ERROR,
-                     "Kernel argument type %d passed to libnomp is not valid.",
-                     type);
-      break;
+      p = (void *)(*((cl_mem **)p));
     }
 
-    cl_int err = clSetKernelArg(ocl_prg->knl, i, size, p);
-    if (err != CL_SUCCESS)
+    cl_int err = clSetKernelArg(oprg->knl, i, size, p);
+    if (err != CL_SUCCESS) {
       return set_log(
           NOMP_OPENCL_FAILURE, NOMP_ERROR,
           "OpenCL clSetKernelArg() failed for argument %d (ptr = %p).", i, p);
+    }
   }
 
   // FIXME: May be do this differently?
@@ -146,22 +130,27 @@ static int opencl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
     global[i] = prg->global[i] * prg->local[i];
 
   struct opencl_backend *ocl = (struct opencl_backend *)bnd->bptr;
-  cl_int err = clEnqueueNDRangeKernel(ocl->queue, ocl_prg->knl, prg->ndim, NULL,
+  cl_int err = clEnqueueNDRangeKernel(ocl->queue, oprg->knl, prg->ndim, NULL,
                                       global, prg->local, 0, NULL, NULL);
   // FIXME: Wrong. Call set_log()
   return err != CL_SUCCESS;
 }
 
 static int opencl_knl_free(struct prog *prg) {
-  struct opencl_prog *ocl_prg = prg->bptr;
-  cl_int err = clReleaseKernel(ocl_prg->knl);
-  if (err != CL_SUCCESS)
+  struct opencl_prog *oprg = prg->bptr;
+
+  cl_int err = clReleaseKernel(oprg->knl);
+  if (err != CL_SUCCESS) {
     return set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
                    "kernel release", err);
-  err = clReleaseProgram(ocl_prg->prg);
-  if (err != CL_SUCCESS)
+  }
+
+  err = clReleaseProgram(oprg->prg);
+  if (err != CL_SUCCESS) {
     return set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
                    "program release", err);
+  }
+
   tfree(prg->bptr), prg->bptr = NULL;
 
   return 0;
@@ -169,14 +158,19 @@ static int opencl_knl_free(struct prog *prg) {
 
 static int opencl_finalize(struct backend *bnd) {
   struct opencl_backend *ocl = bnd->bptr;
+
   cl_int err = clReleaseCommandQueue(ocl->queue);
-  if (err != CL_SUCCESS)
+  if (err != CL_SUCCESS) {
     return set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
                    "command queue release", err);
+  }
+
   err = clReleaseContext(ocl->ctx);
-  if (err != CL_SUCCESS)
+  if (err != CL_SUCCESS) {
     return set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
                    "context release", err);
+  }
+
   tfree(bnd->bptr), bnd->bptr = NULL;
 
   return 0;
@@ -186,7 +180,7 @@ int opencl_init(struct backend *bnd, const int platform_id,
                 const int device_id) {
   cl_uint num_platforms;
   cl_int err = clGetPlatformIDs(0, NULL, &num_platforms);
-  // TODO: Check for err
+  // TODO: Check for the retunr value of `err` as well.
   if (platform_id < 0 | platform_id >= num_platforms) {
     return set_log(NOMP_USER_PLATFORM_IS_INVALID, NOMP_ERROR,
                    "Platform id %d provided to libnomp is not valid.",
@@ -201,18 +195,17 @@ int opencl_init(struct backend *bnd, const int platform_id,
 
   err = clGetPlatformIDs(num_platforms, cl_platforms, &num_platforms);
   cl_platform_id platform = cl_platforms[platform_id];
+  tfree(cl_platforms);
 
   cl_uint num_devices;
   err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 0, NULL, &num_devices);
   if (device_id < 0 || device_id >= num_devices) {
-    tfree(cl_platforms);
     return set_log(NOMP_USER_DEVICE_IS_INVALID, NOMP_ERROR,
                    ERR_STR_USER_DEVICE_IS_INVALID, device_id);
   }
 
   cl_device_id *cl_devices = tcalloc(cl_device_id, num_devices);
   if (cl_devices == NULL) {
-    tfree(cl_platforms);
     return set_log(NOMP_RUNTIME_MEMORY_ALLOCATION_FAILED, NOMP_ERROR,
                    ERR_STR_RUNTIME_MEMORY_ALLOCATION_FAILURE);
   }
@@ -220,6 +213,7 @@ int opencl_init(struct backend *bnd, const int platform_id,
   err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, num_devices, cl_devices,
                        &num_devices);
   cl_device_id device = cl_devices[device_id];
+  tfree(cl_devices);
 
   struct opencl_backend *ocl = tcalloc(struct opencl_backend, 1);
   ocl->device_id = device;
@@ -232,8 +226,6 @@ int opencl_init(struct backend *bnd, const int platform_id,
   bnd->knl_run = opencl_knl_run;
   bnd->knl_free = opencl_knl_free;
   bnd->finalize = opencl_finalize;
-
-  tfree(cl_devices), tfree(cl_platforms);
 
   return 0;
 }

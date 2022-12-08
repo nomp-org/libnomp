@@ -1,11 +1,12 @@
 #include "nomp-test.h"
 
 #define nomp_api_400_aux TOKEN_PASTE(nomp_api_400_aux, TEST_SUFFIX)
-int nomp_api_400_aux(TEST_TYPE *a, TEST_TYPE *z, int N) {
+int nomp_api_400_aux(TEST_TYPE *a, TEST_TYPE *b, int N) {
   const char *KNL_FMT =
-      "void foo(%s *a, %s *z, int N) {                        \n"
+      "void foo(%s *a, %s *b, int N) {                       \n"
       "  for (int i = 0; i < N; i++) {                        \n"
-      "    z[0] += a[i];                                      \n"
+      "    nomp_reduce();                                     \n"
+      "    b[0] += a[i];                                     \n"
       "  }                                                    \n"
       "}                                                      \n";
 
@@ -17,12 +18,12 @@ int nomp_api_400_aux(TEST_TYPE *a, TEST_TYPE *z, int N) {
   static int id = -1;
   const char *clauses[1] = {0};
   int err = nomp_jit(&id, knl, clauses, 3, "a", NOMP_PTR, sizeof(TEST_TYPE),
-                     "z", NOMP_PTR | NOMP_ATTR_REDN, sizeof(TEST_TYPE), "N",
+                     "b", NOMP_INT | NOMP_ATTR_REDN, sizeof(TEST_TYPE), "N",
                      NOMP_INT, sizeof(int));
   tfree(knl);
   nomp_chk(err);
 
-  err = nomp_run(id, a, z, &N);
+  err = nomp_run(id, a, b, &N);
   nomp_chk(err);
 
   return 0;
@@ -33,8 +34,8 @@ int nomp_api_400(const char *backend, int device, int platform) {
   int err = nomp_init(backend, platform, device);
   nomp_chk(err);
 
-  int n = 10;
-  TEST_TYPE a[10], sum;
+  int n = 64;
+  TEST_TYPE a[64], sum;
   for (unsigned i = 0; i < n; i++)
     a[i] = n - i;
 
@@ -47,11 +48,9 @@ int nomp_api_400(const char *backend, int device, int platform) {
   nomp_chk(err);
 
 #if defined(TEST_TOL)
-  for (unsigned i = 0; i < n; i++)
-    nomp_assert(fabs(a[i] - n) < TEST_TOL);
+  nomp_assert(fabs(sum - n * (n + 1) / 2.0) < TEST_TOL);
 #else
-  for (unsigned i = 0; i < n; i++)
-    nomp_assert(a[i] == n);
+  nomp_assert(sum == n * (n + 1) / 2);
 #endif
 
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE);
