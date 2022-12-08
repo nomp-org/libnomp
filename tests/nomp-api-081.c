@@ -28,8 +28,8 @@ int main(int argc, const char *argv[]) {
   nomp_chk(err);
 
   // // Environment variable has higher priority
-  const char *args1[] = {" ", "-b", "invalid", "-d", "0", "-p", "0"};
-  int argsc = 7;
+  const char *args1[] = {"-b", "invalid", "-d", "0", "-p", "0"};
+  int argsc = 6;
   err = nomp_init(argsc, args1);
   nomp_chk(err);
   err = nomp_finalize();
@@ -51,8 +51,8 @@ int main(int argc, const char *argv[]) {
   nomp_chk(err);
 
   // If both are invalid should return an error
-  const char *args2[] = {" ", "-b", "opencl", "-d", "0", "-p", "-1"};
-  argsc = 7;
+  const char *args2[] = {"-b", "opencl", "-d", "0", "-p", "-1"};
+  argsc = 6;
   err = nomp_init(argsc, args2);
 
   nomp_chk(err);
@@ -68,8 +68,8 @@ int main(int argc, const char *argv[]) {
 
   // Run with a valid platform-id environment variable
   setenv("NOMP_PLATFORM_ID", "0", 1);
-  const char *args3[] = {" ", "-b", "opencl", "-d", "0", "-p", "-1"};
-  argsc = 7;
+  const char *args3[] = {"-b", "opencl", "-d", "0", "-p", "-1"};
+  argsc = 6;
   err = nomp_init(argsc, args3);
   nomp_chk(err);
   err = nomp_finalize();
@@ -84,8 +84,8 @@ int main(int argc, const char *argv[]) {
   nomp_chk(err);
 
   // If both are invalid should return an error
-  const char *args4[] = {" ", "-b", "opencl", "-d", "-1", "-p", "0"};
-  argsc = 7;
+  const char *args4[] = {"-b", "opencl", "-d", "-1", "-p", "0"};
+  argsc = 6;
   err = nomp_init(argsc, args4);
   nomp_chk(err);
   err = nomp_finalize();
@@ -100,8 +100,8 @@ int main(int argc, const char *argv[]) {
 
   // Run with a valid device-id environment variable
   setenv("NOMP_DEVICE_ID", "0", 1);
-  const char *args5[] = {" ", "-b", "opencl", "-d", "-1", "-p", "0"};
-  argsc = 7;
+  const char *args5[] = {"-b", "opencl", "-d", "-1", "-p", "0"};
+  argsc = 6;
   err = nomp_init(argsc, args5);
   nomp_chk(err);
   err = nomp_finalize();

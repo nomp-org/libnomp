@@ -5,8 +5,10 @@
 #undef TEST_IMPL_H
 
 int main(int argc,const char *argv[]) {
-
-  TEST_BUILTIN_TYPES(250, argc, argv)
+  const char *args[] = {"-b", "opencl", "-d",  "0",   "-p",
+                        "0",  "-as",    "sem", "-af", "annotate"};
+  argc = 11;
+  TEST_BUILTIN_TYPES(250, argc, args)
 
   return 0;
 }
