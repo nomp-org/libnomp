@@ -38,16 +38,6 @@ jobs:
         run: |
           mamba env update -n libnomp-dev -f environment-dev.yml
         if: steps.cache.outputs.cache-hit != 'true'
-      - uses: actions/cache@v3
-        with:
-          path: ~/conda_pkgs_dir/pocl
-          key:  ${{ runner.os }}-build-pocl-${{ env.POCL_CACHE_NUMBER }}
-        id: pocl_cache
-      - name: Install pocl
-        id: install_pocl
-        run: |
-          mamba install -c conda-forge pocl
-        if: (steps.pocl_cache.outputs.cache-hit != 'true') || (steps.cache.outputs.cache-hit != 'true')
       - name: Generate Makefile
         id: generate_makefile
         run: |
