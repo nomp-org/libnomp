@@ -51,7 +51,8 @@ static int check_env(struct backend *backend) {
     // so in a portable manner.
     const char *home = getenv("HOME");
     if (home)
-      backend->install_dir = strcatn(2, home, "/.nomp");
+      backend->install_dir =
+          strcatn(2, MAX(2, pathlen(home), NOMP_BUFSIZ), home, "/.nomp");
     else
       return set_log(
           NOMP_USER_INPUT_NOT_PROVIDED, NOMP_ERROR,
@@ -95,8 +96,9 @@ int check_args(int argc, const char **argv, struct backend *backend) {
       continue;
     }
     if (i + 1 == argc) {
-      return set_log(NOMP_USER_ARG_IS_INVALID, NOMP_ERROR,
-                     strcatn(2, "Missing argument value: ", argv[i]));
+      return set_log(
+          NOMP_USER_ARG_IS_INVALID, NOMP_ERROR,
+          strcatn(2, NOMP_BUFSIZ, "Missing argument value: ", argv[i]));
     }
 
     if (!strncmp("-b", argv[i], MAX_BACKEND_NAME_SIZE) ||
@@ -143,7 +145,7 @@ int check_args(int argc, const char **argv, struct backend *backend) {
       i += 2;
     } else {
       return set_log(NOMP_USER_ARG_IS_INVALID, NOMP_ERROR,
-                     strcatn(2, "Invalid argument : ", argv[i]));
+                     strcatn(2, NOMP_BUFSIZ, "Invalid argument : ", argv[i]));
     }
   }
 
@@ -194,7 +196,9 @@ int nomp_init(int argc, const char **argv) {
     // Append current working dir
     py_append_to_sys_path(".");
     // nomp.install_dir should be set and we use it here.
-    char *abs_dir = strcatn(3, nomp.install_dir, "/", py_dir);
+    char *abs_dir = strcatn(
+        3, MAX(2, pathlen(nomp.install_dir), strnlen(py_dir, NOMP_BUFSIZ)),
+        nomp.install_dir, "/", py_dir);
     py_append_to_sys_path(abs_dir);
     err = tfree(abs_dir);
   } else {
