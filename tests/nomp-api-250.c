@@ -9,12 +9,7 @@ int main(int argc, char *argv[]) {
   int device = argc > 2 ? atoi(argv[2]) : 0;
   int platform = argc > 3 ? atoi(argv[3]) : 0;
 
-  nomp_api_250_int(backend, device, platform);
-  nomp_api_250_long(backend, device, platform);
-  nomp_api_250_unsigned(backend, device, platform);
-  nomp_api_250_unsigned_long(backend, device, platform);
-  nomp_api_250_float(backend, device, platform);
-  nomp_api_250_double(backend, device, platform);
+  TEST_BUILTIN_TYPES(250, backend, device, platform)
 
   return 0;
 }
