@@ -14,7 +14,7 @@ int nomp_api_300_aux(TEST_TYPE *a, TEST_TYPE *b, int row, int col) {
   snprintf(knl, len, knl_fmt, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE));
 
   static int id = -1;
-  const char *clauses[4] = {"transform", "nomp-api-300", "transform", 0};
+  const char *clauses[4] = {"transform", "nomp_api_300", "transform", 0};
   int err = nomp_jit(&id, knl, clauses);
   nomp_chk(err);
 

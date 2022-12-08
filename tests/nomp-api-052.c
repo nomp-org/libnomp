@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
   tfree(desc);
 
   // Invalid transform function
-  const char *clauses1[4] = {"transform", "nomp-api-50", "invalid_func", 0};
+  const char *clauses1[4] = {"transform", "nomp_api_50", "invalid_func", 0};
   err = nomp_jit(&id, valid_knl, clauses1);
   nomp_assert(nomp_get_log_no(err) == NOMP_PY_CALL_FAILED);
 
@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
   tfree(desc);
 
   // Calling nomp_jit with invalid clauses shoud return an error.
-  const char *clauses2[4] = {"invalid-clause", "nomp-api-50", "transform", 0};
+  const char *clauses2[4] = {"invalid-clause", "nomp_api_50", "transform", 0};
   err = nomp_jit(&id, valid_knl, clauses2);
   nomp_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
   tfree(desc);
 
   // Missing user callback should return an error.
-  const char *clauses4[4] = {"transform", "nomp-api-50", NULL, 0};
+  const char *clauses4[4] = {"transform", "nomp_api_50", NULL, 0};
   err = nomp_jit(&id, valid_knl, clauses4);
   nomp_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_NOT_PROVIDED);
 

@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
   nomp_chk(err);
 
   static int id = -1;
-  const char *clauses[4] = {"transform", "nomp-api-50", "transform", 0};
+  const char *clauses[4] = {"transform", "nomp_api_50", "transform", 0};
   err = nomp_jit(&id, knl, clauses);
   nomp_chk(err);
 

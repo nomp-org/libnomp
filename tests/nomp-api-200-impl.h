@@ -21,7 +21,7 @@ int nomp_api_200() {
   int err = nomp_jit(&id, knl, clauses0);
   nomp_assert(nomp_get_log_no(err) == NOMP_PY_CALL_FAILED);
 
-  const char *clauses1[4] = {"transform", "nomp-api-200", "transform", 0};
+  const char *clauses1[4] = {"transform", "nomp_api_200", "transform", 0};
   err = nomp_jit(&id, knl, clauses1);
   nomp_chk(err);
   tfree(knl);

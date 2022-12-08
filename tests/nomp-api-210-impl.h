@@ -21,7 +21,7 @@ int nomp_api_210() {
   snprintf(knl, len, knl_fmt, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE));
 
   static int id = -1;
-  const char *clauses[4] = {"transform", "nomp-api-200", "transform", 0};
+  const char *clauses[4] = {"transform", "nomp_api_200", "transform", 0};
   err = nomp_jit(&id, knl, clauses);
   nomp_chk(err);
   tfree(knl);
