@@ -110,7 +110,7 @@ static int opencl_knl_run(struct backend *bnd, struct prog *prg) {
   for (int i = 0; i < prg->narg; i++) {
     void *p = prg->args[i].ptr;
     size_t size = prg->args[i].size;
-    unsigned type = prg->args[i].type;
+    unsigned type = prg->reduction_indx == i ? NOMP_PTR : prg->args[i].type;
     if (type == NOMP_PTR) {
       size = sizeof(cl_mem);
       p = (void *)(*((cl_mem **)p));

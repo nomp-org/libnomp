@@ -417,7 +417,7 @@ int nomp_run(int id, ...) {
       void *arg = args[i].hptr = va_arg(vargs, void *);
       // Get meta data we stored during nomp_jit()
       const char *name = args[i].name;
-      unsigned type = args[i].type;
+      unsigned type = i == prg->reduction_indx ? NOMP_PTR : args[i].type;
       size_t size = args[i].size;
 
       PyObject *key, *val;
@@ -455,6 +455,11 @@ int nomp_run(int id, ...) {
 
     int err = py_eval_grid_size(prg, prg->py_dict);
     return_on_err(err);
+
+    // Very hacky, fix this. This is due to we loose some info due to remaking
+    // the kernel.
+    if (prg->reduction_indx >= 0)
+      prg->local[0] = 32;
 
     err = nomp.knl_run(&nomp, prg);
     return_on_err(err);

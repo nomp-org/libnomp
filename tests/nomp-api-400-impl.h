@@ -3,10 +3,10 @@
 #define nomp_api_400_aux TOKEN_PASTE(nomp_api_400_aux, TEST_SUFFIX)
 int nomp_api_400_aux(TEST_TYPE *a, TEST_TYPE *b, int N) {
   const char *KNL_FMT =
-      "void foo(%s *a, %s *b, int N) {                       \n"
+      "void foo(%s *a, %s *b, int N) {                        \n"
       "  for (int i = 0; i < N; i++) {                        \n"
       "    nomp_reduce();                                     \n"
-      "    b[0] += a[i];                                     \n"
+      "    b[0] += a[i];                                      \n"
       "  }                                                    \n"
       "}                                                      \n";
 
