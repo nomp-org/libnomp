@@ -88,8 +88,12 @@ int check_args(int argc, const char **argv, struct backend *backend) {
   if (argc <= 1 || argv == NULL)
     return 0;
 
-  unsigned i = 1;
+  unsigned i = 0;
   while (i < argc) {
+    if (strncmp("-", argv[i], 1)) {
+      i += 1;
+      continue;
+    }
     if (i + 1 == argc) {
       return set_log(NOMP_USER_ARGS_IS_INVALID, NOMP_ERROR,
                      strcatn(2, "Missing argument value: ", argv[i]));
