@@ -1,11 +1,11 @@
 #include "nomp-test.h"
 #include "nomp.h"
 
-static int id = -1, n = 10;
-static int a[10], b[10];
+const int n = 10;
 
 // Invoke with invalid kernel_id
-static int test_invalid_kernel_id(char *backend, int platform, int device) {
+static int test_invalid_kernel_id(char *backend, int platform, int device,
+                                  int *id, int *a, int *b) {
   const char *knl = "void foo(int *a, int *b, int N) {                      \n"
                     "  for (int i = 0; i < N; i++)                          \n"
                     "    a[i] = a[i] * b[i];                                \n"
@@ -17,7 +17,7 @@ static int test_invalid_kernel_id(char *backend, int platform, int device) {
   nomp_test_chk(err);
 
   const char *clauses[4] = {"transform", "nomp-api-50", "transform", 0};
-  err = nomp_jit(&id, knl, clauses);
+  err = nomp_jit(id, knl, clauses);
   nomp_test_chk(err);
 
   err = nomp_run(-1, 3, "a", NOMP_PTR, sizeof(int), a, "b", NOMP_PTR,
@@ -33,7 +33,7 @@ static int test_invalid_kernel_id(char *backend, int platform, int device) {
 }
 
 // Invoke fails because b is not mapped
-static int test_unmapped_variable() {
+static int test_unmapped_variable(int id, int *a, int *b) {
   char *desc;
   int err = nomp_run(id, 3, "a", NOMP_PTR, sizeof(int), a, "b", NOMP_PTR,
                      sizeof(int), b, "N", NOMP_INTEGER, sizeof(int), &n);
@@ -54,13 +54,16 @@ int main(int argc, char *argv[]) {
   char *backend;
   int device, platform;
   parse_input(argc, argv, &backend, &device, &platform);
+  static int a[10], b[10];
+  static int id = -1;
   int err = 0;
 
-  for (unsigned i = 0; i < n; i++)
+  for (int i = 0; i < n; i++) {
     a[i] = n - i, b[i] = i;
+  }
 
-  err |= SUBTEST(test_invalid_kernel_id, backend, device, platform);
-  err |= SUBTEST(test_unmapped_variable);
+  err |= SUBTEST(test_invalid_kernel_id, backend, device, platform, &id, a, b);
+  err |= SUBTEST(test_unmapped_variable, id, a, b);
 
   return err;
 }

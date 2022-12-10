@@ -6,8 +6,6 @@ const char *valid_knl =
     "  for (int i = 0; i < N; i++)                                        \n"
     "    a[i] = i;                                                        \n"
     "}                                                                    \n";
-const char *clauses0[4] = {"transform", "invalid-file", "invalid", 0};
-static int id = -1;
 
 // Calling nomp_jit with invalid functions should return an error.
 static int test_call_jit_with_invalid_function(char *backend, int platform,
@@ -16,6 +14,8 @@ static int test_call_jit_with_invalid_function(char *backend, int platform,
   int err = nomp_init(backend, platform, device);
   nomp_test_chk(err);
 
+  static int id = -1;
+  const char *clauses0[4] = {"transform", "invalid-file", "invalid", 0};
   err = nomp_jit(&id, valid_knl, clauses0);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_PY_CALL_FAILED);
 
@@ -33,6 +33,7 @@ static int test_call_jit_with_invalid_function(char *backend, int platform,
 // Invalid transform function
 static int test_invalid_transform_function() {
   const char *clauses1[4] = {"transform", "nomp-api-50", "invalid_func", 0};
+  static int id = -1;
   int err = nomp_jit(&id, valid_knl, clauses1);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_PY_CALL_FAILED);
 
@@ -50,6 +51,7 @@ static int test_invalid_transform_function() {
 // Calling nomp_jit with invalid clauses should return an error.
 static int test_invalid_clause() {
   const char *clauses2[4] = {"invalid-clause", "nomp-api-50", "transform", 0};
+  static int id = -1;
   int err = nomp_jit(&id, valid_knl, clauses2);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
@@ -68,11 +70,12 @@ static int test_invalid_clause() {
 // Missing file name should return an error.
 static int test_missing_filename() {
   const char *clauses3[4] = {"transform", NULL, "transform", 0};
+  static int id = -1;
   int err = nomp_jit(&id, valid_knl, clauses3);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_NOT_PROVIDED);
 
   char *desc;
-  err = nomp_get_log_str(&desc, err);
+  nomp_get_log_str(&desc, err);
   int matched = match_log(
       desc, "\\[Error\\] "
             ".*libnomp\\/src\\/nomp.c:[0-9]* "
@@ -87,11 +90,12 @@ static int test_missing_filename() {
 // Missing user callback should return an error.
 static int tset_missing_user_callback() {
   const char *clauses4[4] = {"transform", "nomp-api-50", NULL, 0};
+  static int id = -1;
   int err = nomp_jit(&id, valid_knl, clauses4);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_NOT_PROVIDED);
 
   char *desc;
-  err = nomp_get_log_str(&desc, err);
+  nomp_get_log_str(&desc, err);
   int matched = match_log(
       desc, "\\[Error\\] "
             ".*libnomp\\/src\\/nomp.c:[0-9]* "
@@ -105,11 +109,12 @@ static int tset_missing_user_callback() {
 // The kernel has a syntax error due to a missing a semicolon.
 static int test_syntax_error_kernel() {
   const char *invalid_knl =
-      "void foo(int *a, int N) {                                             \n"
+      "void foo(int *a, int N) {                                            \n"
       "  for (int i = 0; i < N; i++)                                        \n"
       "    a[i] = i                                                         \n"
       "}                                                                    \n";
-
+  static int id = -1;
+  const char *clauses0[4] = {"transform", "invalid-file", "invalid", 0};
   int err = nomp_jit(&id, invalid_knl, clauses0);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_LOOPY_CONVERSION_ERROR);
 
