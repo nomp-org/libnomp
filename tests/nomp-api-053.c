@@ -4,8 +4,8 @@
 const int n = 10;
 
 // Invoke with invalid kernel_id
-static int test_invalid_kernel_id(int argc,const char **argv,
-                                  int *id, int *a, int *b) {
+static int test_invalid_kernel_id(int argc, const char **argv, int *id, int *a,
+                                  int *b) {
   const char *knl = "void foo(int *a, int *b, int N) {                      \n"
                     "  for (int i = 0; i < N; i++)                          \n"
                     "    a[i] = a[i] * b[i];                                \n"
@@ -50,7 +50,7 @@ static int test_unmapped_variable(int id, int *a, int *b) {
   return 0;
 }
 
-int main(int argc,const char *argv[]) {
+int main(int argc, const char *argv[]) {
   static int a[10], b[10];
   static int id = -1;
   int err = 0;

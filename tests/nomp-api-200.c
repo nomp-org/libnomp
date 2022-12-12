@@ -5,7 +5,7 @@
 #include "nomp-generate-tests.h"
 #undef TEST_IMPL_H
 
-int main(int argc,const char *argv[]) {
+int main(int argc, const char *argv[]) {
 
   int err = nomp_init(argc, argv);
   nomp_chk(err);

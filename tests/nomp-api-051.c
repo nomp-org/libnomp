@@ -2,7 +2,7 @@
 #include "nomp.h"
 
 // Free'ing before mapping should return an error
-static int test_free_before_mapping(int argc,const char **argv) {
+static int test_free_before_mapping(int argc, const char **argv) {
   int a[10] = {0};
   int err = nomp_init(argc, argv);
   nomp_test_chk(err);
@@ -42,7 +42,7 @@ static int test_d2h_before_h2d() {
   return 0;
 }
 
-int main(int argc,const char *argv[]) {
+int main(int argc, const char *argv[]) {
   int err = 0;
 
   err |= SUBTEST(test_free_before_mapping, argc, argv);

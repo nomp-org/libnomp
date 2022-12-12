@@ -131,11 +131,10 @@ static int test_syntax_error_kernel() {
   return 0;
 }
 
-int main(int argc,const char *argv[]) {
+int main(int argc, const char *argv[]) {
   int err = 0;
 
-  err |=
-      SUBTEST(test_call_jit_with_invalid_function, argc, argv);
+  err |= SUBTEST(test_call_jit_with_invalid_function, argc, argv);
   err |= SUBTEST(test_invalid_transform_function);
   err |= SUBTEST(test_invalid_clause);
   err |= SUBTEST(test_missing_filename);
