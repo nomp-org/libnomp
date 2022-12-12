@@ -15,7 +15,7 @@ static int test_first_nomp_finalize() {
 }
 
 // Calling `nomp_init` twice must return an error, but must not segfault
-static int test_nomp_init_twice(int argc,const char **argv) {
+static int test_nomp_init_twice(int argc, const char **argv) {
   int err = nomp_init(argc, argv);
   nomp_test_chk(err);
   err = nomp_init(argc, argv);
@@ -48,7 +48,7 @@ static int test_nomp_finalize_twice() {
   return 0;
 }
 
-int main(int argc,const char *argv[]) {
+int main(int argc, const char *argv[]) {
   int err = 0;
 
   err |= SUBTEST(test_first_nomp_finalize);
