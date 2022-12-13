@@ -106,9 +106,9 @@
 #define NOMP_USER_KNL_ARG_TYPE_IS_INVALID -136
 /**
  * @ingroup nomp_errors
- * @brief User options type provided to libnomp is not valid.
+ * @brief User argument provided to libnomp is not valid.
  */
-#define NOMP_USER_ARGS_IS_INVALID -137
+#define NOMP_USER_ARG_IS_INVALID -137
 
 /**
  * @ingroup nomp_errors
@@ -204,14 +204,16 @@ extern "C" {
  * return an error (but not segfault). Currently only supports Cuda and OpenCL
  * backends.
  *
- * @param[in] argc The number of command line arguments.
- * @param[in] argv the command lines arguments as passed to a C main function
- * by the operating system.
+ * @param[in] argc The number of arguments to nomp_init().
+ * @param[in] argv Arguments as strings, values followed by options.
  * @return int
  *
  * <b>Example usage:</b>
  * @code{.c}
- * int err = nomp_init("OpenCL", 0, 0);
+ * const char *argv[] = {"--backend", "opencl", "-device", "0", "--platform",
+ * "0"};
+ * int argc = 6;
+ * int err = nomp_init(argc, argv);
  * @endcode
  */
 int nomp_init(int argc, const char **argv);
