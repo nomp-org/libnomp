@@ -95,7 +95,7 @@ int check_args(int argc, const char **argv, struct backend *backend) {
       continue;
     }
     if (i + 1 == argc) {
-      return set_log(NOMP_USER_ARGS_IS_INVALID, NOMP_ERROR,
+      return set_log(NOMP_USER_ARG_IS_INVALID, NOMP_ERROR,
                      strcatn(2, "Missing argument value: ", argv[i]));
     }
 
@@ -142,7 +142,7 @@ int check_args(int argc, const char **argv, struct backend *backend) {
       }
       i += 2;
     } else {
-      return set_log(NOMP_USER_ARGS_IS_INVALID, NOMP_ERROR,
+      return set_log(NOMP_USER_ARG_IS_INVALID, NOMP_ERROR,
                      strcatn(2, "Invalid argument : ", argv[i]));
     }
   }
@@ -151,12 +151,13 @@ int check_args(int argc, const char **argv, struct backend *backend) {
 }
 
 int nomp_init(int argc, const char **argv) {
-  if (initialized)
+  if (initialized) {
     return set_log(
         NOMP_RUNTIME_ALREADY_INITIALIZED, NOMP_ERROR,
         "libnomp is already initialized to use %s. Call nomp_finalize() before "
         "calling nomp_init() again.",
         nomp.name);
+  }
 
   int err = check_args(argc, argv, &nomp);
   return_on_err(err);
