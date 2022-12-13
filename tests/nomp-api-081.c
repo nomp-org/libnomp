@@ -3,7 +3,7 @@
 #include <limits.h>
 
 // Set environment variable with invalid backend
-static int test_invalid_backed(int argc, const char **argv) {
+static int test_invalid_backend(int argc, const char **argv) {
   // Start with initially passed values
   int err = nomp_init(argc, argv);
   nomp_test_chk(err);
@@ -134,13 +134,11 @@ static int test_valid_device_id(int argc, const char **argv) {
 }
 
 int main(int argc, const char *argv[]) {
-
   int length = snprintf(NULL, 0, "%d", INT_MAX);
   char *int_max_str = tcalloc(char, length + 1);
   snprintf(int_max_str, length + 1, "%d", INT_MAX);
-  int err = 0;
 
-  err |= SUBTEST(test_invalid_backed, argc, argv);
+  int err = SUBTEST(test_invalid_backend, argc, argv);
   err |= SUBTEST(test_valid_backend, argc, argv);
 
   const char *args1[] = {"-b", "invalid", "-d", "0", "-p", "0"};
@@ -163,11 +161,11 @@ int main(int argc, const char *argv[]) {
   argsc = 6;
   err |= SUBTEST(test_invalid_both_device_id, argsc, args4);
   err |= SUBTEST(test_positive_device_id, argc, argv, int_max_str);
+  tfree(int_max_str);
 
   const char *args5[] = {"-b", "opencl", "-d", "-1", "-p", "0"};
   argsc = 6;
   err |= SUBTEST(test_valid_device_id, argsc, args5);
 
-  tfree(int_max_str);
   return err;
 }
