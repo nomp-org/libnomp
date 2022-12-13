@@ -252,17 +252,16 @@ int py_get_grid_size(struct prog *prg, PyObject *knl) {
 static int py_eval_grid_size_aux(size_t *out, PyObject *grid, unsigned dim,
                                  PyObject *evaluate, PyObject *dict) {
   PyObject *py_dim = PyTuple_GetItem(grid, dim);
+  int err = 1;
   if (py_dim) {
     PyObject *rslt = PyObject_CallFunctionObjArgs(evaluate, py_dim, dict, NULL);
     if (rslt) {
       out[dim] = PyLong_AsLong(rslt);
-      Py_DECREF(rslt);
-    } else {
-      return 1;
+      Py_DECREF(rslt), err = 0;
     }
   }
 
-  return 0;
+  return err;
 }
 
 int py_eval_grid_size(struct prog *prg, PyObject *dict) {
@@ -273,13 +272,14 @@ int py_eval_grid_size(struct prog *prg, PyObject *dict) {
   for (unsigned i = 0; i < prg->ndim; i++)
     prg->global[i] = prg->local[i] = 1;
 
-  int err = 0;
+  int err = 1;
   if (prg->py_global && prg->py_local) {
     PyObject *mapper = PyImport_ImportModule("pymbolic.mapper.evaluator");
     if (mapper) {
       PyObject *evaluate = PyObject_GetAttrString(mapper, "evaluate");
       Py_DECREF(mapper);
       if (evaluate) {
+        err = 0;
         // Iterate through grid sizes, evaluate and set `global` and `local`
         // sizes respectively.
         for (unsigned i = 0; i < PyTuple_Size(prg->py_global); i++)
@@ -289,13 +289,14 @@ int py_eval_grid_size(struct prog *prg, PyObject *dict) {
           err |= py_eval_grid_size_aux(prg->local, prg->py_local, i, evaluate,
                                        dict);
         Py_DECREF(evaluate);
-        if (err)
-          return set_log(NOMP_LOOPY_EVAL_GRIDSIZE_FAILED, NOMP_ERROR,
-                         "libnomp was unable to evaluate the kernel launch "
-                         "parameters using pymbolic.");
       }
     }
   }
 
+  if (err) {
+    return set_log(NOMP_LOOPY_EVAL_GRIDSIZE_FAILED, NOMP_ERROR,
+                   "libnomp was unable to evaluate the kernel launch "
+                   "parameters using pymbolic.");
+  }
   return 0;
 }
