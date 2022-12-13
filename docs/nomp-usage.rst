@@ -23,7 +23,7 @@ The `foo.c` file contains the example with nomp pragmas.
     }
 
     int main(int argc, char *argv[]){
-    #pragma nomp init("opencl", 0, 0)
+    #pragma nomp init(argc, argv)
         double a[10] = {0};
         for (int i=0; i<10; i++)
             printf("a[%d] = %f \n", i, a[i]);
@@ -73,4 +73,13 @@ To compile any file containing `nomp` pragmas, use `nompcc` as follows:
 
 ..  code-block:: bash
 
-    ./nompcc foo.c
+    ./nompcc foo.c -o foo
+
+You can now run the compiled executable by simply providing arguments to
+initialize and use backends, devices, etc.
+
+..  code-block:: bash
+
+    ./foo -b opencl -d 0
+
+Read more about arguments accepted by nomp_init() under user API.
