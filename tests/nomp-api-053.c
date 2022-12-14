@@ -3,13 +3,7 @@
 
 // Invoke with invalid kernel_id
 static int test_invalid_kernel_id(int *a, int *b, int n) {
-  const char *clauses[4] = {"transform", "nomp-api-50", "foo", 0};
-  static int id = -1;
-  int err = nomp_jit(&id, knl, clauses, 3, "a", NOMP_PTR, sizeof(int), "b",
-                 NOMP_PTR, sizeof(int), "N", NOMP_INT, sizeof(int));
-  nomp_chk(err);
-
-  err = nomp_run(-1, a, b, &n);
+  int err = nomp_run(-1, a, b, &n);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
   char *desc;
@@ -29,8 +23,9 @@ static int test_unmapped_variable(int id, int *a, int *b, int n) {
 
   char *desc;
   err = nomp_get_log_str(&desc, err);
-  matched = match_log(desc, "\\[Error\\] .*\\/src\\/.*.c:[0-9]* Map pointer "
-                            "0[xX][0-9a-fA-F]* was not found on device.");
+  int matched =
+      match_log(desc, "\\[Error\\] .*\\/src\\/.*.c:[0-9]* Map pointer "
+                      "0[xX][0-9a-fA-F]* was not found on device.");
   nomp_test_assert(matched);
   tfree(desc);
 
@@ -59,7 +54,8 @@ int main(int argc, const char *argv[]) {
                     "}                                                      \n";
   static int id = -1;
   const char *clauses[4] = {"transform", "nomp-api-50", "foo", 0};
-  err = nomp_jit(&id, knl, clauses);
+  err = nomp_jit(&id, knl, clauses, 3, "a", NOMP_PTR, sizeof(int), "b",
+                 NOMP_PTR, sizeof(int), "N", NOMP_INT, sizeof(int));
   nomp_test_chk(err);
 
   err |= SUBTEST(test_invalid_kernel_id, a, b, n);

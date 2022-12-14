@@ -4,12 +4,8 @@
 #include "nomp-generate-tests.h"
 #undef TEST_IMPL_H
 
-int main(int argc, char *argv[]) {
-  char *backend = argc > 1 ? argv[1] : "opencl";
-  int device = argc > 2 ? atoi(argv[2]) : 0;
-  int platform = argc > 3 ? atoi(argv[3]) : 0;
-
-  nomp_api_400_int(backend, device, platform);
+int main(int argc, const char *argv[]) {
+  nomp_api_400_int(argc, argv);
 
   return 0;
 }

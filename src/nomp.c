@@ -121,9 +121,9 @@ int check_args(int argc, const char **argv, struct backend *backend) {
       i += 2;
     } else if (!strncmp("-as", argv[i], NOMP_BUFSIZ) ||
                !strncmp("--annts-script", argv[i], NOMP_BUFSIZ)) {
-      char *annts_script = (char *)argv[i + 1];
-      if (annts_script != NULL)
-        backend->annts_script = strndup(annts_script, NOMP_BUFSIZ);
+      char *script = (char *)argv[i + 1];
+      if (script != NULL)
+        backend->script = strndup(script, NOMP_BUFSIZ);
       i += 2;
     } else if (!strncmp("-af", argv[i], NOMP_BUFSIZ) ||
                !strncmp("--annts-func", argv[i], NOMP_BUFSIZ)) {
@@ -148,6 +148,7 @@ int nomp_init(int argc, const char **argv) {
         "libnomp is already initialized to use %s. Call nomp_finalize() before "
         "calling nomp_init() again.",
         nomp.backend);
+  }
 
   int err = check_args(argc, argv, &nomp);
   return_on_err(err);
