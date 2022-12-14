@@ -433,15 +433,16 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv47strcatniz">
-<span id="_CPPv37strcatniz"></span><span id="_CPPv27strcatniz"></span><span id="strcatn__i.z"></span><span class="target" id="group__nomp__other__utils_1gabc3c28a52daffa974de7844216f5c789"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">strcatn</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nstr</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47strcatniz" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv47strcatnjjz">
+<span id="_CPPv37strcatnjjz"></span><span id="_CPPv27strcatnjjz"></span><span id="strcatn__unsigned.unsigned.z"></span><span class="target" id="group__nomp__other__utils_1gae26fc9473d813698f8cad6fc95b917a7"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">strcatn</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nstr</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max_len</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47strcatnjjz" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Concatenates atmost <code class="docutils literal notranslate"><span class="pre">nstr</span></code> strings. </p>
 <p>Concatenates atmost <code class="docutils literal notranslate"><span class="pre">nstr</span></code> strings and returns a pointer to resulting string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nstr</strong> – Number of strings to concatenate. </p></li>
-<li><p><strong>...</strong> – Strings to concatenate. </p></li>
+<li><p><strong>nstr</strong> – <strong>[in]</strong> Number of strings to concatenate. </p></li>
+<li><p><strong>max_len</strong> – <strong>[in]</strong> Maximum length of an individual string. </p></li>
+<li><p><strong>...</strong> – <strong>[in]</strong> Strings to concatenate. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -498,6 +499,24 @@
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>size_t </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv43MAXjz">
+<span id="_CPPv33MAXjz"></span><span id="_CPPv23MAXjz"></span><span id="MAX__unsigned.z"></span><span class="target" id="group__nomp__other__utils_1ga47cd678d180f03f4637a8fc0366e0248"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MAX</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv43MAXjz" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns maximum among all integers passed. </p>
+<p>Returns the maximum between two or more integers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>args</strong> – <strong>[in]</strong> Total number of integers. </p></li>
+<li><p><strong>...</strong> – <strong>[in]</strong> List of integers to find the maximum of as a variable argument list. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int </p>
 </dd>
 </dl>
 </dd></dl>
