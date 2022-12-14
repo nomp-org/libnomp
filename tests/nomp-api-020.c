@@ -2,11 +2,9 @@
 #include "nomp.h"
 
 // Free'ing before mapping should return an error
-static int test_free_before_mapping(int argc, const char **argv) {
+static int test_free_before_mapping() {
   int a[10] = {0};
-  int err = nomp_init(argc, argv);
-  nomp_test_chk(err);
-  err = nomp_update(a, 0, 10, sizeof(int), NOMP_FREE);
+  int err = nomp_update(a, 0, 10, sizeof(int), NOMP_FREE);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_MAP_OP_IS_INVALID);
 
   char *desc;
@@ -43,9 +41,10 @@ static int test_d2h_before_h2d() {
 }
 
 int main(int argc, const char *argv[]) {
-  int err = 0;
+  int err = nomp_init(argc, argv);
+  nomp_test_chk(err);
 
-  err |= SUBTEST(test_free_before_mapping, argc, argv);
+  err |= SUBTEST(test_free_before_mapping);
   err |= SUBTEST(test_d2h_before_h2d);
 
   return err;

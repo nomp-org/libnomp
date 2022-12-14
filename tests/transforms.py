@@ -9,7 +9,7 @@ def foo(knl):
     return knl
 
 
-def invalid_func(knl):
+def throw_err_func(knl):
     (g,) = knl.default_entrypoint.all_names()
     knl = lp.tag_inames(knl, [(g, "g.0")])
     return kn  # noqa

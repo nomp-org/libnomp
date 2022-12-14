@@ -53,7 +53,7 @@ int main(int argc, const char *argv[]) {
                     "    a[i] = a[i] * b[i];                                \n"
                     "}                                                      \n";
   static int id = -1;
-  const char *clauses[4] = {"transform", "nomp-api-50", "foo", 0};
+  const char *clauses[4] = {"transform", "transforms", "foo", 0};
   err = nomp_jit(&id, knl, clauses, 3, "a", NOMP_PTR, sizeof(int), "b",
                  NOMP_PTR, sizeof(int), "N", NOMP_INT, sizeof(int));
   nomp_test_chk(err);
