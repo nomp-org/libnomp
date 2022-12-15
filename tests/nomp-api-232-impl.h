@@ -1,5 +1,4 @@
 #include "nomp-test.h"
-#include "nomp.h"
 
 #define nomp_api_232_aux TOKEN_PASTE(nomp_api_232_aux, TEST_SUFFIX)
 int nomp_api_232_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {
@@ -17,12 +16,12 @@ int nomp_api_232_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {
   static int id = -1;
   const char *clauses[4] = {"transform", "nomp-api-200", "transform", 0};
   int err = nomp_jit(&id, knl, clauses);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   err = nomp_run(id, 4, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
                  sizeof(TEST_TYPE), b, "c", NOMP_PTR, sizeof(TEST_TYPE), c, "N",
                  NOMP_INTEGER, sizeof(int), &N);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   tfree(knl);
   return 0;
@@ -31,7 +30,7 @@ int nomp_api_232_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {
 #define nomp_api_232 TOKEN_PASTE(nomp_api_232, TEST_SUFFIX)
 int nomp_api_232(int argc, const char *argv[]) {
   int err = nomp_init(argc, argv);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   int n = 10;
   TEST_TYPE a[10], b[10], c[10];
@@ -39,34 +38,34 @@ int nomp_api_232(int argc, const char *argv[]) {
     a[i] = n - i, b[i] = i, c[i] = 5;
 
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO);
-  nomp_chk(err);
+  nomp_test_chk(err);
   err = nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO);
-  nomp_chk(err);
+  nomp_test_chk(err);
   err = nomp_update(c, 0, n, sizeof(TEST_TYPE), NOMP_TO);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   nomp_api_232_aux(a, b, c, n);
 
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
 #if defined(TEST_TOL)
   for (unsigned i = 0; i < n; i++)
-    nomp_assert(fabs(a[i] - 5 * (n - i) * i) < TEST_TOL);
+    nomp_test_assert(fabs(a[i] - 5 * (n - i) * i) < TEST_TOL);
 #else
   for (unsigned i = 0; i < n; i++)
-    nomp_assert(a[i] == 5 * (n - i) * i);
+    nomp_test_assert(a[i] == 5 * (n - i) * i);
 #endif
 
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE);
-  nomp_chk(err);
+  nomp_test_chk(err);
   err = nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_FREE);
-  nomp_chk(err);
+  nomp_test_chk(err);
   err = nomp_update(c, 0, n, sizeof(TEST_TYPE), NOMP_FREE);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   err = nomp_finalize();
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   return 0;
 }

@@ -1,5 +1,4 @@
 #include "nomp-test.h"
-#include "nomp.h"
 
 // Free'ing before mapping should return an error
 static int test_free_before_mapping(int argc, const char **argv) {

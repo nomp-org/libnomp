@@ -1,5 +1,4 @@
 #include "nomp-test.h"
-#include "nomp.h"
 
 static int test_valid_arguments() {
   const char *argv[] = {"foo.c", "-b", "opencl", "-d", "0", "-p", "0"};
@@ -41,10 +40,10 @@ static int test_missing_argument() {
   const char *argv[] = {"-b", "opencl", "-d", "0", "-p"};
   int argc = 5;
   int err = nomp_init(argc, argv);
-  nomp_assert(nomp_get_log_no(err) == NOMP_USER_ARG_IS_INVALID);
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_ARG_IS_INVALID);
 
   err = nomp_finalize();
-  nomp_assert(nomp_get_log_no(err) == NOMP_RUNTIME_NOT_INITIALIZED);
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_RUNTIME_NOT_INITIALIZED);
 
   return 0;
 }

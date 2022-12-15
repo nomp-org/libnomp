@@ -6,9 +6,9 @@ int nomp_api_210() {
   int N = 20;
 
   int err = nomp_update(a, 0, 20, sizeof(TEST_TYPE), NOMP_TO);
-  nomp_chk(err);
+  nomp_test_chk(err);
   err = nomp_update(b, 0, 20, sizeof(TEST_TYPE), NOMP_TO);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   const char *knl_fmt =
       "void foo(%s *a, %s *b, int N) {                        \n"
@@ -23,28 +23,28 @@ int nomp_api_210() {
   static int id = -1;
   const char *clauses[4] = {"transform", "nomp-api-200", "transform", 0};
   err = nomp_jit(&id, knl, clauses);
-  nomp_chk(err);
+  nomp_test_chk(err);
   tfree(knl);
 
   err = nomp_run(id, 3, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
                  sizeof(TEST_TYPE), b, "N", NOMP_INTEGER, sizeof(int), &N);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   err = nomp_update(a, 0, 20, sizeof(TEST_TYPE), NOMP_FROM);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
 #if defined(TEST_TOL)
   for (int i = 0; i < N; i++)
-    nomp_assert(fabs(a[i] - 2 * b[i] - 1) < TEST_TOL);
+    nomp_test_assert(fabs(a[i] - 2 * b[i] - 1) < TEST_TOL);
 #else
   for (int i = 0; i < N; i++)
-    nomp_assert(a[i] == 2 * b[i] + 1);
+    nomp_test_assert(a[i] == 2 * b[i] + 1);
 #endif
 
   err = nomp_update(a, 0, 20, sizeof(TEST_TYPE), NOMP_FREE);
-  nomp_chk(err);
+  nomp_test_chk(err);
   err = nomp_update(b, 0, 20, sizeof(TEST_TYPE), NOMP_FREE);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   return 0;
 }

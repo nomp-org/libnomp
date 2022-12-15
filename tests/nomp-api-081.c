@@ -1,5 +1,5 @@
 #include "nomp-test.h"
-#include "nomp.h"
+
 #include <limits.h>
 
 // Set environment variable with invalid backend

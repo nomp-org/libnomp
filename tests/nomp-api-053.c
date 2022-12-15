@@ -1,5 +1,4 @@
 #include "nomp-test.h"
-#include "nomp.h"
 
 const int n = 10;
 
