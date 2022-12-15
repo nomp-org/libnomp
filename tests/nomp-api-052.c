@@ -1,5 +1,4 @@
 #include "nomp-test.h"
-#include "nomp.h"
 
 const char *valid_knl =
     "void foo(int *a, int N) {                                            \n"

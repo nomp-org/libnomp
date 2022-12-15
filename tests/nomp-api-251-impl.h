@@ -18,12 +18,12 @@ int nomp_api_251_aux(TEST_TYPE *a, TEST_TYPE *b, int E, int N) {
   const char *clauses[7] = {"annotate",     "dof_loop", "i", "annotate",
                             "element_loop", "e",        0};
   int err = nomp_jit(&id, knl, clauses);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   err = nomp_run(id, 4, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
                  sizeof(TEST_TYPE), b, "E", NOMP_INTEGER, sizeof(int), &E, "N",
                  NOMP_INTEGER, sizeof(int), &N);
-  nomp_chk(err);
+  nomp_test_chk(err);
   tfree(knl);
 
   return 0;
@@ -32,7 +32,7 @@ int nomp_api_251_aux(TEST_TYPE *a, TEST_TYPE *b, int E, int N) {
 #define nomp_api_251 TOKEN_PASTE(nomp_api_251, TEST_SUFFIX)
 int nomp_api_251(int argc, const char **argv) {
   int err = nomp_init(argc, argv);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   TEST_TYPE a[128], b[128];
   const int n = 128;
@@ -40,32 +40,32 @@ int nomp_api_251(int argc, const char **argv) {
     a[i] = 2 * n - i, b[i] = i;
 
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO);
-  nomp_chk(err);
+  nomp_test_chk(err);
   err = nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   const int E = 4;
   const int N = 32;
   nomp_api_251_aux(a, b, E, N);
 
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
 #if defined(TEST_TOL)
   for (unsigned i = 0; i < n; i++)
-    nomp_assert(fabs(a[i] - 2 * n) < TEST_TOL);
+    nomp_test_assert(fabs(a[i] - 2 * n) < TEST_TOL);
 #else
   for (unsigned i = 0; i < n; i++)
-    nomp_assert(a[i] == 2 * n);
+    nomp_test_assert(a[i] == 2 * n);
 #endif
 
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE);
-  nomp_chk(err);
+  nomp_test_chk(err);
   err = nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_FREE);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   err = nomp_finalize();
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   return 0;
 }

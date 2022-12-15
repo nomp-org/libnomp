@@ -15,11 +15,11 @@ int nomp_api_223_add_aux(TEST_TYPE *a, TEST_TYPE *b, int N) {
   static int id = -1;
   const char *clauses[4] = {"transform", "nomp-api-200", "transform", 0};
   int err = nomp_jit(&id, knl, clauses);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   err = nomp_run(id, 3, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
                  sizeof(TEST_TYPE), b, "N", NOMP_INTEGER, sizeof(int), &N);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   tfree(knl);
   return 0;
@@ -27,33 +27,33 @@ int nomp_api_223_add_aux(TEST_TYPE *a, TEST_TYPE *b, int N) {
 
 #define nomp_api_223_add TOKEN_PASTE(nomp_api_223_add, TEST_SUFFIX)
 int nomp_api_223_add(int n) {
-  nomp_assert(n <= 20);
+  nomp_test_assert(n <= 20);
   TEST_TYPE a[20], b[20];
   for (unsigned i = 0; i < n; i++)
     a[i] = n - i, b[i] = i;
 
   int err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO);
-  nomp_chk(err);
+  nomp_test_chk(err);
   err = nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   nomp_api_223_add_aux(a, b, n);
 
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
 #if defined(TEST_TOL)
   for (unsigned i = 0; i < n; i++)
-    nomp_assert(fabs(a[i] - n) < TEST_TOL);
+    nomp_test_assert(fabs(a[i] - n) < TEST_TOL);
 #else
   for (unsigned i = 0; i < n; i++)
-    nomp_assert(a[i] == n);
+    nomp_test_assert(a[i] == n);
 #endif
 
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE);
-  nomp_chk(err);
+  nomp_test_chk(err);
   err = nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_FREE);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   return 0;
 }
@@ -75,11 +75,11 @@ int nomp_api_223_sub_aux(TEST_TYPE *a, TEST_TYPE *b, int N) {
   static int id = -1;
   const char *clauses[4] = {"transform", "nomp-api-200", "transform", 0};
   int err = nomp_jit(&id, knl, clauses);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   err = nomp_run(id, 3, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
                  sizeof(TEST_TYPE), b, "N", NOMP_INTEGER, sizeof(int), &N);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   tfree(knl);
   return 0;
@@ -87,33 +87,33 @@ int nomp_api_223_sub_aux(TEST_TYPE *a, TEST_TYPE *b, int N) {
 
 #define nomp_api_223_sub TOKEN_PASTE(nomp_api_223_sub, TEST_SUFFIX)
 int nomp_api_223_sub(int n) {
-  nomp_assert(n <= 20);
+  nomp_test_assert(n <= 20);
   TEST_TYPE a[20], b[20];
   for (unsigned i = 0; i < n; i++)
     a[i] = n + i, b[i] = i;
 
   int err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO);
-  nomp_chk(err);
+  nomp_test_chk(err);
   err = nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   nomp_api_223_sub_aux(a, b, n);
 
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
 #if defined(TEST_TOL)
   for (unsigned i = 0; i < n; i++)
-    nomp_assert(fabs(a[i] - n + 1) < TEST_TOL);
+    nomp_test_assert(fabs(a[i] - n + 1) < TEST_TOL);
 #else
   for (unsigned i = 0; i < n; i++)
-    nomp_assert(a[i] == n - 1);
+    nomp_test_assert(a[i] == n - 1);
 #endif
 
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE);
-  nomp_chk(err);
+  nomp_test_chk(err);
   err = nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_FREE);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   return 0;
 }
@@ -135,11 +135,11 @@ int nomp_api_223_mul_aux(TEST_TYPE *a, TEST_TYPE *b, int N) {
   static int id = -1;
   const char *clauses[4] = {"transform", "nomp-api-200", "transform", 0};
   int err = nomp_jit(&id, knl, clauses);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   err = nomp_run(id, 3, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
                  sizeof(TEST_TYPE), b, "N", NOMP_INTEGER, sizeof(int), &N);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   tfree(knl);
   return 0;
@@ -147,33 +147,33 @@ int nomp_api_223_mul_aux(TEST_TYPE *a, TEST_TYPE *b, int N) {
 
 #define nomp_api_223_mul TOKEN_PASTE(nomp_api_223_mul, TEST_SUFFIX)
 int nomp_api_223_mul(int n) {
-  nomp_assert(n <= 20);
+  nomp_test_assert(n <= 20);
   TEST_TYPE a[20], b[20];
   for (unsigned i = 0; i < n; i++)
     a[i] = n - i, b[i] = i;
 
   int err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO);
-  nomp_chk(err);
+  nomp_test_chk(err);
   err = nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   nomp_api_223_mul_aux(a, b, n);
 
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
 #if defined(TEST_TOL)
   for (unsigned i = 0; i < n; i++)
-    nomp_assert(fabs(a[i] - (n - i) * (i + 1)) < TEST_TOL);
+    nomp_test_assert(fabs(a[i] - (n - i) * (i + 1)) < TEST_TOL);
 #else
   for (unsigned i = 0; i < n; i++)
-    nomp_assert(a[i] == (n - i) * (i + 1));
+    nomp_test_assert(a[i] == (n - i) * (i + 1));
 #endif
 
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE);
-  nomp_chk(err);
+  nomp_test_chk(err);
   err = nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_FREE);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   return 0;
 }
