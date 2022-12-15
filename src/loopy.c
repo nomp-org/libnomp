@@ -5,23 +5,8 @@ static const char *c_to_lpy = "c_to_loopy";
 static const char *redn = "reduction";
 static const char *rlze_redn = "realize_reduction";
 
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-
-/**
- * @ingroup nomp_internal_api
- * @brief Returns a non-zero error if the input is NULL.
- *
- * This function call set_log() to register an error if the input is NULL.
- * Use the macro nomp_null_input() to automatically add last three arguments.
- *
- * @param[in] p Input pointer.
- * @param[in] func Function in which the null check is done.
- * @param[in] line Line number where the null check is done.
- * @param[in] file File name in which the null check is done.
- * @return int
- */
-static int check_null_input_(void *p, const char *func, unsigned line,
-                             const char *file) {
+int check_null_input_(void *p, const char *func, unsigned line,
+                      const char *file) {
   if (!p) {
     return set_log(NOMP_RUNTIME_NULL_INPUT_ENCOUNTERED, NOMP_ERROR,
                    "Input pointer passed to function \"%s\" at line %d in file "
@@ -30,9 +15,6 @@ static int check_null_input_(void *p, const char *func, unsigned line,
   }
   return 0;
 }
-
-#define check_null_input(p)                                                    \
-  return_on_err(check_null_input_((void *)(p), __func__, __LINE__, __FILE__))
 
 /**
  * @ingroup nomp_py_utils
@@ -273,8 +255,8 @@ int py_get_grid_size(struct prog *prg, PyObject *knl) {
           if (grid_size) {
             prg->py_global = PyTuple_GetItem(grid_size, 0);
             prg->py_local = PyTuple_GetItem(grid_size, 1);
-            prg->ndim =
-                MAX(PyTuple_Size(prg->py_global), PyTuple_Size(prg->py_local));
+            prg->ndim = MAX(2, PyTuple_Size(prg->py_global),
+                            PyTuple_Size(prg->py_local));
             err = 0;
           }
         }
@@ -342,4 +324,3 @@ int py_eval_grid_size(struct prog *prg, PyObject *dict) {
 }
 
 #undef check_null_input
-#undef MAX
