@@ -148,7 +148,12 @@ class CToLoopyExpressionMapper(IdentityMapper):
         left, right = expr.get_children()
         left_offset = len(list(left.get_tokens()))
         op_str = list(expr.get_tokens())[left_offset].spelling
-        oprtr = _C_BIN_OPS_TO_PYMBOLIC_OPS[op_str]
+        try:
+            oprtr = _C_BIN_OPS_TO_PYMBOLIC_OPS[op_str]
+        except KeyError as exc:
+            raise SyntaxError(
+                f"Invalid binary operator string: {op_str}."
+            ) from exc
         return oprtr(self.rec(left), self.rec(right))
 
 
@@ -193,7 +198,14 @@ class CToLoopyLoopBoundMapper(CToLoopyExpressionMapper):
         left, _ = expr.get_children()
         left_offset = len(list(left.get_tokens()))
         op_str = list(expr.get_tokens())[left_offset].spelling
-        oprtr = _C_BIN_OPS_TO_PYMBOLIC_OPS["//" if op_str == "/" else op_str]
+        try:
+            oprtr = _C_BIN_OPS_TO_PYMBOLIC_OPS[
+                "//" if op_str == "/" else op_str
+            ]
+        except KeyError as exc:
+            raise SyntaxError(
+                f"Invalid binary operator string: {op_str}."
+            ) from exc
         return oprtr(self.rec(expr.left), self.rec(expr.right))
 
 
@@ -506,8 +518,14 @@ def c_to_loopy(c_str: str, backend: str) -> lp.translation_unit.TranslationUnit:
     """Map C kernel to Loopy"""
     index = cindex.Index.create()
     translation_unit = index.parse("foo.c", unsaved_files=[("foo.c", c_str)])
-    (node,) = translation_unit.cursor.get_children()
+    diagnostics = translation_unit.diagnostics
+    if diagnostics:
+        # If there are diagnostics, print the messages
+        for diagnostic in diagnostics:
+            print(diagnostic.spelling)
+        raise SyntaxError("Syntax error in kernel code.")
 
+    (node,) = translation_unit.cursor.get_children()
     # Init `var_to_decl` based on function parameters
     context = ExternalContext(function_name=node.spelling, var_to_decl={})
     global DTYPE_REG
@@ -570,12 +588,8 @@ if __name__ == "__main__":
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
     KNL_STR = """
           void foo(double *a, int N) {
-            int c[2][2];
-            c[1][0] = 4;
-            int b[2];
-            b[1] = 5;
             for (int i = 0; i < N; i++)
-              a[i] *= i;
+              a[i] = i;
           }
           """
     lp_knl = c_to_loopy(KNL_STR, "cuda")
