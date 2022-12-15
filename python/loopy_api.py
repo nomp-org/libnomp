@@ -88,7 +88,7 @@ class IdentityMapper:
         )(val.spelling)
 
     def map_init_list_expr(self, expr: cindex.CursorKind):
-        """Maps C list initialization"""
+        """Maps C array initialization"""
         raise NotImplementedError
 
 
@@ -134,15 +134,6 @@ class CToLoopyExpressionMapper(IdentityMapper):
             )
         raise NotImplementedError
 
-    def map_initlist(self, expr: cindex.CursorKind):
-        """Maps C list initialization"""
-        raise SyntaxError
-
-    def map_unexposed_expr(self, expr: cindex.CursorKind):
-        """Maps unexposed expression"""
-        (child,) = expr.get_children()
-        return self.rec(child)
-
     def map_binary_operator(self, expr: cindex.CursorKind):
         """Maps C binary operation"""
         left, right = expr.get_children()
@@ -155,6 +146,16 @@ class CToLoopyExpressionMapper(IdentityMapper):
                 f"Invalid binary operator string: {op_str}."
             ) from exc
         return oprtr(self.rec(left), self.rec(right))
+
+    def map_unexposed_expr(self, expr: cindex.CursorKind):
+        """Maps unexposed expression"""
+        (child,) = expr.get_children()
+        return self.rec(child)
+
+    def map_paren_expr(self, expr: cindex.CursorKind):
+        """Maps parenthesized expression"""
+        (child,) = expr.get_children()
+        return self.rec(child)
 
 
 # @dataclass automatically adds special methods like __init__ and __repr__
@@ -195,7 +196,7 @@ class CToLoopyLoopBoundMapper(CToLoopyExpressionMapper):
 
     def map_binary_operator(self, expr: cindex.CursorKind):
         """Maps C binary operation"""
-        left, _ = expr.get_children()
+        left, right = expr.get_children()
         left_offset = len(list(left.get_tokens()))
         op_str = list(expr.get_tokens())[left_offset].spelling
         try:
@@ -206,7 +207,7 @@ class CToLoopyLoopBoundMapper(CToLoopyExpressionMapper):
             raise SyntaxError(
                 f"Invalid binary operator string: {op_str}."
             ) from exc
-        return oprtr(self.rec(expr.left), self.rec(expr.right))
+        return oprtr(self.rec(left), self.rec(right))
 
 
 # Helper function for parsing for loop kernels
@@ -588,8 +589,8 @@ if __name__ == "__main__":
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
     KNL_STR = """
           void foo(double *a, int N) {
-            for (int i = 0; i < N; i++)
-              a[i] = i;
+            for (int i = 0; i < N + 1; i++)
+              a[i] = a[i] * (i + 1);
           }
           """
     lp_knl = c_to_loopy(KNL_STR, "cuda")
