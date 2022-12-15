@@ -1,42 +1,67 @@
 Introduction
 ============
 
-nomp: Nomp isn't OpenMP
------------------------
+nomp: Domain Specific Compiler Framework for C Based on Clang and loopy
+-----------------------------------------------------------------------
 
-`nomp` is a pragma based programming model for C. It looks
-superficially similar to OpenMP but acts more like OpenCL and/or
-CUDA thus delivering the best of both worlds. `nomp` has its
-own compiler (`nompcc`) and runtime (`libnomp`).
+`nomp` is a domain specific compiler framework and a runtime for C programming
+language which can be used to program accelerators (GPUs, CPUs, etc.) easily
+and efficiently.
 
-`nompcc` is a `clang` based compiler that can parse `nomp` pragmas
-and convert them to `libnomp` library calls. This transformed
-source code is then compiled using a user's favorite compiler
-(like gcc or `nompcc` itself) and linked against `libnomp`.
-`libnomp` runtime can be thought of as an abstraction on top of
-other compute runtimes like OpenCL, CUDA, HIP, etc. `libnomp`
-exposes APIs for managing host/device buffers as well as kernel
-launches in a platform independent manner.
+`nomp` consists of two main components: `nompcc` and `libnomp`. `nompcc` is the
+`clang`_ based compiler frontend which pre-process and compile C source.
+`libnomp` is the `loopy`_ based runtime which can generate and tune accelerator
+code (i.e., kernels) from C source at execution time and then do low level
+dispatch to accelerators using other high performing programming models like
+OpenCL/Cuda.
 
-`nomp` workflow is shown in the following figure.
+`nomp` uses a pragma based programming model to annotate C source with details
+on which sections of C source must be executed on accelerators as well as when
+to perform data tranfers between driver (most often a CPU) and accelerators.
+`nompcc` converts these pragmas to `libnomp` runtime calls during compilation.
+Then at program execution time, based on runtime calls, `libnomp` wil perform
+kernel generation, transformation, execution and other tasks related to executing
+kernels on accelerators by using `loopy` and other much lower level runtimes
+like Cuda/OpenCL.
+
+Instead of acting solely based on pragmas, `libnomp` can consume a user written
+domain and/or kernel specific transformations script (written using `loopy` API)
+at execution time thus giving users more control on kernel generation and
+execution. This is an external scrpt that doesn't require any changes in
+original C source and can be customized and/or changed without recompiling the
+original C source.
+
+Real power of `nomp` comes from its use of `loopy` at execution time. `loopy` is
+a code generator for array based code on accelerators. In contrast to mainstream
+programming models like OpenCL/CUDA etc., which force users to make
+implementation choices at program logic level, `loopy` separate program logic
+from implementation details. For example, all the afore-mentioned programming
+models force users to decide memory location for arrays at compile time (shared
+memory vs global memory vs registers) and mapping of loops to hardware axes.
+`loopy` provides an API for users to experiment and tune these details at
+execution time and thus providing a more portable way of writing kernels.
+
+`nomp` architecture diagram is shown in the following figure.
 
 .. image:: figures/nomp_diagram.png
-   :alt: nomp_workflow
+   :alt: nomp_architecture.
 
-Real power of `nomp` comes from its use of `loopy` as a code
-generator and runtime code transformer. `loopy` is a code generator
-for array based code on both CPUs and GPUs. In contrast, to most
-popular programming models like OpenMP/OpenCL/CUDA, etc., which force
-the user to make implementation choices at program logic level,
-`loopy` separate program logic from implementation details.
-For example, all the afore mentioned programming models force the
-programmer to decide memory location for the arrays used at compile
-time (shared memory vs global memory vs register file) and how the
-loops are mapped to hardware axes (grid and block configuration in
-CUDA or NDRange in OpenCL). `loopy` provides an API for the user to
-experiment and tune these details at runtime and thus providing a more
-portable way of writing compute kernels. `libnomp` expose these
-functionalities to user through easy to program pragmas.
+`nomp` (Originally a recursive acronym: "Nomp isn't OpenMP"), combines unique
+features available across several mainstream programming models for
+accelerators and complement them with `loopy`. `nomp` is:
+
+#. **Easy to use** since it uses a simple pragma based syntax like OpenMP.
+#. **High performant** since it uses high perfomant programming models like
+   OpenCL/Cuda for dispatching the kernel to accelerators.
+#. **Portable** since it uses `loopy` to separate algorithm and its final
+   schedule on hardware. This gives users (a performance enginner) a chance to
+   customize/optimize based on problem input and/or target hardware it will be
+   executed on.
+#. **External** to source code since its pragma based and uses external
+   transformation scripts. These can be turned off without making any changes
+   to the source code and the C source code would work as expected on CPU.
+#. **Customizable** to each domain since it lets users reuse domain specific
+   programming patterns.
 
 .. toctree::
    :maxdepth: 3
@@ -54,3 +79,6 @@ Indices and tables
 
 * :ref:`genindex`
 * :ref:`search`
+
+.. _loopy: https://documen.tician.de/loopy/
+.. _clang: https://clang.llvm.org/
