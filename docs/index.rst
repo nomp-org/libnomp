@@ -1,8 +1,8 @@
 Introduction
 ============
 
-nomp: Domain Specific Compiler Framework for C Based on Clang and loopy
------------------------------------------------------------------------
+nomp: Framework for Domain Specific Compilers Based on Clang and loopy
+----------------------------------------------------------------------
 
 `nomp` is a domain specific compiler framework and a runtime for C programming
 language which can be used to program accelerators (GPUs, CPUs, etc.) easily
@@ -69,7 +69,7 @@ accelerators and complement them with `loopy`. `nomp` is:
 
    self
    build
-   nomp-usage
+   usage
    user-api
    internal-api
    developer-docs

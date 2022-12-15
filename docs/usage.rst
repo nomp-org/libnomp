@@ -4,7 +4,7 @@ How to Use Nomp
 Make sure both `NOMP_INSTALL_DIR` and `NOMP_CLANG_DIR` are set and follow
 the :doc:`Build Instructions <build>` correctly.
 
-Create new folder(`nomp-test`) and add following files in the folder.
+Create the following files in your working directory.
 
 The `foo.c` file contains the example with nomp pragmas. 
 
@@ -14,12 +14,9 @@ The `foo.c` file contains the example with nomp pragmas.
     #include <stdio.h>
 
     void foo(double *a) {
-    #pragma nomp update(to : a[0, 10])
     #pragma nomp for transform("transforms", "foo")
         for(int i = 0; i<10; i++)
             a[i] = i;
-    #pragma nomp update(from : a[0, 10])
-    #pragma nomp update(free : a[0,10])
     }
 
     int main(int argc, char *argv[]){
@@ -27,7 +24,10 @@ The `foo.c` file contains the example with nomp pragmas.
         double a[10] = {0};
         for (int i=0; i<10; i++)
             printf("a[%d] = %f \n", i, a[i]);
+    #pragma nomp update(to : a[0, 10])
         foo(a);
+    #pragma nomp update(from : a[0, 10])
+    #pragma nomp update(free : a[0, 10])
         for (int i=0; i<10; i++)
             printf("a[%d] = %f \n", i, a[i]);
     #pragma nomp finalize

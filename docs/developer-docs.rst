@@ -93,7 +93,8 @@ Then the workflow will continue and you can monitor the progress on GitHub.
 If the workflow fails at some point, you can use the session you are connected
 for debugging. Session will be kept alive for 30 minutes after failure.
 
-More info on tmate can be found [here](https://mxschmitt.github.io/action-tmate/).
+More info on tmate can be found
+`here <https://mxschmitt.github.io/action-tmate/>`_.
 
 Debugging libnomp tests
 -----------------------
