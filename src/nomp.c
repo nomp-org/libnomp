@@ -27,8 +27,6 @@ static int check_env(struct backend *backend) {
   if (device_id >= 0)
     backend->device_id = device_id;
 
-  // FIXME: We should get rid of these defaults after implementing MPI_Init
-  // like arguments parsing for nomp_init().
   tmp = get_if_env("NOMP_INSTALL_DIR");
   if (tmp != NULL) {
     size_t size = pathlen(tmp) + 1;
@@ -72,7 +70,7 @@ static struct backend nomp;
 static int initialized = 0;
 static const char *py_dir = "python";
 
-int check_args(int argc, const char **argv, struct backend *backend) {
+static int check_args(int argc, const char **argv, struct backend *backend) {
   backend->backend = "opencl";
   backend->device_id = 0, backend->platform_id = 0, backend->verbose = 0;
   if (argc <= 1 || argv == NULL)
