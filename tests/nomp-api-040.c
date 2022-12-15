@@ -15,8 +15,7 @@ static int test_invalid_clause() {
                      "N", NOMP_INT, sizeof(int));
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
-  char *desc;
-  nomp_get_log_str(&desc, err);
+  char *desc = nomp_get_log_str(err);
   int matched = match_log(
       desc,
       "\\[Error\\] "
@@ -36,8 +35,7 @@ static int test_call_jit_with_invalid_function() {
                      "N", NOMP_INT, sizeof(int));
   nomp_test_assert(nomp_get_log_no(err) == NOMP_PY_CALL_FAILED);
 
-  char *desc;
-  nomp_get_log_str(&desc, err);
+  char *desc = nomp_get_log_str(err);
   int matched =
       match_log(desc, "\\[Error\\] .*src\\/loopy.c:[0-9]* Calling "
                       "user transform function: \"invalid_func\" failed.");
@@ -55,8 +53,7 @@ static int test_call_jit_with_invalid_script() {
                      "N", NOMP_INT, sizeof(int));
   nomp_test_assert(nomp_get_log_no(err) == NOMP_PY_CALL_FAILED);
 
-  char *desc;
-  nomp_get_log_str(&desc, err);
+  char *desc = nomp_get_log_str(err);
   int matched = match_log(desc, "\\[Error\\] .*src\\/loopy.c:[0-9]* Calling "
                                 "user transform function: \"foo\" failed.");
   nomp_test_assert(matched);
@@ -72,8 +69,7 @@ static int test_missing_filename() {
                      "N", NOMP_INT, sizeof(int));
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_NOT_PROVIDED);
 
-  char *desc;
-  nomp_get_log_str(&desc, err);
+  char *desc = nomp_get_log_str(err);
   int matched = match_log(
       desc, "\\[Error\\] "
             ".*libnomp\\/src\\/nomp.c:[0-9]* "
@@ -93,8 +89,7 @@ static int test_missing_user_callback() {
                      "N", NOMP_INT, sizeof(int));
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_NOT_PROVIDED);
 
-  char *desc;
-  nomp_get_log_str(&desc, err);
+  char *desc = nomp_get_log_str(err);
   int matched = match_log(
       desc, "\\[Error\\] "
             ".*libnomp\\/src\\/nomp.c:[0-9]* "
@@ -119,8 +114,7 @@ static int test_syntax_error_kernel() {
                      "N", NOMP_INT, sizeof(int));
   nomp_test_assert(nomp_get_log_no(err) == NOMP_LOOPY_CONVERSION_ERROR);
 
-  char *desc;
-  err = nomp_get_log_str(&desc, err);
+  char *desc = nomp_get_log_str(err);
   int matched = match_log(desc, "\\[Error\\] "
                                 ".*"
                                 "libnomp\\/src\\/loopy.c:[0-9]* C "

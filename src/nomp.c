@@ -481,14 +481,13 @@ void nomp_assert_(int cond, const char *file, unsigned line) {
   }
 }
 
-void nomp_chk_(int err_id, const char *file, unsigned line) {
-  if (err_id == 0)
+void nomp_chk_(int id, const char *file, unsigned line) {
+  if (id == 0)
     return;
-  if (nomp_get_log_type(err_id) == NOMP_ERROR) {
-    char *err_str;
-    int err = nomp_get_log_str(&err_str, err_id);
-    printf("%s:%d %s\n", file, line, err_str);
-    tfree(err_str);
+  if (nomp_get_log_type(id) == NOMP_ERROR) {
+    char *str = nomp_get_log_str(id);
+    printf("%s:%d %s\n", file, line, str);
+    tfree(str);
     exit(1);
   }
 }

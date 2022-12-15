@@ -7,8 +7,7 @@ static int test_free_before_mapping() {
   int err = nomp_update(a, 0, 10, sizeof(int), NOMP_FREE);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_MAP_OP_IS_INVALID);
 
-  char *desc;
-  err = nomp_get_log_str(&desc, err);
+  char *desc = nomp_get_log_str(err);
   int matched = match_log(
       desc, "\\[Error\\] "
             ".*libnomp\\/src\\/nomp.c:[0-9]* NOMP_FREE or NOMP_FROM can only "
@@ -25,8 +24,7 @@ static int test_d2h_before_h2d() {
   int err = nomp_update(a, 0, 10, sizeof(int), NOMP_FROM);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_MAP_OP_IS_INVALID);
 
-  char *desc;
-  err = nomp_get_log_str(&desc, err);
+  char *desc = nomp_get_log_str(err);
   int matched = match_log(
       desc, "\\[Error\\] "
             ".*libnomp\\/src\\/nomp.c:[0-9]* NOMP_FREE or NOMP_FROM can only "
