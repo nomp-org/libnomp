@@ -65,7 +65,7 @@
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
       <li>How to Use Nomp</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/nomp-usage.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/usage.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -77,27 +77,27 @@
 <h1>How to Use Nomp<a class="headerlink" href="#how-to-use-nomp" title="Permalink to this heading"></a></h1>
 <p>Make sure both <cite>NOMP_INSTALL_DIR</cite> and <cite>NOMP_CLANG_DIR</cite> are set and follow
 the <a class="reference internal" href="build.html"><span class="doc">Build Instructions</span></a> correctly.</p>
-<p>Create new folder(<cite>nomp-test</cite>) and add following files in the folder.</p>
+<p>Create the following files in your working directory.</p>
 <p>The <cite>foo.c</cite> file contains the example with nomp pragmas.</p>
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">foo.c</span><a class="headerlink" href="#id1" title="Permalink to this code"></a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
 
 <span class="kt">void</span><span class="w"> </span><span class="nf">foo</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="o">*</span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="cp">#pragma nomp update(to : a[0, 10])</span>
 <span class="cp">#pragma nomp for transform(&quot;transforms&quot;, &quot;foo&quot;)</span>
 <span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">&lt;</span><span class="mi">10</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"></span>
 <span class="w">        </span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
-<span class="cp">#pragma nomp update(from : a[0, 10])</span>
-<span class="cp">#pragma nomp update(free : a[0,10])</span>
 <span class="p">}</span><span class="w"></span>
 
 <span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[]){</span><span class="w"></span>
-<span class="cp">#pragma nomp init(&quot;opencl&quot;, 0, 0)</span>
+<span class="cp">#pragma nomp init(argc, argv)</span>
 <span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">};</span><span class="w"></span>
 <span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">&lt;</span><span class="mi">10</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"></span>
 <span class="w">        </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;a[%d] = %f </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span><span class="w"></span>
+<span class="cp">#pragma nomp update(to : a[0, 10])</span>
 <span class="w">    </span><span class="n">foo</span><span class="p">(</span><span class="n">a</span><span class="p">);</span><span class="w"></span>
+<span class="cp">#pragma nomp update(from : a[0, 10])</span>
+<span class="cp">#pragma nomp update(free : a[0, 10])</span>
 <span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">&lt;</span><span class="mi">10</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"></span>
 <span class="w">        </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;a[%d] = %f </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span><span class="w"></span>
 <span class="cp">#pragma nomp finalize</span>
@@ -142,9 +142,15 @@ the <a class="reference internal" href="build.html"><span class="doc">Build Inst
 </div>
 </div>
 <p>To compile any file containing <cite>nomp</cite> pragmas, use <cite>nompcc</cite> as follows:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./nompcc foo.c
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./nompcc foo.c -o foo
 </pre></div>
 </div>
+<p>You can now run the compiled executable by simply providing arguments to
+initialize and use backends, devices, etc.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./foo -b opencl -d <span class="m">0</span>
+</pre></div>
+</div>
+<p>Read more about arguments accepted by nomp_init() under user API.</p>
 </section>
 
 

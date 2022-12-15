@@ -42,7 +42,7 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="build.html">Build Instructions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="nomp-usage.html">How to Use Nomp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">How to Use Nomp</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user-api.html">User API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="internal-api.html">Internal API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developer-docs.html">Developer Documentation</a></li>
@@ -74,36 +74,59 @@
              
   <section id="introduction">
 <h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading"></a></h1>
-<section id="nomp-nomp-isn-t-openmp">
-<h2>nomp: Nomp isn’t OpenMP<a class="headerlink" href="#nomp-nomp-isn-t-openmp" title="Permalink to this heading"></a></h2>
-<p><cite>nomp</cite> is a pragma based programming model for C. It looks
-superficially similar to OpenMP but acts more like OpenCL and/or
-CUDA thus delivering the best of both worlds. <cite>nomp</cite> has its
-own compiler (<cite>nompcc</cite>) and runtime (<cite>libnomp</cite>).</p>
-<p><cite>nompcc</cite> is a <cite>clang</cite> based compiler that can parse <cite>nomp</cite> pragmas
-and convert them to <cite>libnomp</cite> library calls. This transformed
-source code is then compiled using a user’s favorite compiler
-(like gcc or <cite>nompcc</cite> itself) and linked against <cite>libnomp</cite>.
-<cite>libnomp</cite> runtime can be thought of as an abstraction on top of
-other compute runtimes like OpenCL, CUDA, HIP, etc. <cite>libnomp</cite>
-exposes APIs for managing host/device buffers as well as kernel
-launches in a platform independent manner.</p>
-<p><cite>nomp</cite> workflow is shown in the following figure.</p>
-<img alt="nomp_workflow" src="_images/nomp_diagram.png" />
-<p>Real power of <cite>nomp</cite> comes from its use of <cite>loopy</cite> as a code
-generator and runtime code transformer. <cite>loopy</cite> is a code generator
-for array based code on both CPUs and GPUs. In contrast, to most
-popular programming models like OpenMP/OpenCL/CUDA, etc., which force
-the user to make implementation choices at program logic level,
-<cite>loopy</cite> separate program logic from implementation details.
-For example, all the afore mentioned programming models force the
-programmer to decide memory location for the arrays used at compile
-time (shared memory vs global memory vs register file) and how the
-loops are mapped to hardware axes (grid and block configuration in
-CUDA or NDRange in OpenCL). <cite>loopy</cite> provides an API for the user to
-experiment and tune these details at runtime and thus providing a more
-portable way of writing compute kernels. <cite>libnomp</cite> expose these
-functionalities to user through easy to program pragmas.</p>
+<section id="nomp-framework-for-domain-specific-compilers-based-on-clang-and-loopy">
+<h2>nomp: Framework for Domain Specific Compilers Based on Clang and loopy<a class="headerlink" href="#nomp-framework-for-domain-specific-compilers-based-on-clang-and-loopy" title="Permalink to this heading"></a></h2>
+<p><cite>nomp</cite> is a domain specific compiler framework and a runtime for C programming
+language which can be used to program accelerators (GPUs, CPUs, etc.) easily
+and efficiently.</p>
+<p><cite>nomp</cite> consists of two main components: <cite>nompcc</cite> and <cite>libnomp</cite>. <cite>nompcc</cite> is the
+<a class="reference external" href="https://clang.llvm.org/">clang</a> based compiler frontend which pre-process and compile C source.
+<cite>libnomp</cite> is the <a class="reference external" href="https://documen.tician.de/loopy/">loopy</a> based runtime which can generate and tune accelerator
+code (i.e., kernels) from C source at execution time and then do low level
+dispatch to accelerators using other high performing programming models like
+OpenCL/Cuda.</p>
+<p><cite>nomp</cite> uses a pragma based programming model to annotate C source with details
+on which sections of C source must be executed on accelerators as well as when
+to perform data tranfers between driver (most often a CPU) and accelerators.
+<cite>nompcc</cite> converts these pragmas to <cite>libnomp</cite> runtime calls during compilation.
+Then at program execution time, based on runtime calls, <cite>libnomp</cite> wil perform
+kernel generation, transformation, execution and other tasks related to executing
+kernels on accelerators by using <cite>loopy</cite> and other much lower level runtimes
+like Cuda/OpenCL.</p>
+<p>Instead of acting solely based on pragmas, <cite>libnomp</cite> can consume a user written
+domain and/or kernel specific transformations script (written using <cite>loopy</cite> API)
+at execution time thus giving users more control on kernel generation and
+execution. This is an external scrpt that doesn’t require any changes in
+original C source and can be customized and/or changed without recompiling the
+original C source.</p>
+<p>Real power of <cite>nomp</cite> comes from its use of <cite>loopy</cite> at execution time. <cite>loopy</cite> is
+a code generator for array based code on accelerators. In contrast to mainstream
+programming models like OpenCL/CUDA etc., which force users to make
+implementation choices at program logic level, <cite>loopy</cite> separate program logic
+from implementation details. For example, all the afore-mentioned programming
+models force users to decide memory location for arrays at compile time (shared
+memory vs global memory vs registers) and mapping of loops to hardware axes.
+<cite>loopy</cite> provides an API for users to experiment and tune these details at
+execution time and thus providing a more portable way of writing kernels.</p>
+<p><cite>nomp</cite> architecture diagram is shown in the following figure.</p>
+<img alt="nomp_architecture." src="_images/nomp_diagram.png" />
+<p><cite>nomp</cite> (Originally a recursive acronym: “Nomp isn’t OpenMP”), combines unique
+features available across several mainstream programming models for
+accelerators and complement them with <cite>loopy</cite>. <cite>nomp</cite> is:</p>
+<ol class="arabic simple">
+<li><p><strong>Easy to use</strong> since it uses a simple pragma based syntax like OpenMP.</p></li>
+<li><p><strong>High performant</strong> since it uses high perfomant programming models like
+OpenCL/Cuda for dispatching the kernel to accelerators.</p></li>
+<li><p><strong>Portable</strong> since it uses <cite>loopy</cite> to separate algorithm and its final
+schedule on hardware. This gives users (a performance enginner) a chance to
+customize/optimize based on problem input and/or target hardware it will be
+executed on.</p></li>
+<li><p><strong>External</strong> to source code since its pragma based and uses external
+transformation scripts. These can be turned off without making any changes
+to the source code and the C source code would work as expected on CPU.</p></li>
+<li><p><strong>Customizable</strong> to each domain since it lets users reuse domain specific
+programming patterns.</p></li>
+</ol>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
 <ul class="current">
@@ -113,7 +136,7 @@ functionalities to user through easy to program pragmas.</p>
 <li class="toctree-l2"><a class="reference internal" href="build.html#clang-frontend">Clang frontend</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="nomp-usage.html">How to Use Nomp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">How to Use Nomp</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user-api.html">User API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="user-api.html#functions">Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="user-api.html#map-direction">Map Direction</a></li>
