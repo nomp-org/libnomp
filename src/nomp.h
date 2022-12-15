@@ -104,6 +104,11 @@
  * @brief Kernel argument type provided to libnomp is not valid.
  */
 #define NOMP_USER_KNL_ARG_TYPE_IS_INVALID -136
+/**
+ * @ingroup nomp_errors
+ * @brief User argument provided to libnomp is not valid.
+ */
+#define NOMP_USER_ARG_IS_INVALID -137
 
 /**
  * @ingroup nomp_errors
@@ -199,17 +204,19 @@ extern "C" {
  * return an error (but not segfault). Currently only supports Cuda and OpenCL
  * backends.
  *
- * @param[in] backend Target backend for code generation.
- * @param[in] platform Target platform id (only used for OpenCL backend).
- * @param[in] device Target device id to use for computation.
+ * @param[in] argc The number of arguments to nomp_init().
+ * @param[in] argv Arguments as strings, values followed by options.
  * @return int
  *
  * <b>Example usage:</b>
  * @code{.c}
- * int err = nomp_init("OpenCL", 0, 0);
+ * const char *argv[] = {"--backend", "opencl", "-device", "0", "--platform",
+ * "0"};
+ * int argc = 6;
+ * int err = nomp_init(argc, argv);
  * @endcode
  */
-int nomp_init(const char *backend, int platform, int device);
+int nomp_init(int argc, const char **argv);
 
 /**
  * @ingroup nomp_user_api

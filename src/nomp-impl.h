@@ -209,11 +209,12 @@ void py_print(PyObject *obj);
  * Concatenates atmost `nstr` strings and returns a pointer to
  * resulting string.
  *
- * @param nstr Number of strings to concatenate.
- * @param ... Strings to concatenate.
+ * @param[in] nstr Number of strings to concatenate.
+ * @param[in] max_len Maximum length of an individual string.
+ * @param[in] ... Strings to concatenate.
  * @return char*
  */
-char *strcatn(int nstr, ...);
+char *strcatn(unsigned nstr, unsigned max_len, ...);
 
 /**
  * @ingroup nomp_other_utils
@@ -253,6 +254,19 @@ int strntoui(const char *str, size_t size);
  * @return size_t
  */
 size_t pathlen(const char *path);
+
+/**
+ * @ingroup nomp_other_utils
+ * @brief Returns maximum among all integers passed.
+ *
+ * Returns the maximum between two or more integers.
+ *
+ * @param[in] args Total number of integers.
+ * @param[in] ... List of integers to find the maximum of as a variable argument
+ * list.
+ * @return int
+ */
+int MAX(unsigned args, ...);
 
 /**
  * @ingroup nomp_internal_api

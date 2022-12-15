@@ -1,4 +1,5 @@
 #include "nomp-test.h"
+#include "nomp.h"
 
 #define nomp_api_232_aux TOKEN_PASTE(nomp_api_232_aux, TEST_SUFFIX)
 int nomp_api_232_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {
@@ -28,8 +29,8 @@ int nomp_api_232_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {
 }
 
 #define nomp_api_232 TOKEN_PASTE(nomp_api_232, TEST_SUFFIX)
-int nomp_api_232(const char *backend, int device, int platform) {
-  int err = nomp_init(backend, platform, device);
+int nomp_api_232(int argc, const char *argv[]) {
+  int err = nomp_init(argc, argv);
   nomp_chk(err);
 
   int n = 10;

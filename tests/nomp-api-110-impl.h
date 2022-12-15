@@ -1,13 +1,13 @@
 #include "nomp-test.h"
+#include "nomp.h"
 
 #define nomp_api_110 TOKEN_PASTE(nomp_api_110, TEST_SUFFIX)
-int nomp_api_110(const char *backend, int device, int platform, unsigned s,
-                 unsigned e) {
+int nomp_api_110(int argc, const char *argv[], unsigned s, unsigned e) {
   nomp_assert(e <= 10);
 
   TEST_TYPE a[10] = {0}, b[10] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 
-  int err = nomp_init(backend, platform, device);
+  int err = nomp_init(argc, argv);
   nomp_chk(err);
 
   // Free'ing before mapping should return an error

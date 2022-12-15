@@ -1,20 +1,21 @@
-How to use nomp
+How to Use Nomp
 ===============
 
 Make sure both `NOMP_INSTALL_DIR` and `NOMP_CLANG_DIR` are set and follow
-the :doc:`Build instructions <build>` correctly. 
+the :doc:`Build Instructions <build>` correctly.
 
 Create new folder(`nomp-test`) and add following files in the folder.
 
 The `foo.c` file contains the example with nomp pragmas. 
 
-`foo.c`::
+..  code-block:: c
+    :caption: foo.c
 
     #include <stdio.h>
 
     void foo(double *a) {
     #pragma nomp update(to : a[0, 10])
-    #pragma nomp for transform("transforms:foo")
+    #pragma nomp for transform("transforms", "foo")
         for(int i = 0; i<10; i++)
             a[i] = i;
     #pragma nomp update(from : a[0, 10])
@@ -35,7 +36,8 @@ The `foo.c` file contains the example with nomp pragmas.
 
 The `transforms.py` file contains the `foo` function that creates the loopy kernel. 
 
-`transforms.py`::
+..  code-block:: python
+    :caption: transforms.py
 
     import loopy as lp
 
@@ -48,7 +50,8 @@ The `transforms.py` file contains the `foo` function that creates the loopy kern
 
 `nompcc` contains the script that link libnomp installation to the clang compiler. 
 
-`nompcc`::
+..  code-block:: bash
+    :caption: nompcc
 
     #!/bin/bash
 
@@ -66,6 +69,8 @@ The `transforms.py` file contains the `foo` function that creates the loopy kern
 
     ${NOMP_CLANG_DIR}/clang -fnomp -include nomp.h -I${NOMP_INC_DIR} "$@" -Wl,-rpath,${NOMP_LIB_DIR} -L${NOMP_LIB_DIR} -lnomp
 
-To compile any file containing `nomp` pragmas, use `nompcc` as below::
+To compile any file containing `nomp` pragmas, use `nompcc` as follows:
+
+..  code-block:: bash
 
     ./nompcc foo.c

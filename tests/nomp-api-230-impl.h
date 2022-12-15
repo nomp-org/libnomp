@@ -1,4 +1,5 @@
 #include "nomp-test.h"
+#include "nomp.h"
 
 #define nomp_api_230_aux TOKEN_PASTE(nomp_api_230_aux, TEST_SUFFIX)
 int nomp_api_230_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {
@@ -8,7 +9,7 @@ int nomp_api_230_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {
       "    a[i] = a[i] + b[i] + c[i];                         \n"
       "}                                                      \n";
 
-  size_t len = strlen(knl_fmt) + 2 * strlen(TOSTRING(TEST_TYPE)) + 1;
+  size_t len = strlen(knl_fmt) + 3 * strlen(TOSTRING(TEST_TYPE)) + 1;
   char *knl = tcalloc(char, len);
   snprintf(knl, len, knl_fmt, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE),
            TOSTRING(TEST_TYPE));
@@ -28,8 +29,8 @@ int nomp_api_230_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {
 }
 
 #define nomp_api_230 TOKEN_PASTE(nomp_api_230, TEST_SUFFIX)
-int nomp_api_230(const char *backend, int device, int platform) {
-  int err = nomp_init(backend, platform, device);
+int nomp_api_230(int argc, const char *argv[]) {
+  int err = nomp_init(argc, argv);
   nomp_chk(err);
 
   int n = 10;

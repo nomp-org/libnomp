@@ -51,7 +51,8 @@ static int check_env(struct backend *backend) {
     // so in a portable manner.
     const char *home = getenv("HOME");
     if (home)
-      backend->install_dir = strcatn(2, home, "/.nomp");
+      backend->install_dir =
+          strcatn(2, MAX(2, pathlen(home), NOMP_BUFSIZ), home, "/.nomp");
     else
       return set_log(
           NOMP_USER_INPUT_NOT_PROVIDED, NOMP_ERROR,
@@ -82,19 +83,87 @@ static struct backend nomp;
 static int initialized = 0;
 static const char *py_dir = "python";
 
-int nomp_init(const char *backend, int platform, int device) {
-  if (initialized)
+int check_args(int argc, const char **argv, struct backend *backend) {
+  backend->backend = "opencl";
+  backend->device_id = 0, backend->platform_id = 0, backend->verbose = 0;
+  if (argc <= 1 || argv == NULL)
+    return 0;
+
+  unsigned i = 0;
+  while (i < argc) {
+    if (strncmp("-", argv[i], 1)) {
+      i += 1;
+      continue;
+    }
+    if (i + 1 == argc) {
+      return set_log(
+          NOMP_USER_ARG_IS_INVALID, NOMP_ERROR,
+          strcatn(2, NOMP_BUFSIZ, "Missing argument value: ", argv[i]));
+    }
+
+    if (!strncmp("-b", argv[i], MAX_BACKEND_NAME_SIZE) ||
+        !strncmp("--backend", argv[i], MAX_BACKEND_NAME_SIZE)) {
+      backend->backend = strndup(argv[i + 1], MAX_BACKEND_NAME_SIZE);
+      i += 2;
+    } else if (!strncmp("-p", argv[i], NOMP_BUFSIZ) ||
+               !strncmp("--platform", argv[i], NOMP_BUFSIZ)) {
+      int platform_id = strntoui(argv[i + 1], NOMP_BUFSIZ);
+      if (platform_id >= 0)
+        backend->platform_id = platform_id;
+      i += 2;
+    } else if (!strncmp("-d", argv[i], NOMP_BUFSIZ) ||
+               !strncmp("--device", argv[i], NOMP_BUFSIZ)) {
+      int device_id = strntoui(argv[i + 1], NOMP_BUFSIZ);
+      if (device_id >= 0)
+        backend->device_id = device_id;
+      i += 2;
+    } else if (!strncmp("-v", argv[i], NOMP_BUFSIZ) ||
+               !strncmp("--verbose", argv[i], NOMP_BUFSIZ)) {
+      int verbose = strntoui(argv[i + 1], NOMP_BUFSIZ);
+      if (verbose >= 0)
+        backend->verbose = strntoui(argv[i + 1], NOMP_BUFSIZ);
+      i += 2;
+    } else if (!strncmp("-i", argv[i], NOMP_BUFSIZ) ||
+               !strncmp("--install-dir", argv[i], NOMP_BUFSIZ)) {
+      char *install_dir = (char *)argv[i + 1];
+      size_t size = pathlen(install_dir) + 1;
+      if (install_dir != NULL)
+        backend->install_dir = strndup(install_dir, size);
+      i += 2;
+    } else if (!strncmp("-as", argv[i], NOMP_BUFSIZ) ||
+               !strncmp("--annts-script", argv[i], NOMP_BUFSIZ)) {
+      char *annts_script = (char *)argv[i + 1];
+      if (annts_script != NULL)
+        backend->annts_script = strndup(annts_script, NOMP_BUFSIZ);
+      i += 2;
+    } else if (!strncmp("-af", argv[i], NOMP_BUFSIZ) ||
+               !strncmp("--annts-func", argv[i], NOMP_BUFSIZ)) {
+      char *annts_func = (char *)argv[i + 1];
+      if (annts_func != NULL) {
+        backend->annts_func = strndup(annts_func, NOMP_BUFSIZ);
+      }
+      i += 2;
+    } else {
+      return set_log(NOMP_USER_ARG_IS_INVALID, NOMP_ERROR,
+                     strcatn(2, NOMP_BUFSIZ, "Invalid argument : ", argv[i]));
+    }
+  }
+
+  return 0;
+}
+
+int nomp_init(int argc, const char **argv) {
+  if (initialized) {
     return set_log(
         NOMP_RUNTIME_ALREADY_INITIALIZED, NOMP_ERROR,
         "libnomp is already initialized to use %s. Call nomp_finalize() before "
         "calling nomp_init() again.",
         nomp.name);
+  }
 
-  nomp.backend = tcalloc(char, MAX_BACKEND_NAME_SIZE);
-  strncpy(nomp.backend, backend, MAX_BACKEND_NAME_SIZE);
-  nomp.platform_id = platform, nomp.device_id = device;
-
-  int err = check_env(&nomp);
+  int err = check_args(argc, argv, &nomp);
+  return_on_err(err);
+  err = check_env(&nomp);
   return_on_err(err);
 
   char name[MAX_BACKEND_NAME_SIZE + 1];
@@ -127,7 +196,9 @@ int nomp_init(const char *backend, int platform, int device) {
     // Append current working dir
     py_append_to_sys_path(".");
     // nomp.install_dir should be set and we use it here.
-    char *abs_dir = strcatn(3, nomp.install_dir, "/", py_dir);
+    char *abs_dir = strcatn(
+        3, MAX(2, pathlen(nomp.install_dir), strnlen(py_dir, NOMP_BUFSIZ)),
+        nomp.install_dir, "/", py_dir);
     py_append_to_sys_path(abs_dir);
     err = tfree(abs_dir);
   } else {
