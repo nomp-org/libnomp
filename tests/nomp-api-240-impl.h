@@ -1,12 +1,12 @@
 #include "nomp-test.h"
 #include "nomp.h"
 
-#define nomp_api_232_aux TOKEN_PASTE(nomp_api_232_aux, TEST_SUFFIX)
-int nomp_api_232_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {
+#define nomp_api_240_aux TOKEN_PASTE(nomp_api_240_aux, TEST_SUFFIX)
+int nomp_api_240_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {
   const char *KNL_FMT =
-      "void foo(%s *a, %s *b, %s *c, int N) {                 \n"
+      "void foo(%s *a, %s *b, %s *c,int N) {                  \n"
       "  for (int i = 0; i < N; i++)                          \n"
-      "    a[i] = a[i] * b[i] * c[i];                         \n"
+      "    a[i] = a[i] + b[i] + c[i];                         \n"
       "}                                                      \n";
 
   const char *TYPE_STR = TOSTRING(TEST_TYPE);
@@ -28,8 +28,8 @@ int nomp_api_232_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {
   return 0;
 }
 
-#define nomp_api_232 TOKEN_PASTE(nomp_api_232, TEST_SUFFIX)
-int nomp_api_232(int argc, const char *argv[]) {
+#define nomp_api_240 TOKEN_PASTE(nomp_api_240, TEST_SUFFIX)
+int nomp_api_240(int argc, const char *argv[]) {
   int err = nomp_init(argc, argv);
   nomp_chk(err);
 
@@ -45,17 +45,17 @@ int nomp_api_232(int argc, const char *argv[]) {
   err = nomp_update(c, 0, n, sizeof(TEST_TYPE), NOMP_TO);
   nomp_chk(err);
 
-  nomp_api_232_aux(a, b, c, n);
+  nomp_api_240_aux(a, b, c, n);
 
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM);
   nomp_chk(err);
 
 #if defined(TEST_TOL)
   for (unsigned i = 0; i < n; i++)
-    nomp_assert(fabs(a[i] - 5 * (n - i) * i) < TEST_TOL);
+    nomp_assert(fabs(a[i] - n - 5) < TEST_TOL);
 #else
   for (unsigned i = 0; i < n; i++)
-    nomp_assert(a[i] == 5 * (n - i) * i);
+    nomp_assert(a[i] == n + 5);
 #endif
 
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE);
@@ -70,6 +70,6 @@ int nomp_api_232(int argc, const char *argv[]) {
 
   return 0;
 }
-#undef nomp_api_232
+#undef nomp_api_240
 
-#undef nomp_api_232_aux
+#undef nomp_api_240_aux

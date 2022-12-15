@@ -1,8 +1,8 @@
 #include "nomp-test.h"
 #include "nomp.h"
 
-#define nomp_api_231_aux TOKEN_PASTE(nomp_api_231_aux, TEST_SUFFIX)
-int nomp_api_231_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {
+#define nomp_api_241_aux TOKEN_PASTE(nomp_api_241_aux, TEST_SUFFIX)
+int nomp_api_241_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {
   const char *KNL_FMT =
       "void foo(%s *a, %s *b, %s *c, int N) {                 \n"
       "  for (int i = 0; i < N; i++)                          \n"
@@ -28,8 +28,8 @@ int nomp_api_231_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {
   return 0;
 }
 
-#define nomp_api_231 TOKEN_PASTE(nomp_api_231, TEST_SUFFIX)
-int nomp_api_231(int argc, const char *argv[]) {
+#define nomp_api_241 TOKEN_PASTE(nomp_api_241, TEST_SUFFIX)
+int nomp_api_241(int argc, const char *argv[]) {
   int err = nomp_init(argc, argv);
   nomp_chk(err);
 
@@ -45,7 +45,7 @@ int nomp_api_231(int argc, const char *argv[]) {
   err = nomp_update(c, 0, n, sizeof(TEST_TYPE), NOMP_TO);
   nomp_chk(err);
 
-  nomp_api_231_aux(a, b, c, n);
+  nomp_api_241_aux(a, b, c, n);
 
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM);
   nomp_chk(err);
@@ -70,6 +70,6 @@ int nomp_api_231(int argc, const char *argv[]) {
 
   return 0;
 }
-#undef nomp_api_231
+#undef nomp_api_241
 
-#undef nomp_api_231_aux
+#undef nomp_api_241_aux
