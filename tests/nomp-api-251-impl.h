@@ -11,11 +11,14 @@ int nomp_api_251_aux(TEST_TYPE *a, TEST_TYPE *b, int E, int N) {
   const char *clauses[7] = {"annotate",     "dof_loop", "i", "annotate",
                             "element_loop", "e",        0};
 
-  char *knl = create_knl(knl_fmt, 2, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE));
+  static int id = -1;
+  int err = create_knl(&id, knl_fmt, clauses, 2, TOSTRING(TEST_TYPE),
+                       TOSTRING(TEST_TYPE));
+  nomp_test_chk(err)
 
-  return run_kernel(knl, clauses, 4, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b",
-                    NOMP_PTR, sizeof(TEST_TYPE), b, "E", NOMP_INTEGER,
-                    sizeof(int), &E, "N", NOMP_INTEGER, sizeof(int), &N);
+      return nomp_run(id, 4, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
+                      sizeof(TEST_TYPE), b, "E", NOMP_INTEGER, sizeof(int), &E,
+                      "N", NOMP_INTEGER, sizeof(int), &N);
 }
 
 #define nomp_api_251 TOKEN_PASTE(nomp_api_251, TEST_SUFFIX)

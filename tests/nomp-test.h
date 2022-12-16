@@ -46,8 +46,9 @@ static int subtest_(int err, const char *test_name) {
       return 1;                                                                \
   }
 
-static char *create_knl(const char *knl_fmt, const int args_n, ...) {
-  size_t len = strlen(knl_fmt) + args_n * strlen(TOSTRING(test_type)) + 1;
+static int create_knl(int *id, const char *knl_fmt, const char **clauses,
+                        const int args_n, ...) {
+  size_t len = strlen(knl_fmt) + args_n * strlen(TOSTRING(TEST_TYPE)) + 1;
   char *knl = tcalloc(char, len);
 
   va_list vargs;
@@ -55,21 +56,8 @@ static char *create_knl(const char *knl_fmt, const int args_n, ...) {
   vsnprintf(knl, len, knl_fmt, vargs);
   va_end(vargs);
 
-  return knl;
-}
-
-static int run_kernel(char *knl, const char **clauses, const int args_n, ...) {
-  static int id = -1;
-
-  int err = nomp_jit(&id, knl, clauses);
+  int err = nomp_jit(id, knl, clauses);
   nomp_test_chk(err);
-
-  va_list vargs;
-  va_start(vargs, args_n);
-  err = nomp_run(id, args_n, vargs);
-  nomp_test_chk(err);
-  va_end(vargs);
-
   tfree(knl);
   return 0;
 }
