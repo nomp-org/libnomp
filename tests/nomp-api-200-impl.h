@@ -7,10 +7,7 @@ int nomp_api_200() {
       "  for (int i = 0; i < N; i++)                                        \n"
       "    a[i] = i;                                                        \n"
       "}                                                                    \n";
-
-  size_t len = strlen(knl_fmt) + strlen(TOSTRING(TEST_TYPE)) + 1;
-  char *knl = tcalloc(char, len);
-  snprintf(knl, len, knl_fmt, TOSTRING(TEST_TYPE));
+  char *knl = create_knl(knl_fmt, 1, TOSTRING(TEST_TYPE));
 
   // Calling nomp_jit with invalid functions should return an error.
   static int id = -1;

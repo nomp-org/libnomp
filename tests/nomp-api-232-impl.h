@@ -7,24 +7,13 @@ int nomp_api_232_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {
       "  for (int i = 0; i < N; i++)                          \n"
       "    a[i] = a[i] * b[i] * c[i];                         \n"
       "}                                                      \n";
-
-  size_t len = strlen(knl_fmt) + 3 * strlen(TOSTRING(TEST_TYPE)) + 1;
-  char *knl = tcalloc(char, len);
-  snprintf(knl, len, knl_fmt, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE),
-           TOSTRING(TEST_TYPE));
-
-  static int id = -1;
   const char *clauses[4] = {"transform", "nomp-api-200", "transform", 0};
-  int err = nomp_jit(&id, knl, clauses);
-  nomp_test_chk(err);
 
-  err = nomp_run(id, 4, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
+  char *knl = create_knl(knl_fmt, 3, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE),
+                         TOSTRING(TEST_TYPE));
+  return run_kernel(knl, clauses, 4, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
                  sizeof(TEST_TYPE), b, "c", NOMP_PTR, sizeof(TEST_TYPE), c, "N",
                  NOMP_INTEGER, sizeof(int), &N);
-  nomp_test_chk(err);
-
-  tfree(knl);
-  return 0;
 }
 
 #define nomp_api_232 TOKEN_PASTE(nomp_api_232, TEST_SUFFIX)
