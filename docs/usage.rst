@@ -19,7 +19,7 @@ The `foo.c` file contains the example with nomp pragmas.
             a[i] = i;
     }
 
-    int main(int argc, char *argv[]){
+    int main(int argc, const char *argv[]) {
     #pragma nomp init(argc, argv)
         double a[10] = {0};
         for (int i=0; i<10; i++)
@@ -82,4 +82,4 @@ initialize and use backends, devices, etc.
 
     ./foo -b opencl -d 0
 
-Read more about arguments accepted by nomp_init() under user API.
+Read more about arguments accepted by nomp_init() under :doc:`User API <user-api>`.

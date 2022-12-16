@@ -195,14 +195,24 @@ extern "C" {
 
 /**
  * @ingroup nomp_user_api
- * @brief Initializes libnomp with the specified backend, platform and device.
+ * @brief Initializes libnomp with the specified backend, platform, device, etc.
  *
  * @details Initializes nomp code generation for the specified backend (e.g.,
- * OpenCL, Cuda, etc) using the given platform id and device id. Returns a
- * negative value if an error occurs during the initialization, otherwise
- * returns 0. Calling this method twice (without nomp_finalize in between) will
- * return an error (but not segfault). Currently only supports Cuda and OpenCL
- * backends.
+ * OpenCL, Cuda, etc) using command line arguments. Also platform id, device id,
+ * verbose level, annotation scripte and annotation function can be specified as
+ * well. Returns a negative value if an error occurs during the initialization,
+ * otherwise returns 0. Calling this method twice (without nomp_finalize in
+ * between) will return an error (but not segfault). Currently only supports
+ * Cuda and OpenCL backends.
+ *
+ * <b>Accepted arguments:</b>
+ * \arg `-b|--backend <backend-name>` Specify backend type (Default: opencl).
+ * \arg `-p|--platform <platform-index>` Specify platform id (Default: 0).
+ * \arg `-d|--device <device-index>` Specify device id (Default: 0).
+ * \arg `-v|--verbose <verbose-level>` Specify verbose level (Default: 0).
+ * \arg `-as|--annts-script <annotation-script>` Specify the directory which the
+ * annotation script resides. \arg `-af|--annts-func <annotation-function>`
+ * Specify the annotation funtion name.
  *
  * @param[in] argc The number of arguments to nomp_init().
  * @param[in] argv Arguments as strings, values followed by options.
