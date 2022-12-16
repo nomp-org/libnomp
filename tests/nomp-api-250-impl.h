@@ -9,11 +9,13 @@ int nomp_api_250_aux(TEST_TYPE *a, TEST_TYPE *b, TEST_TYPE *c, int N) {
       "}                                                      \n";
   const char *clauses[4] = {"annotate", "grid_loop", "i", 0};
 
-  char *knl = create_knl(knl_fmt, 3, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE),
-                         TOSTRING(TEST_TYPE));
-  return run_kernel(knl, clauses, 4, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b",
-                    NOMP_PTR, sizeof(TEST_TYPE), b, "c", NOMP_PTR,
-                    sizeof(TEST_TYPE), c, "N", NOMP_INTEGER, sizeof(int), &N);
+  static int id = -1;
+  int err = create_knl(&id, knl_fmt, clauses, 3, TOSTRING(TEST_TYPE),
+                       TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE));
+  nomp_test_chk(err);
+  return nomp_run(id, 4, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
+                  sizeof(TEST_TYPE), b, "c", NOMP_PTR, sizeof(TEST_TYPE), c,
+                  "N", NOMP_INTEGER, sizeof(int), &N);
 }
 
 #define nomp_api_250 TOKEN_PASTE(nomp_api_250, TEST_SUFFIX)

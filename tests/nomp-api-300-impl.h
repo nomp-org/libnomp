@@ -11,10 +11,13 @@ int nomp_api_300_aux(TEST_TYPE *a, TEST_TYPE *b, int row, int col) {
 
   const char *clauses[4] = {"transform", "nomp-api-300", "transform", 0};
 
-  char *knl = create_knl(knl_fmt, 2, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE));
-  return run_kernel(knl, clauses, 4, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b",
-                    NOMP_PTR, sizeof(TEST_TYPE), b, "row", NOMP_INTEGER,
-                    sizeof(int), &row, "col", NOMP_INTEGER, sizeof(int), &col);
+  static int id = -1;
+  int err = create_knl(&id, knl_fmt, clauses, 2, TOSTRING(TEST_TYPE),
+                       TOSTRING(TEST_TYPE));
+  nomp_test_chk(err);
+  return nomp_run(id, 4, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
+                  sizeof(TEST_TYPE), b, "row", NOMP_INTEGER, sizeof(int), &row,
+                  "col", NOMP_INTEGER, sizeof(int), &col);
 }
 
 #define nomp_api_300 TOKEN_PASTE(nomp_api_300, TEST_SUFFIX)

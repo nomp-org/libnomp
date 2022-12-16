@@ -8,10 +8,12 @@ int nomp_api_210_aux(const char *knl_fmt, TEST_TYPE *a, TEST_TYPE *b, int n) {
   nomp_test_chk(err);
 
   const char *clauses[4] = {"transform", "nomp-api-200", "transform", 0};
-  char *knl = create_knl(knl_fmt, 2, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE));
-  err = run_kernel(knl, clauses, 3, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b",
-                   NOMP_PTR, sizeof(TEST_TYPE), b, "N", NOMP_INTEGER,
-                   sizeof(int), &n);
+  static int id = -1;
+  err = create_knl(&id, knl_fmt, clauses, 2, TOSTRING(TEST_TYPE),
+                   TOSTRING(TEST_TYPE));
+  nomp_test_chk(err);
+  err = nomp_run(id, 3, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
+                 sizeof(TEST_TYPE), b, "N", NOMP_INTEGER, sizeof(int), &n);
   nomp_test_chk(err);
 
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM);
