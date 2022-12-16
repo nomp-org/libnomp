@@ -3,33 +3,45 @@
 #undef TEST_IMPL_H
 
 static int test_vector_addition() {
+  int err = 0;
   TEST_BUILTIN_TYPES(210_add, 10)
   TEST_BUILTIN_TYPES(210_add, 20)
+  return err;
 }
 
 static int test_vector_subtraction() {
+  int err = 0;
   TEST_BUILTIN_TYPES(210_sub, 10)
   TEST_BUILTIN_TYPES(210_sub, 20)
+  return err;
 }
 
 static int test_vector_multiplication_summation() {
+  int err = 0;
   TEST_BUILTIN_TYPES(210_mul_sum, 10)
   TEST_BUILTIN_TYPES(210_mul_sum, 20)
+  return err;
 }
 
 static int test_vector_multiplication() {
+  int err = 0;
   TEST_BUILTIN_TYPES(210_mul, 10)
   TEST_BUILTIN_TYPES(210_mul, 20)
+  return err;
 }
 
 static int test_vector_square_sum() {
+  int err = 0;
   TEST_BUILTIN_TYPES(210_square, 10)
   TEST_BUILTIN_TYPES(210_square, 20)
+  return err;
 }
 
 static int test_vector_linear() {
+  int err = 0;
   TEST_BUILTIN_TYPES(210_linear, 10)
   TEST_BUILTIN_TYPES(210_linear, 20)
+  return err;
 }
 
 int main(int argc, const char *argv[]) {
