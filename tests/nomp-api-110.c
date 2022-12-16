@@ -3,10 +3,9 @@
 #undef TEST_IMPL_H
 
 int main(int argc, const char *argv[]) {
-
+  int err = 0;
   TEST_BUILTIN_TYPES(110, argc, argv, 0, 10)
   TEST_BUILTIN_TYPES(110, argc, argv, 5, 10)
   TEST_BUILTIN_TYPES(110, argc, argv, 2, 8)
-
-  return 0;
+  return err;
 }

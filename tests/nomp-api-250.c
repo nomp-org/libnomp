@@ -6,7 +6,7 @@ int main(int argc, const char *argv[]) {
   const char *args[] = {"-b", "opencl", "-d",  "0",   "-p",
                         "0",  "-as",    "sem", "-af", "annotate"};
   argc = 10;
+  int err = 0;
   TEST_BUILTIN_TYPES(250, argc, args)
-
-  return 0;
+  return err;
 }
