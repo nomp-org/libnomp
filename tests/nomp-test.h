@@ -5,6 +5,7 @@
 #include "nomp.h"
 #include <math.h>
 #include <regex.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -43,6 +44,34 @@ static int subtest_(int err, const char *test_name) {
     if (nomp_get_log_type((err_id)) == NOMP_ERROR)                             \
       return 1;                                                                \
   }
+
+static char *create_knl(const char *knl_fmt, const int args_n, ...) {
+  size_t len = strlen(knl_fmt) + args_n * strlen(TOSTRING(test_type)) + 1;
+  char *knl = tcalloc(char, len);
+
+  va_list vargs;
+  va_start(vargs, args_n);
+  vsnprintf(knl, len, knl_fmt, vargs);
+  va_end(vargs);
+
+  return knl;
+}
+
+static int run_kernel(char *knl, const char **clauses, const int args_n, ...) {
+  static int id = -1;
+
+  int err = nomp_jit(&id, knl, clauses);
+  nomp_test_chk(err);
+
+  va_list vargs;
+  va_start(vargs, args_n);
+  err = nomp_run(id, args_n, vargs);
+  nomp_test_chk(err);
+  va_end(vargs);
+
+  tfree(knl);
+  return 0;
+}
 
 static int match_log(const char *log, const char *pattern) {
   regex_t regex;

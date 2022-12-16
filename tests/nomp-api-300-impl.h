@@ -9,22 +9,12 @@ int nomp_api_300_aux(TEST_TYPE *a, TEST_TYPE *b, int row, int col) {
       "       b[j + i * row] = a[i + j * col];                           \n"
       "}                                                                 \n";
 
-  size_t len = strlen(knl_fmt) + 3 * strlen(TOSTRING(TEST_TYPE)) + 1;
-  char *knl = tcalloc(char, len);
-  snprintf(knl, len, knl_fmt, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE));
-
-  static int id = -1;
   const char *clauses[4] = {"transform", "nomp-api-300", "transform", 0};
-  int err = nomp_jit(&id, knl, clauses);
-  nomp_test_chk(err);
 
-  err = nomp_run(id, 4, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
+  char *knl = create_knl(knl_fmt, 2, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE));
+  return run_kernel(knl, clauses, 4, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
                  sizeof(TEST_TYPE), b, "row", NOMP_INTEGER, sizeof(int), &row,
                  "col", NOMP_INTEGER, sizeof(int), &col);
-  nomp_test_chk(err);
-
-  tfree(knl);
-  return 0;
 }
 
 #define nomp_api_300 TOKEN_PASTE(nomp_api_300, TEST_SUFFIX)
