@@ -13,9 +13,9 @@ int nomp_api_251_aux(TEST_TYPE *a, TEST_TYPE *b, int E, int N) {
 
   char *knl = create_knl(knl_fmt, 2, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE));
 
-  return run_kernel(knl, clauses, 4, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
-                 sizeof(TEST_TYPE), b, "E", NOMP_INTEGER, sizeof(int), &E, "N",
-                 NOMP_INTEGER, sizeof(int), &N);
+  return run_kernel(knl, clauses, 4, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b",
+                    NOMP_PTR, sizeof(TEST_TYPE), b, "E", NOMP_INTEGER,
+                    sizeof(int), &E, "N", NOMP_INTEGER, sizeof(int), &N);
 }
 
 #define nomp_api_251 TOKEN_PASTE(nomp_api_251, TEST_SUFFIX)
