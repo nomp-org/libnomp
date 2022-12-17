@@ -55,7 +55,7 @@ int main(int argc, const char *argv[]) {
   err |= SUBTEST(test_vector_square_sum);
   err |= SUBTEST(test_vector_linear);
 
-  err = nomp_finalize();
+  err |= nomp_finalize();
   nomp_test_chk(err);
 
   return err;
