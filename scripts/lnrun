@@ -124,7 +124,7 @@ function run_tests() {
 
   echo -e "Running tests..."
   ERR=0
-  cd "${NOMP_TEST_DIR}" 
+  cd "${NOMP_TEST_DIR}" &&
   for t in $(ls  ${TESTS}); do
     OUTPUT=$($t -b ${NOMP_BACKEND} -d ${NOMP_DEVICE} -p ${NOMP_PLATFORM} \
             -i ${NOMP_INSTALL_DIR} -v ${NOMP_VERBOSE})
@@ -147,8 +147,10 @@ function debug_test() {
   BUILD_TEST="${NOMP_TEST_DIR}/${TEST_NAME}"
   if [[ -f "$BUILD_TEST" ]]; then
     echo -e "\nDebugging session started for: ${cyan}${TEST_NAME}${reset}"
+    cd "${NOMP_TEST_DIR}" &&
     gdbserver "localhost:${NOMP_PORT}" "${BUILD_TEST}" "${NOMP_BACKEND}" \
       "${NOMP_DEVICE}" "${NOMP_PLATFORM}"
+    cd -
     echo "Debugging session ended"
   else
     echo -e "\n${red}Test not found: nomp-api-${DEBUG_TEST}${reset}"
