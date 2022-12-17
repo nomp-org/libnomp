@@ -131,3 +131,4 @@ int nomp_api_220_linear(int n) {
   return 0;
 }
 #undef nomp_api_220_linear
+#undef nomp_api_220_aux
