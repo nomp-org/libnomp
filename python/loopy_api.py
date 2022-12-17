@@ -13,7 +13,7 @@ from loopy.target.c.compyte.dtypes import (
     DTypeRegistry,
     fill_registry_with_c_types,
 )
-from pytools import UniqueNameGenerator, memoize
+from pytools import UniqueNameGenerator
 
 LOOPY_LANG_VERSION = (2018, 2)
 LOOPY_INSN_PREFIX = "_nomp_insn"
@@ -92,8 +92,6 @@ class IdentityMapper:
         raise NotImplementedError
 
 
-# Memoize is caching the return of a function based on its input parameters
-# @memoize
 def _get_dtype_from_decl_type(decl):
     """Retrieve data type from declaration type"""
     if (
@@ -220,7 +218,7 @@ def check_and_parse_for(
             "More than one initialization declarations not yet supported."
         )
 
-    decl_stmt, cond, updt_stmt, *_ = expr.get_children()
+    decl_stmt, cond, updt_stmt, _ = expr.get_children()
     (var_decl,) = decl_stmt.get_children()
     (literal,) = var_decl.get_children()
     iname = var_decl.spelling
@@ -287,7 +285,7 @@ class CToLoopyMapper(IdentityMapper):
         true_result = self.rec(if_true, true_context)
 
         # Map expr.iffalse with !cond
-        try:
+        if len(rest) != 0:
             (if_false,) = rest
             false_predicates = context.predicates | {prim.LogicalNot(cond)}
             false_context = context.copy(predicates=false_predicates)
@@ -306,8 +304,8 @@ class CToLoopyMapper(IdentityMapper):
                 stmt.no_sync_with = true_insn_ids
                 false_result.statements[i] = stmt
             return self.combine([true_result, false_result])
-        except:
-            return true_result
+
+        return true_result
 
     def map_for_stmt(
         self, expr: cindex.CursorKind, context: CToLoopyMapperContext
@@ -337,13 +335,19 @@ class CToLoopyMapper(IdentityMapper):
     def map_decl_stmt(
         self, expr: cindex.CursorKind, context: CToLoopyMapperContext
     ):
-        """Map C variable declaration"""
+        """Map C declaration statements"""
         (decl,) = expr.get_children()
-        name = decl.spelling
+        return self.rec(decl, context)
+
+    def map_var_decl(
+        self, expr: cindex.CursorKind, context: CToLoopyMapperContext
+    ):
+        """Map C variable declaration"""
+        name = expr.spelling
         init = None
         # In case expr is an array
-        if decl.type.kind == cindex.TypeKind.CONSTANTARRAY:
-            children = list(decl.get_children())
+        if expr.type.kind == cindex.TypeKind.CONSTANTARRAY:
+            children = list(expr.get_children())
             init = []
             dims = []
             for child in children:
@@ -354,9 +358,9 @@ class CToLoopyMapper(IdentityMapper):
                 else:
                     raise NotImplementedError
             shape = tuple([CToLoopyExpressionMapper()(dim) for dim in dims])
-        elif isinstance(decl.type.kind, cindex.TypeKind):
+        elif isinstance(expr.type.kind, cindex.TypeKind):
             shape = ()
-            children = list(decl.get_children())
+            children = list(expr.get_children())
             if len(children) == 1:
                 init = children[0]
         else:
@@ -379,7 +383,7 @@ class CToLoopyMapper(IdentityMapper):
                 [
                     lp.TemporaryVariable(
                         name,
-                        dtype=_get_dtype_from_decl_type(decl.type),
+                        dtype=_get_dtype_from_decl_type(expr.type),
                         shape=shape,
                     )
                 ],
@@ -390,7 +394,7 @@ class CToLoopyMapper(IdentityMapper):
             [
                 lp.TemporaryVariable(
                     name,
-                    dtype=_get_dtype_from_decl_type(decl.type),
+                    dtype=_get_dtype_from_decl_type(expr.type),
                     shape=shape,
                 )
             ],
@@ -520,11 +524,12 @@ def c_to_loopy(c_str: str, backend: str) -> lp.translation_unit.TranslationUnit:
     index = cindex.Index.create()
     translation_unit = index.parse("foo.c", unsaved_files=[("foo.c", c_str)])
     diagnostics = translation_unit.diagnostics
+    # Check for syntax errors in parsed C kernel
     if diagnostics:
-        # If there are diagnostics, print the messages
+        errors = []
         for diagnostic in diagnostics:
-            print(diagnostic.spelling)
-        raise SyntaxError("Syntax error in kernel code.")
+            errors.append(diagnostic.spelling)
+        raise SyntaxError(f"Syntax error in kernel code. Errors: {errors}")
 
     (node,) = translation_unit.cursor.get_children()
     # Init `var_to_decl` based on function parameters
