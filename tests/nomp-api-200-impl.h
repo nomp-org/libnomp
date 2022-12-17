@@ -1,25 +1,22 @@
 #include "nomp-test.h"
 
 #define nomp_api_200 TOKEN_PASTE(nomp_api_200, TEST_SUFFIX)
-int nomp_api_200() {
+int nomp_api_200(const char **clauses) {
   const char *knl_fmt =
       "void foo(%s *a, int N) {                                             \n"
       "  for (int i = 0; i < N; i++)                                        \n"
       "    a[i] = i;                                                        \n"
       "}                                                                    \n";
-  char *knl = create_knl(knl_fmt, 1, TOSTRING(TEST_TYPE));
+  int id = -1;
+  return create_knl(&id, knl_fmt, clauses, 1, TOSTRING(TEST_TYPE));
+}
 
-  // Calling nomp_jit with invalid functions should return an error.
-  static int id = -1;
-  const char *clauses0[4] = {"transform", "invalid-file", "invalid_func", 0};
-  int err = nomp_jit(&id, knl, clauses0);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_PY_CALL_FAILED);
-
-  const char *clauses1[4] = {"transform", "nomp-api-200", "transform", 0};
-  err = nomp_jit(&id, knl, clauses1);
-  nomp_test_chk(err);
-  tfree(knl);
-
+#define nomp_api_200_err TOKEN_PASTE(nomp_api_200_err, TEST_SUFFIX)
+int nomp_api_200_err(const char **clauses) {
+  int err = nomp_api_200(clauses);
+  nomp_assert(nomp_get_log_no(err) == NOMP_PY_CALL_FAILED);
   return 0;
 }
+#undef nomp_api_200_err
+
 #undef nomp_api_200

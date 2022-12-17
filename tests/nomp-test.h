@@ -43,13 +43,13 @@ static int subtest_(int err, const char *test_name) {
 #define nomp_test_chk(err_id)                                                  \
   {                                                                            \
     if (nomp_get_log_type((err_id)) == NOMP_ERROR)                             \
-      return 1;                                                                \
+      return err_id;                                                           \
   }
 
 static int create_knl(int *id, const char *knl_fmt, const char **clauses,
-                        const int args_n, ...) {
+                      const int args_n, ...) {
   size_t len = strlen(knl_fmt) + args_n * strlen(TOSTRING(TEST_TYPE)) + 1;
-  char *knl = tcalloc(char, len);
+  char knl[len];
 
   va_list vargs;
   va_start(vargs, args_n);
@@ -58,7 +58,6 @@ static int create_knl(int *id, const char *knl_fmt, const char **clauses,
 
   int err = nomp_jit(id, knl, clauses);
   nomp_test_chk(err);
-  tfree(knl);
   return 0;
 }
 

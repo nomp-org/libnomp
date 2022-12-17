@@ -16,7 +16,7 @@ static int test_vector_subtraction() {
   return err;
 }
 
-static int test_vector_multiplication_summation() {
+static int test_vector_multiplication_sum() {
   int err = 0;
   TEST_BUILTIN_TYPES(210_mul_sum, 10)
   TEST_BUILTIN_TYPES(210_mul_sum, 20)
@@ -50,7 +50,7 @@ int main(int argc, const char *argv[]) {
 
   err |= SUBTEST(test_vector_addition);
   err |= SUBTEST(test_vector_subtraction);
-  err |= SUBTEST(test_vector_multiplication_summation);
+  err |= SUBTEST(test_vector_multiplication_sum);
   err |= SUBTEST(test_vector_multiplication);
   err |= SUBTEST(test_vector_square_sum);
   err |= SUBTEST(test_vector_linear);
