@@ -8,6 +8,7 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 
 option(ENABLE_OPENCL "Build OpenCL backend" ON)
 option(ENABLE_CUDA "Build Cuda backend" OFF)
+option(ENABLE_ISPC "Build ISPC backend" OFF)
 
 # https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling
 # Use, i.e. don't skip the full RPATH for the build tree
@@ -29,6 +30,10 @@ if (ENABLE_CUDA)
   list(APPEND SOURCES src/cuda.c)
   add_compile_definitions(CUDA_ENABLED)
 endif()
+if (ENABLE_ISPC)
+  list(APPEND SOURCES src/ispc.c)
+  add_compile_definitions(ISPC_ENABLED)
+endif()
 add_library(nomp SHARED ${SOURCES})
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
@@ -42,6 +47,10 @@ endif()
 if (ENABLE_CUDA)
   find_package(CUDAToolkit REQUIRED)
   target_link_libraries(nomp PRIVATE CUDA::cudart CUDA::nvrtc)
+endif()
+if (ENABLE_ISPC)
+  find_package(ispcrt REQUIRED)
+  target_link_libraries(nomp PRIVATE ispcrt::ispcrt)
 endif()
 
 set_target_properties(nomp PROPERTIES

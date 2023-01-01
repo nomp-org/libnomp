@@ -99,4 +99,20 @@ int opencl_init(struct backend *backend, const int platform_id,
 int cuda_init(struct backend *backend, const int platform_id,
               const int device_id);
 
+/**
+ * @ingroup nomp_backend_init
+ * @brief Initializes ISPC backend with the specified platform and device.
+ *
+ * Initializes ISPC backend using the given device id and platform type.
+ * Returns a negative value if an error occured during the initialization,
+ * otherwise returns 0.
+ *
+ * @param[in] backend Target backend for code generation.
+ * @param[in] platform_type Target platform type.
+ * @param[in] device_id Target device id.
+ * @return int
+ */
+int ispc_init(struct backend *backend, const int platform_type,
+              const int device_id);
+
 #endif // _LIB_NOMP_IMPL_H_
