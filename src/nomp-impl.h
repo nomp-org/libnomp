@@ -88,7 +88,24 @@ int opencl_init(struct backend *backend, const int platform_id,
                 const int device_id);
 
 /**
- * @ingroup nomp_backend_utils
+ * @ingroup nomp_backend_init
+ * @brief Initializes SYCL Opencl backend with the specified platform and
+ * device.
+ *
+ * Initializes OpenCL backend while creating a command queue using the
+ * given platform id and device id. Returns a negative value if an error
+ * occured during the initialization, otherwise returns 0.
+ *
+ * @param[in] backend Target backend for code generation.
+ * @param[in] platform_id Target platform id.
+ * @param[in] device_id Target device id.
+ * @return int
+ */
+int sycl_opencl_init(struct backend *backend, const int platform_id,
+                     const int device_id);
+
+/**
+ * @ingroup nomp_backend_init
  * @brief Initializes Cuda backend with the specified platform and device.
  *
  * Initializes Cuda backend using the given device id. Platform id is not
@@ -124,3 +141,7 @@ int hip_init(struct backend *backend, const int platform_id,
 #endif
 
 #endif // _LIB_NOMP_IMPL_H_
+
+#ifdef __cplusplus
+}
+#endif
