@@ -4,12 +4,14 @@ project(libnomp VERSION 0.0.1 DESCRIPTION "nomp runtime library" LANGUAGES C CXX
 # Treat compiler warnings as errors
 set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
 set(CMAKE_C_STANDARD 99)
+# TODO: Set the CXX standard here as well.
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 
 option(ENABLE_OPENCL "Build OpenCL backend" ON)
 option(ENABLE_CUDA "Build Cuda backend" OFF)
 option(ENABLE_HIP "Build HIP backend" OFF)
+option(ENABLE_SYCL "Build SYCL backend" OFF)
 
 # https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling
 # Use, i.e. don't skip the full RPATH for the build tree
@@ -41,6 +43,10 @@ if (ENABLE_HIP)
   endif()
 endif()
 
+if (ENABLE_SYCL)
+  list(APPEND SOURCES src/sycl.cpp)
+  add_compile_definitions(SYCL_ENABLED)
+endif()
 add_library(nomp SHARED ${SOURCES})
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
@@ -57,6 +63,10 @@ if (ENABLE_CUDA)
 endif()
 if (ENABLE_HIP AND HIP_FOUND)
   target_link_libraries(nomp PRIVATE nomp::HIP)
+endif()
+if (ENABLE_SYCL)
+  find_package(IntelDPCPP REQUIRED)
+  target_link_libraries(nomp PRIVATE -fsycl)
 endif()
 
 set_target_properties(nomp PROPERTIES
