@@ -5,6 +5,9 @@ static const char *c_to_loopy = "c_to_loopy";
 static const char *get_knl_src = "get_knl_src";
 static const char *get_knl_name = "get_knl_name";
 
+static const char *kernel_wrapper = "kernel_wrapper";
+static const char *create_kernel_wrapper_fun = "create_kernel_wrapper_fun";
+
 void py_print(const char *msg, PyObject *obj) {
   PyObject *repr = PyObject_Repr(obj);
   PyObject *py_str = PyUnicode_AsEncodedString(repr, "utf-8", "~E~");
@@ -177,6 +180,35 @@ int py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
         "Backend code generation from loopy kernel \"%s\" failed.", *name);
   }
   return 0;
+}
+
+int py_get_sycl_knl_name_and_src(char **name, char **src, PyObject *knl) {
+  int err = 1;
+  err = py_get_knl_name_and_src(name, src, knl);
+
+  const char *src_;
+  PyObject *kernel_py = PyUnicode_FromString(kernel_wrapper);
+  if (kernel_py) {
+    PyObject *module = PyImport_Import(kernel_py);
+    if (module) {
+      PyObject *c_to_lpy =
+          PyObject_GetAttrString(module, create_kernel_wrapper_fun);
+      if (c_to_lpy) {
+        PyObject *kernelfun = PyObject_CallFunctionObjArgs(c_to_lpy, knl, NULL);
+        Py_ssize_t size;
+        src_ = PyUnicode_AsUTF8AndSize(kernelfun, &size);
+        Py_DECREF(kernelfun);
+        Py_DECREF(c_to_lpy);
+      }
+      Py_DECREF(module);
+    }
+    Py_DECREF(kernel_py);
+  }
+  *src = nomp_str_cat(3, BUFSIZ, *src, "\n", src_);
+
+  if (err) {
+    printf("Something went wrong here lpy.c \n");
+  }
 }
 
 int py_get_grid_size(struct prog *prg, PyObject *knl) {
