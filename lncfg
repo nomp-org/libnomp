@@ -85,7 +85,7 @@ echo -e "NOMP_INSTALL_DIR=${NOMP_INSTALL_DIR}\n" \
 # configure cmake
 NOMP_CONFIGURE_SUCCESS=false
 echo "Configuring build files for libnomp..."
-cmake "$NOMP_BUILD_CMAKE_CXX_COMPILER" -B "${NOMP_BUILD_DIR}" -S "${NOMP_SOURCE_DIR}" "${NOMP_CMAKE_OPTS[@]}" &&
+cmake -D CMAKE_CXX_COMPILER=icpx -B "${NOMP_BUILD_DIR}" -S "${NOMP_SOURCE_DIR}" "${NOMP_CMAKE_OPTS[@]}" &&
   NOMP_CONFIGURE_SUCCESS=true
 
 if [[ ${NOMP_CONFIGURE_SUCCESS} = true ]]; then
