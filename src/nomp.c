@@ -150,6 +150,10 @@ int nomp_init(int argc, const char **argv) {
 #if defined(CUDA_ENABLED)
     err = cuda_init(&nomp, nomp.platform_id, nomp.device_id);
 #endif
+  } else if (strncmp(name, "syclopencl", MAX_BACKEND_NAME_SIZE) == 0) {
+#if defined(SYCL_OPENCL_ENABLED)
+    err = sycl_opencl_init(&nomp, nomp.platform_id, nomp.device_id);
+#endif
   } else {
     err = set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                   "Failed to initialized libnomp. Invalid backend: %s", name);

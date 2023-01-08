@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(libnomp VERSION 0.0.1 DESCRIPTION "nomp runtime library" LANGUAGES C)
+project(libnomp VERSION 0.0.1 DESCRIPTION "nomp runtime library")
 
 # Treat compiler warnings as errors
 set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
@@ -8,6 +8,7 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 
 option(ENABLE_OPENCL "Build OpenCL backend" ON)
 option(ENABLE_CUDA "Build Cuda backend" OFF)
+option(ENABLE_SYCL_OCL "Build SYCL OpenCL backend" ON)
 
 # https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling
 # Use, i.e. don't skip the full RPATH for the build tree
@@ -29,6 +30,10 @@ if (ENABLE_CUDA)
   list(APPEND SOURCES src/cuda.c)
   add_compile_definitions(CUDA_ENABLED)
 endif()
+if (ENABLE_SYCL_OCL)
+  list(APPEND SOURCES src/sycl-opencl.cpp)
+  add_compile_definitions(SYCL_OPENCL_ENABLED)
+endif()
 add_library(nomp SHARED ${SOURCES})
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
@@ -42,6 +47,10 @@ endif()
 if (ENABLE_CUDA)
   find_package(CUDAToolkit REQUIRED)
   target_link_libraries(nomp PRIVATE CUDA::cudart CUDA::nvrtc)
+endif()
+if (ENABLE_SYCL_OCL)
+  find_package(IntelDPCPP REQUIRED)
+  target_link_libraries(nomp PRIVATE OpenCL::OpenCL -fsycl)
 endif()
 
 set_target_properties(nomp PROPERTIES
