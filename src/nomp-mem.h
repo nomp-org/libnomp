@@ -7,7 +7,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 /**
  * @defgroup nomp_mem_utils Host memory management functions
  */

@@ -11,9 +11,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 option(ENABLE_OPENCL "Build OpenCL backend" ON)
 option(ENABLE_CUDA "Build Cuda backend" OFF)
 option(ENABLE_HIP "Build HIP backend" OFF)
-option(ENABLE_SYCL "Build SYCL backend" OFF)
-
-option(SYCL_IMPLEMENTATION "Specify the SYCL implementation package")
+option(ENABLE_SYCL_OCL "Build SYCL OpenCL backend" ON)
 
 # https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling
 # Use, i.e. don't skip the full RPATH for the build tree
@@ -44,9 +42,10 @@ if (ENABLE_HIP)
     message(FATAL_ERROR "ENABLE_HIP is ON but unable to find HIP runtime")
   endif()
 endif()
-if (ENABLE_SYCL)
-  list(APPEND SOURCES src/sycl.cpp)
-  add_compile_definitions(SYCL_ENABLED)
+
+if (ENABLE_SYCL_OCL)
+  list(APPEND SOURCES src/sycl-opencl.cpp)
+  add_compile_definitions(SYCL_OPENCL_ENABLED)
 endif()
 add_library(nomp SHARED ${SOURCES})
 
@@ -65,9 +64,9 @@ endif()
 if (ENABLE_HIP AND HIP_FOUND)
   target_link_libraries(nomp PRIVATE nomp::HIP)
 endif()
-if (ENABLE_SYCL)
-  find_package(${SYCL_IMPLEMENTATION} REQUIRED)
-  target_link_libraries(nomp PRIVATE ${SYCL_IMPLEMENTATION_LIBRARIES})
+if (ENABLE_SYCL_OCL)
+  find_package(IntelDPCPP REQUIRED)
+  target_link_libraries(nomp PRIVATE OpenCL::OpenCL -fsycl)
 endif()
 
 set_target_properties(nomp PROPERTIES
