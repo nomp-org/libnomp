@@ -619,5 +619,5 @@ if __name__ == "__main__":
               a[i] = a[i] * (i + 1);
           }
           """
-    lp_knl = c_to_loopy(KNL_STR, "cuda")
+    lp_knl = c_to_loopy(KNL_STR, "syclopencl")
     print(lp.generate_code_v2(lp_knl).device_code())
