@@ -2,7 +2,6 @@
 
 #include <CL/opencl.h>
 #include <CL/sycl.hpp>
-#include <CL/sycl/backend/opencl.hpp>
 
 // TODO: Handle errors properly in OpenCL backend
 struct opencl_backend {
