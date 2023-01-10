@@ -154,6 +154,10 @@ int nomp_init(int argc, const char **argv) {
 #if defined(SYCL_OPENCL_ENABLED)
     err = sycl_opencl_init(&nomp, nomp.platform_id, nomp.device_id);
 #endif
+  } else if (strncmp(name, "sycl", MAX_BACKEND_NAME_SIZE) == 0) {
+#if defined(SYCL_ENABLED)
+    err = sycl_init(&nomp, nomp.platform_id, nomp.device_id);
+#endif
   } else {
     err = set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                   "Failed to initialized libnomp. Invalid backend: %s", name);
@@ -303,6 +307,8 @@ int nomp_jit(int *id, const char *c_src, const char **clauses) {
     PyObject *knl = NULL;
     return_on_err(py_c_to_loopy(&knl, c_src, nomp.name));
 
+
+    
     // Parse the clauses
     char *usr_file = NULL, *usr_func = NULL;
     PyObject *annts;
@@ -313,13 +319,22 @@ int nomp_jit(int *id, const char *c_src, const char **clauses) {
         py_user_annotate(&knl, annts, nomp.annts_script, nomp.annts_func));
     Py_XDECREF(annts);
 
+    
     // Handle transform clauase
     return_on_err(py_user_transform(&knl, usr_file, usr_func));
     tfree(usr_file), tfree(usr_func);
 
+    
     // Get OpenCL, CUDA, etc. source and name from the loopy kernel
     char *name, *src;
     return_on_err(py_get_knl_name_and_src(&name, &src, knl));
+
+    char *knl_fun;
+    err =py_kernel_fun(&knl_fun,knl);
+    return_on_err(err);
+    knl_fun=strcatn(4,BUFSIZ,"#include <stdio.h>\n",src,"\n",knl_fun);
+    nomp.knl_fun=knl_fun;
+    
 
     // Build the kernel
     struct prog *prg = progs[progs_n] = tcalloc(struct prog, 1);
