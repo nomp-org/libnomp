@@ -299,6 +299,12 @@ int nomp_jit(int *id, const char *c_src, const char **clauses) {
     knl_fun = strcatn(4, BUFSIZ, "#include <stdio.h>\n", src, "\n", knl_fun);
     nomp.knl_fun = knl_fun;
 
+    char *knl_fun;
+    err = py_kernel_fun(&knl_fun, knl);
+    return_on_err(err);
+    knl_fun = strcatn(4, BUFSIZ, "#include <stdio.h>\n", src, "\n", knl_fun);
+    nomp.knl_fun = knl_fun;
+
     // Build the kernel
     struct prog *prg = progs[progs_n] = nomp_calloc(struct prog, 1);
     nomp_check(nomp.knl_build(&nomp, prg, src, name));
