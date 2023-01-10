@@ -4,13 +4,15 @@ project(libnomp VERSION 0.0.1 DESCRIPTION "nomp runtime library" LANGUAGES C CXX
 # Treat compiler warnings as errors
 set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
 set(CMAKE_C_STANDARD 99)
+# TODO: Set the CXX standard here as well.
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 
 option(ENABLE_OPENCL "Build OpenCL backend" ON)
 option(ENABLE_CUDA "Build Cuda backend" OFF)
 option(ENABLE_HIP "Build HIP backend" OFF)
-option(ENABLE_SYCL_OCL "Build SYCL OpenCL backend" ON)
+option(ENABLE_SYCL_OCL "Build SYCL OpenCL backend" OFF)
+option(ENABLE_SYCL "Build SYCL backend" OFF)
 
 # https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling
 # Use, i.e. don't skip the full RPATH for the build tree
@@ -46,6 +48,10 @@ if (ENABLE_SYCL_OCL)
   list(APPEND SOURCES src/sycl-opencl.cpp)
   add_compile_definitions(SYCL_OPENCL_ENABLED)
 endif()
+if (ENABLE_SYCL)
+  list(APPEND SOURCES src/sycl.cpp)
+  add_compile_definitions(SYCL_ENABLED)
+endif()
 add_library(nomp SHARED ${SOURCES})
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
@@ -63,9 +69,9 @@ endif()
 if (ENABLE_HIP AND HIP_FOUND)
   target_link_libraries(nomp PRIVATE nomp::HIP)
 endif()
-if (ENABLE_SYCL_OCL)
+if (ENABLE_SYCL_OCL OR ENABLE_SYCL)
   find_package(IntelDPCPP REQUIRED)
-  target_link_libraries(nomp PRIVATE OpenCL::OpenCL -fsycl)
+  target_link_libraries(nomp PRIVATE OpenCL::OpenCL -fsycl -fsycl-unnamed-lambda)
 endif()
 
 set_target_properties(nomp PROPERTIES

@@ -1,6 +1,8 @@
 #if !defined(_NOMP_JIT_H_)
 #define _NOMP_JIT_H_
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @defgroup nomp_compile_utils Functions to compile source at runtime.
  */
@@ -53,3 +55,6 @@ int jit_run(int id, void *p[]);
 int jit_free(int *id);
 
 #endif // _NOMP_JIT_H_
+#ifdef __cplusplus
+}
+#endif

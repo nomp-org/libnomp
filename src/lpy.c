@@ -5,6 +5,9 @@ static const char *c_to_loopy = "c_to_loopy";
 static const char *get_knl_src = "get_knl_src";
 static const char *get_knl_name = "get_knl_name";
 
+static const char *kernel_wrapper = "kernel_wrapper";
+static const char *create_kernel_wrapper_fun = "create_kernel_wrapper_fun";
+
 void py_print(const char *msg, PyObject *obj) {
   PyObject *repr = PyObject_Repr(obj);
   PyObject *py_str = PyUnicode_AsEncodedString(repr, "utf-8", "~E~");
@@ -29,6 +32,29 @@ int py_append_to_sys_path(const char *path) {
   if (err) {
     return nomp_set_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,
                         "Appending path to the sys.path failed.");
+  }
+  return 0;
+}
+
+int py_kernel_fun(char **src, PyObject *knl) {
+  *src = "sycl";
+  PyObject *kernel_py = PyUnicode_FromString(kernel_wrapper);
+  if (kernel_py) {
+    PyObject *module = PyImport_Import(kernel_py);
+    if (module) {
+      PyObject *c_to_lpy = PyObject_GetAttrString(module, create_kernel_wrapper_fun);
+      if (c_to_lpy) {
+        PyObject *kernelfun = PyObject_CallFunctionObjArgs(c_to_lpy, knl, NULL);
+        Py_ssize_t size;
+        const char *src_ = PyUnicode_AsUTF8AndSize(kernelfun, &size);
+        *src = tcalloc(char, size + 1);
+        strncpy(*src, src_, size + 1);
+        Py_DECREF(kernelfun);
+        Py_DECREF(c_to_lpy);
+      }
+      Py_DECREF(module);
+    }
+    Py_DECREF(kernel_py);
   }
   return 0;
 }

@@ -7,6 +7,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /**
  * @defgroup nomp_mem_utils Host memory management functions
  */
@@ -106,3 +107,6 @@ void *nomp_realloc_(void *ptr, size_t size, const char *file, unsigned line);
   ((T *)nomp_realloc_((ptr), (count) * sizeof(T), __FILE__, __LINE__))
 
 #endif // _NOMP_MEM_H_
+#ifdef __cplusplus
+}
+#endif
