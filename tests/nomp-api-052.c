@@ -8,7 +8,6 @@ const char *valid_knl =
 
 // Calling nomp_jit with invalid functions should return an error.
 static int test_call_jit_with_invalid_function(int argc, const char **argv) {
-
   int err = nomp_init(argc, argv);
   nomp_test_chk(err);
 
@@ -23,8 +22,9 @@ static int test_call_jit_with_invalid_function(int argc, const char **argv) {
       match_log(desc, "\\[Error\\] "
                       ".*src\\/loopy.c:[0-9]* PyImport_Import() failed when "
                       "importing user transform file: invalid-file.");
-  nomp_test_assert(matched);
   tfree(desc);
+  nomp_test_assert(matched);
+
   return 0;
 }
 
@@ -41,8 +41,9 @@ static int test_invalid_transform_function() {
       desc, "\\[Error\\] "
             ".*src\\/loopy.c:[0-9]* PyObject_CallFunctionObjArgs() failed when "
             "calling user transform function: invalid_func.");
-  nomp_test_assert(matched);
   tfree(desc);
+  nomp_test_assert(matched);
+
   return 0;
 }
 
@@ -60,8 +61,9 @@ static int test_invalid_clause() {
       "\\[Error\\] "
       ".*libnomp\\/src\\/nomp.c:[0-9]* "
       "Clause \"invalid-clause\" passed into nomp_jit is not a valid caluse.");
-  nomp_test_assert(matched);
   tfree(desc);
+  nomp_test_assert(matched);
+
   return 0;
 }
 
@@ -79,9 +81,9 @@ static int test_missing_filename() {
             ".*libnomp\\/src\\/nomp.c:[0-9]* "
             "\"transform\" clause should be followed by a file name and a "
             "function name. At least one of them is not provided.");
-
-  nomp_test_assert(matched);
   tfree(desc);
+  nomp_test_assert(matched);
+
   return 0;
 }
 
@@ -99,8 +101,9 @@ static int tset_missing_user_callback() {
             ".*libnomp\\/src\\/nomp.c:[0-9]* "
             "\"transform\" clause should be followed by a file name and a "
             "function name. At least one of them is not provided.");
-  nomp_test_assert(matched);
   tfree(desc);
+  nomp_test_assert(matched);
+
   return 0;
 }
 
@@ -122,11 +125,12 @@ static int test_syntax_error_kernel() {
                                 ".*"
                                 "libnomp\\/src\\/loopy.c:[0-9]* C "
                                 "to Loopy conversion failed.");
-  nomp_test_assert(matched);
   tfree(desc);
+  nomp_test_assert(matched);
 
   err = nomp_finalize();
   nomp_test_chk(err);
+
   return 0;
 }
 

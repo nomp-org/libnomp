@@ -233,13 +233,13 @@ int strnlower(char **out, const char *in, size_t max);
 
 /**
  * @ingroup nomp_other_utils
- * @brief Convert a string to int
+ * @brief Convert a string to unsigned long value if possible.
  *
- * Convert input string `str` to int. Returns converted int if given
- * str successfully converted, otherwise return -1.
+ * Convert input string `str` to an unsigned int value. Returns converted
+ * unsigned int value if successful, otherwise return -1.
  *
- * @param[in] str String to convert into int
- * @param[in] size Size of the string
+ * @param[in] str String to convert into unsigned int.
+ * @param[in] size Length of the string.
  * @return int
  */
 int strntoui(const char *str, size_t size);

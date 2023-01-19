@@ -181,13 +181,18 @@ static int cuda_finalize(struct backend *bnd) {
 }
 
 int cuda_init(struct backend *bnd, const int platform_id, const int device_id) {
-  cudaFree(0); // Make sure a Context exists for nvrtc
+  // Make sure a context exists for nvrtc.
+  cudaFree(0);
+
   int num_devices;
   CUresult result = cudaGetDeviceCount(&num_devices);
   chk_cu(result);
-  if (device_id < 0 || device_id >= num_devices)
-    return set_log(NOMP_USER_DEVICE_IS_INVALID, NOMP_ERROR,
+
+  if (device_id < 0 || device_id >= num_devices) {
+    return set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                    ERR_STR_USER_DEVICE_IS_INVALID, device_id);
+  }
+
   result = cudaSetDevice(device_id);
   chk_cu(result);
 

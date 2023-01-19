@@ -11,68 +11,55 @@ int check_null_input_(void *p, const char *func, unsigned line,
   return 0;
 }
 
-static char *get_if_env(const char *name) {
+static char *copyenv(const char *name, size_t size) {
   const char *tmp = getenv(name);
   if (tmp != NULL) {
-    char *tmp_var = tcalloc(char, NOMP_BUFSIZ);
-    if (tmp_var != NULL) {
-      strncpy(tmp_var, tmp, NOMP_BUFSIZ);
-      return tmp_var;
+    char *copy = tcalloc(char, size);
+    if (copy != NULL) {
+      strncpy(copy, tmp, size);
+      return copy;
     }
   }
   return NULL;
 }
 
 static int check_env(struct backend *backend) {
-  char *tmp = get_if_env("NOMP_BACKEND");
-  if (tmp != NULL) {
+  char *tmp = getenv("NOMP_PLATFORM_ID");
+  if (tmp)
+    backend->platform_id = strntoui(tmp, NOMP_BUFSIZ);
+
+  tmp = getenv("NOMP_DEVICE_ID");
+  if (tmp)
+    backend->device_id = strntoui(tmp, NOMP_BUFSIZ);
+
+  tmp = getenv("NOMP_VERBOSE_LEVEL");
+  if (tmp)
+    backend->verbose = strntoui(tmp, NOMP_BUFSIZ);
+
+  tmp = copyenv("NOMP_BACKEND", NOMP_BUFSIZ);
+  if (tmp) {
     backend->backend = trealloc(backend->backend, char, MAX_BACKEND_NAME_SIZE);
     strncpy(backend->backend, tmp, MAX_BACKEND_NAME_SIZE), tfree(tmp);
   }
 
-  int platform_id = strntoui(getenv("NOMP_PLATFORM_ID"), NOMP_BUFSIZ);
-  if (platform_id >= 0)
-    backend->platform_id = platform_id;
-
-  int device_id = strntoui(getenv("NOMP_DEVICE_ID"), NOMP_BUFSIZ);
-  if (device_id >= 0)
-    backend->device_id = device_id;
-
-  // FIXME: We should get rid of these defaults after implementing MPI_Init
-  // like arguments parsing for nomp_init().
-  tmp = get_if_env("NOMP_INSTALL_DIR");
-  if (tmp != NULL) {
+  tmp = copyenv("NOMP_INSTALL_DIR", NOMP_BUFSIZ);
+  if (tmp) {
     size_t size = pathlen(tmp) + 1;
-    backend->install_dir = tcalloc(char, size);
+    backend->install_dir = trealloc(backend->install_dir, char, size);
     strncpy(backend->install_dir, tmp, size), tfree(tmp);
-  } else {
-    // Default to ${HOME}/.nomp. Also, there is a way to find the directory
-    // where the libnomp.so is located within linomp.so itself. Maybe we can do
-    // so in a portable manner.
-    const char *home = getenv("HOME");
-    if (home)
-      backend->install_dir =
-          strcatn(2, MAX(2, pathlen(home), NOMP_BUFSIZ), home, "/.nomp");
-    else
-      return set_log(
-          NOMP_USER_INPUT_NOT_PROVIDED, NOMP_ERROR,
-          "Unable to initialize libnomp install directory. Neither "
-          "NOMP_INSTALL_DIR nor HOME environment variables are defined.");
   }
 
-  backend->verbose = strntoui(getenv("NOMP_VERBOSE_LEVEL"), NOMP_BUFSIZ);
-
-  tmp = get_if_env("NOMP_ANNOTATE_SCRIPT");
+  tmp = copyenv("NOMP_ANNOTATE_SCRIPT", NOMP_BUFSIZ);
   if (tmp) {
     size_t size = strnlen(tmp, NOMP_BUFSIZ) + 1;
-    backend->annts_script = tcalloc(char, size);
+    backend->annts_script = trealloc(backend->annts_script, char, size);
     strncpy(backend->annts_script, tmp, size), tfree(tmp);
   }
 
-  tmp = get_if_env("NOMP_ANNOTATE_FUNCTION");
+  tmp = copyenv("NOMP_ANNOTATE_FUNCTION", NOMP_BUFSIZ);
   if (tmp) {
     size_t size = strnlen(tmp, NOMP_BUFSIZ) + 1;
-    backend->annts_func = tcalloc(char, size);
+    backend->annts_func = trealloc(backend->annts_func, char, size);
     strncpy(backend->annts_func, tmp, size), tfree(tmp);
   }
 
@@ -83,9 +70,12 @@ static struct backend nomp;
 static int initialized = 0;
 static const char *py_dir = "python";
 
-int check_args(int argc, const char **argv, struct backend *backend) {
-  backend->backend = "opencl";
+static int check_args(int argc, const char **argv, struct backend *backend) {
+  // Default values
   backend->device_id = 0, backend->platform_id = 0, backend->verbose = 0;
+  backend->backend = backend->install_dir = NULL;
+  backend->annts_script = backend->annts_func = NULL;
+
   if (argc <= 1 || argv == NULL)
     return 0;
 
@@ -107,28 +97,21 @@ int check_args(int argc, const char **argv, struct backend *backend) {
       i += 2;
     } else if (!strncmp("-p", argv[i], NOMP_BUFSIZ) ||
                !strncmp("--platform", argv[i], NOMP_BUFSIZ)) {
-      int platform_id = strntoui(argv[i + 1], NOMP_BUFSIZ);
-      if (platform_id >= 0)
-        backend->platform_id = platform_id;
+      backend->platform_id = strntoui(argv[i + 1], NOMP_BUFSIZ);
       i += 2;
     } else if (!strncmp("-d", argv[i], NOMP_BUFSIZ) ||
                !strncmp("--device", argv[i], NOMP_BUFSIZ)) {
-      int device_id = strntoui(argv[i + 1], NOMP_BUFSIZ);
-      if (device_id >= 0)
-        backend->device_id = device_id;
+      backend->device_id = strntoui(argv[i + 1], NOMP_BUFSIZ);
       i += 2;
     } else if (!strncmp("-v", argv[i], NOMP_BUFSIZ) ||
                !strncmp("--verbose", argv[i], NOMP_BUFSIZ)) {
-      int verbose = strntoui(argv[i + 1], NOMP_BUFSIZ);
-      if (verbose >= 0)
-        backend->verbose = strntoui(argv[i + 1], NOMP_BUFSIZ);
+      backend->verbose = strntoui(argv[i + 1], NOMP_BUFSIZ);
       i += 2;
     } else if (!strncmp("-i", argv[i], NOMP_BUFSIZ) ||
                !strncmp("--install-dir", argv[i], NOMP_BUFSIZ)) {
       char *install_dir = (char *)argv[i + 1];
       size_t size = pathlen(install_dir) + 1;
-      if (install_dir != NULL)
-        backend->install_dir = strndup(install_dir, size);
+      backend->install_dir = strndup(install_dir, size);
       i += 2;
     } else if (!strncmp("-as", argv[i], NOMP_BUFSIZ) ||
                !strncmp("--annts-script", argv[i], NOMP_BUFSIZ)) {
@@ -139,9 +122,7 @@ int check_args(int argc, const char **argv, struct backend *backend) {
     } else if (!strncmp("-af", argv[i], NOMP_BUFSIZ) ||
                !strncmp("--annts-func", argv[i], NOMP_BUFSIZ)) {
       char *annts_func = (char *)argv[i + 1];
-      if (annts_func != NULL) {
-        backend->annts_func = strndup(annts_func, NOMP_BUFSIZ);
-      }
+      backend->annts_func = strndup(annts_func, NOMP_BUFSIZ);
       i += 2;
     } else {
       return set_log(NOMP_USER_ARG_IS_INVALID, NOMP_ERROR,
@@ -419,9 +400,10 @@ void nomp_chk_(int err_id, const char *file, unsigned line) {
 }
 
 int nomp_finalize(void) {
-  if (!initialized)
+  if (!initialized) {
     return set_log(NOMP_RUNTIME_NOT_INITIALIZED, NOMP_ERROR,
                    "libnomp is not initialized.");
+  }
 
   for (unsigned i = 0; i < mems_n; i++) {
     if (mems[i]) {
@@ -445,9 +427,10 @@ int nomp_finalize(void) {
   tfree(nomp.annts_script), tfree(nomp.annts_func);
 
   initialized = nomp.finalize(&nomp);
-  if (initialized)
+  if (initialized) {
     return set_log(NOMP_RUNTIME_FAILED_TO_FINALIZE, NOMP_ERROR,
                    "Failed to initialize libnomp.");
+  }
 
   return 0;
 }

@@ -35,11 +35,11 @@ int strntoui(const char *str, size_t size) {
   if (str == NULL)
     return -1;
 
-  char *str_dup = strndup(str, size), *end_ptr;
-  int num = (int)strtol(str_dup, &end_ptr, 10);
-  if (str_dup == end_ptr || '\0' != *end_ptr || num < 0)
+  char *copy = strndup(str, size), *end_ptr;
+  int num = (int)strtol(copy, &end_ptr, 10);
+  if (copy == end_ptr || *end_ptr != '\0' || num < 0)
     num = -1;
-  tfree(str_dup);
+  tfree(copy);
 
   return num;
 }
