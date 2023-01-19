@@ -186,22 +186,27 @@ int opencl_init(struct backend *bnd, const int platform_id,
                 const int device_id) {
   cl_uint num_platforms;
   cl_int err = clGetPlatformIDs(0, NULL, &num_platforms);
-  if (platform_id < 0 | platform_id >= num_platforms)
-    return set_log(NOMP_USER_PLATFORM_IS_INVALID, NOMP_ERROR,
+  if (platform_id < 0 | platform_id >= num_platforms) {
+    return set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                    "Platform id %d provided to libnomp is not valid.",
                    platform_id);
+  }
+
   cl_platform_id *cl_platforms = tcalloc(cl_platform_id, num_platforms);
-  if (cl_platforms == NULL)
+  if (cl_platforms == NULL) {
     return set_log(NOMP_RUNTIME_MEMORY_ALLOCATION_FAILED, NOMP_ERROR,
                    ERR_STR_RUNTIME_MEMORY_ALLOCATION_FAILURE);
+  }
+
   err = clGetPlatformIDs(num_platforms, cl_platforms, &num_platforms);
   cl_platform_id platform = cl_platforms[platform_id];
 
   cl_uint num_devices;
   err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 0, NULL, &num_devices);
-  if (device_id < 0 || device_id >= num_devices)
-    return set_log(NOMP_USER_DEVICE_IS_INVALID, NOMP_ERROR,
+  if (device_id < 0 || device_id >= num_devices) {
+    return set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                    ERR_STR_USER_DEVICE_IS_INVALID, device_id);
+  }
 
   cl_device_id *cl_devices = tcalloc(cl_device_id, num_devices);
   if (cl_devices == NULL)
