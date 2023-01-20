@@ -1,6 +1,6 @@
 #include "nomp-test.h"
 
-// Calling `nomp_finalize` before `nomp_init` should return an error
+// Calling nomp_finalize() before nomp_init() should return an error.
 static int test_first_nomp_finalize() {
   int err = nomp_finalize();
   nomp_test_assert(nomp_get_log_no(err) == NOMP_RUNTIME_NOT_INITIALIZED);
@@ -11,10 +11,11 @@ static int test_first_nomp_finalize() {
                                 "libnomp is not initialized.");
   nomp_test_assert(matched);
   tfree(desc);
+
   return 0;
 }
 
-// Calling `nomp_init` twice must return an error, but must not segfault
+// Calling nomp_init() twice must return an error, but must not segfault.
 static int test_nomp_init_twice(int argc, const char **argv) {
   int err = nomp_init(argc, argv);
   nomp_test_chk(err);
@@ -29,10 +30,11 @@ static int test_nomp_init_twice(int argc, const char **argv) {
                       "before calling nomp_init() again.");
   nomp_test_assert(matched);
   tfree(desc);
+
   return 0;
 }
 
-// Calling `nomp_finalize` twice must return an error, but must not segfault
+// Calling nomp_finalize() twice must return an error, but must not segfault.
 static int test_nomp_finalize_twice() {
   int err = nomp_finalize();
   nomp_test_chk(err);
@@ -45,6 +47,7 @@ static int test_nomp_finalize_twice() {
                                 "libnomp is not initialized.");
   nomp_test_assert(matched);
   tfree(desc);
+
   return 0;
 }
 

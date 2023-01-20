@@ -3,7 +3,6 @@
 #undef TEST_IMPL_H
 
 int main(int argc, const char *argv[]) {
-
   int err = nomp_init(argc, argv);
   nomp_test_chk(err);
 
@@ -14,5 +13,5 @@ int main(int argc, const char *argv[]) {
   err = nomp_finalize();
   nomp_test_chk(err);
 
-  return 0;
+  return err;
 }
