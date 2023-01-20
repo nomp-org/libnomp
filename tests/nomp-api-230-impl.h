@@ -4,26 +4,26 @@
 int nomp_api_230_aux(const char *knl_fmt, const char **clauses, TEST_TYPE *a,
                      TEST_TYPE *b, int rows, int cols, int n) {
   int err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO);
-  nomp_chk(err);
+  nomp_test_chk(err);
   err = nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   int id = -1;
   err = create_knl(&id, knl_fmt, clauses, 2, TOSTRING(TEST_TYPE),
                    TOSTRING(TEST_TYPE));
-  nomp_chk(err);
+  nomp_test_chk(err);
   nomp_run(id, 4, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
            sizeof(TEST_TYPE), b, "rows", NOMP_INTEGER, sizeof(int), &rows,
            "cols", NOMP_INTEGER, sizeof(int), &cols);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM);
-  nomp_chk(err);
+  nomp_test_chk(err);
 
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE);
-  nomp_chk(err);
+  nomp_test_chk(err);
   err = nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_FREE);
-  nomp_chk(err);
+  nomp_test_chk(err);
   return 0;
 }
 
@@ -46,10 +46,10 @@ int nomp_api_230_add(int rows, int cols) {
 
 #if defined(TEST_TOL)
   for (unsigned i = 0; i < n; i++)
-    nomp_assert(fabs(a[i] - 2 * n) < TEST_TOL);
+    nomp_test_assert(fabs(a[i] - 2 * n) < TEST_TOL);
 #else
   for (unsigned i = 0; i < n; i++)
-    nomp_assert(a[i] == 2 * n);
+    nomp_test_assert(a[i] == 2 * n);
 #endif
   return 0;
 }
@@ -79,7 +79,7 @@ int nomp_api_230_transform(int rows, int cols) {
 #else
   for (unsigned i = 0; i < rows; i++)
     for (unsigned j = 0; j < cols; j++)
-      nomp_assert(b[j + i * cols] == a[i + j * rows]);
+      nomp_test_assert(b[j + i * cols] == a[i + j * rows]);
 #endif
   return 0;
 }
