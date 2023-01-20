@@ -11,7 +11,7 @@ static int test_valid_clauses() {
   return err;
 }
 
-// Calling nomp_jit with invalid functions should return an error.
+// Calling nomp_jit() with invalid functions should return an error.
 static int test_invalid_clauses() {
   int err = 0;
   const char *clauses[4] = {"transform", "invalid-file", "invalid_func", 0};

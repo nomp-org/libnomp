@@ -20,10 +20,10 @@
 #define MAX_BACKEND_NAME_SIZE 32
 
 #define return_on_err(err)                                                     \
-  do {                                                                         \
+  {                                                                            \
     if (nomp_get_log_type((err)) == NOMP_ERROR)                                \
       return (err);                                                            \
-  } while (0)
+  }
 
 struct prog {
   unsigned nargs, ndim;
