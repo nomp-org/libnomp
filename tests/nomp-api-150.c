@@ -13,7 +13,7 @@ static int test_invalid_kernel_id(int argc, const char **argv, int *id, int *a,
   err = nomp_update(a, 0, n, sizeof(int), NOMP_TO);
   nomp_test_chk(err);
 
-  const char *clauses[4] = {"transform", "nomp-api-50", "transform", 0};
+  const char *clauses[4] = {"transform", "nomp-api-100", "transform", 0};
   err = nomp_jit(id, knl, clauses);
   nomp_test_chk(err);
 
