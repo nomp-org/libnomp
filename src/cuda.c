@@ -6,35 +6,35 @@
 #define NARGS_MAX 64
 
 #define chk_cu_(file, line, x)                                                 \
-  do {                                                                         \
+  {                                                                            \
     if (x != CUDA_SUCCESS) {                                                   \
       const char *msg;                                                         \
       cuGetErrorName(x, &msg);                                                 \
       return set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE,      \
                      "operation", msg);                                        \
     }                                                                          \
-  } while (0)
+  }
 
 #define chk_cu(x) chk_cu_(__FILE__, __LINE__, x)
 
 #define chk_nvrtc_(file, line, x)                                              \
-  do {                                                                         \
+  {                                                                            \
     if (x != NVRTC_SUCCESS) {                                                  \
       const char *msg = nvrtcGetErrorString(x);                                \
       return set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE,      \
                      "runtime compilation", msg);                              \
     }                                                                          \
-  } while (0)
+  }
 #define chk_nvrtc(x) chk_nvrtc_(__FILE__, __LINE__, x)
 
 #define chk_cuda_(file, line, x)                                               \
-  do {                                                                         \
+  {                                                                            \
     if (x != cudaSuccess) {                                                    \
       const char *msg = cudaGetErrorString(x);                                 \
       return set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE,      \
                      "operation", msg);                                        \
     }                                                                          \
-  } while (0)
+  }
 #define chk_cuda(x) chk_cuda_(__FILE__, __LINE__, x)
 
 struct cuda_backend {
