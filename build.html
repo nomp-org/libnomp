@@ -82,33 +82,33 @@
 <section id="libnomp">
 <h2>libnomp<a class="headerlink" href="#libnomp" title="Permalink to this heading"></a></h2>
 <p>Clone the repo first:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/nomp-org/libnomp.git
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/nomp-org/libnomp.git
 </pre></div>
 </div>
 <p>Install dependencies using conda to build and run <cite>libnomp</cite>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda env create -f environment.yml
-conda activate libnomp
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>environment.yml
+conda<span class="w"> </span>activate<span class="w"> </span>libnomp
 </pre></div>
 </div>
 <p>You can use mamba to install the dependencies faster.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mamba env create -f environment.yml
-mamba activate libnomp
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mamba<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>environment.yml
+mamba<span class="w"> </span>activate<span class="w"> </span>libnomp
 </pre></div>
 </div>
 <p>If you are planning on contributing to <cite>libnomp</cite>, install the dev dependencies
 instead:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda env create -f environment-dev.yml
-conda activate libnomp-dev
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>environment-dev.yml
+conda<span class="w"> </span>activate<span class="w"> </span>libnomp-dev
 </pre></div>
 </div>
 <p>Similarly, you can install the dev dependencies with mamba as well:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mamba env create -f environment-dev.yml
-mamba activate libnomp-dev
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mamba<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>environment-dev.yml
+mamba<span class="w"> </span>activate<span class="w"> </span>libnomp-dev
 </pre></div>
 </div>
 <p>Use <cite>lncfg</cite> to configure cmake for <cite>libnomp</cite> and <cite>lninstall</cite> to install <cite>libnomp</cite>.
 For the available options, you can check <cite>lncfg -h</cite>.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> libnomp
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>libnomp
 ./lncfg
 ./lninstall
 </pre></div>
@@ -118,51 +118,51 @@ For the available options, you can check <cite>lncfg -h</cite>.</p>
 open the documentation, run the tests, and debug the provided test.</p>
 <p>You might additionally want to specify OpenCL libray path like below if CMake
 can’t find OpenCL:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./lncfg -o /lib/x86_64-linux-gnu/libOpenCL.so.1
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./lncfg<span class="w"> </span>-o<span class="w"> </span>/lib/x86_64-linux-gnu/libOpenCL.so.1
 </pre></div>
 </div>
 </section>
 <section id="clang-frontend">
 <h2>Clang frontend<a class="headerlink" href="#clang-frontend" title="Permalink to this heading"></a></h2>
 <p>Clone the llvm-project repo first:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/nomp-org/llvm-project.git
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/nomp-org/llvm-project.git
 </pre></div>
 </div>
 <p>If you are using Linux, build the llvm-project as follows:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">nprocs</span><span class="o">=</span><span class="k">$(</span>grep -c ^processor /proc/cpuinfo<span class="k">)</span>
-<span class="nb">cd</span> llvm-project
-mkdir build<span class="p">;</span> <span class="nb">cd</span> build
-cmake -G <span class="s2">&quot;Unix Makefiles&quot;</span> ../llvm                    <span class="se">\</span>
-                   -DLLVM_ENABLE_PROJECTS<span class="o">=</span><span class="s2">&quot;clang&quot;</span>    <span class="se">\</span>
-                   -DLLVM_TARGETS_TO_BUILD<span class="o">=</span><span class="s2">&quot;X86&quot;</span>     <span class="se">\</span>
-                   -DLLVM_OPTIMIZED_TABLEGEN<span class="o">=</span>ON      <span class="se">\</span>
-                   -DCMAKE_BUILD_TYPE<span class="o">=</span>RelWithDebInfo <span class="se">\</span>
-                   -DCMAKE_C_COMPILER<span class="o">=</span><span class="sb">`</span>which gcc<span class="sb">`</span>    <span class="se">\</span>
-                   -DCMAKE_CXX_COMPILER<span class="o">=</span><span class="sb">`</span>which g++<span class="sb">`</span>  <span class="se">\</span>
-                   -DBUILD_SHARED_LIBS<span class="o">=</span>on
-make -j<span class="si">${</span><span class="nv">nprocs</span><span class="si">}</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">nprocs</span><span class="o">=</span><span class="k">$(</span>grep<span class="w"> </span>-c<span class="w"> </span>^processor<span class="w"> </span>/proc/cpuinfo<span class="k">)</span>
+<span class="nb">cd</span><span class="w"> </span>llvm-project
+mkdir<span class="w"> </span>build<span class="p">;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>build
+cmake<span class="w"> </span>-G<span class="w"> </span><span class="s2">&quot;Unix Makefiles&quot;</span><span class="w"> </span>../llvm<span class="w">                    </span><span class="se">\</span>
+<span class="w">                   </span>-DLLVM_ENABLE_PROJECTS<span class="o">=</span><span class="s2">&quot;clang&quot;</span><span class="w">    </span><span class="se">\</span>
+<span class="w">                   </span>-DLLVM_TARGETS_TO_BUILD<span class="o">=</span><span class="s2">&quot;X86&quot;</span><span class="w">     </span><span class="se">\</span>
+<span class="w">                   </span>-DLLVM_OPTIMIZED_TABLEGEN<span class="o">=</span>ON<span class="w">      </span><span class="se">\</span>
+<span class="w">                   </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>RelWithDebInfo<span class="w"> </span><span class="se">\</span>
+<span class="w">                   </span>-DCMAKE_C_COMPILER<span class="o">=</span><span class="sb">`</span>which<span class="w"> </span>gcc<span class="sb">`</span><span class="w">    </span><span class="se">\</span>
+<span class="w">                   </span>-DCMAKE_CXX_COMPILER<span class="o">=</span><span class="sb">`</span>which<span class="w"> </span>g++<span class="sb">`</span><span class="w">  </span><span class="se">\</span>
+<span class="w">                   </span>-DBUILD_SHARED_LIBS<span class="o">=</span>on
+make<span class="w"> </span>-j<span class="si">${</span><span class="nv">nprocs</span><span class="si">}</span>
 </pre></div>
 </div>
 <p>If you are using OSX with Apple silicon, build the llvm-project as follows:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">nprocs</span><span class="o">=</span><span class="k">$(</span>sysctl -n hw.ncpu<span class="k">)</span>
-<span class="nb">cd</span> llvm-project
-mkdir build<span class="p">;</span> <span class="nb">cd</span> build
-cmake -G <span class="s2">&quot;Unix Makefiles&quot;</span> ../llvm                                <span class="se">\</span>
-                    -DLLVM_ENABLE_PROJECTS<span class="o">=</span><span class="s2">&quot;clang&quot;</span>               <span class="se">\</span>
-                    -DLLVM_TARGETS_TO_BUILD<span class="o">=</span><span class="s2">&quot;AArch64&quot;</span>            <span class="se">\</span>
-                    -DLLVM_OPTIMIZED_TABLEGEN<span class="o">=</span>ON                 <span class="se">\</span>
-                    -DCMAKE_BUILD_TYPE<span class="o">=</span>RelWithDebInfo            <span class="se">\</span>
-                    -DCMAKE_C_COMPILER<span class="o">=</span><span class="sb">`</span>which clang<span class="sb">`</span>             <span class="se">\</span>
-                    -DCMAKE_CXX_COMPILER<span class="o">=</span><span class="sb">`</span>which clang++<span class="sb">`</span>         <span class="se">\</span>
-                    -DCMAKE_OSX_ARCHITECTURES<span class="o">=</span><span class="s1">&#39;arm64&#39;</span>            <span class="se">\</span>
-                    -DDEFAULT_SYSROOT<span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span>xcrun --show-sdk-path<span class="k">)</span><span class="s2">&quot;</span> <span class="se">\</span>
-                    -DBUILD_SHARED_LIBS<span class="o">=</span>on
-make -j<span class="si">${</span><span class="nv">nprocs</span><span class="si">}</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">nprocs</span><span class="o">=</span><span class="k">$(</span>sysctl<span class="w"> </span>-n<span class="w"> </span>hw.ncpu<span class="k">)</span>
+<span class="nb">cd</span><span class="w"> </span>llvm-project
+mkdir<span class="w"> </span>build<span class="p">;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>build
+cmake<span class="w"> </span>-G<span class="w"> </span><span class="s2">&quot;Unix Makefiles&quot;</span><span class="w"> </span>../llvm<span class="w">                                </span><span class="se">\</span>
+<span class="w">                    </span>-DLLVM_ENABLE_PROJECTS<span class="o">=</span><span class="s2">&quot;clang&quot;</span><span class="w">               </span><span class="se">\</span>
+<span class="w">                    </span>-DLLVM_TARGETS_TO_BUILD<span class="o">=</span><span class="s2">&quot;AArch64&quot;</span><span class="w">            </span><span class="se">\</span>
+<span class="w">                    </span>-DLLVM_OPTIMIZED_TABLEGEN<span class="o">=</span>ON<span class="w">                 </span><span class="se">\</span>
+<span class="w">                    </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>RelWithDebInfo<span class="w">            </span><span class="se">\</span>
+<span class="w">                    </span>-DCMAKE_C_COMPILER<span class="o">=</span><span class="sb">`</span>which<span class="w"> </span>clang<span class="sb">`</span><span class="w">             </span><span class="se">\</span>
+<span class="w">                    </span>-DCMAKE_CXX_COMPILER<span class="o">=</span><span class="sb">`</span>which<span class="w"> </span>clang++<span class="sb">`</span><span class="w">         </span><span class="se">\</span>
+<span class="w">                    </span>-DCMAKE_OSX_ARCHITECTURES<span class="o">=</span><span class="s1">&#39;arm64&#39;</span><span class="w">            </span><span class="se">\</span>
+<span class="w">                    </span>-DDEFAULT_SYSROOT<span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span>xcrun<span class="w"> </span>--show-sdk-path<span class="k">)</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">                    </span>-DBUILD_SHARED_LIBS<span class="o">=</span>on
+make<span class="w"> </span>-j<span class="si">${</span><span class="nv">nprocs</span><span class="si">}</span>
 </pre></div>
 </div>
 <p>This will build clang compiler in <cite>bin/clang</cite>. Set <cite>NOMP_CLANG_DIR</cite> to point to
 this clang binary directory:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">NOMP_CLANG_DIR</span><span class="o">=</span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>/bin
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">NOMP_CLANG_DIR</span><span class="o">=</span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>/bin
 </pre></div>
 </div>
 </section>

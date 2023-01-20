@@ -473,13 +473,13 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv48strntouiPKc6size_t">
 <span id="_CPPv38strntouiPKc6size_t"></span><span id="_CPPv28strntouiPKc6size_t"></span><span id="strntoui__cCP.s"></span><span class="target" id="group__nomp__other__utils_1gad7c0a21627bc758beaeff7ad6b5d48be"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">strntoui</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">str</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48strntouiPKc6size_t" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Convert a string to int. </p>
-<p>Convert input string <code class="docutils literal notranslate"><span class="pre">str</span></code> to int. Returns converted int if given str successfully converted, otherwise return -1.</p>
+<dd><p>Convert a string to unsigned long value if possible. </p>
+<p>Convert input string <code class="docutils literal notranslate"><span class="pre">str</span></code> to an unsigned int value. Returns converted unsigned int value if successful, otherwise return -1.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>str</strong> – <strong>[in]</strong> String to convert into int </p></li>
-<li><p><strong>size</strong> – <strong>[in]</strong> Size of the string </p></li>
+<li><p><strong>str</strong> – <strong>[in]</strong> String to convert into unsigned int. </p></li>
+<li><p><strong>size</strong> – <strong>[in]</strong> Length of the string. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
