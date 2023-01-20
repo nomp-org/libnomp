@@ -29,5 +29,5 @@ int main(int argc, const char *argv[]) {
   err |= nomp_finalize();
   nomp_chk(err);
 
-  return 0;
+  return err;
 }
