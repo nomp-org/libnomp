@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(libnomp VERSION 0.0.1 DESCRIPTION "nomp runtime library" LANGUAGES C)
+project(libnomp VERSION 0.0.1 DESCRIPTION "nomp runtime library" LANGUAGES C CXX)
 
 # Treat compiler warnings as errors
 set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
@@ -8,6 +8,8 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 
 option(ENABLE_OPENCL "Build OpenCL backend" ON)
 option(ENABLE_CUDA "Build Cuda backend" OFF)
+option(ENABLE_HIP "Build HIP backend" OFF)
+set(HIP_PATH /opt/rocm)
 
 # https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling
 # Use, i.e. don't skip the full RPATH for the build tree
@@ -29,6 +31,26 @@ if (ENABLE_CUDA)
   list(APPEND SOURCES src/cuda.c)
   add_compile_definitions(CUDA_ENABLED)
 endif()
+if (ENABLE_HIP)
+  find_program(
+    HIP_CONFIG_EXECUTABLE
+    NAMES hipconfig
+    PATHS
+    ${HIP_PATH}
+    PATH_SUFFIXES bin
+  )
+  execute_process(
+    COMMAND ${HIP_CONFIG_EXECUTABLE} --cxx_config
+    OUTPUT_VARIABLE _hip_flags
+    ERROR_VARIABLE _hip_error
+  )
+  if(NOT _hip_error)
+    list(APPEND SOURCES src/hip.cpp)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_hip_flags} ")
+    add_compile_definitions(HIP_ENABLED)
+  endif()
+endif()
+
 add_library(nomp SHARED ${SOURCES})
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
@@ -42,6 +64,10 @@ endif()
 if (ENABLE_CUDA)
   find_package(CUDAToolkit REQUIRED)
   target_link_libraries(nomp PRIVATE CUDA::cudart CUDA::nvrtc)
+endif()
+if (ENABLE_HIP)
+  target_link_libraries(nomp PRIVATE ${HIP_PATH}/lib/libamdhip64.so)
+  target_link_libraries(nomp PRIVATE ${HIP_PATH}/lib/libhiprtc.so)
 endif()
 
 set_target_properties(nomp PROPERTIES

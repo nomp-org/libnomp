@@ -99,4 +99,20 @@ int opencl_init(struct backend *backend, const int platform_id,
 int cuda_init(struct backend *backend, const int platform_id,
               const int device_id);
 
+/**
+ * @ingroup nomp_backend_init
+ * @brief Initializes HIP backend with the specified platform and device.
+ *
+ * Initializes HIP backend using the given device id. Platform id is not
+ * used in the initialization of HIP backend. Returns a negative value if an
+ * error occured during the initialization, otherwise returns 0.
+ *
+ * @param[in] backend Target backend for code generation.
+ * @param[in] platform_id Target platform id.
+ * @param[in] device_id Target device id.
+ * @return int
+ */
+int hip_init(struct backend *backend, const int platform_id,
+             const int device_id);
+
 #endif // _LIB_NOMP_IMPL_H_
