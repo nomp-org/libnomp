@@ -10,6 +10,7 @@ option(ENABLE_OPENCL "Build OpenCL backend" ON)
 option(ENABLE_CUDA "Build Cuda backend" OFF)
 option(ENABLE_HIP "Build HIP backend" OFF)
 set(HIP_PATH /opt/rocm)
+set(HIP_PLATFORM amd)
 
 # https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling
 # Use, i.e. don't skip the full RPATH for the build tree
@@ -44,6 +45,11 @@ if (ENABLE_HIP)
     OUTPUT_VARIABLE _hip_flags
     ERROR_VARIABLE _hip_error
   )
+  execute_process(
+    COMMAND ${HIP_CONFIG_EXECUTABLE} --platform
+    OUTPUT_VARIABLE HIP_PLATFORM
+    ERROR_VARIABLE _hip_error
+  )
   if(NOT _hip_error)
     list(APPEND SOURCES src/hip.cpp)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_hip_flags} ")
@@ -61,7 +67,7 @@ if (ENABLE_OPENCL)
   find_package(OpenCL REQUIRED)
   target_link_libraries(nomp PRIVATE OpenCL::OpenCL)
 endif()
-if (ENABLE_CUDA)
+if (ENABLE_CUDA OR (ENABLE_HIP AND ${HIP_PLATFORM} STREQUAL "nvidia"))
   find_package(CUDAToolkit REQUIRED)
   target_link_libraries(nomp PRIVATE CUDA::cudart CUDA::nvrtc)
 endif()
