@@ -167,14 +167,19 @@ static int ispc_finalize(struct backend *bnd) {
   return 0;
 }
 
+static int nomp_to_ispc_device[3] = {
+    ISPCRT_DEVICE_TYPE_AUTO, ISPCRT_DEVICE_TYPE_CPU, ISPCRT_DEVICE_TYPE_GPU};
+
 int ispc_init(struct backend *bnd, const int platform_type,
               const int device_id) {
   ispcrtSetErrorFunc(ispcrt_error);
-  if (platform_type < 0 | platform_type >= 3)
+  if (platform_type < 0 | platform_type >= 3) {
     return set_log(NOMP_USER_PLATFORM_IS_INVALID, NOMP_ERROR,
                    "Platform type %d provided to libnomp is not valid.",
                    platform_type);
-  uint32_t num_devices = ispcrtGetDeviceCount(platform_type);
+  }
+  uint32_t num_devices =
+      ispcrtGetDeviceCount(nomp_to_ispc_device(platform_type));
   if (rt_error != ISPCRT_NO_ERROR)
     return rt_error;
   if (device_id < 0 || device_id >= num_devices)
@@ -183,8 +188,7 @@ int ispc_init(struct backend *bnd, const int platform_type,
   if (rt_error != ISPCRT_NO_ERROR)
     return rt_error;
 
-  bnd->bptr = tcalloc(struct ispc_backend, 1);
-  struct ispc_backend *ispc = (struct ispc_backend *)bnd->bptr;
+  struct ispc_backend *ispc = bnd->bptr = tcalloc(struct ispc_backend, 1);
   ispc->device = device;
   ispc->queue = ispcrtNewTaskQueue(device);
   if (rt_error != ISPCRT_NO_ERROR)
