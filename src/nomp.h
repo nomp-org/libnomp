@@ -185,6 +185,11 @@
 #define NOMP_CUDA_FAILURE -512
 /**
  * @ingroup nomp_errors
+ * @brief libnomp HIP operation failed.
+ */
+#define NOMP_HIP_FAILURE -145
+/**
+ * @ingroup nomp_errors
  * @brief libnomp OpenCL failure.
  */
 #define NOMP_OPENCL_FAILURE -513
