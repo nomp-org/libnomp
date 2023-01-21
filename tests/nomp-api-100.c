@@ -122,7 +122,7 @@ static int test_syntax_error_in_kernel() {
   nomp_test_assert(nomp_get_log_no(err) == NOMP_LOOPY_CONVERSION_ERROR);
 
   char *desc;
-  err = nomp_get_log_str(&desc, err);
+  nomp_get_log_str(&desc, err);
   int matched = match_log(desc, "\\[Error\\] "
                                 ".*"
                                 "libnomp\\/src\\/loopy.c:[0-9]* C "
