@@ -1,9 +1,9 @@
-
 #include "nomp-impl.h"
 #include <CL/opencl.h>
 #include <CL/sycl.hpp>
 #include <CL/sycl/backend/opencl.hpp>
 #include <dlfcn.h>
+
 // TODO: Handle errors properly in SYCL backend
 struct sycl_backend {
   sycl::device device_id;
@@ -13,13 +13,13 @@ struct sycl_backend {
 // auto mybundle = sycl::make_kernel_bundle<sycl::backend::opencl,
 // sycl::bundle_state::executable>(ocl_program, ctx);
 
-
 static int sycl_update(struct backend *bnd, struct mem *m, const int op) {
   struct sycl_backend *sycl = (struct sycl_backend *)bnd->bptr;
 
   if (op & NOMP_ALLOC) {
-    m->bptr = sycl::malloc_device((m->idx1 - m->idx0) * m->usize, sycl->device_id,sycl->ctx);
-    //sycl->queue.wait();
+    m->bptr = sycl::malloc_device((m->idx1 - m->idx0) * m->usize,
+                                  sycl->device_id, sycl->ctx);
+    // sycl->queue.wait();
   }
 
   if (op & NOMP_TO) {
@@ -45,8 +45,8 @@ static int sycl_update(struct backend *bnd, struct mem *m, const int op) {
 }
 
 static int sycl_knl_free(struct prog *prg) {
-  //struct opencl_prog *ocl_prg = (opencl_prog *)prg->bptr;
-  //tfree(prg->bptr), prg->bptr = NULL;
+  // struct opencl_prog *ocl_prg = (opencl_prog *)prg->bptr;
+  // tfree(prg->bptr), prg->bptr = NULL;
 
   return 0;
 }
@@ -55,18 +55,18 @@ static int sycl_knl_build(struct backend *bnd, struct prog *prg,
                           const char *source, const char *name) {
   struct sycl_backend *sycl = (sycl_backend *)bnd->bptr;
 
-  char *path=writefile(bnd->knl_fun);
+  char *path = writefile(bnd->knl_fun);
   compile(path);
- // prg->bptr = tcalloc(struct opencl_prog, 1);
- // struct opencl_prog *ocl_prg = (opencl_prog *)prg->bptr;
-  
-  //printf("source  %s\n",source);
+  // prg->bptr = tcalloc(struct opencl_prog, 1);
+  // struct opencl_prog *ocl_prg = (opencl_prog *)prg->bptr;
+
+  // printf("source  %s\n",source);
   return 0;
 }
 
 static int sycl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
   struct sycl_backend *sycl = (sycl_backend *)bnd->bptr;
-  //struct opencl_prog *ocl_prg = (struct opencl_prog *)prg->bptr;
+  // struct opencl_prog *ocl_prg = (struct opencl_prog *)prg->bptr;
   struct mem *m;
   size_t size;
   sycl->queue = sycl::queue(sycl->ctx, sycl->device_id);
@@ -94,18 +94,15 @@ static int sycl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
                      type);
       break;
     }
-    arg_list[i]=p;
+    arg_list[i] = p;
   }
-  
-  char *nomp_dir=getenv("NOMP_INSTALL_DIR");
 
-  void* handle = dlopen("libkernellib.so.0.0.1", RTLD_LAZY);
+  char *nomp_dir = getenv("NOMP_INSTALL_DIR");
+
+  void *handle = dlopen("libkernellib.so.0.0.1", RTLD_LAZY);
   if (!handle) {
     printf("error \n");
-
   }
-
-  
 
   size_t global[3];
   for (unsigned i = 0; i < prg->ndim; i++)
@@ -114,30 +111,32 @@ static int sycl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
     sycl::range global_range = sycl::range(global[0]);
     sycl::range local_range = sycl::range(prg->local[0]);
     sycl::nd_range<1> nd_range = sycl::nd_range(global_range, local_range);
-    typedef void (*kernel_function_1)(sycl::queue , sycl::nd_range<1> , unsigned int , void **);
-    kernel_function_1 hello = (kernel_function_1)dlsym(handle, "kernel_function_1");
-     if (!hello) {
-        std::cerr << "Error: " << dlerror() << std::endl;
-        return 1;
+    typedef void (*kernel_function_1)(sycl::queue, sycl::nd_range<1>,
+                                      unsigned int, void **);
+    kernel_function_1 hello =
+        (kernel_function_1)dlsym(handle, "kernel_function_1");
+    if (!hello) {
+      std::cerr << "Error: " << dlerror() << std::endl;
+      return 1;
     }
-    hello(sycl->queue,nd_range,prg->nargs, arg_list);
-  }
-  else if (prg->ndim == 2)
-  {
-    sycl::range global_range = sycl::range(global[0],global[1]);
-    sycl::range local_range = sycl::range(prg->local[0],prg->local[1]);
+    hello(sycl->queue, nd_range, prg->nargs, arg_list);
+  } else if (prg->ndim == 2) {
+    sycl::range global_range = sycl::range(global[0], global[1]);
+    sycl::range local_range = sycl::range(prg->local[0], prg->local[1]);
     sycl::nd_range<2> nd_range = sycl::nd_range(global_range, local_range);
-    typedef void (*kernel_fun_2)(sycl::queue queue, sycl::nd_range<2> nd_range, unsigned int nargs, void **args);
+    typedef void (*kernel_fun_2)(sycl::queue queue, sycl::nd_range<2> nd_range,
+                                 unsigned int nargs, void **args);
     kernel_fun_2 hello = (kernel_fun_2)dlsym(handle, "kernel_function_2");
-    hello(sycl->queue,nd_range,prg->nargs, arg_list);
-  }
-  else{
-    sycl::range global_range = sycl::range(global[0],global[1],global[2]);
-    sycl::range local_range = sycl::range(prg->local[0],prg->local[1],prg->local[2]);
+    hello(sycl->queue, nd_range, prg->nargs, arg_list);
+  } else {
+    sycl::range global_range = sycl::range(global[0], global[1], global[2]);
+    sycl::range local_range =
+        sycl::range(prg->local[0], prg->local[1], prg->local[2]);
     sycl::nd_range<3> nd_range = sycl::nd_range(global_range, local_range);
-    typedef void (*kernel_fun_3)(sycl::queue queue, sycl::nd_range<3> nd_range, unsigned int nargs, void **args);
+    typedef void (*kernel_fun_3)(sycl::queue queue, sycl::nd_range<3> nd_range,
+                                 unsigned int nargs, void **args);
     kernel_fun_3 hello = (kernel_fun_3)dlsym(handle, "kernel_function_3");
-    hello(sycl->queue,nd_range,prg->nargs, arg_list);
+    hello(sycl->queue, nd_range, prg->nargs, arg_list);
   }
   dlclose(handle);
   // FIXME: Wrong. Call set_log()
@@ -145,7 +144,7 @@ static int sycl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
 }
 
 static int sycl_finalize(struct backend *bnd) {
-   struct sycl_backend *sycl = (sycl_backend *)bnd->bptr;
+  struct sycl_backend *sycl = (sycl_backend *)bnd->bptr;
   // cl_int err = clReleaseCommandQueue(ocl->queue);
   // if (err != CL_SUCCESS)
   //   return set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
@@ -154,7 +153,7 @@ static int sycl_finalize(struct backend *bnd) {
   // if (err != CL_SUCCESS)
   //   return set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
   //                  "context release", err);
-   tfree(bnd->bptr), bnd->bptr = NULL;
+  tfree(bnd->bptr), bnd->bptr = NULL;
 
   return 0;
 }

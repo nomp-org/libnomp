@@ -1,18 +1,16 @@
 cmake_minimum_required(VERSION 3.22)
-project(libnomp VERSION 0.0.1 DESCRIPTION "nomp runtime library")
+project(libnomp VERSION 0.0.1 DESCRIPTION "nomp runtime library" LANGUAGES C CXX)
 
 # Treat compiler warnings as errors
 set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
 set(CMAKE_C_STANDARD 99)
+# TODO: Set the CXX standard here as well.
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
 option(ENABLE_OPENCL "Build OpenCL backend" ON)
 option(ENABLE_CUDA "Build Cuda backend" OFF)
-option(ENABLE_SYCL_OCL "Build SYCL OpenCL backend" ON)
-option(ENABLE_SYCL "Build SYCL backend" ON)
-
-
-
+option(ENABLE_SYCL_OCL "Build SYCL OpenCL backend" OFF)
+option(ENABLE_SYCL "Build SYCL backend" OFF)
 
 # https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling
 # Use, i.e. don't skip the full RPATH for the build tree

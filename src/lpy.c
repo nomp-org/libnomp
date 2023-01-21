@@ -1,8 +1,9 @@
 #include "nomp-impl.h"
 
 static const char *loopy_api = "loopy_api";
-static const char *kernel = "kernel";
 static const char *c_to_loopy = "c_to_loopy";
+
+static const char *kernel = "kernel";
 static const char *create_kernel_fun = "create_kernel_fun";
 
 void py_print(const char *msg, PyObject *obj) {
@@ -33,17 +34,17 @@ int py_append_to_sys_path(const char *path) {
   return 0;
 }
 
-int py_kernel_fun(char **src,PyObject *knl) {
-  *src="sycl";
+int py_kernel_fun(char **src, PyObject *knl) {
+  *src = "sycl";
   PyObject *kernel_py = PyUnicode_FromString(kernel);
   if (kernel_py) {
     PyObject *module = PyImport_Import(kernel_py);
     if (module) {
       PyObject *c_to_lpy = PyObject_GetAttrString(module, create_kernel_fun);
       if (c_to_lpy) {
-         PyObject *kernelfun = PyObject_CallFunctionObjArgs(c_to_lpy, knl, NULL);
-         Py_ssize_t size;
-          const char *src_ = PyUnicode_AsUTF8AndSize(kernelfun, &size);
+        PyObject *kernelfun = PyObject_CallFunctionObjArgs(c_to_lpy, knl, NULL);
+        Py_ssize_t size;
+        const char *src_ = PyUnicode_AsUTF8AndSize(kernelfun, &size);
         *src = tcalloc(char, size + 1);
         strncpy(*src, src_, size + 1);
         Py_DECREF(kernelfun);

@@ -33,7 +33,12 @@ _C_BIN_OPS_TO_PYMBOLIC_OPS = {
     "!=": lambda l, r: prim.Comparison(l, "!=", r),
 }
 
-_BACKEND_TO_TARGET = {"opencl": lp.OpenCLTarget(), "cuda": lp.CudaTarget(),"syclopencl": lp.OpenCLTarget(),"sycl":lp.SYCLTarget()}
+_BACKEND_TO_TARGET = {
+    "opencl": lp.OpenCLTarget(),
+    "cuda": lp.CudaTarget(),
+    "syclopencl": lp.OpenCLTarget(),
+    "sycl": lp.SYCLTarget(),
+}
 
 
 class IdentityMapper:
