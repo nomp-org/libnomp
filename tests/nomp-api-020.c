@@ -49,7 +49,8 @@ static int test_missing_argument() {
 }
 
 int main(int argc, const char *argv[]) {
-  int err = SUBTEST(test_valid_arguments);
+  int err = 0;
+  err |= SUBTEST(test_valid_arguments);
   err |= SUBTEST(test_ignore_non_argument_string);
   err |= SUBTEST(test_invalid_argument_flag);
   err |= SUBTEST(test_missing_argument);

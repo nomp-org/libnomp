@@ -101,7 +101,6 @@ static int test_valid_device_id(int argc, const char **argv) {
 
 int main(int argc, const char *argv[]) {
   int err = 0, argsc = 6;
-
   const char *args0[] = {"-b", "opencl", "-d", "0", "-p", "0"};
   err |= SUBTEST(test_invalid_backend, argsc, args0);
   err |= SUBTEST(test_invalid_platform_id, argsc, args0);
