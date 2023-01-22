@@ -200,6 +200,7 @@ int opencl_init(struct backend *bnd, const int platform_id,
 
   err = clGetPlatformIDs(num_platforms, cl_platforms, &num_platforms);
   cl_platform_id platform = cl_platforms[platform_id];
+  tfree(cl_platforms);
 
   cl_uint num_devices;
   err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 0, NULL, &num_devices);
@@ -216,14 +217,12 @@ int opencl_init(struct backend *bnd, const int platform_id,
   err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, num_devices, cl_devices,
                        &num_devices);
   cl_device_id device = cl_devices[device_id];
+  tfree(cl_devices);
 
   struct opencl_backend *ocl = bnd->bptr = tcalloc(struct opencl_backend, 1);
   ocl->device_id = device;
   ocl->ctx = clCreateContext(NULL, 1, &device, NULL, NULL, &err);
   ocl->queue = clCreateCommandQueueWithProperties(ocl->ctx, device, 0, &err);
-
-  tfree(cl_devices);
-  tfree(cl_platforms);
 
   bnd->update = opencl_update;
   bnd->knl_build = opencl_knl_build;
