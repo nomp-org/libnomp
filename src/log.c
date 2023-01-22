@@ -66,16 +66,16 @@ int set_log_(const char *description, int logno, nomp_log_type type,
   return logs_n;
 }
 
-int nomp_get_log_str(char **log_str, int log_id) {
-  if (log_id <= 0 || log_id > logs_n) {
-    *log_str = NULL;
-    return NOMP_USER_LOG_ID_IS_INVALID;
-  }
-  struct log lg = logs[log_id - 1];
-  size_t n_desc = strnlen(lg.description, BUFSIZ) + 1;
-  *log_str = tcalloc(char, n_desc);
-  strncpy(*log_str, lg.description, n_desc);
-  return 0;
+char *nomp_get_log_str(int id) {
+  if (id <= 0 || id > logs_n)
+    return NULL;
+
+  const char *desc = logs[id - 1].description;
+  size_t n_desc = strnlen(desc, BUFSIZ) + 1;
+  char *str = tcalloc(char, n_desc);
+  strncpy(str, desc, n_desc);
+
+  return str;
 }
 
 int nomp_get_log_no(int log_id) {

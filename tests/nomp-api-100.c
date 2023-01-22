@@ -14,8 +14,7 @@ static int test_invalid_file() {
   int err = nomp_jit(&id, valid_knl, clauses);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_PY_CALL_FAILED);
 
-  char *desc;
-  nomp_get_log_str(&desc, err);
+  char *desc = nomp_get_log_str(err);
   int matched =
       match_log(desc, "\\[Error\\] "
                       ".*src\\/loopy.c:[0-9]* PyImport_Import() failed when "
@@ -34,8 +33,7 @@ static int test_invalid_transform_function() {
   int err = nomp_jit(&id, valid_knl, clauses);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_PY_CALL_FAILED);
 
-  char *desc;
-  nomp_get_log_str(&desc, err);
+  char *desc = nomp_get_log_str(err);
   int matched = match_log(
       desc, "\\[Error\\] "
             ".*src\\/loopy.c:[0-9]* PyObject_CallFunctionObjArgs() failed when "
@@ -54,8 +52,7 @@ static int test_invalid_clause() {
   int err = nomp_jit(&id, valid_knl, clauses);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
-  char *desc;
-  nomp_get_log_str(&desc, err);
+  char *desc = nomp_get_log_str(err);
   int matched = match_log(
       desc,
       "\\[Error\\] "
@@ -75,8 +72,7 @@ static int test_missing_filename() {
   int err = nomp_jit(&id, valid_knl, clauses);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_NOT_PROVIDED);
 
-  char *desc;
-  nomp_get_log_str(&desc, err);
+  char *desc = nomp_get_log_str(err);
   int matched = match_log(
       desc, "\\[Error\\] "
             ".*libnomp\\/src\\/nomp.c:[0-9]* "
@@ -96,8 +92,7 @@ static int test_missing_user_callback() {
   int err = nomp_jit(&id, valid_knl, clauses);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_NOT_PROVIDED);
 
-  char *desc;
-  nomp_get_log_str(&desc, err);
+  char *desc = nomp_get_log_str(err);
   int matched = match_log(
       desc, "\\[Error\\] "
             ".*libnomp\\/src\\/nomp.c:[0-9]* "
@@ -121,8 +116,7 @@ static int test_syntax_error_in_kernel() {
   int err = nomp_jit(&id, invalid_knl, clauses0);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_LOOPY_CONVERSION_ERROR);
 
-  char *desc;
-  nomp_get_log_str(&desc, err);
+  char *desc = nomp_get_log_str(err);
   int matched = match_log(desc, "\\[Error\\] "
                                 ".*"
                                 "libnomp\\/src\\/loopy.c:[0-9]* C "
