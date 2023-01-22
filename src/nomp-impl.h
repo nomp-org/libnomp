@@ -292,6 +292,6 @@ int check_null_input_(void *p, const char *func, unsigned line,
  *
  * @return void
  */
-void nomp_finalize_logs();
+void finalize_logs();
 
 #endif // _LIB_NOMP_IMPL_H_
