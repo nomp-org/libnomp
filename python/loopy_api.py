@@ -36,6 +36,8 @@ _C_BIN_OPS_TO_PYMBOLIC_OPS = {
 }
 _OPS = ["*", "+", "-", "/", "//", "%", "<", ">", "<=", ">=", "==", "!="]
 _BACKEND_TO_TARGET = {"opencl": lp.OpenCLTarget(), "cuda": lp.CudaTarget()}
+_ARRAY_TYPES = [cindex.TypeKind.CONSTANTARRAY, cindex.TypeKind.INCOMPLETEARRAY]
+_ARRAY_TYPES_W_P = _ARRAY_TYPES + [cindex.TypeKind.POINTER]
 
 
 class IdentityMapper:
@@ -119,11 +121,11 @@ def _get_dtype_from_decl_type(decl):
     ):
         ctype = decl.get_pointee().kind.spelling.lower()
         return dtype_to_ctype_registry().get_or_register_dtype(ctype)
+    if decl.kind in _ARRAY_TYPES:
+        return _get_dtype_from_decl_type(decl.get_array_element_type())
     if isinstance(decl.kind, cindex.TypeKind):
         ctype = decl.kind.spelling.lower()
         return dtype_to_ctype_registry().get_or_register_dtype(ctype)
-    if decl.kind == cindex.TypeKind.CONSTANTARRAY:
-        return _get_dtype_from_decl_type(decl.get_array_element_type())
     raise NotImplementedError(f"_get_dtype_from_decl: {decl}")
 
 
@@ -469,20 +471,22 @@ class ExternalContext:
         return {
             k: v
             for k, v in self.var_to_decl.items()
-            if v.type.kind != cindex.TypeKind.POINTER
+            if v.type.kind not in _ARRAY_TYPES_W_P
         }
 
 
 def decl_to_knl_arg(decl: cindex.Cursor, dtype):
     """Type declaration to kernel arg"""
     decl_type = decl.type.kind
-    if decl_type == cindex.TypeKind.POINTER:
+    if decl_type in _ARRAY_TYPES_W_P:
         return lp.ArrayArg(
             decl.spelling, dtype=dtype, address_space=AddressSpace.GLOBAL
         )
     if isinstance(decl_type, cindex.TypeKind):
         return lp.ValueArg(decl.spelling, dtype=dtype)
-    raise NotImplementedError(f"decl_to_knl_arg: {decl} is invalid.")
+    raise NotImplementedError(
+        f"decl_to_knl_arg: {decl.kind} is of invalid type: {decl_type}."
+    )
 
 
 def c_to_loopy(c_str: str, backend: str) -> lp.translation_unit.TranslationUnit:
