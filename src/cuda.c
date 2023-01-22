@@ -5,7 +5,7 @@
 
 #define NARGS_MAX 64
 
-#define chk_cu_(file, line, x)                                                 \
+#define chk_cu(x)                                                              \
   {                                                                            \
     if (x != CUDA_SUCCESS) {                                                   \
       const char *msg;                                                         \
@@ -15,9 +15,7 @@
     }                                                                          \
   }
 
-#define chk_cu(x) chk_cu_(__FILE__, __LINE__, x)
-
-#define chk_nvrtc_(file, line, x)                                              \
+#define chk_nvrtc(x)                                                           \
   {                                                                            \
     if (x != NVRTC_SUCCESS) {                                                  \
       const char *msg = nvrtcGetErrorString(x);                                \
@@ -25,9 +23,8 @@
                      "runtime compilation", msg);                              \
     }                                                                          \
   }
-#define chk_nvrtc(x) chk_nvrtc_(__FILE__, __LINE__, x)
 
-#define chk_cuda_(file, line, x)                                               \
+#define chk_cuda(x)                                                            \
   {                                                                            \
     if (x != cudaSuccess) {                                                    \
       const char *msg = cudaGetErrorString(x);                                 \
@@ -35,7 +32,6 @@
                      "operation", msg);                                        \
     }                                                                          \
   }
-#define chk_cuda(x) chk_cuda_(__FILE__, __LINE__, x)
 
 struct cuda_backend {
   int device_id;
@@ -68,8 +64,7 @@ static int cuda_update(struct backend *bnd, struct mem *m, const int op) {
     chk_cuda(err);
   } else if (op == NOMP_FREE) {
     err = cudaFree(m->bptr);
-    chk_cuda(err);
-    m->bptr = NULL;
+    chk_cuda(err), m->bptr = NULL;
   }
 
   return 0;
@@ -87,10 +82,10 @@ static int cuda_knl_build(struct backend *bnd, struct prog *prg,
       nvrtcCreateProgram(&prog, source, NULL, 0, NULL, NULL);
   chk_nvrtc(nvrtc_err);
 
-  struct cuda_backend *cbnd = (struct cuda_backend *)bnd->bptr;
+  struct cuda_backend *cuda = (struct cuda_backend *)bnd->bptr;
   char arch[NOMP_BUFSIZ];
-  snprintf(arch, NOMP_BUFSIZ, "-arch=compute_%d%d", cbnd->prop.major,
-           cbnd->prop.minor);
+  snprintf(arch, NOMP_BUFSIZ, "-arch=compute_%d%d", cuda->prop.major,
+           cuda->prop.minor);
 
   const char *opts[1] = {arch};
   nvrtc_err = nvrtcCompileProgram(prog, 1, opts);
@@ -99,14 +94,16 @@ static int cuda_knl_build(struct backend *bnd, struct prog *prg,
     nvrtcGetProgramLogSize(prog, &log_size);
     char *log = tcalloc(char, log_size);
     nvrtcGetProgramLog(prog, log);
-    const char *err_str = nvrtcGetErrorString(nvrtc_err);
-    size_t msg_size = log_size + strlen(err_str) + 2;
+
+    const char *err = nvrtcGetErrorString(nvrtc_err);
+
+    size_t msg_size = log_size + strlen(err) + 3;
     char *msg = tcalloc(char, msg_size);
-    snprintf(msg, msg_size, "%s: %s", err_str, log);
-    int err_id = set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE,
-                         "build", msg);
+    snprintf(msg, msg_size, "%s: %s", err, log);
+    int id = set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE,
+                     "build", msg);
     tfree(log), tfree(msg);
-    return err_id;
+    return id;
   }
 
   size_t ptx_size;
@@ -122,9 +119,7 @@ static int cuda_knl_build(struct backend *bnd, struct prog *prg,
 
   struct cuda_prog *cprg = prg->bptr = tcalloc(struct cuda_prog, 1);
   CUresult cu_err = cuModuleLoadData(&cprg->module, ptx);
-  chk_cu(cu_err);
-
-  tfree(ptx);
+  tfree(ptx), chk_cu(cu_err);
 
   cu_err = cuModuleGetFunction(&cprg->kernel, cprg->module, name);
   chk_cu(cu_err);
@@ -196,10 +191,9 @@ int cuda_init(struct backend *bnd, const int platform_id, const int device_id) {
   result = cudaSetDevice(device_id);
   chk_cu(result);
 
-  bnd->bptr = tcalloc(struct cuda_backend, 1);
-  struct cuda_backend *cbnd = (struct cuda_backend *)bnd->bptr;
-  cbnd->device_id = device_id;
-  result = cudaGetDeviceProperties(&cbnd->prop, device_id);
+  struct cuda_backend *cuda = bnd->bptr = tcalloc(struct cuda_backend, 1);
+  cuda->device_id = device_id;
+  result = cudaGetDeviceProperties(&cuda->prop, device_id);
   chk_cu(result);
 
   bnd->update = cuda_update;
