@@ -34,7 +34,6 @@ _C_BIN_OPS_TO_PYMBOLIC_OPS = {
     "==": lambda l, r: prim.Comparison(l, "==", r),
     "!=": lambda l, r: prim.Comparison(l, "!=", r),
 }
-_OPS = ["*", "+", "-", "/", "//", "%", "<", ">", "<=", ">=", "==", "!="]
 _BACKEND_TO_TARGET = {"opencl": lp.OpenCLTarget(), "cuda": lp.CudaTarget()}
 _ARRAY_TYPES = [cindex.TypeKind.CONSTANTARRAY, cindex.TypeKind.INCOMPLETEARRAY]
 _ARRAY_TYPES_W_P = _ARRAY_TYPES + [cindex.TypeKind.POINTER]
@@ -58,7 +57,7 @@ class IdentityMapper:
 
     def map_integer_literal(self, expr: cindex.CursorKind):
         """Maps int constant"""
-        (val,) = expr.get_tokens()
+        val, = expr.get_tokens()
         return (
             dtype_to_ctype_registry()
             .get_or_register_dtype(expr.type.kind.spelling.lower())
@@ -67,7 +66,7 @@ class IdentityMapper:
 
     def map_floating_literal(self, expr: cindex.CursorKind):
         """Maps float constant"""
-        (val,) = expr.get_tokens()
+        val, = expr.get_tokens()
         return (
             dtype_to_ctype_registry()
             .get_or_register_dtype(expr.type.kind.spelling.lower())
@@ -134,8 +133,8 @@ class CToLoopyExpressionMapper(IdentityMapper):
 
     def map_var_decl(self, expr: cindex.Cursor):
         "Maps variable declaration expression"
-        (literal,) = expr.get_children()
-        (val,) = literal.get_tokens()
+        literal, = expr.get_children()
+        val, = literal.get_tokens()
         return (
             dtype_to_ctype_registry()
             .get_or_register_dtype(expr.type.kind.spelling.lower())
@@ -144,7 +143,7 @@ class CToLoopyExpressionMapper(IdentityMapper):
 
     def map_decl_ref_expr(self, expr: cindex.CursorKind):
         """Maps reference to a C declaration"""
-        (var_name,) = expr.get_tokens()
+        var_name, = expr.get_tokens()
         return prim.Variable(var_name.spelling)
 
     def map_array_subscript_expr(self, expr: cindex.CursorKind):
@@ -165,18 +164,15 @@ class CToLoopyExpressionMapper(IdentityMapper):
 
     def map_unexposed_expr(self, expr: cindex.CursorKind):
         """Maps unexposed expression"""
-        (child,) = expr.get_children()
+        child, = expr.get_children()
         return self.rec(child)
 
     def map_binary_operator(self, expr: cindex.CursorKind):
         """Maps C binary operation"""
-        ops = ""
-        for i in expr.get_tokens():
-            if i.spelling in _OPS:
-                ops = i.spelling
-                break
-        oprtr = _C_BIN_OPS_TO_PYMBOLIC_OPS[ops]
         left, right = expr.get_children()
+        left_offset = len([i for i in left.get_tokens()])
+        op_str = [i for i in expr.get_tokens()][left_offset].spelling
+        oprtr = _C_BIN_OPS_TO_PYMBOLIC_OPS[op_str]
         return oprtr(self.rec(left), self.rec(right))
 
 
@@ -216,9 +212,15 @@ class CToLoopyMapperAccumulator:
 class CToLoopyLoopBoundMapper(CToLoopyExpressionMapper):
     """Map loop bounds"""
 
-    def map_binaryop(self, expr: cindex.CursorKind):
+    def map_binary_operator(self, expr: cindex.CursorKind):
         """Maps C binary operation"""
-        oprtr = _C_BIN_OPS_TO_PYMBOLIC_OPS["//" if expr.op == "/" else expr.op]
+        left, right = expr.get_children()
+        left_offset = len([i for i in left.get_tokens()])
+        right_offset = len([i for i in right.get_tokens()])
+        op_str = ""
+        for token in [i for i in expr.get_tokens()][left_offset:-right_offset]:
+            op_str += token.spelling
+        oprtr = _C_BIN_OPS_TO_PYMBOLIC_OPS["//" if op_str == "/" else op_str]
         return oprtr(self.rec(expr.left), self.rec(expr.right))
 
 
@@ -233,27 +235,28 @@ def check_and_parse_for(
         )
 
     decl_stmt, cond, updt_stmt, *_ = expr.get_children()
-    (var_decl,) = decl_stmt.get_children()
+    var_decl, = decl_stmt.get_children()
     iname = var_decl.spelling
-    ops = []
-    for token in cond.get_tokens():
-        ops.append(token.spelling)
+    left, right = cond.get_children()
+    left_offset = len([i for i in left.get_tokens()])
+    op_str = [i for i in cond.get_tokens()][left_offset].spelling
     exs = []
+    print(type(updt_stmt.location))
     for token in updt_stmt.get_tokens():
+        print(token.spelling)
         exs.append(token.spelling)
 
-    if not (cond.kind == cindex.CursorKind.BINARY_OPERATOR and "<" in ops):
+    if not (cond.kind == cindex.CursorKind.BINARY_OPERATOR and op_str == "<"):
         raise NotImplementedError("Only increasing domains are supported")
 
-    left, right = cond.get_children()
     if updt_stmt.kind == cindex.CursorKind.UNARY_OPERATOR and "++" in exs:
         lbound_expr = CToLoopyLoopBoundMapper()(var_decl)
         ubound_expr = CToLoopyLoopBoundMapper()(right)
     else:
         raise NotImplementedError("Only increments by 1 are supported")
 
-    (left_body,) = left.get_children()
-    (next_body,) = updt_stmt.get_children()
+    left_body, = left.get_children()
+    next_body, = updt_stmt.get_children()
     if not (
         left_body.kind == cindex.CursorKind.DECL_REF_EXPR
         and left_body.spelling == iname
@@ -300,7 +303,7 @@ class CToLoopyMapper(IdentityMapper):
 
         # Map expr.iffalse with !cond
         try:
-            (if_false,) = rest
+            if_false, = rest
             false_predicates = context.predicates | {prim.LogicalNot(cond)}
             false_context = context.copy(predicates=false_predicates)
             false_result = self.rec(if_false, false_context)
@@ -350,7 +353,7 @@ class CToLoopyMapper(IdentityMapper):
         self, expr: cindex.CursorKind, context: CToLoopyMapperContext
     ):
         """Map C variable declaration"""
-        (decl,) = expr.get_children()
+        decl, = expr.get_children()
         name = decl.spelling
         if decl.kind == cindex.CursorKind.VAR_DECL:
             shape = ()
@@ -369,7 +372,7 @@ class CToLoopyMapper(IdentityMapper):
 
         if decl:
             lhs = prim.Variable(name)
-            (right,) = decl.get_children()
+            right, = decl.get_children()
             rhs = CToLoopyExpressionMapper()(right)
             return CToLoopyMapperAccumulator(
                 [],
@@ -493,7 +496,7 @@ def c_to_loopy(c_str: str, backend: str) -> lp.translation_unit.TranslationUnit:
     """Map C kernel to Loopy"""
     index = cindex.Index.create()
     translation_unit = index.parse("foo.c", unsaved_files=[("foo.c", c_str)])
-    (node,) = translation_unit.cursor.get_children()
+    node, = translation_unit.cursor.get_children()
 
     # Init `var_to_decl` based on function parameters
     context = ExternalContext(function_name=node.spelling, var_to_decl={})
@@ -555,7 +558,7 @@ if __name__ == "__main__":
     KNL_STR = """
           void foo(double *a, int N) {
             for (int i = 0; i < N; i++)
-              a[i] = i + 7;
+              a[i] = i <= 7;
           }
           """
     lp_knl = c_to_loopy(KNL_STR, "cuda")
