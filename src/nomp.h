@@ -326,14 +326,14 @@ typedef enum {
 
 /**
  * @ingroup nomp_user_api
- * @brief Return log description.
+ * @brief Return the log description given the log id.
  *
- * @details Returns the log description given the log_id.
- * @param[out] log variable to set the error description.
- * @param[in] log_id id of the error.
- * @return int
+ * @details Returns the log description given the log id. Returns NULL if the
+ * id is invalid.
+ * @param[in] id id of the error.
+ * @return char*
  */
-int nomp_get_log_str(char **log, int log_id);
+char *nomp_get_log_str(int id);
 
 /**
  * @ingroup nomp_user_api
