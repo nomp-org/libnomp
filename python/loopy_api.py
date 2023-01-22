@@ -1,9 +1,11 @@
 """Loopy API wrapper"""
+import struct
 from dataclasses import dataclass, fields, replace
 from typing import Dict, FrozenSet, List, Optional, Union
 
 import islpy as isl
 import loopy as lp
+import numpy as np
 import pymbolic.primitives as prim
 from clang import cindex
 from loopy.isl_helpers import make_slab
@@ -53,13 +55,48 @@ class IdentityMapper:
     __call__ = rec
 
     def map_integer_literal(self, expr: cindex.CursorKind):
-        """Maps int variable"""
-        (val,) = expr.get_tokens()
+        """Maps int constant"""
+        val, = expr.get_tokens()
         return (
             dtype_to_ctype_registry()
             .get_or_register_dtype(expr.type.kind.spelling.lower())
             .type
         )(val.spelling)
+
+    def map_floating_literal(self, expr: cindex.CursorKind):
+        """Maps float constant"""
+        val, = expr.get_tokens()
+        return (
+            dtype_to_ctype_registry()
+            .get_or_register_dtype(expr.type.kind.spelling.lower())
+            .type
+        )(val.spelling)
+
+
+def fill_registry_with_clang_types(reg, include_bool=True):
+    """Fill registry with Clang type to dtype mapping"""
+    if include_bool:
+        # bool is of unspecified size in the OpenCL spec and may in fact be
+        # 4-byte.
+        reg.get_or_register_dtype("bool", np.bool8)
+
+    reg.get_or_register_dtype(["char_s", "schar"], np.int8)
+    reg.get_or_register_dtype(["char_u", "uchar"], np.uint8)
+    reg.get_or_register_dtype(["short"], np.int16)
+    reg.get_or_register_dtype(["ushort"], np.uint16)
+    reg.get_or_register_dtype(["int"], np.int32)
+    reg.get_or_register_dtype(["uint"], np.uint32)
+
+    is_64_bit = struct.calcsize("@P") * 8 == 64
+    if is_64_bit:
+        reg.get_or_register_dtype(["long"], np.int64)
+        reg.get_or_register_dtype(["ulong"], np.uint64)
+
+    if is_64_bit:
+        reg.get_or_register_dtype(["ulong"], np.uintp)
+
+    reg.get_or_register_dtype("float", np.float32)
+    reg.get_or_register_dtype("double", np.float64)
 
 
 # Memoize is caching the return of a function based on its input parameters
@@ -68,7 +105,7 @@ class IdentityMapper:
 def dtype_to_ctype_registry():
     """Retrieve data type with C type"""
     dtype_reg = DTypeRegistry()
-    fill_registry_with_c_types(dtype_reg, True)
+    fill_registry_with_clang_types(dtype_reg, True)
     return dtype_reg
 
 
