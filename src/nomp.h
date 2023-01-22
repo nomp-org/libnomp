@@ -370,6 +370,7 @@ nomp_log_type nomp_get_log_type(int log_id);
  * @return int
  */
 int nomp_finalize(void);
+
 #ifdef __cplusplus
 }
 #endif

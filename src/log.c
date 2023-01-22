@@ -70,12 +70,7 @@ char *nomp_get_log_str(int id) {
   if (id <= 0 || id > logs_n)
     return NULL;
 
-  const char *desc = logs[id - 1].description;
-  size_t n_desc = strnlen(desc, BUFSIZ) + 1;
-  char *str = tcalloc(char, n_desc);
-  strncpy(str, desc, n_desc);
-
-  return str;
+  return strndup(logs[id - 1].description, BUFSIZ);
 }
 
 int nomp_get_log_no(int log_id) {
@@ -90,7 +85,7 @@ nomp_log_type nomp_get_log_type(int log_id) {
   return logs[log_id - 1].type;
 }
 
-void nomp_finalize_logs() {
+void finalize_logs() {
   for (unsigned i = 0; i < logs_n; i++)
     tfree(logs[i].description);
   tfree(logs);
