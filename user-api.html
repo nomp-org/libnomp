@@ -211,19 +211,16 @@ Operation <code class="docutils literal notranslate"><span class="pre">op</span>
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv416nomp_get_log_strPPci">
-<span id="_CPPv316nomp_get_log_strPPci"></span><span id="_CPPv216nomp_get_log_strPPci"></span><span id="nomp_get_log_str__cPP.i"></span><span class="target" id="group__nomp__user__api_1gad71b847920c94f872ede3f8f43e4f51e"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_get_log_str</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">log</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">log_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416nomp_get_log_strPPci" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Return log description. </p>
-<p>Returns the log description given the log_id. </p>
+<dt class="sig sig-object cpp" id="_CPPv416nomp_get_log_stri">
+<span id="_CPPv316nomp_get_log_stri"></span><span id="_CPPv216nomp_get_log_stri"></span><span id="nomp_get_log_str__i"></span><span class="target" id="group__nomp__user__api_1ga64b207d004404af50b94e91a2b571107"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_get_log_str</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416nomp_get_log_stri" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Return the log description given the log id. </p>
+<p>Returns the log description given the log id. Returns NULL if the id is invalid. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>log</strong> – <strong>[out]</strong> variable to set the error description. </p></li>
-<li><p><strong>log_id</strong> – <strong>[in]</strong> id of the error. </p></li>
-</ul>
+<dd class="field-odd"><p><strong>id</strong> – <strong>[in]</strong> id of the error. </p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>int </p>
+<dd class="field-even"><p>char* </p>
 </dd>
 </dl>
 </dd></dl>
