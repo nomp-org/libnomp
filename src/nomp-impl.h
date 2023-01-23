@@ -114,8 +114,8 @@ int py_append_to_sys_path(const char *path);
  * @ingroup nomp_py_utils
  * @brief Creates loopy kernel from C source.
  *
- * @param[out] knl Loopy kernal object.
- * @param[in] c_src C kernal source.
+ * @param[out] knl Loopy kernel object.
+ * @param[in] c_src C kernel source.
  * @param[in] backend Backend name.
  * @return int
  */
@@ -130,7 +130,7 @@ int py_c_to_loopy(PyObject **knl, const char *c_src, const char *backend);
  * annts. \p knl will be modified based on the transformations. Function will
  * return a non-zero value if there was an error after registering a log.
  *
- * @param[in,out] knl Pointer to loopy kernal object.
+ * @param[in,out] knl Pointer to loopy kernel object.
  * @param[in] annts Annotations (as a PyDict) to specify which transformations
  * to apply.
  * @param[in] file Path to the file containing transform function \p func.
@@ -148,7 +148,7 @@ int py_user_annotate(PyObject **knl, PyObject *annts, const char *file,
  * \p knl. \p knl will be modified based on the transformations. Function will
  * return a non-zero value if there was an error after registering a log.
  *
- * @param[in,out] knl Pointer to loopy kernal object.
+ * @param[in,out] knl Pointer to loopy kernel object.
  * @param[in] file Path to the file containing transform function \p func.
  * @param[in] func Transform function.
  * @return int
@@ -157,11 +157,11 @@ int py_user_transform(PyObject **knl, const char *file, const char *func);
 
 /**
  * @ingroup nomp_py_utils
- * @brief Get kernal name and generated source for the backend.
+ * @brief Get kernel name and generated source for the backend.
  *
  * @param[out] name Kernel name as a C-string.
  * @param[out] src Kernel source as a C-string.
- * @param[in] knl Loopy kernal object.
+ * @param[in] knl Loopy kernel object.
  * @return int
  */
 int py_get_knl_name_and_src(char **name, char **src, PyObject *knl);
@@ -173,7 +173,7 @@ int py_get_knl_name_and_src(char **name, char **src, PyObject *knl);
  * Grid sizes are stored in the program object itself.
  *
  * @param[in] prg Nomp program object.
- * @param[in] knl Python kernal object.
+ * @param[in] knl Python kernel object.
  * @return int
  */
 int py_get_grid_size(struct prog *prg, PyObject *knl);
@@ -191,12 +191,13 @@ int py_eval_grid_size(struct prog *prg, PyObject *dict);
 
 /**
  * @ingroup nomp_py_utils
- * @brief Get the representation of python object.
+ * @brief Get the string representation of python object.
  *
+ * @param msg Debug message before printing the object.
  * @param obj Python object.
  * @return void
  */
-void py_print(PyObject *obj);
+void py_print(const char *msg, PyObject *obj);
 
 /**
  * @defgroup nomp_other_utils Other helper functions.

@@ -1,5 +1,3 @@
-#include "nomp-impl.h"
-
 #define CL_TARGET_OPENCL_VERSION 220
 #ifdef __APPLE__
 #define clCreateCommandQueueWithProperties clCreateCommandQueue
@@ -7,6 +5,8 @@
 #else
 #include <CL/cl.h>
 #endif
+
+#include "nomp-impl.h"
 
 // TODO: Handle errors properly in OpenCL backend
 struct opencl_backend {
