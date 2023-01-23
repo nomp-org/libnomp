@@ -152,8 +152,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>knl</strong> – <strong>[out]</strong> Loopy kernal object. </p></li>
-<li><p><strong>c_src</strong> – <strong>[in]</strong> C kernal source. </p></li>
+<li><p><strong>knl</strong> – <strong>[out]</strong> Loopy kernel object. </p></li>
+<li><p><strong>c_src</strong> – <strong>[in]</strong> C kernel source. </p></li>
 <li><p><strong>backend</strong> – <strong>[in]</strong> Backend name. </p></li>
 </ul>
 </dd>
@@ -171,7 +171,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>knl</strong> – <strong>[inout]</strong> Pointer to loopy kernal object. </p></li>
+<li><p><strong>knl</strong> – <strong>[inout]</strong> Pointer to loopy kernel object. </p></li>
 <li><p><strong>annts</strong> – <strong>[in]</strong> Annotations (as a PyDict) to specify which transformations to apply. </p></li>
 <li><p><strong>file</strong> – <strong>[in]</strong> Path to the file containing transform function <code class="docutils literal notranslate"><span class="pre">func</span></code>. </p></li>
 <li><p><strong>func</strong> – <strong>[in]</strong> Transform function. </p></li>
@@ -191,7 +191,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>knl</strong> – <strong>[inout]</strong> Pointer to loopy kernal object. </p></li>
+<li><p><strong>knl</strong> – <strong>[inout]</strong> Pointer to loopy kernel object. </p></li>
 <li><p><strong>file</strong> – <strong>[in]</strong> Path to the file containing transform function <code class="docutils literal notranslate"><span class="pre">func</span></code>. </p></li>
 <li><p><strong>func</strong> – <strong>[in]</strong> Transform function. </p></li>
 </ul>
@@ -205,13 +205,13 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv423py_get_knl_name_and_srcPPcPPcP8PyObject">
 <span id="_CPPv323py_get_knl_name_and_srcPPcPPcP8PyObject"></span><span id="_CPPv223py_get_knl_name_and_srcPPcPPcP8PyObject"></span><span id="py_get_knl_name_and_src__cPP.cPP.PyObjectP"></span><span class="target" id="group__nomp__py__utils_1gae3d45e1bda5ed89cf077d7069d5c5734"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">py_get_knl_name_and_src</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">src</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">knl</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423py_get_knl_name_and_srcPPcPPcP8PyObject" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Get kernal name and generated source for the backend. </p>
+<dd><p>Get kernel name and generated source for the backend. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[out]</strong> Kernel name as a C-string. </p></li>
 <li><p><strong>src</strong> – <strong>[out]</strong> Kernel source as a C-string. </p></li>
-<li><p><strong>knl</strong> – <strong>[in]</strong> Loopy kernal object. </p></li>
+<li><p><strong>knl</strong> – <strong>[in]</strong> Loopy kernel object. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -229,7 +229,7 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>prg</strong> – <strong>[in]</strong> Nomp program object. </p></li>
-<li><p><strong>knl</strong> – <strong>[in]</strong> Python kernal object. </p></li>
+<li><p><strong>knl</strong> – <strong>[in]</strong> Python kernel object. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -256,12 +256,15 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv48py_printP8PyObject">
-<span id="_CPPv38py_printP8PyObject"></span><span id="_CPPv28py_printP8PyObject"></span><span id="py_print__PyObjectP"></span><span class="target" id="group__nomp__py__utils_1ga7194b5a4a971a01545838527d60ad088"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">py_print</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">obj</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48py_printP8PyObject" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Get the representation of python object. </p>
+<dt class="sig sig-object cpp" id="_CPPv48py_printPKcP8PyObject">
+<span id="_CPPv38py_printPKcP8PyObject"></span><span id="_CPPv28py_printPKcP8PyObject"></span><span id="py_print__cCP.PyObjectP"></span><span class="target" id="group__nomp__py__utils_1ga7431bbc62eaf2a06f501bdfa8143798f"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">py_print</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">msg</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">obj</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48py_printPKcP8PyObject" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Get the string representation of python object. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>obj</strong> – Python object. </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msg</strong> – Debug message before printing the object. </p></li>
+<li><p><strong>obj</strong> – Python object. </p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>void </p>
