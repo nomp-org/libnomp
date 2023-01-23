@@ -160,7 +160,7 @@ static int cuda_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
   struct cuda_prog *cprg = (struct cuda_prog *)prg->bptr;
   int err = cuLaunchKernel(cprg->kernel, global[0], global[1], global[2],
                            local[0], local[1], local[2], 0, NULL, vargs, NULL);
-  // FIXME: Wrong, call set_log.
+  // FIXME: Wrong, call set_log()
   return err != CUDA_SUCCESS;
 }
 

@@ -3,11 +3,11 @@
 static const char *loopy_api = "loopy_api";
 static const char *c_to_loopy = "c_to_loopy";
 
-void py_print(PyObject *obj) {
+void py_print(const char *msg, PyObject *obj) {
   PyObject *repr = PyObject_Repr(obj);
   PyObject *py_str = PyUnicode_AsEncodedString(repr, "utf-8", "~E~");
   const char *str = PyBytes_AS_STRING(py_str);
-  printf("%s", str);
+  printf("%s: %s\n", msg, str);
   Py_XDECREF(repr), Py_XDECREF(py_str);
 }
 
