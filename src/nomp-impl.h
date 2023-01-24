@@ -21,8 +21,9 @@
 
 #define return_on_err(err)                                                     \
   {                                                                            \
-    if (nomp_get_log_type((err)) == NOMP_ERROR)                                \
-      return (err);                                                            \
+    int err_ = (err);                                                          \
+    if (nomp_get_log_type(err_) == NOMP_ERROR)                                 \
+      return err_;                                                             \
   }
 
 struct prog {
