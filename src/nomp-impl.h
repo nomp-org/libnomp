@@ -18,6 +18,8 @@
 
 #define NOMP_BUFSIZ 64
 #define MAX_BACKEND_NAME_SIZE 32
+#define MAX_SRC_SIZE 16384
+#define MAX_CFLAGS_SIZE 16384
 
 #define return_on_err(err)                                                     \
   {                                                                            \
@@ -295,5 +297,29 @@ int check_null_input_(void *p, const char *func, unsigned line,
  * @return void
  */
 void finalize_logs();
+
+/**
+ * @ingroup nomp_compile_utils
+ * @brief Compile a source string at runtime.
+ *
+ * Compile a source string at runtime using a specified compiler, flags and
+ * a working directory. \p id is set to dynamically loaded \p entry point in the
+ * compiled object file. \p id should be set to -1 on input and is set to a
+ * non-negative value upon successful exit. On success, compile() returns 0 and
+ * non-zero otherwise.
+ *
+ * @param[out] id Handle to the \p entry in the compiled binary file.
+ * @param[in] source Source to be compiled at runtime.
+ * @param[in] cc Full path to the compiler.
+ * @param[in] cflags Compile flags to be used during compilation.
+ * @param[in] entry Entry point (usually the name of function to be called) to
+ * the source.
+ * @param[in] wrkdir Working directory to generate outputs and store
+ * temporaries.
+ *
+ * @return int
+ */
+int compile(int *id, const char *source, const char *cc, const char *cflags,
+            const char *entry, const char *wrkdir);
 
 #endif // _LIB_NOMP_IMPL_H_
