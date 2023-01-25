@@ -166,12 +166,17 @@
  * @ingroup nomp_errors
  * @brief libnomp Cuda operation failed.
  */
-#define NOMP_CUDA_FAILURE -144
+#define NOMP_CUDA_FAILURE -512
 /**
  * @ingroup nomp_errors
  * @brief libnomp OpenCL failure.
  */
-#define NOMP_OPENCL_FAILURE -146
+#define NOMP_OPENCL_FAILURE -513
+/**
+ * @ingroup nomp_errors
+ * @brief libnomp source compilation failure.
+ */
+#define NOMP_COMPILE_FAILURE -524
 
 #ifdef __cplusplus
 extern "C" {
