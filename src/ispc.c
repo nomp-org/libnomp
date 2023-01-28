@@ -5,11 +5,6 @@
 
 #define NARGS_MAX 64
 
-struct mem_view {
-  struct mem *m;
-  void *view;
-};
-
 struct ispc_backend {
   ISPCRTDevice device;
   ISPCRTTaskQueue queue;
@@ -20,25 +15,19 @@ struct ispc_prog {
   ISPCRTKernel kernel;
 };
 
-static struct mem_view **mem_views = NULL;
-static int mems_n = 0;
-static int mems_max = 0;
-
-static unsigned mem_if_exist(void *p, size_t idx0, size_t idx1) {
-  for (unsigned i = 0; i < mems_n; i++) {
-    if (mem_views[i] && mem_views[i]->m && mem_views[i]->m->hptr == p &&
-        mem_views[i]->m->idx0 == idx0 && mem_views[i]->m->idx1 == idx1)
-      return i;
-  }
-  return mems_n;
-}
-
 static ISPCRTError rt_error = ISPCRT_NO_ERROR;
 static char *err_message = NULL;
 static void ispcrt_error(ISPCRTError err_code, const char *message) {
   rt_error = err_code;
   err_message = (char *)message;
 }
+
+#define chk_ispcrt(msg, x)                                                     \
+  {                                                                            \
+    if (x != ISPCRT_NO_ERROR)                                                  \
+      return set_log(NOMP_ISPC_FAILURE, NOMP_ERROR, ERR_STR_ISPC_FAILURE, msg, \
+                     err_message);                                             \
+  }
 
 static int ispc_update(struct backend *bnd, struct mem *m, const int op) {
   struct ispc_backend *ispc = (struct ispc_backend *)bnd->bptr;
@@ -47,38 +36,22 @@ static int ispc_update(struct backend *bnd, struct mem *m, const int op) {
     ISPCRTNewMemoryViewFlags flags;
     flags.allocType = ISPCRT_ALLOC_TYPE_DEVICE;
     ISPCRTMemoryView view = ispcrtNewMemoryView(
-        ispc->device, &m->hptr, (m->idx1 - m->idx0) * m->usize, &flags);
-    m->bptr = ispcrtDevicePtr(view);
-
-    unsigned idx = mem_if_exist(&m->hptr, m->idx0, m->idx1);
-    if (idx == mems_n) {
-      if (mems_n == mems_max) {
-        mems_max += mems_max / 2 + 1;
-        mem_views = trealloc(mem_views, struct mem_view *, mems_max);
-      }
-      struct mem_view *m_view = mem_views[mems_n] = tcalloc(struct mem_view, 1);
-      m_view->m = m;
-    }
-    mem_views[idx]->view = m->bptr;
+        ispc->device, m->hptr, (m->idx1 - m->idx0) * m->usize, &flags);
+    m->bptr = view;
   }
 
-  if (op & NOMP_TO) {
-    // Objects which used as inputs for ISPC kernel should be
-    // explicitly copied to device from host
-    unsigned idx = mem_if_exist(&m->hptr, m->idx0, m->idx1);
-    if (idx != mems_n)
-      ispcrtCopyToDevice(ispc->queue, mem_views[idx]->view);
-  }
+  if (op & NOMP_TO)
+    ispcrtCopyToDevice(ispc->queue, (ISPCRTMemoryView)(m->bptr));
 
   if (op == NOMP_FROM) {
-    unsigned idx = mem_if_exist(&m->hptr, m->idx0, m->idx1);
-    if (idx != mems_n)
-      ispcrtCopyToHost(ispc->queue, mem_views[idx]->view);
+    ispcrtCopyToHost(ispc->queue, (ISPCRTMemoryView)(m->bptr));
   } else if (op == NOMP_FREE) {
+    ispcrtRelease((ISPCRTMemoryView)(m->bptr));
     m->bptr = NULL;
   }
 
-  return 0;
+  // FIXME: Wrong. call set_log()
+  return rt_error != ISPCRT_NO_ERROR;
 }
 
 static int ispc_knl_build(struct backend *bnd, struct prog *prg,
@@ -93,14 +66,16 @@ static int ispc_knl_build(struct backend *bnd, struct prog *prg,
   ispc_prg->module = ispcrtLoadModule(ispc->device, name, options);
   if (rt_error != ISPCRT_NO_ERROR) {
     ispc_prg->module = NULL;
-    return rt_error;
+    return set_log(NOMP_ISPC_FAILURE, NOMP_ERROR, ERR_STR_ISPC_FAILURE,
+                   "module load", rt_error);
   }
 
   ispc_prg->kernel = ispcrtNewKernel(ispc->device, ispc_prg->module, name);
   if (rt_error != ISPCRT_NO_ERROR) {
     ispc_prg->module = NULL;
     ispc_prg->kernel = NULL;
-    return rt_error;
+    return set_log(NOMP_ISPC_FAILURE, NOMP_ERROR, ERR_STR_ISPC_FAILURE,
+                   "kernel build", rt_error);
   }
   return 0;
 }
@@ -123,11 +98,7 @@ static int ispc_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
     case NOMP_FLOAT:
       break;
     case NOMP_PTR:
-      m = mem_if_mapped(p);
-      if (m == NULL)
-        return set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
-                       ERR_STR_USER_MAP_PTR_IS_INVALID, p);
-      p = &m->bptr;
+      p = ispcrtDevicePtr((ISPCRTMemoryView)(m->bptr));
       break;
     default:
       return set_log(NOMP_USER_KNL_ARG_TYPE_IS_INVALID, NOMP_ERROR,
@@ -149,50 +120,53 @@ static int ispc_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
   // TODO:
   ispcrtLaunch1D(ispc->queue, ispc_prg->kernel, params, global[0]);
   ispcrtSync(ispc->queue);
-  return rt_error != ISPCRT_NO_ERROR;
+  chk_ispcrt("kernel run", rt_error);
+  return 0;
 }
 
 static int ispc_knl_free(struct prog *prg) {
   struct ispc_prog *iprg = (struct ispc_prog *)prg->bptr;
   ispcrtRelease(iprg->kernel);
+  chk_ispcrt("kernel release", rt_error);
   ispcrtRelease(iprg->module);
+  chk_ispcrt("module release", rt_error);
   return 0;
 }
 
 static int ispc_finalize(struct backend *bnd) {
   struct ispc_backend *ispc = (struct ispc_backend *)bnd->bptr;
   ispcrtRelease(ispc->device);
+  chk_ispcrt("device release", rt_error);
   ispcrtRelease(ispc->queue);
+  chk_ispcrt("queue release", rt_error);
   tfree(bnd->bptr), bnd->bptr = NULL;
   return 0;
 }
 
 static int nomp_to_ispc_device[3] = {
-    ISPCRT_DEVICE_TYPE_AUTO, ISPCRT_DEVICE_TYPE_CPU, ISPCRT_DEVICE_TYPE_GPU};
+    ISPCRT_DEVICE_TYPE_CPU, ISPCRT_DEVICE_TYPE_GPU, ISPCRT_DEVICE_TYPE_AUTO};
 
 int ispc_init(struct backend *bnd, const int platform_type,
               const int device_id) {
   ispcrtSetErrorFunc(ispcrt_error);
   if (platform_type < 0 | platform_type >= 3) {
-    return set_log(NOMP_USER_PLATFORM_IS_INVALID, NOMP_ERROR,
+    return set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                    "Platform type %d provided to libnomp is not valid.",
                    platform_type);
   }
   uint32_t num_devices =
-      ispcrtGetDeviceCount(nomp_to_ispc_device(platform_type));
-  if (rt_error != ISPCRT_NO_ERROR)
-    return rt_error;
+      ispcrtGetDeviceCount(nomp_to_ispc_device[platform_type]);
+  chk_ispcrt("get device count", rt_error);
   if (device_id < 0 || device_id >= num_devices)
-    return rt_error;
+    return set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                   ERR_STR_USER_DEVICE_IS_INVALID, device_id);
   ISPCRTDevice device = ispcrtGetDevice(platform_type, device_id);
-  if (rt_error != ISPCRT_NO_ERROR)
-    return rt_error;
+  chk_ispcrt("device get", rt_error);
 
   struct ispc_backend *ispc = bnd->bptr = tcalloc(struct ispc_backend, 1);
   ispc->device = device;
   ispc->queue = ispcrtNewTaskQueue(device);
-  if (rt_error != ISPCRT_NO_ERROR)
-    return rt_error;
+  chk_ispcrt("context create", rt_error);
 
   bnd->update = ispc_update;
   bnd->knl_build = ispc_knl_build;
