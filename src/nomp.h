@@ -200,6 +200,11 @@
 #define NOMP_SYCL_FAILURE -514
 /**
  * @ingroup nomp_errors
+ * @brief libnomp ISPC failure.
+ */
+#define NOMP_ISPC_FAILURE -515
+/**
+ * @ingroup nomp_errors
  * @brief libnomp source compilation failure.
  */
 #define NOMP_JIT_FAILURE -524
