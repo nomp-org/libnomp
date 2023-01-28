@@ -190,6 +190,11 @@
 #define NOMP_OPENCL_FAILURE -513
 /**
  * @ingroup nomp_errors
+ * @brief libnomp ISPC failure.
+ */
+#define NOMP_ISPC_FAILURE -514
+/**
+ * @ingroup nomp_errors
  * @brief libnomp source compilation failure.
  */
 #define NOMP_JIT_FAILURE -524

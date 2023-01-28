@@ -614,20 +614,23 @@ def c_to_loopy(c_str: str, backend: str) -> lp.translation_unit.TranslationUnit:
 
 
 def fill_registry_with_ispc_types(reg):
+    """Add ispc types to the registry"""
     reg.get_or_register_dtype(["int32"], np.int32)
     reg.get_or_register_dtype(["float"], np.float64)
 
 
 def get_arg(reg, index, value):
+    """Get ISPC type"""
     ctype = reg.dtype_to_ctype(value.dtype)
-    if type(value) == lp.kernel.data.ArrayArg:
+    if isinstance(value, lp.kernel.data.ArrayArg):
         return f"({ctype} *)(p[{index}])"
-    elif type(value) == lp.kernel.data.ValueArg:
+    if isinstance(value, lp.kernel.data.ValueArg):
         return f"*(({ctype} *)(p[{index}]))"
     return ""
 
 
 def create_kernel_fun(knl):
+    """Create ISPC kernel wrapper"""
     reg = DTypeRegistry()
     fill_registry_with_ispc_types(reg)
     (entry,) = knl.entrypoints
