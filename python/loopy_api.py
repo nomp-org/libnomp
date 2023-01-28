@@ -16,6 +16,7 @@ from loopy.target.c.compyte.dtypes import (
     fill_registry_with_c_types,
 )
 from pytools import UniqueNameGenerator
+import cgen as c
 
 LOOPY_LANG_VERSION = (2018, 2)
 LOOPY_INSN_PREFIX = "_nomp_insn"
@@ -610,6 +611,56 @@ def c_to_loopy(c_str: str, backend: str) -> lp.translation_unit.TranslationUnit:
     )
 
     return knl
+
+
+def fill_registry_with_ispc_types(reg):
+    reg.get_or_register_dtype(["int32"], np.int32)
+    reg.get_or_register_dtype(["float"], np.float64)
+
+
+def get_arg(reg, index, value):
+    ctype = reg.dtype_to_ctype(value.dtype)
+    if type(value) == lp.kernel.data.ArrayArg:
+        return f"({ctype} *)(p[{index}])"
+    elif type(value) == lp.kernel.data.ValueArg:
+        return f"*(({ctype} *)(p[{index}]))"
+    return ""
+
+
+def create_kernel_fun(knl):
+    reg = DTypeRegistry()
+    fill_registry_with_ispc_types(reg)
+    (entry,) = knl.entrypoints
+    suffix = "_main"
+    knl_args = [
+        c.Value("", get_arg(reg, index, value))
+        for index, value in enumerate(knl[entry].args)
+    ]
+    gen_code = lp.generate_code_v2(knl)
+    device_code = gen_code.device_code().replace("task", "static", 1)
+    knl_name = gen_code.device_programs[0].name
+    calling_func = c.FunctionBody(
+        c.FunctionDeclaration(
+            c.Value("task void", f"{knl_name}{suffix}"),
+            [
+                c.Value("void *uniform", "_p"),
+            ],
+        ),
+        c.Block(
+            (
+                [
+                    c.Statement("void **uniform p = (void **uniform)_p"),
+                    c.FunctionDeclaration(c.Value("", knl_name), knl_args),
+                ]
+            )
+        ),
+    )
+    include_header = c.Include("ispcrt.h")
+    entry_point = c.Line(f"DEFINE_CPU_ENTRY_POINT({knl_name}{suffix})")
+    content = list(
+        map(str, [device_code, calling_func, include_header, entry_point])
+    )
+    return "\n".join(content)
 
 
 if __name__ == "__main__":
