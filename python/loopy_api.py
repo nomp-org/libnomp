@@ -1,4 +1,5 @@
 """Loopy API wrapper"""
+import hashlib
 from dataclasses import dataclass, fields, replace
 from typing import Dict, FrozenSet, List, Optional, Union
 
@@ -156,7 +157,7 @@ class CToLoopyExpressionMapper(IdentityMapper):
     def map_binary_operator(self, expr: cindex.CursorKind):
         """Maps C binary operation"""
         left, right = expr.get_children()
-        op_str = list(expr.get_tokens())[len(list(left.get_tokens()))].spelling
+        op_str = get_op_str(expr, left)
         try:
             oprtr = _C_BIN_OPS_TO_PYMBOLIC_OPS[op_str]
         except KeyError as exc:
@@ -213,7 +214,7 @@ class CToLoopyLoopBoundMapper(CToLoopyExpressionMapper):
     def map_binary_operator(self, expr: cindex.CursorKind):
         """Maps C binary operation"""
         left, right = expr.get_children()
-        op_str = list(expr.get_tokens())[len(list(left.get_tokens()))].spelling
+        op_str = get_op_str(expr, left)
         try:
             oprtr = _C_BIN_OPS_TO_PYMBOLIC_OPS[
                 "//" if op_str == "/" else op_str
@@ -223,6 +224,11 @@ class CToLoopyLoopBoundMapper(CToLoopyExpressionMapper):
                 f"Invalid binary operator string: {op_str}."
             ) from exc
         return oprtr(self.rec(left), self.rec(right))
+
+
+def get_op_str(expr: cindex.CursorKind, lhs: cindex.CursorKind):
+    """Get operator as string from a binary expression"""
+    return list(expr.get_tokens())[len(list(lhs.get_tokens()))].spelling
 
 
 def check_and_parse_for(expr: cindex.CursorKind):
@@ -456,7 +462,7 @@ class CToLoopyMapper(IdentityMapper):
         lhs = CToLoopyExpressionMapper()(left)
         rhs = CToLoopyExpressionMapper()(right)
 
-        op_str = list(expr.get_tokens())[len(list(left.get_tokens()))].spelling
+        op_str = get_op_str(expr, left)
         if op_str == "+=":
             rhs = lhs + rhs
         elif op_str == "-=":
@@ -533,8 +539,9 @@ def decl_to_knl_arg(decl: cindex.Cursor, dtype):
 def c_to_loopy(c_str: str, backend: str) -> lp.translation_unit.TranslationUnit:
     """Map C kernel to Loopy"""
     index = cindex.Index.create()
+    kernel_hash = hashlib.sha256(c_str.encode("utf-8")).hexdigest() + ".c"
     translation_unit = index.parse(
-        "kernel.c", unsaved_files=[("kernel.c", c_str)]
+        kernel_hash, unsaved_files=[(kernel_hash, c_str)]
     )
     diagnostics = translation_unit.diagnostics
     # Check for syntax errors in parsed C kernel
