@@ -34,7 +34,7 @@ struct mem {
 };
 
 /**
- * @ingroup nomp_other_utils
+ * @ingroup nomp_mem_utils
  * @brief Returns the mem object corresponding to host pointer \p p.
  *
  * Returns the mem object corresponding to host ponter \p p. If no buffer has
@@ -65,11 +65,11 @@ struct backend {
 };
 
 /**
- * @defgroup nomp_backend_init Backend init functions
+ * @defgroup nomp_backend_utils Backend init functions
  */
 
 /**
- * @ingroup nomp_backend_init
+ * @ingroup nomp_backend_utils
  * @brief Initializes OpenCL backend with the specified platform and device.
  *
  * Initializes OpenCL backend while creating a command queue using the
@@ -85,7 +85,7 @@ int opencl_init(struct backend *backend, const int platform_id,
                 const int device_id);
 
 /**
- * @ingroup nomp_backend_init
+ * @ingroup nomp_backend_utils
  * @brief Initializes Cuda backend with the specified platform and device.
  *
  * Initializes Cuda backend using the given device id. Platform id is not
@@ -273,7 +273,7 @@ size_t pathlen(const char *path);
 int MAX(unsigned args, ...);
 
 /**
- * @ingroup nomp_internal_api
+ * @ingroup nomp_other_utils
  * @brief Returns a non-zero error if the input is NULL.
  *
  * This function call set_log() to register an error if the input is NULL.
@@ -291,12 +291,8 @@ int check_null_input_(void *p, const char *func, unsigned line,
   return_on_err(check_null_input_((void *)(p), __func__, __LINE__, __FILE__))
 
 /**
- * @ingroup nomp_log_utils
- * @brief Free log variables.
- *
- * @return void
+ * @defgroup nomp_compile_utils Functions to compile source at runtime.
  */
-void finalize_logs();
 
 /**
  * @ingroup nomp_compile_utils
