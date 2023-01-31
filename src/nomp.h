@@ -114,12 +114,12 @@
  * @ingroup nomp_errors
  * @brief Failed to finalize libnomp.
  */
-#define NOMP_RUNTIME_FAILED_TO_FINALIZE -258
+#define NOMP_RUNTIME_FINALIZE_FAILUREE -258
 /**
  * @ingroup nomp_errors
  * @brief Memory allocation on host by libnomp failed.
  */
-#define NOMP_RUNTIME_MEMORY_ALLOCATION_FAILED -259
+#define NOMP_RUNTIME_MEMORY_ALLOCATION_FAILURE -259
 /**
  * @ingroup nomp_errors
  * @brief One of the inputs to a libnomp function call are not valid.
@@ -130,17 +130,17 @@
  * @ingroup nomp_errors
  * @brief libnomp python initialization failed.
  */
-#define NOMP_PY_INITIALIZE_ERROR -384
+#define NOMP_PY_INITIALIZE_FAILURE -384
 /**
  * @ingroup nomp_errors
  * @brief A python call made by libnomp failed.
  */
-#define NOMP_PY_CALL_FAILED -385
+#define NOMP_PYCALL_FAILURE -385
 /**
  * @ingroup nomp_errors
  * @brief Loopy conversion failed.
  */
-#define NOMP_LOOPY_CONVERSION_ERROR -387
+#define NOMP_LOOPY_CONVERSION_FAILURE -387
 /**
  * @ingroup nomp_errors
  * @brief Failed to find loopy kernel.
@@ -150,17 +150,17 @@
  * @ingroup nomp_errors
  * @brief Code generation from loopy kernel failed.
  */
-#define NOMP_LOOPY_CODEGEN_FAILED -389
+#define NOMP_LOOPY_CODEGEN_FAILURE -389
 /**
  * @ingroup nomp_errors
  * @brief Code generation from loopy kernel failed.
  */
-#define NOMP_LOOPY_GET_GRIDSIZE_FAILED -390
+#define NOMP_LOOPY_GET_GRIDSIZE_FAILURE -390
 /**
  * @ingroup nomp_errors
  * @brief Grid size calculation failed.
  */
-#define NOMP_LOOPY_EVAL_GRIDSIZE_FAILED -391
+#define NOMP_LOOPY_EVAL_GRIDSIZE_FAILURE -391
 
 /**
  * @ingroup nomp_errors

@@ -12,13 +12,13 @@ static int test_invalid_file() {
 
   static int id = -1;
   int err = nomp_jit(&id, valid_knl, clauses);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_PY_CALL_FAILED);
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_PYCALL_FAILURE);
 
   char *desc = nomp_get_log_str(err);
   int matched =
       match_log(desc, "\\[Error\\] "
-                      ".*src\\/loopy.c:[0-9]* PyImport_Import() failed when "
-                      "importing user transform file: invalid-file.");
+                      ".*src\\/loopy.c:[0-9]* Failed to call user transform "
+                      "function: \"invalid\" in file: \"invalid-file\".");
   tfree(desc);
   nomp_test_assert(matched);
 
@@ -27,17 +27,17 @@ static int test_invalid_file() {
 
 // Calling nomp_jit() with invalid function should return an error.
 static int test_invalid_transform_function() {
-  const char *clauses[4] = {"transform", "nomp-api-100", "invalid_func", 0};
+  const char *clauses[4] = {"transform", "nomp-api-100", "invalid-func", 0};
 
   static int id = -1;
   int err = nomp_jit(&id, valid_knl, clauses);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_PY_CALL_FAILED);
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_PYCALL_FAILURE);
 
   char *desc = nomp_get_log_str(err);
-  int matched = match_log(
-      desc, "\\[Error\\] "
-            ".*src\\/loopy.c:[0-9]* PyObject_CallFunctionObjArgs() failed when "
-            "calling user transform function: invalid_func.");
+  int matched =
+      match_log(desc, "\\[Error\\] "
+                      ".*src\\/loopy.c:[0-9]* Failed to call user transform "
+                      "function: \"invalid-func\" in file: \"nomp-api-100\".");
   tfree(desc);
   nomp_test_assert(matched);
 
@@ -114,7 +114,7 @@ static int test_syntax_error_in_kernel() {
   static int id = -1;
   const char *clauses0[4] = {"transform", "invalid-file", "invalid", 0};
   int err = nomp_jit(&id, invalid_knl, clauses0);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_LOOPY_CONVERSION_ERROR);
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_LOOPY_CONVERSION_FAILURE);
 
   char *desc = nomp_get_log_str(err);
   int matched = match_log(desc, "\\[Error\\] "
