@@ -1,22 +1,22 @@
 #include "nomp-impl.h"
 
-char *strcatn(unsigned nstr, unsigned max_len, ...) {
-  unsigned n = 0, max = MAX_BUFSIZ;
-  char *out = tcalloc(char, max);
-
+char *strcatn(unsigned n, unsigned max_len, ...) {
   va_list vargs;
   va_start(vargs, max_len);
-  for (int i = 0; i < nstr; i++) {
+
+  unsigned max = MAX_BUFSIZ, len = 0;
+  char *out = tcalloc(char, max);
+  for (int i = 0; i < n; i++) {
     const char *s = va_arg(vargs, const char *);
-    if (max <= n + strnlen(s, max_len)) {
-      max = 3 * (n + strnlen(s, max_len)) / 2 + 1;
+    if (max <= len + strnlen(s, max_len)) {
+      max = 3 * (len + strnlen(s, max_len)) / 2 + 1;
       out = trealloc(out, char, max);
     }
-    strncpy(out + n, s, strnlen(s, max_len));
-    n += strnlen(s, max_len);
+    strncpy(out + len, s, strnlen(s, max_len));
+    len += strnlen(s, max_len);
   }
   va_end(vargs);
-  out[n] = '\0';
+  out[len] = '\0';
 
   return out;
 }
