@@ -5,13 +5,15 @@
 
 extern const char *ERR_STR_USER_MAP_PTR_IS_INVALID;
 extern const char *ERR_STR_USER_DEVICE_IS_INVALID;
-
 extern const char *ERR_STR_RUNTIME_MEMORY_ALLOCATION_FAILURE;
-
 extern const char *ERR_STR_KNL_ARG_TYPE_IS_INVALID;
 
 /**
- * @ingroup nomp_internal_api
+ * @defgroup nomp_log_utils Internal functions used by logging module.
+ */
+
+/**
+ * @ingroup nomp_log_utils
  * @brief Register a log with libnomp runtime.
  *
  * @details Register a log given a description of the log, log number and log
@@ -30,5 +32,13 @@ int set_log_(const char *desc, int logno, nomp_log_type type, const char *fname,
 
 #define set_log(logno, type, desc, ...)                                        \
   set_log_(desc, logno, type, __FILE__, __LINE__, ##__VA_ARGS__)
+
+/**
+ * @ingroup nomp_log_utils
+ * @brief Free log variables.
+ *
+ * @return void
+ */
+void finalize_logs();
 
 #endif
