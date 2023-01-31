@@ -142,10 +142,8 @@ int nomp_init(int argc, const char **argv) {
         nomp.name);
   }
 
-  int err = check_args(argc, argv, &nomp);
-  return_on_err(err);
-  err = check_env(&nomp);
-  return_on_err(err);
+  return_on_err(check_args(argc, argv, &nomp));
+  return_on_err(check_env(&nomp));
 
   char name[MAX_BACKEND_NAME_SIZE + 1];
   size_t n = strnlen(nomp.backend, MAX_BACKEND_NAME_SIZE);
@@ -153,6 +151,7 @@ int nomp_init(int argc, const char **argv) {
     name[i] = tolower(nomp.backend[i]);
   name[n] = '\0';
 
+  int err = 0;
   if (strncmp(name, "opencl", MAX_BACKEND_NAME_SIZE) == 0) {
 #if defined(OPENCL_ENABLED)
     err = opencl_init(&nomp, nomp.platform_id, nomp.device_id);
@@ -180,15 +179,17 @@ int nomp_init(int argc, const char **argv) {
     char *abs_dir = strcatn(
         3, MAX(2, pathlen(nomp.install_dir), strnlen(py_dir, MAX_BUFSIZ)),
         nomp.install_dir, "/", py_dir);
-    py_append_to_sys_path(abs_dir);
-    err = tfree(abs_dir);
+    err = py_append_to_sys_path(abs_dir);
+    tfree(abs_dir);
   } else {
     // Python is already initialized.
     err = 0;
   }
-  if (err)
+
+  if (err) {
     return set_log(NOMP_PY_INITIALIZE_FAILURE, NOMP_ERROR,
                    "Unable to initialize python during initializing libnomp.");
+  }
 
   initialized = 1;
   return 0;
@@ -303,42 +304,37 @@ int nomp_jit(int *id, const char *c_src, const char **clauses) {
 
     // Create loopy kernel from C source
     PyObject *knl = NULL;
-    int err = py_c_to_loopy(&knl, c_src, nomp.name);
-    return_on_err(err);
+    return_on_err(py_c_to_loopy(&knl, c_src, nomp.name));
 
     // Parse the clauses
     char *usr_file = NULL, *usr_func = NULL;
     PyObject *annts;
-    err = parse_clauses(&usr_file, &usr_func, &annts, clauses);
-    return_on_err(err);
+    return_on_err(parse_clauses(&usr_file, &usr_func, &annts, clauses));
 
     // Handle annotate clauses if the exist
-    err = py_user_annotate(&knl, annts, nomp.annts_script, nomp.annts_func);
-    return_on_err(err);
+    return_on_err(
+        py_user_annotate(&knl, annts, nomp.annts_script, nomp.annts_func));
+    Py_XDECREF(annts);
 
     // Handle transform clauase
-    err = py_user_transform(&knl, usr_file, usr_func);
+    return_on_err(py_user_transform(&knl, usr_file, usr_func));
     tfree(usr_file), tfree(usr_func);
-    return_on_err(err);
 
     // Get OpenCL, CUDA, etc. source and name from the loopy kernel
     char *name, *src;
-    err = py_get_knl_name_and_src(&name, &src, knl);
-    return_on_err(err);
+    return_on_err(py_get_knl_name_and_src(&name, &src, knl));
 
     // Build the kernel
     struct prog *prg = progs[progs_n] = tcalloc(struct prog, 1);
-    err = nomp.knl_build(&nomp, prg, src, name);
+    return_on_err(nomp.knl_build(&nomp, prg, src, name));
     tfree(src), tfree(name);
-    return_on_err(err);
 
     // Get grid size of the loopy kernel as pymbolic expressions after
     // transformations. These grid sizes will be evaluated when the kernel is
     // run.
     prg->py_dict = PyDict_New();
-    err = py_get_grid_size(prg, knl);
+    return_on_err(py_get_grid_size(prg, knl));
     Py_XDECREF(knl);
-    return_on_err(err);
 
     *id = progs_n++;
   }
@@ -366,16 +362,15 @@ int nomp_run(int id, int nargs, ...) {
       }
     }
     va_end(args);
-    int err = py_eval_grid_size(prg, prg->py_dict);
-    return_on_err(err);
+    return_on_err(py_eval_grid_size(prg, prg->py_dict));
 
     va_start(args, nargs);
-    err = nomp.knl_run(&nomp, prg, args);
+    return_on_err(nomp.knl_run(&nomp, prg, args));
     va_end(args);
-    return_on_err(err);
 
     return 0;
   }
+
   return set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                  "Kernel id %d passed to nomp_run is not valid.", id);
 }

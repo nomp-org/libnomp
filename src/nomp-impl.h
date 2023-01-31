@@ -12,9 +12,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "nomp.h"
+
 #include "nomp-log.h"
 #include "nomp-mem.h"
-#include "nomp.h"
 
 #define MAX_BUFSIZ 64
 #define MAX_BACKEND_NAME_SIZE 32
