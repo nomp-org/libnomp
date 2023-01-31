@@ -16,9 +16,6 @@ const char *ERR_STR_RUNTIME_MEMORY_ALLOCATION_FAILURE =
 const char *ERR_STR_KNL_ARG_TYPE_IS_INVALID =
     "Invalid libnomp kernel argument type %d.";
 
-const char *ERR_STR_CUDA_FAILURE = "Cuda %s failed: %s.";
-const char *ERR_STR_OPENCL_FAILURE = "OpenCL %s failure with error code: %d.";
-
 struct log {
   char *description;
   int logno;

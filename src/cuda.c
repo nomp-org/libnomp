@@ -34,6 +34,8 @@
     }                                                                          \
   }
 
+static const char *ERR_STR_CUDA_FAILURE = "Cuda %s failed: %s.";
+
 struct cuda_backend {
   int device_id;
   struct cudaDeviceProp prop;
