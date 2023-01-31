@@ -135,7 +135,7 @@
  * @ingroup nomp_errors
  * @brief A python call made by libnomp failed.
  */
-#define NOMP_PYCALL_FAILURE -385
+#define NOMP_PY_CALL_FAILURE -385
 /**
  * @ingroup nomp_errors
  * @brief Loopy conversion failed.

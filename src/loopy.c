@@ -25,7 +25,7 @@ int py_append_to_sys_path(const char *path) {
   }
 
   if (err) {
-    return set_log(NOMP_PYCALL_FAILURE, NOMP_ERROR,
+    return set_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,
                    "Appending path to the sys.path failed.");
   }
   return 0;
@@ -86,7 +86,7 @@ int py_user_annotate(PyObject **knl, PyObject *annts, const char *file,
 
   if (err) {
     return set_log(
-        NOMP_PYCALL_FAILURE, NOMP_ERROR,
+        NOMP_PY_CALL_FAILURE, NOMP_ERROR,
         "Failed to call user annotate function: \"%s\" in file: \"%s\".", func,
         file);
   }
@@ -121,7 +121,7 @@ int py_user_transform(PyObject **knl, const char *file, const char *func) {
 
   if (err) {
     return set_log(
-        NOMP_PYCALL_FAILURE, NOMP_ERROR,
+        NOMP_PY_CALL_FAILURE, NOMP_ERROR,
         "Failed to call user transform function: \"%s\" in file: \"%s\".", func,
         file);
   }
