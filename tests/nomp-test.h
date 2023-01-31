@@ -61,7 +61,7 @@ static int create_knl(int *id, const char *knl_fmt, const char **clauses,
   return 0;
 }
 
-static int match_log(const char *log, const char *pattern) {
+static int logcmp(const char *log, const char *pattern) {
   regex_t regex;
   int result = regcomp(&regex, pattern, 0);
   if (!result)

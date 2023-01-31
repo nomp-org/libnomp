@@ -6,10 +6,10 @@ static int test_first_nomp_finalize() {
   nomp_test_assert(nomp_get_log_no(err) == NOMP_RUNTIME_NOT_INITIALIZED);
 
   char *desc = nomp_get_log_str(err);
-  int matched = match_log(desc, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* "
-                                "libnomp is not initialized.");
+  int eq = logcmp(desc, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* "
+                        "libnomp is not initialized.");
   tfree(desc);
-  nomp_test_assert(matched);
+  nomp_test_assert(eq);
 
   return 0;
 }
@@ -22,12 +22,12 @@ static int test_nomp_init_twice(int argc, const char **argv) {
   nomp_test_assert(nomp_get_log_no(err) == NOMP_RUNTIME_ALREADY_INITIALIZED);
 
   char *desc = nomp_get_log_str(err);
-  int matched =
-      match_log(desc, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* libnomp is "
-                      "already initialized to use opencl. Call nomp_finalize() "
-                      "before calling nomp_init() again.");
+  int eq =
+      logcmp(desc, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* libnomp is "
+                   "already initialized to use opencl. Call nomp_finalize() "
+                   "before calling nomp_init() again.");
   tfree(desc);
-  nomp_test_assert(matched);
+  nomp_test_assert(eq);
 
   return 0;
 }
@@ -40,10 +40,10 @@ static int test_nomp_finalize_twice() {
   nomp_test_assert(nomp_get_log_no(err) == NOMP_RUNTIME_NOT_INITIALIZED);
 
   char *desc = nomp_get_log_str(err);
-  int matched = match_log(desc, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* "
-                                "libnomp is not initialized.");
+  int eq = logcmp(desc, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* "
+                        "libnomp is not initialized.");
   tfree(desc);
-  nomp_test_assert(matched);
+  nomp_test_assert(eq);
 
   return 0;
 }
