@@ -11,7 +11,7 @@ int check_null_input_(void *p, const char *func, unsigned line,
   return 0;
 }
 
-static char *copyenv(const char *name, size_t size) {
+static char *copy_env(const char *name, size_t size) {
   const char *tmp = getenv(name);
   if (tmp != NULL) {
     char *copy = tcalloc(char, size);
@@ -26,39 +26,39 @@ static char *copyenv(const char *name, size_t size) {
 static int check_env(struct backend *backend) {
   char *tmp = getenv("NOMP_PLATFORM_ID");
   if (tmp)
-    backend->platform_id = strntoui(tmp, NOMP_BUFSIZ);
+    backend->platform_id = strntoui(tmp, MAX_BUFSIZ);
 
   tmp = getenv("NOMP_DEVICE_ID");
   if (tmp)
-    backend->device_id = strntoui(tmp, NOMP_BUFSIZ);
+    backend->device_id = strntoui(tmp, MAX_BUFSIZ);
 
   tmp = getenv("NOMP_VERBOSE_LEVEL");
   if (tmp)
-    backend->verbose = strntoui(tmp, NOMP_BUFSIZ);
+    backend->verbose = strntoui(tmp, MAX_BUFSIZ);
 
-  tmp = copyenv("NOMP_BACKEND", NOMP_BUFSIZ);
+  tmp = copy_env("NOMP_BACKEND", MAX_BUFSIZ);
   if (tmp) {
     backend->backend = trealloc(backend->backend, char, MAX_BACKEND_NAME_SIZE);
     strncpy(backend->backend, tmp, MAX_BACKEND_NAME_SIZE), tfree(tmp);
   }
 
-  tmp = copyenv("NOMP_INSTALL_DIR", NOMP_BUFSIZ);
+  tmp = copy_env("NOMP_INSTALL_DIR", MAX_BUFSIZ);
   if (tmp) {
     size_t size = pathlen(tmp) + 1;
     backend->install_dir = trealloc(backend->install_dir, char, size);
     strncpy(backend->install_dir, tmp, size), tfree(tmp);
   }
 
-  tmp = copyenv("NOMP_ANNOTATE_SCRIPT", NOMP_BUFSIZ);
+  tmp = copy_env("NOMP_ANNOTATE_SCRIPT", MAX_BUFSIZ);
   if (tmp) {
-    size_t size = strnlen(tmp, NOMP_BUFSIZ) + 1;
+    size_t size = strnlen(tmp, MAX_BUFSIZ) + 1;
     backend->annts_script = trealloc(backend->annts_script, char, size);
     strncpy(backend->annts_script, tmp, size), tfree(tmp);
   }
 
-  tmp = copyenv("NOMP_ANNOTATE_FUNCTION", NOMP_BUFSIZ);
+  tmp = copy_env("NOMP_ANNOTATE_FUNCTION", MAX_BUFSIZ);
   if (tmp) {
-    size_t size = strnlen(tmp, NOMP_BUFSIZ) + 1;
+    size_t size = strnlen(tmp, MAX_BUFSIZ) + 1;
     backend->annts_func = trealloc(backend->annts_func, char, size);
     strncpy(backend->annts_func, tmp, size), tfree(tmp);
   }
@@ -88,45 +88,45 @@ static int check_args(int argc, const char **argv, struct backend *backend) {
     if (i + 1 == argc) {
       return set_log(
           NOMP_USER_ARG_IS_INVALID, NOMP_ERROR,
-          strcatn(2, NOMP_BUFSIZ, "Missing argument value: ", argv[i]));
+          strcatn(2, MAX_BUFSIZ, "Missing argument value: ", argv[i]));
     }
 
     if (!strncmp("-b", argv[i], MAX_BACKEND_NAME_SIZE) ||
         !strncmp("--backend", argv[i], MAX_BACKEND_NAME_SIZE)) {
       backend->backend = strndup(argv[i + 1], MAX_BACKEND_NAME_SIZE);
       i += 2;
-    } else if (!strncmp("-p", argv[i], NOMP_BUFSIZ) ||
-               !strncmp("--platform", argv[i], NOMP_BUFSIZ)) {
-      backend->platform_id = strntoui(argv[i + 1], NOMP_BUFSIZ);
+    } else if (!strncmp("-p", argv[i], MAX_BUFSIZ) ||
+               !strncmp("--platform", argv[i], MAX_BUFSIZ)) {
+      backend->platform_id = strntoui(argv[i + 1], MAX_BUFSIZ);
       i += 2;
-    } else if (!strncmp("-d", argv[i], NOMP_BUFSIZ) ||
-               !strncmp("--device", argv[i], NOMP_BUFSIZ)) {
-      backend->device_id = strntoui(argv[i + 1], NOMP_BUFSIZ);
+    } else if (!strncmp("-d", argv[i], MAX_BUFSIZ) ||
+               !strncmp("--device", argv[i], MAX_BUFSIZ)) {
+      backend->device_id = strntoui(argv[i + 1], MAX_BUFSIZ);
       i += 2;
-    } else if (!strncmp("-v", argv[i], NOMP_BUFSIZ) ||
-               !strncmp("--verbose", argv[i], NOMP_BUFSIZ)) {
-      backend->verbose = strntoui(argv[i + 1], NOMP_BUFSIZ);
+    } else if (!strncmp("-v", argv[i], MAX_BUFSIZ) ||
+               !strncmp("--verbose", argv[i], MAX_BUFSIZ)) {
+      backend->verbose = strntoui(argv[i + 1], MAX_BUFSIZ);
       i += 2;
-    } else if (!strncmp("-i", argv[i], NOMP_BUFSIZ) ||
-               !strncmp("--install-dir", argv[i], NOMP_BUFSIZ)) {
+    } else if (!strncmp("-i", argv[i], MAX_BUFSIZ) ||
+               !strncmp("--install-dir", argv[i], MAX_BUFSIZ)) {
       char *install_dir = (char *)argv[i + 1];
       size_t size = pathlen(install_dir) + 1;
       backend->install_dir = strndup(install_dir, size);
       i += 2;
-    } else if (!strncmp("-as", argv[i], NOMP_BUFSIZ) ||
-               !strncmp("--annts-script", argv[i], NOMP_BUFSIZ)) {
+    } else if (!strncmp("-as", argv[i], MAX_BUFSIZ) ||
+               !strncmp("--annts-script", argv[i], MAX_BUFSIZ)) {
       char *annts_script = (char *)argv[i + 1];
       if (annts_script != NULL)
-        backend->annts_script = strndup(annts_script, NOMP_BUFSIZ);
+        backend->annts_script = strndup(annts_script, MAX_BUFSIZ);
       i += 2;
-    } else if (!strncmp("-af", argv[i], NOMP_BUFSIZ) ||
-               !strncmp("--annts-func", argv[i], NOMP_BUFSIZ)) {
+    } else if (!strncmp("-af", argv[i], MAX_BUFSIZ) ||
+               !strncmp("--annts-func", argv[i], MAX_BUFSIZ)) {
       char *annts_func = (char *)argv[i + 1];
-      backend->annts_func = strndup(annts_func, NOMP_BUFSIZ);
+      backend->annts_func = strndup(annts_func, MAX_BUFSIZ);
       i += 2;
     } else {
       return set_log(NOMP_USER_ARG_IS_INVALID, NOMP_ERROR,
-                     strcatn(2, NOMP_BUFSIZ, "Invalid argument : ", argv[i]));
+                     strcatn(2, MAX_BUFSIZ, "Invalid argument : ", argv[i]));
     }
   }
 
@@ -178,7 +178,7 @@ int nomp_init(int argc, const char **argv) {
     py_append_to_sys_path(".");
     // nomp.install_dir should be set and we use it here.
     char *abs_dir = strcatn(
-        3, MAX(2, pathlen(nomp.install_dir), strnlen(py_dir, NOMP_BUFSIZ)),
+        3, MAX(2, pathlen(nomp.install_dir), strnlen(py_dir, MAX_BUFSIZ)),
         nomp.install_dir, "/", py_dir);
     py_append_to_sys_path(abs_dir);
     err = tfree(abs_dir);
@@ -260,25 +260,25 @@ static int parse_clauses(char **usr_file, char **usr_func, PyObject **dict_,
   PyObject *dict = *dict_ = PyDict_New();
   unsigned i = 0;
   while (clauses[i]) {
-    if (strncmp(clauses[i], "transform", NOMP_BUFSIZ) == 0) {
+    if (strncmp(clauses[i], "transform", MAX_BUFSIZ) == 0) {
       if (clauses[i + 1] == NULL || clauses[i + 2] == NULL)
         return set_log(
             NOMP_USER_INPUT_NOT_PROVIDED, NOMP_ERROR,
             "\"transform\" clause should be followed by a file name and a "
             "function name. At least one of them is not provided.");
       *usr_file = strndup(clauses[i + 1], pathlen(clauses[i + 1]));
-      *usr_func = strndup(clauses[i + 2], NOMP_BUFSIZ);
+      *usr_func = strndup(clauses[i + 2], MAX_BUFSIZ);
       i = i + 3;
-    } else if (strncmp(clauses[i], "annotate", NOMP_BUFSIZ) == 0) {
+    } else if (strncmp(clauses[i], "annotate", MAX_BUFSIZ) == 0) {
       if (clauses[i + 1] == NULL || clauses[i + 2] == NULL)
         return set_log(NOMP_USER_INPUT_NOT_PROVIDED, NOMP_ERROR,
                        "\"annotate\" clause should be followed by a key value "
                        "pair. At least one of them is not provided.");
       const char *key = clauses[i + 1], *val = clauses[i + 2];
       PyObject *pkey =
-          PyUnicode_FromStringAndSize(key, strnlen(key, NOMP_BUFSIZ));
+          PyUnicode_FromStringAndSize(key, strnlen(key, MAX_BUFSIZ));
       PyObject *pval =
-          PyUnicode_FromStringAndSize(val, strnlen(val, NOMP_BUFSIZ));
+          PyUnicode_FromStringAndSize(val, strnlen(val, MAX_BUFSIZ));
       PyDict_SetItem(dict, pkey, pval);
       Py_XDECREF(pkey), Py_XDECREF(pval);
       i = i + 3;
