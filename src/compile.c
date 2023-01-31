@@ -55,12 +55,10 @@ static int write_file(const char *path, const char *src) {
   return 0;
 }
 
-// FIXME: Should be done using a cmake project.
 static int compile_aux(const char *cc, const char *cflags, const char *src,
                        const char *out) {
   unsigned len = pathlen(cc) + strnlen(cflags, MAX_CFLAGS_SIZE) + pathlen(src) +
                  pathlen(out) + 32;
-
   char *cmd = tcalloc(char, len);
   snprintf(cmd, len, "%s %s %s -o %s", cc, cflags, src, out);
   int ret = system(cmd), failed = 0;

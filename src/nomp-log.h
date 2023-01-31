@@ -10,9 +10,6 @@ extern const char *ERR_STR_RUNTIME_MEMORY_ALLOCATION_FAILURE;
 
 extern const char *ERR_STR_KNL_ARG_TYPE_IS_INVALID;
 
-extern const char *ERR_STR_CUDA_FAILURE;
-extern const char *ERR_STR_OPENCL_FAILURE;
-
 /**
  * @ingroup nomp_internal_api
  * @brief Register a log with libnomp runtime.
