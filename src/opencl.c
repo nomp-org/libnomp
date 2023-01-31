@@ -77,7 +77,7 @@ static int opencl_knl_build(struct backend *bnd, struct prog *prg,
     char *log = tcalloc(char, log_size);
     // Verify log memory allocation
     if (!log)
-      return set_log(NOMP_RUNTIME_MEMORY_ALLOCATION_FAILED, NOMP_ERROR,
+      return set_log(NOMP_RUNTIME_MEMORY_ALLOCATION_FAILURE, NOMP_ERROR,
                      ERR_STR_RUNTIME_MEMORY_ALLOCATION_FAILURE);
 
     // Get the log
@@ -193,7 +193,7 @@ int opencl_init(struct backend *bnd, const int platform_id,
 
   cl_platform_id *cl_platforms = tcalloc(cl_platform_id, num_platforms);
   if (cl_platforms == NULL) {
-    return set_log(NOMP_RUNTIME_MEMORY_ALLOCATION_FAILED, NOMP_ERROR,
+    return set_log(NOMP_RUNTIME_MEMORY_ALLOCATION_FAILURE, NOMP_ERROR,
                    ERR_STR_RUNTIME_MEMORY_ALLOCATION_FAILURE);
   }
 
@@ -210,7 +210,7 @@ int opencl_init(struct backend *bnd, const int platform_id,
 
   cl_device_id *cl_devices = tcalloc(cl_device_id, num_devices);
   if (cl_devices == NULL)
-    return set_log(NOMP_RUNTIME_MEMORY_ALLOCATION_FAILED, NOMP_ERROR,
+    return set_log(NOMP_RUNTIME_MEMORY_ALLOCATION_FAILURE, NOMP_ERROR,
                    ERR_STR_RUNTIME_MEMORY_ALLOCATION_FAILURE);
 
   err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, num_devices, cl_devices,

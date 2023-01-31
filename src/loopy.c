@@ -12,47 +12,49 @@ void py_print(const char *msg, PyObject *obj) {
 }
 
 int py_append_to_sys_path(const char *path) {
+  int err = 1;
   PyObject *sys = PyImport_ImportModule("sys");
   if (sys) {
     PyObject *ppath = PyObject_GetAttrString(sys, "path");
     Py_DECREF(sys);
     if (ppath) {
       PyObject *pstr = PyUnicode_FromString(path);
-      int err = PyList_Append(ppath, pstr);
+      err = PyList_Append(ppath, pstr);
       Py_DECREF(ppath), Py_XDECREF(pstr);
-      // TODO: Add the exception to the error message as well
-      if (err)
-        return set_log(NOMP_PY_CALL_FAILED, NOMP_ERROR,
-                       "Appending path to the sys.path failed.");
     }
   }
 
+  if (err) {
+    return set_log(NOMP_PYCALL_FAILURE, NOMP_ERROR,
+                   "Appending path to the sys.path failed.");
+  }
   return 0;
 }
 
 int py_c_to_loopy(PyObject **knl, const char *src, const char *backend) {
-  int err = NOMP_LOOPY_CONVERSION_ERROR;
+  int err = 1;
   PyObject *lpy_api = PyUnicode_FromString(loopy_api);
   if (lpy_api) {
     PyObject *module = PyImport_Import(lpy_api);
     if (module) {
       PyObject *c_to_lpy = PyObject_GetAttrString(module, c_to_loopy);
       if (c_to_lpy) {
-        PyObject *py_src = PyUnicode_FromString(src);
-        PyObject *py_backend = PyUnicode_FromString(backend);
-        *knl = PyObject_CallFunctionObjArgs(c_to_lpy, py_src, py_backend, NULL);
-        if (*knl)
-          err = 0;
-        Py_XDECREF(py_src), Py_XDECREF(py_backend), Py_DECREF(c_to_lpy);
+        PyObject *psrc = PyUnicode_FromString(src);
+        PyObject *pbackend = PyUnicode_FromString(backend);
+        *knl = PyObject_CallFunctionObjArgs(c_to_lpy, psrc, pbackend, NULL);
+        err = (*knl == NULL);
+        Py_XDECREF(psrc), Py_XDECREF(pbackend), Py_DECREF(c_to_lpy);
       }
       Py_DECREF(module);
     }
     Py_DECREF(lpy_api);
   }
-  if (err)
-    return set_log(NOMP_LOOPY_CONVERSION_ERROR, NOMP_ERROR,
-                   ERR_STR_LOOPY_CONVERSION_ERROR);
-  return err;
+
+  if (err) {
+    return set_log(NOMP_LOOPY_CONVERSION_FAILURE, NOMP_ERROR,
+                   "C to Loopy conversion failed.\n");
+  }
+  return 0;
 }
 
 int py_user_annotate(PyObject **knl, PyObject *annts, const char *file,
@@ -63,6 +65,7 @@ int py_user_annotate(PyObject **knl, PyObject *annts, const char *file,
   if (file == NULL || func == NULL)
     return 0;
 
+  int err = 1;
   PyObject *pfile = PyUnicode_FromString(file);
   if (pfile) {
     PyObject *module = PyImport_Import(pfile);
@@ -73,34 +76,20 @@ int py_user_annotate(PyObject **knl, PyObject *annts, const char *file,
       if (pfunc && PyCallable_Check(pfunc)) {
         PyObject *tknl = PyObject_CallFunctionObjArgs(pfunc, *knl, annts, NULL);
         Py_DECREF(pfunc);
-        if (tknl)
+        if (tknl) {
           Py_DECREF(*knl), *knl = tknl;
-        else
-          return set_log(
-              NOMP_PY_CALL_FAILED, NOMP_ERROR,
-              "PyObject_CallFunctionObjArgs() failed when calling user "
-              "annotate function: %s.",
-              func);
-      } else {
-        return set_log(NOMP_PY_CALL_FAILED, NOMP_ERROR,
-                       "PyObject_GetAttrString() failed when importing user "
-                       "annotate function: %s.",
-                       func);
+          err = 0;
+        }
       }
-    } else {
-      return set_log(
-          NOMP_PY_CALL_FAILED, NOMP_ERROR,
-          "PyImport_Import() failed when importing user annotate file: %s.",
-          file);
     }
-  } else {
-    return set_log(NOMP_PY_CALL_FAILED, NOMP_ERROR,
-                   "PyUnicode_FromString() failed when converting user "
-                   "annotate file name \"%s\""
-                   "to a python string.",
-                   file);
   }
 
+  if (err) {
+    return set_log(
+        NOMP_PYCALL_FAILURE, NOMP_ERROR,
+        "Failed to call user annotate function: \"%s\" in file: \"%s\".", func,
+        file);
+  }
   return 0;
 }
 
@@ -111,6 +100,7 @@ int py_user_transform(PyObject **knl, const char *file, const char *func) {
   if (file == NULL || func == NULL)
     return 0;
 
+  int err = 1;
   PyObject *pfile = PyUnicode_FromString(file);
   if (pfile) {
     PyObject *module = PyImport_Import(pfile);
@@ -121,97 +111,82 @@ int py_user_transform(PyObject **knl, const char *file, const char *func) {
       if (pfunc && PyCallable_Check(pfunc)) {
         PyObject *tknl = PyObject_CallFunctionObjArgs(pfunc, *knl, NULL);
         Py_DECREF(pfunc);
-        if (tknl)
+        if (tknl) {
           Py_DECREF(*knl), *knl = tknl;
-        else
-          return set_log(
-              NOMP_PY_CALL_FAILED, NOMP_ERROR,
-              "PyObject_CallFunctionObjArgs() failed when calling user "
-              "transform function: %s.",
-              func);
-      } else {
-        return set_log(NOMP_PY_CALL_FAILED, NOMP_ERROR,
-                       "PyObject_GetAttrString() failed when importing user "
-                       "transform function: %s.",
-                       func);
+          err = 0;
+        }
       }
-    } else {
-      return set_log(
-          NOMP_PY_CALL_FAILED, NOMP_ERROR,
-          "PyImport_Import() failed when importing user transform file: %s.",
-          file);
     }
-  } else {
-    return set_log(NOMP_PY_CALL_FAILED, NOMP_ERROR,
-                   "PyUnicode_FromString() failed when converting user "
-                   "transform file name \"%s\""
-                   "to a python string.",
-                   file);
   }
 
+  if (err) {
+    return set_log(
+        NOMP_PYCALL_FAILURE, NOMP_ERROR,
+        "Failed to call user transform function: \"%s\" in file: \"%s\".", func,
+        file);
+  }
   return 0;
 }
 
 int py_get_knl_name_and_src(char **name, char **src, PyObject *knl) {
+  check_null_input(knl);
+
   int err = 1;
-
-  if (knl) {
-    err = NOMP_LOOPY_KNL_NAME_NOT_FOUND;
-    PyObject *epts = PyObject_GetAttrString(knl, "entrypoints");
-    if (epts) {
-      Py_ssize_t len = PySet_Size(epts);
-      // FIXME: This doesn't require iterator API
-      // Iterator C API: https://docs.python.org/3/c-api/iter.html
-      PyObject *iter = PyObject_GetIter(epts);
-      if (iter) {
-        PyObject *entry = PyIter_Next(iter);
-        PyObject *py_name = PyObject_Str(entry);
-        if (py_name) {
-          Py_ssize_t size;
-          const char *name_ = PyUnicode_AsUTF8AndSize(py_name, &size);
-          *name = tcalloc(char, size + 1);
-          strncpy(*name, name_, size + 1);
-          Py_DECREF(py_name), err = 0;
-        }
-        Py_XDECREF(entry), Py_DECREF(iter);
+  PyObject *epts = PyObject_GetAttrString(knl, "entrypoints");
+  if (epts) {
+    Py_ssize_t len = PySet_Size(epts);
+    // FIXME: This doesn't require iterator API
+    // Iterator C API: https://docs.python.org/3/c-api/iter.html
+    PyObject *iter = PyObject_GetIter(epts);
+    if (iter) {
+      PyObject *entry = PyIter_Next(iter), *py_name = PyObject_Str(entry);
+      if (py_name) {
+        Py_ssize_t size;
+        const char *name_ = PyUnicode_AsUTF8AndSize(py_name, &size);
+        *name = strndup(name_, size);
+        Py_DECREF(py_name), err = 0;
       }
-      Py_DECREF(epts);
+      Py_XDECREF(entry), Py_DECREF(iter);
     }
-    if (err)
-      return set_log(NOMP_LOOPY_KNL_NAME_NOT_FOUND, NOMP_ERROR,
-                     ERR_STR_LOOPY_KNL_NAME_NOT_FOUND, *name);
-
-    // Get the kernel source
-    err = 1;
-    PyObject *lpy = PyImport_ImportModule("loopy");
-    if (lpy) {
-      PyObject *gen_v2 = PyObject_GetAttrString(lpy, "generate_code_v2");
-      if (gen_v2) {
-        PyObject *code = PyObject_CallFunctionObjArgs(gen_v2, knl, NULL);
-        if (code) {
-          PyObject *py_device = PyObject_GetAttrString(code, "device_code");
-          if (py_device) {
-            PyObject *py_src = PyObject_CallFunctionObjArgs(py_device, NULL);
-            if (py_src) {
-              Py_ssize_t size;
-              const char *src_ = PyUnicode_AsUTF8AndSize(py_src, &size);
-              *src = tcalloc(char, size + 1);
-              strncpy(*src, src_, size + 1);
-              Py_DECREF(py_src), err = 0;
-            }
-            Py_DECREF(py_device);
-          }
-          Py_DECREF(code);
-        }
-        Py_DECREF(gen_v2);
-      }
-      Py_DECREF(lpy);
-    }
+    Py_DECREF(epts);
   }
-  if (err)
-    return set_log(NOMP_LOOPY_CODEGEN_FAILED, NOMP_ERROR,
-                   ERR_STR_LOOPY_CODEGEN_FAILED, *name);
 
+  if (err) {
+    return set_log(NOMP_LOOPY_KNL_NAME_NOT_FOUND, NOMP_ERROR,
+                   "Unable to get loopy kernel name.");
+  }
+
+  // Get the kernel source
+  err = 1;
+  PyObject *lpy = PyImport_ImportModule("loopy");
+  if (lpy) {
+    PyObject *gen_v2 = PyObject_GetAttrString(lpy, "generate_code_v2");
+    if (gen_v2) {
+      PyObject *code = PyObject_CallFunctionObjArgs(gen_v2, knl, NULL);
+      if (code) {
+        PyObject *py_device = PyObject_GetAttrString(code, "device_code");
+        if (py_device) {
+          PyObject *py_src = PyObject_CallFunctionObjArgs(py_device, NULL);
+          if (py_src) {
+            Py_ssize_t size;
+            const char *src_ = PyUnicode_AsUTF8AndSize(py_src, &size);
+            *src = strndup(src_, size);
+            Py_DECREF(py_src), err = 0;
+          }
+          Py_DECREF(py_device);
+        }
+        Py_DECREF(code);
+      }
+      Py_DECREF(gen_v2);
+    }
+    Py_DECREF(lpy);
+  }
+
+  if (err) {
+    return set_log(NOMP_LOOPY_CODEGEN_FAILURE, NOMP_ERROR,
+                   "Backend code generation from loopy kernel \"%s\" failed.",
+                   *name);
+  }
   return 0;
 }
 
@@ -243,9 +218,11 @@ int py_get_grid_size(struct prog *prg, PyObject *knl) {
       Py_DECREF(callables);
     }
   }
-  if (err)
-    return set_log(NOMP_LOOPY_GET_GRIDSIZE_FAILED, NOMP_ERROR,
-                   ERR_STR_LOOPY_GRIDSIZE_FAILED);
+
+  if (err) {
+    return set_log(NOMP_LOOPY_GET_GRIDSIZE_FAILURE, NOMP_ERROR,
+                   "Unable to get grid sizes from loopy kernel.");
+  }
   return 0;
 }
 
@@ -294,7 +271,7 @@ int py_eval_grid_size(struct prog *prg, PyObject *dict) {
   }
 
   if (err) {
-    return set_log(NOMP_LOOPY_EVAL_GRIDSIZE_FAILED, NOMP_ERROR,
+    return set_log(NOMP_LOOPY_EVAL_GRIDSIZE_FAILURE, NOMP_ERROR,
                    "libnomp was unable to evaluate the kernel launch "
                    "parameters using pymbolic.");
   }

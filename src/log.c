@@ -16,13 +16,6 @@ const char *ERR_STR_RUNTIME_MEMORY_ALLOCATION_FAILURE =
 const char *ERR_STR_KNL_ARG_TYPE_IS_INVALID =
     "Invalid libnomp kernel argument type %d.";
 
-const char *ERR_STR_LOOPY_CONVERSION_ERROR = "C to Loopy conversion failed.";
-const char *ERR_STR_LOOPY_KNL_NAME_NOT_FOUND =
-    "Failed to find loopy kernel %s.";
-const char *ERR_STR_LOOPY_CODEGEN_FAILED =
-    "Code generation from loopy kernel %s failed.";
-const char *ERR_STR_LOOPY_GRIDSIZE_FAILED = "Loopy grid size failure.";
-
 const char *ERR_STR_CUDA_FAILURE = "Cuda %s failed: %s.";
 const char *ERR_STR_OPENCL_FAILURE = "OpenCL %s failure with error code: %d.";
 
@@ -42,7 +35,7 @@ int set_log_(const char *description, int logno, nomp_log_type type,
     logs_max += logs_max / 2 + 1;
     logs = trealloc(logs, struct log, logs_max);
     if (logs == NULL)
-      return NOMP_RUNTIME_MEMORY_ALLOCATION_FAILED;
+      return NOMP_RUNTIME_MEMORY_ALLOCATION_FAILURE;
   }
 
   va_list vargs;

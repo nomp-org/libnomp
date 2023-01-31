@@ -187,7 +187,7 @@ int nomp_init(int argc, const char **argv) {
     err = 0;
   }
   if (err)
-    return set_log(NOMP_PY_INITIALIZE_ERROR, NOMP_ERROR,
+    return set_log(NOMP_PY_INITIALIZE_FAILURE, NOMP_ERROR,
                    "Unable to initialize python during initializing libnomp.");
 
   initialized = 1;
@@ -427,7 +427,7 @@ int nomp_finalize(void) {
 
   initialized = nomp.finalize(&nomp);
   if (initialized) {
-    return set_log(NOMP_RUNTIME_FAILED_TO_FINALIZE, NOMP_ERROR,
+    return set_log(NOMP_RUNTIME_FINALIZE_FAILUREE, NOMP_ERROR,
                    "Failed to initialize libnomp.");
   }
 
