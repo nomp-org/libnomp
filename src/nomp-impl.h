@@ -28,16 +28,28 @@
       return err_;                                                             \
   }
 
+struct mem {
+  size_t idx0, idx1, usize;
+  void *hptr, *bptr;
+};
+
+/**
+ * @ingroup nomp_other_utils
+ * @brief Returns the mem object corresponding to host pointer \p p.
+ *
+ * Returns the mem object corresponding to host ponter \p p. If no buffer has
+ * been allocated for \p p on the device, returns NULL.
+ *
+ * @param[in] p Host pointer
+ * @return struct mem *
+ */
+struct mem *mem_if_mapped(void *p);
+
 struct prog {
   unsigned nargs, ndim;
   PyObject *py_global, *py_local, *py_dict;
   size_t global[3], local[3];
   void *bptr;
-};
-
-struct mem {
-  size_t idx0, idx1, usize;
-  void *hptr, *bptr;
 };
 
 struct backend {
@@ -51,18 +63,6 @@ struct backend {
   int (*finalize)(struct backend *);
   void *bptr;
 };
-
-/**
- * @ingroup nomp_other_utils
- * @brief Returns the mem object corresponding to host pointer `p`.
- *
- * Returns the mem object corresponding to host ponter `p`. If no buffer has
- * been allocated for `p` on the device, returns NULL.
- *
- * @param[in] p Host pointer
- * @return struct mem *
- */
-struct mem *mem_if_mapped(void *p);
 
 /**
  * @defgroup nomp_backend_init Backend init functions
@@ -118,11 +118,11 @@ int py_append_to_sys_path(const char *path);
  * @brief Creates loopy kernel from C source.
  *
  * @param[out] knl Loopy kernel object.
- * @param[in] c_src C kernel source.
+ * @param[in] src C kernel source.
  * @param[in] backend Backend name.
  * @return int
  */
-int py_c_to_loopy(PyObject **knl, const char *c_src, const char *backend);
+int py_c_to_loopy(PyObject **knl, const char *src, const char *backend);
 
 /**
  * @ingroup nomp_py_utils
@@ -213,12 +213,12 @@ void py_print(const char *msg, PyObject *obj);
  * Concatenates atmost `nstr` strings and returns a pointer to
  * resulting string.
  *
- * @param[in] nstr Number of strings to concatenate.
+ * @param[in] n Number of strings to concatenate.
  * @param[in] max_len Maximum length of an individual string.
  * @param[in] ... Strings to concatenate.
  * @return char*
  */
-char *strcatn(unsigned nstr, unsigned max_len, ...);
+char *strcatn(unsigned n, unsigned max_len, ...);
 
 /**
  * @ingroup nomp_other_utils
