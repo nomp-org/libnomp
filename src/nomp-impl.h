@@ -16,7 +16,7 @@
 #include "nomp-mem.h"
 #include "nomp.h"
 
-#define NOMP_BUFSIZ 64
+#define MAX_BUFSIZ 64
 #define MAX_BACKEND_NAME_SIZE 32
 #define MAX_SRC_SIZE 16384
 #define MAX_CFLAGS_SIZE 16384
@@ -43,7 +43,7 @@ struct mem {
 struct backend {
   char *backend, *install_dir, *annts_script, *annts_func;
   int platform_id, device_id, verbose;
-  char name[NOMP_BUFSIZ];
+  char name[MAX_BUFSIZ];
   int (*update)(struct backend *, struct mem *, const int);
   int (*knl_build)(struct backend *, struct prog *, const char *, const char *);
   int (*knl_run)(struct backend *, struct prog *, va_list);
