@@ -422,7 +422,7 @@ int nomp_finalize(void) {
 
   initialized = nomp.finalize(&nomp);
   if (initialized) {
-    return set_log(NOMP_RUNTIME_FINALIZE_FAILUREE, NOMP_ERROR,
+    return set_log(NOMP_RUNTIME_FINALIZE_FAILURE, NOMP_ERROR,
                    "Failed to initialize libnomp.");
   }
 

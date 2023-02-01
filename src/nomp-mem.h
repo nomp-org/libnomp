@@ -1,3 +1,6 @@
+#if !defined(_NOMP_MEM_H_)
+#define _NOMP_MEM_H_
+
 #include <stddef.h>
 #include <stdlib.h>
 
@@ -15,6 +18,7 @@
  * @return int
  */
 int sfree(void *p, const char *file, unsigned line);
+
 /**
  * @ingroup nomp_mem_utils
  * @brief Helper macro for deallocating or freeing a memory block using sfree().
@@ -35,6 +39,7 @@ int sfree(void *p, const char *file, unsigned line);
  * @return Void pointer
  */
 void *smalloc(size_t size, const char *file, unsigned line);
+
 /**
  * @ingroup nomp_mem_utils
  * @brief Helper macro for allocating memory blocks using smalloc().
@@ -58,6 +63,7 @@ void *smalloc(size_t size, const char *file, unsigned line);
  * @return Void pointer
  */
 void *scalloc(size_t nmemb, size_t size, const char *file, unsigned line);
+
 /**
  * @ingroup nomp_mem_utils
  * @brief Helper macro for allocating an array in memory with elements
@@ -81,6 +87,7 @@ void *scalloc(size_t nmemb, size_t size, const char *file, unsigned line);
  * @return Void pointer
  */
 void *srealloc(void *ptr, size_t size, const char *file, unsigned line);
+
 /**
  * @ingroup nomp_mem_utils
  * @brief Helper macro for reallocating memory blocks using srealloc().
@@ -93,3 +100,5 @@ void *srealloc(void *ptr, size_t size, const char *file, unsigned line);
  */
 #define trealloc(ptr, T, count)                                                \
   ((T *)srealloc((ptr), (count) * sizeof(T), __FILE__, __LINE__))
+
+#endif // _NOMP_MEM_H_
