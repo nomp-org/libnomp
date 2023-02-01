@@ -15,8 +15,9 @@ char *strcatn(unsigned n, unsigned max_len, ...) {
     strncpy(out + len, s, strnlen(s, max_len));
     len += strnlen(s, max_len);
   }
-  va_end(vargs);
   out[len] = '\0';
+
+  va_end(vargs);
 
   return out;
 }
