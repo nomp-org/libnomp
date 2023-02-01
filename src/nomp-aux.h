@@ -71,12 +71,12 @@ size_t pathlen(const char *path);
  *
  * Returns the maximum between two or more integers.
  *
- * @param[in] args Total number of integers.
+ * @param[in] n Total number of integers.
  * @param[in] ... List of integers to find the maximum of as a variable argument
  * list.
  * @return int
  */
-int MAX(unsigned args, ...);
+int maxn(unsigned n, ...);
 
 /**
  * @ingroup nomp_other_utils

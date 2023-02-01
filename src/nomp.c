@@ -165,7 +165,7 @@ int nomp_init(int argc, const char **argv) {
     py_append_to_sys_path(".");
     // nomp.install_dir should be set and we use it here.
     char *abs_dir = strcatn(
-        3, MAX(2, pathlen(nomp.install_dir), strnlen(py_dir, MAX_BUFSIZ)),
+        3, maxn(2, pathlen(nomp.install_dir), strnlen(py_dir, MAX_BUFSIZ)),
         nomp.install_dir, "/", py_dir);
     err = py_append_to_sys_path(abs_dir);
     tfree(abs_dir);
