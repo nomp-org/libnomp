@@ -49,16 +49,19 @@ size_t pathlen(const char *path) {
   return (size_t)pathconf(path, _PC_PATH_MAX);
 }
 
-int MAX(unsigned args, ...) {
+int maxn(unsigned n, ...) {
   va_list valist;
-  va_start(valist, args);
-  int max = INT_MIN, cur;
-  for (unsigned i = 0; i < args; i++) {
-    cur = va_arg(valist, int);
+  va_start(valist, n);
+
+  int max = INT_MIN;
+  for (unsigned i = 0; i < n; i++) {
+    int cur = va_arg(valist, int);
     if (max < cur)
       max = cur;
   }
+
   va_end(valist);
+
   return max;
 }
 

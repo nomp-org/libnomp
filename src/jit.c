@@ -8,7 +8,7 @@
 static int make_knl_dir(char **dir_, const char *cache_dir, const char *src) {
   unsigned len = strnlen(src, MAX_SRC_SIZE);
   if (len == MAX_SRC_SIZE) {
-    return set_log(NOMP_COMPILE_FAILURE, NOMP_ERROR,
+    return set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
                    "Kernel source size exceeds maximum allowed size: %u.",
                    MAX_SRC_SIZE);
   }
@@ -21,17 +21,17 @@ static int make_knl_dir(char **dir_, const char *cache_dir, const char *src) {
   unsigned char *ret = SHA256(s, len, hash);
   tfree(s);
   if (ret == NULL) {
-    return set_log(NOMP_COMPILE_FAILURE, NOMP_ERROR,
+    return set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
                    "Unable to calculate SHA256 hash of string: \"%s\".", s);
   }
 
-  unsigned max = MAX(pathlen(cache_dir), SHA256_DIGEST_LENGTH);
+  unsigned max = maxn(pathlen(cache_dir), SHA256_DIGEST_LENGTH);
   char *dir = *dir_ = strcatn(3, max, cache_dir, "/", hash);
   // Create the folder if it doesn't exist.
   if (access(dir, F_OK)) {
     if (mkdir(dir, S_IRUSR | S_IWUSR) == -1) {
       tfree(dir);
-      return set_log(NOMP_COMPILE_FAILURE, NOMP_ERROR,
+      return set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
                      "Unable to create directory: %s.", dir);
     }
   }
@@ -47,8 +47,8 @@ static int write_file(const char *path, const char *src) {
       fprintf(fp, "%s", src);
       fclose(fp);
     } else {
-      return set_log(NOMP_COMPILE_FAILURE, NOMP_ERROR,
-                     "Unable to write file: %s.", path);
+      return set_log(NOMP_JIT_FAILURE, NOMP_ERROR, "Unable to write file: %s.",
+                     path);
     }
   }
 
@@ -63,18 +63,18 @@ static int compile_aux(const char *cc, const char *cflags, const char *src,
   snprintf(cmd, len, "%s %s %s -o %s", cc, cflags, src, out);
   int ret = system(cmd), failed = 0;
   if (ret == -1) {
-    failed = set_log(NOMP_COMPILE_FAILURE, NOMP_ERROR,
+    failed = set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
                      "Got error \"%s\" when trying to execute command: \"%s\".",
                      cmd, strerror(errno));
   } else if (WIFEXITED(ret)) {
     int status = WEXITSTATUS(ret);
     if (status) {
-      failed = set_log(NOMP_COMPILE_FAILURE, NOMP_ERROR,
+      failed = set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
                        "Command: \"%s\" exitted with non-zero status code: %d.",
                        cmd, status);
     }
   } else {
-    failed = set_log(NOMP_COMPILE_FAILURE, NOMP_ERROR,
+    failed = set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
                      "Command: \"%s\" was terminated by a signal.", cmd);
   }
   tfree(cmd);
@@ -96,7 +96,7 @@ int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
   return_on_err(make_knl_dir(&dir, wrkdir, source));
 
   const char *cpp = "source.cpp", *lib = "mylib.so";
-  unsigned max = MAX(pathlen(dir), MAX(strnlen(cpp, 64), strnlen(lib, 64)));
+  unsigned max = maxn(pathlen(dir), maxn(strnlen(cpp, 64), strnlen(lib, 64)));
   char *src = strcatn(3, max, dir, "/", cpp);
   char *out = strcatn(3, max, dir, "/", lib);
   tfree(dir);
@@ -117,7 +117,7 @@ int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
 
   if (dlh == NULL || dlf == NULL) {
     return set_log(
-        NOMP_COMPILE_FAILURE, NOMP_ERROR,
+        NOMP_JIT_FAILURE, NOMP_ERROR,
         "Failed to open object/symbol \"%s\" due to error: \"%s\".\n",
         dlerror());
   }
@@ -137,7 +137,7 @@ int jit_run(int id, int n, ...) {
     return 0;
   }
 
-  return set_log(NOMP_COMPILE_FAILURE, NOMP_ERROR,
+  return set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
                  "Failed to run program with handle: %d", id);
 }
 
@@ -150,6 +150,6 @@ int jit_free(int *id) {
     return 0;
   }
 
-  return set_log(NOMP_COMPILE_FAILURE, NOMP_ERROR,
+  return set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
                  "Failed to free program with handle: %d", fid);
 }
