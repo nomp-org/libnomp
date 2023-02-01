@@ -38,18 +38,6 @@ struct mem {
   void *hptr, *bptr;
 };
 
-/**
- * @ingroup nomp_mem_utils
- * @brief Returns the mem object corresponding to host pointer \p p.
- *
- * Returns the mem object corresponding to host ponter \p p. If no buffer has
- * been allocated for \p p on the device, returns NULL.
- *
- * @param[in] p Host pointer
- * @return struct mem *
- */
-struct mem *mem_if_mapped(void *p);
-
 struct prog {
   unsigned nargs, ndim;
   PyObject *py_global, *py_local, *py_dict;
@@ -68,6 +56,18 @@ struct backend {
   int (*finalize)(struct backend *);
   void *bptr;
 };
+
+/**
+ * @ingroup nomp_mem_utils
+ * @brief Returns the mem object corresponding to host pointer \p p.
+ *
+ * Returns the mem object corresponding to host ponter \p p. If no buffer has
+ * been allocated for \p p on the device, returns NULL.
+ *
+ * @param[in] p Host pointer
+ * @return struct mem *
+ */
+struct mem *mem_if_mapped(void *p);
 
 /**
  * @defgroup nomp_backend_utils Backend init functions
@@ -111,13 +111,13 @@ int cuda_init(struct backend *backend, const int platform_id,
 
 /**
  * @ingroup nomp_compile_utils
- * @brief Compile a source string at runtime.
+ * @brief JIT compile a source string at runtime.
  *
- * Compile a source string at runtime using a specified compiler, flags and
+ * JIT Compile a source string at runtime using a specified compiler, flags and
  * a working directory. \p id is set to dynamically loaded \p entry point in the
- * compiled object file. \p id should be set to -1 on input and is set to a
- * non-negative value upon successful exit. On success, compile() returns 0 and
- * non-zero otherwise.
+ * JIT compiled program. \p id should be set to -1 on input and is set to a
+ * non-negative value upon successful exit. On success, jit_compile() returns 0
+ * and a positive value otherwise.
  *
  * @param[out] id Handle to the \p entry in the compiled binary file.
  * @param[in] source Source to be compiled at runtime.
@@ -130,7 +130,31 @@ int cuda_init(struct backend *backend, const int platform_id,
  *
  * @return int
  */
-int compile(int *id, const char *source, const char *cc, const char *cflags,
-            const char *entry, const char *wrkdir);
+int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
+                const char *entry, const char *wrkdir);
+
+/**
+ * @ingroup nomp_compile_utils
+ * @brief Run a JIT compiled program.
+ *
+ * @param[in] id Handle of the JIT compiled program.
+ * @param[in] n Number of arguments to the program.
+ * @param[in] ... Variable list of arguments to the program.
+ *
+ * @return int
+ */
+int jit_run(int id, int n, ...);
+
+/**
+ * @ingroup nomp_compile_utils
+ * @brief Free a jit compiled program.
+ *
+ * Free a jit compiled program. On successful exit, \p id is set to -1.
+ *
+ * @param[in] id Handle of the JIT compiled program.
+ *
+ * @return int
+ */
+int jit_free(int *id);
 
 #endif // _LIB_NOMP_IMPL_H_

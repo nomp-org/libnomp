@@ -20,7 +20,7 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 # outside the build tree to the install RPATH
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-set(SOURCES src/nomp.c src/lpy.c src/aux.c src/log.c src/mem.c src/compile.c)
+set(SOURCES src/nomp.c src/lpy.c src/aux.c src/log.c src/mem.c src/jit.c)
 if (ENABLE_OPENCL)
   list(APPEND SOURCES src/opencl.c)
   add_compile_definitions(OPENCL_ENABLED)

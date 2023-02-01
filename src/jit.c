@@ -84,14 +84,14 @@ static int compile_aux(const char *cc, const char *cflags, const char *src,
 
 struct function {
   void *dlh;
-  void (*dlf)(int N, ...);
+  void (*dlf)(int n, va_list vargs);
 };
 
 static struct function **funcs = NULL;
 static unsigned funcs_n = 0, funcs_max = 0;
 
-int compile(int *id, const char *source, const char *cc, const char *cflags,
-            const char *entry, const char *wrkdir) {
+int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
+                const char *entry, const char *wrkdir) {
   char *dir = NULL;
   return_on_err(make_knl_dir(&dir, wrkdir, source));
 
@@ -116,13 +116,40 @@ int compile(int *id, const char *source, const char *cc, const char *cflags,
     dlf = dlsym(dlh, entry);
 
   if (dlh == NULL || dlf == NULL) {
-    return set_log(NOMP_COMPILE_FAILURE, NOMP_ERROR,
-                   "Failed to open object/symbol \"%s\". Error: \"%s\".\n",
-                   dlerror());
+    return set_log(
+        NOMP_COMPILE_FAILURE, NOMP_ERROR,
+        "Failed to open object/symbol \"%s\" due to error: \"%s\".\n",
+        dlerror());
   }
 
   struct function *f = funcs[funcs_n] = tcalloc(struct function, 1);
-  f->dlh = dlh, f->dlf = (void (*)(int N, ...))dlf, *id = funcs_n++;
+  f->dlh = dlh, f->dlf = (void (*)(int, va_list))dlf, *id = funcs_n++;
 
   return 0;
+}
+
+int jit_run(int id, int n, ...) {
+  if (id >= 0 && id < funcs_n && funcs[id] && funcs[id]->dlf) {
+    va_list vargs;
+    va_start(vargs, n);
+    funcs[id]->dlf(n, vargs);
+    va_end(vargs);
+    return 0;
+  }
+
+  return set_log(NOMP_COMPILE_FAILURE, NOMP_ERROR,
+                 "Failed to run program with handle: %d", id);
+}
+
+int jit_free(int *id) {
+  int fid = *id;
+  if (fid >= 0 && fid < funcs_n) {
+    struct function *f = funcs[fid];
+    dlclose(f->dlh), f->dlh = NULL, f->dlf = NULL, tfree(f);
+    funcs[fid] = NULL, *id = -1;
+    return 0;
+  }
+
+  return set_log(NOMP_COMPILE_FAILURE, NOMP_ERROR,
+                 "Failed to free program with handle: %d", fid);
 }

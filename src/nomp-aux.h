@@ -8,8 +8,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "nomp-mem.h"
-
 /**
  * @defgroup nomp_compile_utils Functions to compile source at runtime.
  */
