@@ -114,7 +114,7 @@
  * @ingroup nomp_errors
  * @brief Failed to finalize libnomp.
  */
-#define NOMP_RUNTIME_FINALIZE_FAILUREE -258
+#define NOMP_RUNTIME_FINALIZE_FAILURE -258
 /**
  * @ingroup nomp_errors
  * @brief Memory allocation on host by libnomp failed.
