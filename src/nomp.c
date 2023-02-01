@@ -1,16 +1,5 @@
 #include "nomp-impl.h"
 
-int check_null_input_(void *p, const char *func, unsigned line,
-                      const char *file) {
-  if (!p) {
-    return set_log(NOMP_RUNTIME_NULL_INPUT_ENCOUNTERED, NOMP_ERROR,
-                   "Input pointer passed to function \"%s\" at line %d in file "
-                   "%s is NULL.",
-                   func, line, file);
-  }
-  return 0;
-}
-
 static char *copy_env(const char *name, size_t size) {
   const char *tmp = getenv(name);
   if (tmp != NULL) {
@@ -71,7 +60,6 @@ static int initialized = 0;
 static const char *py_dir = "python";
 
 static int check_args(int argc, const char **argv, struct backend *backend) {
-  // Default values
   backend->device_id = 0, backend->platform_id = 0, backend->verbose = 0;
   backend->backend = backend->install_dir = NULL;
   backend->annts_script = backend->annts_func = NULL;
@@ -226,10 +214,11 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
   unsigned idx = mem_if_exist(ptr, idx0, idx1);
   if (idx == mems_n) {
     // A new entry can't be created with NOMP_FREE or NOMP_FROM
-    if (op == NOMP_FROM || op == NOMP_FREE)
+    if (op == NOMP_FROM || op == NOMP_FREE) {
       return set_log(NOMP_USER_MAP_OP_IS_INVALID, NOMP_ERROR,
                      "NOMP_FREE or NOMP_FROM can only be called on a pointer "
                      "which is already on the device.");
+    }
     op |= NOMP_ALLOC;
     if (mems_n == mems_max) {
       mems_max += mems_max / 2 + 1;
@@ -240,15 +229,16 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
     m->hptr = ptr, m->bptr = NULL;
   }
 
-  int err = nomp.update(&nomp, mems[idx], op);
+  return_on_err(nomp.update(&nomp, mems[idx], op));
 
-  // Device memory got free'd
+  // Device memory object was free'd
   if (mems[idx]->bptr == NULL)
     tfree(mems[idx]), mems[idx] = NULL;
+  // Or new memory object got created
   else if (idx == mems_n)
     mems_n++;
 
-  return err;
+  return 0;
 }
 
 static struct prog **progs = NULL;
