@@ -9,7 +9,7 @@
 #include <unistd.h>
 
 /**
- * @defgroup nomp_compile_utils Functions to compile source at runtime.
+ * @defgroup nomp_other_utils Other helper functions.
  */
 
 /**
