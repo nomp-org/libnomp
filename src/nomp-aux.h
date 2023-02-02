@@ -60,10 +60,11 @@ int strntoui(const char *str, size_t size);
  *
  * Returns the maximum length of specified path.
  *
+ * @param[in] len Lenth of path specified in \p path.
  * @param[in] path Path to get the maximum length.
- * @return size_t
+ * @return int
  */
-size_t pathlen(const char *path);
+int pathlen(size_t *len, const char *path);
 
 /**
  * @ingroup nomp_other_utils

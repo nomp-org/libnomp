@@ -5,8 +5,8 @@
 #include <openssl/sha.h>
 #include <unistd.h>
 
-static int make_knl_dir(char **dir_, const char *cache_dir, const char *src) {
-  unsigned len = strnlen(src, MAX_SRC_SIZE);
+static int make_knl_dir(char **dir_, const char *knl_dir, const char *src) {
+  size_t len = strnlen(src, MAX_SRC_SIZE);
   if (len == MAX_SRC_SIZE) {
     return set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
                    "Kernel source size exceeds maximum allowed size: %u.",
@@ -25,9 +25,11 @@ static int make_knl_dir(char **dir_, const char *cache_dir, const char *src) {
                    "Unable to calculate SHA256 hash of string: \"%s\".", s);
   }
 
-  unsigned max = maxn(pathlen(cache_dir), SHA256_DIGEST_LENGTH);
-  char *dir = *dir_ = strcatn(3, max, cache_dir, "/", hash);
+  return_on_err(pathlen(&len, knl_dir));
+  unsigned lmax = maxn(2, len, SHA256_DIGEST_LENGTH);
+
   // Create the folder if it doesn't exist.
+  char *dir = *dir_ = strcatn(3, lmax, knl_dir, "/", hash);
   if (access(dir, F_OK)) {
     if (mkdir(dir, S_IRUSR | S_IWUSR) == -1) {
       tfree(dir);
@@ -57,8 +59,12 @@ static int write_file(const char *path, const char *src) {
 
 static int compile_aux(const char *cc, const char *cflags, const char *src,
                        const char *out) {
-  unsigned len = pathlen(cc) + strnlen(cflags, MAX_CFLAGS_SIZE) + pathlen(src) +
-                 pathlen(out) + 32;
+  size_t lcc, lsrc, lout;
+  return_on_err(pathlen(&lcc, cc));
+  return_on_err(pathlen(&lsrc, src));
+  return_on_err(pathlen(&lout, out));
+
+  size_t len = lcc + strnlen(cflags, MAX_CFLAGS_SIZE) + lsrc + lout + 32;
   char *cmd = tcalloc(char, len);
   snprintf(cmd, len, "%s %s %s -o %s", cc, cflags, src, out);
   int ret = system(cmd), failed = 0;
@@ -95,15 +101,18 @@ int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
   char *dir = NULL;
   return_on_err(make_knl_dir(&dir, wrkdir, source));
 
-  const char *cpp = "source.cpp", *lib = "mylib.so";
-  unsigned max = maxn(pathlen(dir), maxn(strnlen(cpp, 64), strnlen(lib, 64)));
-  char *src = strcatn(3, max, dir, "/", cpp);
-  char *out = strcatn(3, max, dir, "/", lib);
+  size_t ldir;
+  return_on_err(pathlen(&ldir, dir));
+
+  const char *srcf = "source.c", *libf = "mylib.so";
+  unsigned max = maxn(3, ldir, strnlen(srcf, 64), strnlen(libf, 64));
+  char *src = strcatn(3, max, dir, "/", srcf);
+  char *lib = strcatn(3, max, dir, "/", libf);
   tfree(dir);
 
   return_on_err(write_file(src, source));
-  return_on_err(compile_aux(cc, cflags, src, out));
-  tfree(src), tfree(out);
+  return_on_err(compile_aux(cc, cflags, src, lib));
+  tfree(src), tfree(lib);
 
   if (funcs_n == funcs_max) {
     funcs_max += funcs_max / 2 + 1;
@@ -111,15 +120,14 @@ int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
   }
 
   void (*dlf)() = NULL;
-  void *dlh = dlopen(out, RTLD_LAZY | RTLD_LOCAL);
+  void *dlh = dlopen(lib, RTLD_LAZY | RTLD_LOCAL);
   if (dlh)
     dlf = dlsym(dlh, entry);
 
   if (dlh == NULL || dlf == NULL) {
-    return set_log(
-        NOMP_JIT_FAILURE, NOMP_ERROR,
-        "Failed to open object/symbol \"%s\" due to error: \"%s\".\n",
-        dlerror());
+    return set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
+                   "Failed to open object/symbol \"%s\" due to error: \"%s\".",
+                   dlerror());
   }
 
   struct function *f = funcs[funcs_n] = tcalloc(struct function, 1);

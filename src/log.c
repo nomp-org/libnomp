@@ -31,22 +31,24 @@ int set_log_(const char *description, int logno, nomp_log_type type,
   if (logs_max <= logs_n) {
     logs_max += logs_max / 2 + 1;
     logs = trealloc(logs, struct log, logs_max);
-    if (logs == NULL)
-      return NOMP_RUNTIME_MEMORY_ALLOCATION_FAILURE;
   }
 
-  va_list vargs;
   char buf[BUFSIZ];
+
+  va_list vargs;
   va_start(vargs, line);
   vsnprintf(buf, BUFSIZ, description, vargs);
   va_end(vargs);
 
-  char *desc = strndup(buf, BUFSIZ), *file = strndup(fname, pathlen(fname));
+  size_t len;
+  if (pathlen(&len, fname))
+    return -1;
+
+  char *desc = strndup(buf, BUFSIZ), *file = strndup(fname, len);
   const char *type_str = LOG_TYPE_STRING[type];
 
-  // 10 for UINT_MAX, 5 for `[] : ` 5 characters and 1 for `\0`.
-  size_t len = strlen(desc) + strlen(file) + strlen(type_str) + 10 + 5 + 1;
-
+  // 10 for UINT_MAX, 5 for `[] : ` characters and 1 for `\0`.
+  len = strlen(desc) + strlen(file) + strlen(type_str) + 10 + 5 + 1;
   logs[logs_n].description = tcalloc(char, len);
   snprintf(logs[logs_n].description, len, "[%s] %s:%u %s", type_str, fname,
            line, desc);

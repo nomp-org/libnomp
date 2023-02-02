@@ -128,11 +128,6 @@
 
 /**
  * @ingroup nomp_errors
- * @brief libnomp python initialization failed.
- */
-#define NOMP_PY_INITIALIZE_FAILURE -384
-/**
- * @ingroup nomp_errors
  * @brief A python call made by libnomp failed.
  */
 #define NOMP_PY_CALL_FAILURE -385

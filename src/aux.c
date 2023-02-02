@@ -45,8 +45,15 @@ int strntoui(const char *str, size_t size) {
   return num;
 }
 
-size_t pathlen(const char *path) {
-  return (size_t)pathconf(path, _PC_PATH_MAX);
+int pathlen(size_t *len, const char *path) {
+  long ret = pathconf(path, _PC_PATH_MAX);
+  if (ret == -1) {
+    *len = 0;
+    return set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                   "Unable to find the length of path: \"%s\".", path);
+  }
+  *len = ret;
+  return 0;
 }
 
 int maxn(unsigned n, ...) {
