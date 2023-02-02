@@ -22,16 +22,6 @@ char *strcatn(unsigned n, unsigned max_len, ...) {
   return out;
 }
 
-int strnlower(char **out, const char *in, size_t max) {
-  unsigned len = strnlen(in, max);
-  char *wrk = *out = trealloc(*out, char, len + 1);
-  for (unsigned i = 0; i < len; i++)
-    wrk[i] = tolower(in[i]);
-  wrk[len] = '\0';
-
-  return 0;
-}
-
 int strntoui(const char *str, size_t size) {
   if (str == NULL)
     return -1;

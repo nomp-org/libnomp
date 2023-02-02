@@ -28,21 +28,6 @@ char *strcatn(unsigned n, unsigned max_len, ...);
 
 /**
  * @ingroup nomp_other_utils
- * @brief Convert a C-string to lowercase
- *
- * Convert input string `in` to lower case and store in `out`. Maximum length
- * of the input string `in` is specified by `max`. Returns 0 if successful, 1
- * otherwise.
- *
- * @param[out] out Output string.
- * @param[in] in Input string.
- * @param[in] max Maximum allowed length for the input string.
- * @return int
- */
-int strnlower(char **out, const char *in, size_t max);
-
-/**
- * @ingroup nomp_other_utils
  * @brief Convert a string to unsigned long value if possible.
  *
  * Convert input string `str` to an unsigned int value. Returns converted
