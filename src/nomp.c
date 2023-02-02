@@ -380,8 +380,7 @@ int nomp_finalize(void) {
 
   for (unsigned i = 0; i < mems_n; i++) {
     if (mems[i]) {
-      // FIXME: Check error returned form `nomp.update`
-      nomp.update(&nomp, mems[i], NOMP_FREE);
+      return_on_err(nomp.update(&nomp, mems[i], NOMP_FREE));
       tfree(mems[i]), mems[i] = NULL;
     }
   }
@@ -389,8 +388,7 @@ int nomp_finalize(void) {
 
   for (unsigned i = 0; i < progs_n; i++) {
     if (progs[i]) {
-      // FIXME: Check error returned form `nomp.knl_free`
-      nomp.knl_free(progs[i]);
+      return_on_err(nomp.knl_free(progs[i]));
       tfree(progs[i]), progs[i] = NULL;
     }
   }
