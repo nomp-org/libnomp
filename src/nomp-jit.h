@@ -34,12 +34,11 @@ int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
  * @brief Run a JIT compiled program.
  *
  * @param[in] id Handle of the JIT compiled program.
- * @param[in] n Number of arguments to the program.
- * @param[in] ... Variable list of arguments to the program.
+ * @param[in] p Array of pointers to the function arguments.
  *
  * @return int
  */
-int jit_run(int id, int n, ...);
+int jit_run(int id, void *p[]);
 
 /**
  * @ingroup nomp_compile_utils
