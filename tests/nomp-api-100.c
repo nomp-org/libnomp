@@ -12,12 +12,11 @@ static int test_invalid_file() {
 
   static int id = -1;
   int err = nomp_jit(&id, valid_knl, clauses);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_PY_CALL_FAILURE);
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
   char *log = nomp_get_log_str(err);
-  int eq =
-      logcmp(log, "\\[Error\\] .*src\\/lpy.c:[0-9]* Failed to call user "
-                  "transform function: \"invalid\" in file: \"invalid-file\".");
+  int eq = logcmp(log, "\\[Error\\] .*src\\/aux.c:[0-9]* Unable to find the "
+                       "length of path: \"invalid-file\".");
   tfree(log);
   nomp_test_assert(eq);
 

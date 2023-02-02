@@ -19,8 +19,9 @@ extern const char *ERR_STR_KNL_ARG_TYPE_IS_INVALID;
  * @brief Register a log with libnomp runtime.
  *
  * @details Register a log given a description of the log, log number and log
- * type. Returns a unique log id that can be used to query log later. Use
- * set_log() macro to py pass the argumnets \p fname and \p line_no.
+ * type. Returns a unique log id that can be used to query log later on success.
+ * On failure, set_log_() returns -1. Use set_log() macro to by pass the
+ * argumnets \p fname and \p line_no.
  *
  * @param[in] logno Log number which is defined in nomp.h
  * @param[in] type Type of the log (one of @ref nomp_log_type)

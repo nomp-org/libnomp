@@ -33,8 +33,9 @@ static int check_env(struct backend *backend) {
 
   tmp = copy_env("NOMP_INSTALL_DIR", MAX_BUFSIZ);
   if (tmp) {
-    size_t size = pathlen(tmp) + 1;
-    backend->install_dir = trealloc(backend->install_dir, char, size);
+    size_t size;
+    return_on_err(pathlen(&size, tmp));
+    backend->install_dir = trealloc(backend->install_dir, char, size + 1);
     strncpy(backend->install_dir, tmp, size), tfree(tmp);
   }
 
@@ -98,8 +99,9 @@ static int check_args(int argc, const char **argv, struct backend *backend) {
     } else if (!strncmp("-i", argv[i], MAX_BUFSIZ) ||
                !strncmp("--install-dir", argv[i], MAX_BUFSIZ)) {
       char *install_dir = (char *)argv[i + 1];
-      size_t size = pathlen(install_dir) + 1;
-      backend->install_dir = strndup(install_dir, size);
+      size_t size;
+      return_on_err(pathlen(&size, install_dir));
+      backend->install_dir = strndup(install_dir, size + 1);
       i += 2;
     } else if (!strncmp("-as", argv[i], MAX_BUFSIZ) ||
                !strncmp("--annts-script", argv[i], MAX_BUFSIZ)) {
@@ -161,22 +163,19 @@ int nomp_init(int argc, const char **argv) {
     // https://docs.python.org/3/c-api/init_config.html#init-config
     // But for now, we do the simplest thing possible.
     Py_Initialize();
-    // Append current working dir
-    py_append_to_sys_path(".");
-    // nomp.install_dir should be set and we use it here.
-    char *abs_dir = strcatn(
-        3, maxn(2, pathlen(nomp.install_dir), strnlen(py_dir, MAX_BUFSIZ)),
-        nomp.install_dir, "/", py_dir);
-    err = py_append_to_sys_path(abs_dir);
-    tfree(abs_dir);
-  } else {
-    // Python is already initialized.
-    err = 0;
-  }
 
-  if (err) {
-    return set_log(NOMP_PY_INITIALIZE_FAILURE, NOMP_ERROR,
-                   "Unable to initialize python during initializing libnomp.");
+    // Append current working directroy to sys.path.
+    return_on_err(py_append_to_sys_path("."));
+
+    // Append nomp python directory to sys.path.
+    // nomp.install_dir should be set and we use it here.
+    size_t len, max;
+    return_on_err(pathlen(&len, nomp.install_dir));
+    max = maxn(2, len, strnlen(py_dir, MAX_BUFSIZ));
+    char *abs_dir = strcatn(3, max, nomp.install_dir, "/", py_dir);
+    return_on_err(py_append_to_sys_path(abs_dir));
+
+    tfree(abs_dir);
   }
 
   initialized = 1;
@@ -252,19 +251,23 @@ static int parse_clauses(char **usr_file, char **usr_func, PyObject **dict_,
   unsigned i = 0;
   while (clauses[i]) {
     if (strncmp(clauses[i], "transform", MAX_BUFSIZ) == 0) {
-      if (clauses[i + 1] == NULL || clauses[i + 2] == NULL)
+      if (clauses[i + 1] == NULL || clauses[i + 2] == NULL) {
         return set_log(
             NOMP_USER_INPUT_NOT_PROVIDED, NOMP_ERROR,
             "\"transform\" clause should be followed by a file name and a "
             "function name. At least one of them is not provided.");
-      *usr_file = strndup(clauses[i + 1], pathlen(clauses[i + 1]));
+      }
+      size_t size;
+      return_on_err(pathlen(&size, clauses[i + 1]));
+      *usr_file = strndup(clauses[i + 1], size);
       *usr_func = strndup(clauses[i + 2], MAX_BUFSIZ);
       i = i + 3;
     } else if (strncmp(clauses[i], "annotate", MAX_BUFSIZ) == 0) {
-      if (clauses[i + 1] == NULL || clauses[i + 2] == NULL)
+      if (clauses[i + 1] == NULL || clauses[i + 2] == NULL) {
         return set_log(NOMP_USER_INPUT_NOT_PROVIDED, NOMP_ERROR,
                        "\"annotate\" clause should be followed by a key value "
                        "pair. At least one of them is not provided.");
+      }
       const char *key = clauses[i + 1], *val = clauses[i + 2];
       PyObject *pkey =
           PyUnicode_FromStringAndSize(key, strnlen(key, MAX_BUFSIZ));
