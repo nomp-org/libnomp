@@ -67,7 +67,8 @@ static int cuda_update(struct backend *bnd, struct mem *m, const int op) {
     chk_cuda(err);
   } else if (op == NOMP_FREE) {
     err = cudaFree(m->bptr);
-    chk_cuda(err), m->bptr = NULL;
+    chk_cuda(err);
+    m->bptr = NULL;
   }
 
   return 0;
@@ -122,7 +123,8 @@ static int cuda_knl_build(struct backend *bnd, struct prog *prg,
 
   struct cuda_prog *cprg = prg->bptr = tcalloc(struct cuda_prog, 1);
   CUresult cu_err = cuModuleLoadData(&cprg->module, ptx);
-  tfree(ptx), chk_cu(cu_err);
+  chk_cu(cu_err);
+  tfree(ptx);
 
   cu_err = cuModuleGetFunction(&cprg->kernel, cprg->module, name);
   chk_cu(cu_err);
@@ -131,16 +133,14 @@ static int cuda_knl_build(struct backend *bnd, struct prog *prg,
 }
 
 static int cuda_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
-  const int ndim = prg->ndim, nargs = prg->nargs;
-  const size_t *global = prg->global, *local = prg->local;
-
-  struct mem *m;
   void *vargs[NARGS_MAX];
-  for (int i = 0; i < nargs; i++) {
+  for (int i = 0; i < prg->nargs; i++) {
     const char *var = va_arg(args, const char *);
     int type = va_arg(args, int);
     size_t size = va_arg(args, size_t);
     void *p = va_arg(args, void *);
+
+    struct mem *m;
     switch (type) {
     case NOMP_INTEGER:
     case NOMP_FLOAT:
@@ -160,16 +160,17 @@ static int cuda_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
     vargs[i] = p;
   }
 
+  const size_t *global = prg->global, *local = prg->local;
   struct cuda_prog *cprg = (struct cuda_prog *)prg->bptr;
   int err = cuLaunchKernel(cprg->kernel, global[0], global[1], global[2],
                            local[0], local[1], local[2], 0, NULL, vargs, NULL);
-  // FIXME: Wrong, call set_log()
-  return err != CUDA_SUCCESS;
+  chk_cu(err);
 }
 
 static int cuda_knl_free(struct prog *prg) {
   struct cuda_prog *cprg = (struct cuda_prog *)prg->bptr;
   int err = cuModuleUnload(cprg->module);
+  chk_cu(err);
   return 0;
 }
 
@@ -184,7 +185,7 @@ int cuda_init(struct backend *bnd, const int platform_id, const int device_id) {
 
   int num_devices;
   CUresult result = cudaGetDeviceCount(&num_devices);
-  chk_cu(result);
+  chk_cuda(result);
 
   if (device_id < 0 || device_id >= num_devices) {
     return set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
@@ -192,12 +193,12 @@ int cuda_init(struct backend *bnd, const int platform_id, const int device_id) {
   }
 
   result = cudaSetDevice(device_id);
-  chk_cu(result);
+  chk_cuda(result);
 
   struct cuda_backend *cuda = bnd->bptr = tcalloc(struct cuda_backend, 1);
   cuda->device_id = device_id;
   result = cudaGetDeviceProperties(&cuda->prop, device_id);
-  chk_cu(result);
+  chk_cuda(result);
 
   bnd->update = cuda_update;
   bnd->knl_build = cuda_knl_build;
