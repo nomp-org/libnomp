@@ -154,7 +154,7 @@ static int cuda_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
       break;
     default:
       return set_log(NOMP_USER_KNL_ARG_TYPE_IS_INVALID, NOMP_ERROR,
-                     ERR_STR_KNL_ARG_TYPE_IS_INVALID, type);
+                     "Invalid libnomp kernel argument type %d.", type);
       break;
     }
     vargs[i] = p;

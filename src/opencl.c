@@ -80,11 +80,6 @@ static int opencl_knl_build(struct backend *bnd, struct prog *prg,
     clGetProgramBuildInfo(ocl_prg->prg, ocl->device_id, CL_PROGRAM_BUILD_LOG, 0,
                           NULL, &log_size);
     char *log = tcalloc(char, log_size);
-    if (!log) {
-      return set_log(NOMP_RUNTIME_MEMORY_ALLOCATION_FAILURE, NOMP_ERROR,
-                     ERR_STR_RUNTIME_MEMORY_ALLOCATION_FAILURE);
-    }
-
     clGetProgramBuildInfo(ocl_prg->prg, ocl->device_id, CL_PROGRAM_BUILD_LOG,
                           log_size, log, NULL);
     int err =
@@ -203,11 +198,6 @@ int opencl_init(struct backend *bnd, const int platform_id,
   }
 
   cl_platform_id *cl_platforms = tcalloc(cl_platform_id, num_platforms);
-  if (cl_platforms == NULL) {
-    return set_log(NOMP_RUNTIME_MEMORY_ALLOCATION_FAILURE, NOMP_ERROR,
-                   ERR_STR_RUNTIME_MEMORY_ALLOCATION_FAILURE);
-  }
-
   err = clGetPlatformIDs(num_platforms, cl_platforms, &num_platforms);
   cl_platform_id platform = cl_platforms[platform_id];
   tfree(cl_platforms);
@@ -220,11 +210,6 @@ int opencl_init(struct backend *bnd, const int platform_id,
   }
 
   cl_device_id *cl_devices = tcalloc(cl_device_id, num_devices);
-  if (cl_devices == NULL) {
-    return set_log(NOMP_RUNTIME_MEMORY_ALLOCATION_FAILURE, NOMP_ERROR,
-                   ERR_STR_RUNTIME_MEMORY_ALLOCATION_FAILURE);
-  }
-
   err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, num_devices, cl_devices,
                        &num_devices);
   cl_device_id device = cl_devices[device_id];

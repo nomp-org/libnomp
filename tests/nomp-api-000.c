@@ -3,7 +3,7 @@
 // Calling nomp_finalize() before nomp_init() should return an error.
 static int test_first_nomp_finalize() {
   int err = nomp_finalize();
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_RUNTIME_NOT_INITIALIZED);
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_RUNTIME_FINALIZE_FAILURE);
 
   char *desc = nomp_get_log_str(err);
   int eq = logcmp(desc, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* "
@@ -37,7 +37,7 @@ static int test_nomp_finalize_twice() {
   int err = nomp_finalize();
   nomp_test_chk(err);
   err = nomp_finalize();
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_RUNTIME_NOT_INITIALIZED);
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_RUNTIME_FINALIZE_FAILURE);
 
   char *desc = nomp_get_log_str(err);
   int eq = logcmp(desc, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* "

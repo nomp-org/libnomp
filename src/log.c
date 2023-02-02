@@ -10,12 +10,6 @@ const char *ERR_STR_USER_MAP_PTR_IS_INVALID =
 const char *ERR_STR_USER_DEVICE_IS_INVALID =
     "Device id %d passed into libnomp is not valid.";
 
-const char *ERR_STR_RUNTIME_MEMORY_ALLOCATION_FAILURE =
-    "libnomp host memory allocation failed.";
-
-const char *ERR_STR_KNL_ARG_TYPE_IS_INVALID =
-    "Invalid libnomp kernel argument type %d.";
-
 struct log {
   char *description;
   int logno;
