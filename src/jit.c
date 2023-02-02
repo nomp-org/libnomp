@@ -101,7 +101,7 @@ static int compile_aux(const char *cc, const char *cflags, const char *src,
 
 struct function {
   void *dlh;
-  void (*dlf)(int n, va_list vargs);
+  void (*dlf)(void **);
 };
 
 static struct function **funcs = NULL;
@@ -143,17 +143,14 @@ int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
   }
 
   struct function *f = funcs[funcs_n] = tcalloc(struct function, 1);
-  f->dlh = dlh, f->dlf = (void (*)(int, va_list))dlf, *id = funcs_n++;
+  f->dlh = dlh, f->dlf = (void (*)(void **))dlf, *id = funcs_n++;
 
   return 0;
 }
 
-int jit_run(int id, int n, ...) {
+int jit_run(int id, void *p[]) {
   if (id >= 0 && id < funcs_n && funcs[id] && funcs[id]->dlf) {
-    va_list vargs;
-    va_start(vargs, n);
-    funcs[id]->dlf(n, vargs);
-    va_end(vargs);
+    funcs[id]->dlf(p);
     return 0;
   }
 
