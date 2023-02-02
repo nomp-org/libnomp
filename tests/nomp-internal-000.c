@@ -1,3 +1,4 @@
+#include "nomp-aux.h"
 #include "nomp-jit.h"
 #include "nomp-test.h"
 
@@ -11,18 +12,25 @@ static int test_jit_compile_and_free() {
                        "  int b = *((int *)p[1]);                           \n"
                        "  *((int *)p[2]) = foo(a, b);                       \n"
                        "}                                                   \n";
-  const char *cc = "cc";
-  const char *cflags = "-c -shared";
+
+  char cwd[BUFSIZ];
+  if (getcwd(cwd, BUFSIZ) == NULL) {
+    perror("getcwd() error");
+    return 1;
+  }
+
+  const char *cc = "/usr/bin/cc";
+  const char *cflags = "-shared";
   const char *entry = "foo_wrapper";
-  const char *wkdir = "nomp_jit_cache_dir";
+  const char *wkdir = strcatn(3, BUFSIZ, cwd, "/", ".nomp_jit_cache");
   int id = -1;
 
   int err = jit_compile(&id, source, cc, cflags, entry, wkdir);
-  nomp_test_assert(err);
+  nomp_test_chk(err);
   nomp_test_assert(id == 0);
 
   err = jit_free(&id);
-  nomp_test_assert(err);
+  nomp_test_chk(err);
   nomp_test_assert(id == -1);
 
   return 0;

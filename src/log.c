@@ -52,8 +52,8 @@ int set_log_(const char *description, int logno, nomp_log_type type,
   logs[logs_n].description = tcalloc(char, len);
   snprintf(logs[logs_n].description, len, "[%s] %s:%u %s", type_str, fname,
            line, desc);
-  logs[logs_n].logno = logno, logs[logs_n].type = type, logs_n += 1;
   tfree(desc), tfree(file);
+  logs[logs_n].logno = logno, logs[logs_n].type = type, logs_n++;
 
   return logs_n;
 }
