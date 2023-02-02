@@ -211,6 +211,20 @@ Operation <code class="docutils literal notranslate"><span class="pre">op</span>
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv48nomp_chki">
+<span id="_CPPv38nomp_chki"></span><span id="_CPPv28nomp_chki"></span><span id="nomp_chk__i"></span><span class="target" id="group__nomp__user__api_1ga925f5b8f2a18a89689f4bbe99d7fcfbf"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_chk</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">retval</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48nomp_chki" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Check nomp API function return values for errors. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>retval</strong> – <strong>[in]</strong> Return value from a nomp API function.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>void </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv416nomp_get_log_stri">
 <span id="_CPPv316nomp_get_log_stri"></span><span id="_CPPv216nomp_get_log_stri"></span><span id="nomp_get_log_str__i"></span><span class="target" id="group__nomp__user__api_1ga64b207d004404af50b94e91a2b571107"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_get_log_str</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416nomp_get_log_stri" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Return the log description given the log id. </p>
@@ -375,21 +389,9 @@ Operation <code class="docutils literal notranslate"><span class="pre">op</span>
 </dd></dl>
 
 <dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.NOMP_RUNTIME_NOT_INITIALIZED">
-<span class="target" id="group__nomp__errors_1ga075effe1315539d798280c1be7331ee0"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_RUNTIME_NOT_INITIALIZED</span></span></span><a class="headerlink" href="#c.NOMP_RUNTIME_NOT_INITIALIZED" title="Permalink to this definition"></a><br /></dt>
-<dd><p>libnomp is not initialized. </p>
-</dd></dl>
-
-<dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.NOMP_RUNTIME_FAILED_TO_FINALIZE">
-<span class="target" id="group__nomp__errors_1ga4eed9a76b37e38cb6109b57ff179dc9f"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_RUNTIME_FAILED_TO_FINALIZE</span></span></span><a class="headerlink" href="#c.NOMP_RUNTIME_FAILED_TO_FINALIZE" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="c.NOMP_RUNTIME_FINALIZE_FAILURE">
+<span class="target" id="group__nomp__errors_1ga354ba975b5aec6ae4fea30d45d7b86cd"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_RUNTIME_FINALIZE_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_RUNTIME_FINALIZE_FAILURE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Failed to finalize libnomp. </p>
-</dd></dl>
-
-<dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.NOMP_RUNTIME_MEMORY_ALLOCATION_FAILED">
-<span class="target" id="group__nomp__errors_1ga8494001000b2c510f15ce5f37c827099"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_RUNTIME_MEMORY_ALLOCATION_FAILED</span></span></span><a class="headerlink" href="#c.NOMP_RUNTIME_MEMORY_ALLOCATION_FAILED" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Memory allocation on host by libnomp failed. </p>
 </dd></dl>
 
 <dl class="cpp macro">
@@ -399,20 +401,14 @@ Operation <code class="docutils literal notranslate"><span class="pre">op</span>
 </dd></dl>
 
 <dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.NOMP_PY_INITIALIZE_ERROR">
-<span class="target" id="group__nomp__errors_1gaf80bd63484ec432276b4814c6d90b635"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_PY_INITIALIZE_ERROR</span></span></span><a class="headerlink" href="#c.NOMP_PY_INITIALIZE_ERROR" title="Permalink to this definition"></a><br /></dt>
-<dd><p>libnomp python initialization failed. </p>
-</dd></dl>
-
-<dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.NOMP_PY_CALL_FAILED">
-<span class="target" id="group__nomp__errors_1gad2791877acc514272b484c9b2eaf63b1"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_PY_CALL_FAILED</span></span></span><a class="headerlink" href="#c.NOMP_PY_CALL_FAILED" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="c.NOMP_PY_CALL_FAILURE">
+<span class="target" id="group__nomp__errors_1gad411377fc36b3278318d135304df9011"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_PY_CALL_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_PY_CALL_FAILURE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A python call made by libnomp failed. </p>
 </dd></dl>
 
 <dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.NOMP_LOOPY_CONVERSION_ERROR">
-<span class="target" id="group__nomp__errors_1gac5b7841ecb88dd1517712ca2930b3ec9"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_LOOPY_CONVERSION_ERROR</span></span></span><a class="headerlink" href="#c.NOMP_LOOPY_CONVERSION_ERROR" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="c.NOMP_LOOPY_CONVERSION_FAILURE">
+<span class="target" id="group__nomp__errors_1gaa1c5a8fa4227bcc637a0d5569bb4bba0"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_LOOPY_CONVERSION_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_LOOPY_CONVERSION_FAILURE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Loopy conversion failed. </p>
 </dd></dl>
 
@@ -423,20 +419,20 @@ Operation <code class="docutils literal notranslate"><span class="pre">op</span>
 </dd></dl>
 
 <dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.NOMP_LOOPY_CODEGEN_FAILED">
-<span class="target" id="group__nomp__errors_1ga3294be3cfa9cca6afd4963a8aac0446a"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_LOOPY_CODEGEN_FAILED</span></span></span><a class="headerlink" href="#c.NOMP_LOOPY_CODEGEN_FAILED" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="c.NOMP_LOOPY_CODEGEN_FAILURE">
+<span class="target" id="group__nomp__errors_1ga1da82121ad001ca2c288fae459349002"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_LOOPY_CODEGEN_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_LOOPY_CODEGEN_FAILURE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Code generation from loopy kernel failed. </p>
 </dd></dl>
 
 <dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.NOMP_LOOPY_GET_GRIDSIZE_FAILED">
-<span class="target" id="group__nomp__errors_1ga98ad165859e59940f37b3a4139b5d59e"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_LOOPY_GET_GRIDSIZE_FAILED</span></span></span><a class="headerlink" href="#c.NOMP_LOOPY_GET_GRIDSIZE_FAILED" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="c.NOMP_LOOPY_GET_GRIDSIZE_FAILURE">
+<span class="target" id="group__nomp__errors_1ga391e236fde647679e742827d9e8c84ab"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_LOOPY_GET_GRIDSIZE_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_LOOPY_GET_GRIDSIZE_FAILURE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Code generation from loopy kernel failed. </p>
 </dd></dl>
 
 <dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.NOMP_LOOPY_EVAL_GRIDSIZE_FAILED">
-<span class="target" id="group__nomp__errors_1ga396a7c89eca919ad523fe362660cbe50"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_LOOPY_EVAL_GRIDSIZE_FAILED</span></span></span><a class="headerlink" href="#c.NOMP_LOOPY_EVAL_GRIDSIZE_FAILED" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="c.NOMP_LOOPY_EVAL_GRIDSIZE_FAILURE">
+<span class="target" id="group__nomp__errors_1ga0d374c861dfcec987ca837bc3384e8ad"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_LOOPY_EVAL_GRIDSIZE_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_LOOPY_EVAL_GRIDSIZE_FAILURE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Grid size calculation failed. </p>
 </dd></dl>
 
@@ -450,6 +446,12 @@ Operation <code class="docutils literal notranslate"><span class="pre">op</span>
 <dt class="sig sig-object cpp" id="c.NOMP_OPENCL_FAILURE">
 <span class="target" id="group__nomp__errors_1gac8a9d1e0e7fe73b2ccef64eedc7f3ad3"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_OPENCL_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_OPENCL_FAILURE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>libnomp OpenCL failure. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.NOMP_JIT_FAILURE">
+<span class="target" id="group__nomp__errors_1ga69a43ed070537af9e7d342699852b6c4"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_JIT_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_JIT_FAILURE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>libnomp source compilation failure. </p>
 </dd></dl>
 
 </section>

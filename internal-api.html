@@ -46,13 +46,12 @@
 <li class="toctree-l1"><a class="reference internal" href="usage.html">How to Use Nomp</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user-api.html">User API</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Internal API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#functions">Functions</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#backend-init-functions">Backend init functions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#python-helper-functions">Python helper functions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#memory-management-functions">Memory management functions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#other-helper-functions">Other helper functions</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#backend-init-functions">Backend init functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#python-helper-functions">Python helper functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#memory-management-functions">Memory management functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#kernel-compilation-functions">Kernel compilation functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#logging-functions">Logging functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#other-helper-functions">Other helper functions</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="developer-docs.html">Developer Documentation</a></li>
@@ -86,13 +85,11 @@
 </div>
 <section id="internal-api">
 <h1>Internal API<a class="headerlink" href="#internal-api" title="Permalink to this heading"></a></h1>
-<section id="functions">
-<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h2>
 <section id="backend-init-functions">
-<h3>Backend init functions<a class="headerlink" href="#backend-init-functions" title="Permalink to this heading"></a></h3>
+<h2>Backend init functions<a class="headerlink" href="#backend-init-functions" title="Permalink to this heading"></a></h2>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv411opencl_initP7backendKiKi">
-<span id="_CPPv311opencl_initP7backendKiKi"></span><span id="_CPPv211opencl_initP7backendKiKi"></span><span id="opencl_init__backendP.iC.iC"></span><span class="target" id="group__nomp__backend__init_1gac76f1949c40487b03ed06b587b82474d"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">opencl_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411opencl_initP7backendKiKi" title="opencl_init::backend"><span class="n"><span class="pre">backend</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">backend</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">platform_id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">device_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411opencl_initP7backendKiKi" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv311opencl_initP7backendKiKi"></span><span id="_CPPv211opencl_initP7backendKiKi"></span><span id="opencl_init__backendP.iC.iC"></span><span class="target" id="group__nomp__backend__utils_1gac76f1949c40487b03ed06b587b82474d"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">opencl_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411opencl_initP7backendKiKi" title="opencl_init::backend"><span class="n"><span class="pre">backend</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">backend</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">platform_id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">device_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411opencl_initP7backendKiKi" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Initializes OpenCL backend with the specified platform and device. </p>
 <p>Initializes OpenCL backend while creating a command queue using the given platform id and device id. Returns a negative value if an error occured during the initialization, otherwise returns 0.</p>
 <dl class="field-list simple">
@@ -111,7 +108,7 @@
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv49cuda_initP7backendKiKi">
-<span id="_CPPv39cuda_initP7backendKiKi"></span><span id="_CPPv29cuda_initP7backendKiKi"></span><span id="cuda_init__backendP.iC.iC"></span><span class="target" id="group__nomp__backend__init_1gad20aff63a4f0f808165c1b01e36fae7f"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cuda_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49cuda_initP7backendKiKi" title="cuda_init::backend"><span class="n"><span class="pre">backend</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">backend</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">platform_id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">device_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49cuda_initP7backendKiKi" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv39cuda_initP7backendKiKi"></span><span id="_CPPv29cuda_initP7backendKiKi"></span><span id="cuda_init__backendP.iC.iC"></span><span class="target" id="group__nomp__backend__utils_1gad20aff63a4f0f808165c1b01e36fae7f"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cuda_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv49cuda_initP7backendKiKi" title="cuda_init::backend"><span class="n"><span class="pre">backend</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">backend</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">platform_id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">device_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49cuda_initP7backendKiKi" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Initializes Cuda backend with the specified platform and device. </p>
 <p>Initializes Cuda backend using the given device id. Platform id is not used in the initialization of Cuda backend. Returns a negative value if an error occured during the initialization, otherwise returns 0.</p>
 <dl class="field-list simple">
@@ -130,7 +127,7 @@
 
 </section>
 <section id="python-helper-functions">
-<h3>Python helper functions<a class="headerlink" href="#python-helper-functions" title="Permalink to this heading"></a></h3>
+<h2>Python helper functions<a class="headerlink" href="#python-helper-functions" title="Permalink to this heading"></a></h2>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv421py_append_to_sys_pathPKc">
 <span id="_CPPv321py_append_to_sys_pathPKc"></span><span id="_CPPv221py_append_to_sys_pathPKc"></span><span id="py_append_to_sys_path__cCP"></span><span class="target" id="group__nomp__py__utils_1gabd19a456d0af819d3b5458d717e2bd39"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">py_append_to_sys_path</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">path</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421py_append_to_sys_pathPKc" title="Permalink to this definition"></a><br /></dt>
@@ -147,13 +144,13 @@
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv413py_c_to_loopyPP8PyObjectPKcPKc">
-<span id="_CPPv313py_c_to_loopyPP8PyObjectPKcPKc"></span><span id="_CPPv213py_c_to_loopyPP8PyObjectPKcPKc"></span><span id="py_c_to_loopy__PyObjectPP.cCP.cCP"></span><span class="target" id="group__nomp__py__utils_1ga6afe05407c79932755e4efd3ef3543f7"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">py_c_to_loopy</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">knl</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">c_src</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">backend</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413py_c_to_loopyPP8PyObjectPKcPKc" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv313py_c_to_loopyPP8PyObjectPKcPKc"></span><span id="_CPPv213py_c_to_loopyPP8PyObjectPKcPKc"></span><span id="py_c_to_loopy__PyObjectPP.cCP.cCP"></span><span class="target" id="group__nomp__py__utils_1gafe3c9a33c1db37f13187340e5dec3d2a"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">py_c_to_loopy</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">knl</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">src</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">backend</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413py_c_to_loopyPP8PyObjectPKcPKc" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Creates loopy kernel from C source. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>knl</strong> – <strong>[out]</strong> Loopy kernel object. </p></li>
-<li><p><strong>c_src</strong> – <strong>[in]</strong> C kernel source. </p></li>
+<li><p><strong>src</strong> – <strong>[in]</strong> C kernel source. </p></li>
 <li><p><strong>backend</strong> – <strong>[in]</strong> Backend name. </p></li>
 </ul>
 </dd>
@@ -274,10 +271,25 @@
 
 </section>
 <section id="memory-management-functions">
-<h3>Memory management functions<a class="headerlink" href="#memory-management-functions" title="Permalink to this heading"></a></h3>
+<h2>Memory management functions<a class="headerlink" href="#memory-management-functions" title="Permalink to this heading"></a></h2>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413mem_if_mappedPv">
+<span id="_CPPv313mem_if_mappedPv"></span><span id="_CPPv213mem_if_mappedPv"></span><span id="mem_if_mapped__voidP"></span><span class="target" id="group__nomp__mem__utils_1gaab1db545d8487741c80dcb134fe0a2f8"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">mem</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">mem_if_mapped</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413mem_if_mappedPv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the mem object corresponding to host pointer <code class="docutils literal notranslate"><span class="pre">p</span></code>. </p>
+<p>Returns the mem object corresponding to host ponter <code class="docutils literal notranslate"><span class="pre">p</span></code>. If no buffer has been allocated for <code class="docutils literal notranslate"><span class="pre">p</span></code> on the device, returns NULL.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>p</strong> – <strong>[in]</strong> Host pointer </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>struct mem * </p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv45sfreePvPKcj">
-<span id="_CPPv35sfreePvPKcj"></span><span id="_CPPv25sfreePvPKcj"></span><span id="sfree__voidP.cCP.unsigned"></span><span class="target" id="group__nomp__mem__management_1ga8a207a24340a601421390a38689b5154"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sfree</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">p</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv45sfreePvPKcj" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv35sfreePvPKcj"></span><span id="_CPPv25sfreePvPKcj"></span><span id="sfree__voidP.cCP.unsigned"></span><span class="target" id="group__nomp__mem__utils_1ga8a207a24340a601421390a38689b5154"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sfree</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">p</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv45sfreePvPKcj" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Deallocates or frees a memory block. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -295,7 +307,7 @@
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv47smalloc6size_tPKcj">
-<span id="_CPPv37smalloc6size_tPKcj"></span><span id="_CPPv27smalloc6size_tPKcj"></span><span id="smalloc__s.cCP.unsigned"></span><span class="target" id="group__nomp__mem__management_1ga0949b0aa8f3c09a3f801e0abb42f20bb"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">smalloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47smalloc6size_tPKcj" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv37smalloc6size_tPKcj"></span><span id="_CPPv27smalloc6size_tPKcj"></span><span id="smalloc__s.cCP.unsigned"></span><span class="target" id="group__nomp__mem__utils_1ga0949b0aa8f3c09a3f801e0abb42f20bb"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">smalloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47smalloc6size_tPKcj" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Allocates memory blocks. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -313,7 +325,7 @@
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv47scalloc6size_t6size_tPKcj">
-<span id="_CPPv37scalloc6size_t6size_tPKcj"></span><span id="_CPPv27scalloc6size_t6size_tPKcj"></span><span id="scalloc__s.s.cCP.unsigned"></span><span class="target" id="group__nomp__mem__management_1ga4c8d6382784529c5ba41a4bc1d2db800"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">scalloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nmemb</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47scalloc6size_t6size_tPKcj" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv37scalloc6size_t6size_tPKcj"></span><span id="_CPPv27scalloc6size_t6size_tPKcj"></span><span id="scalloc__s.s.cCP.unsigned"></span><span class="target" id="group__nomp__mem__utils_1ga4c8d6382784529c5ba41a4bc1d2db800"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">scalloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nmemb</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47scalloc6size_t6size_tPKcj" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Allocates an array in memory with elements initialized to 0. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -332,7 +344,7 @@
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv48sreallocPv6size_tPKcj">
-<span id="_CPPv38sreallocPv6size_tPKcj"></span><span id="_CPPv28sreallocPv6size_tPKcj"></span><span id="srealloc__voidP.s.cCP.unsigned"></span><span class="target" id="group__nomp__mem__management_1ga5f56b5c6a6c86798effedc9b0bb96f24"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">srealloc</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ptr</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48sreallocPv6size_tPKcj" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv38sreallocPv6size_tPKcj"></span><span id="_CPPv28sreallocPv6size_tPKcj"></span><span id="srealloc__voidP.s.cCP.unsigned"></span><span class="target" id="group__nomp__mem__utils_1ga5f56b5c6a6c86798effedc9b0bb96f24"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">srealloc</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ptr</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48sreallocPv6size_tPKcj" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Reallocate memory blocks. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -351,8 +363,8 @@
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.tfree">
-<span class="target" id="group__nomp__mem__management_1ga4f70f0e484d4077c3d6b85da4217fd28"></span><span class="sig-name descname"><span class="n"><span class="pre">tfree</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.tfree" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Helper macro for deallocating or freeing a memory block using <a class="reference internal" href="#group__nomp__mem__management_1ga8a207a24340a601421390a38689b5154"><span class="std std-ref">sfree()</span></a>. File name and line number are passed implicitly. </p>
+<span class="target" id="group__nomp__mem__utils_1ga4f70f0e484d4077c3d6b85da4217fd28"></span><span class="sig-name descname"><span class="n"><span class="pre">tfree</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.tfree" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Helper macro for deallocating or freeing a memory block using <a class="reference internal" href="#group__nomp__mem__utils_1ga8a207a24340a601421390a38689b5154"><span class="std std-ref">sfree()</span></a>. File name and line number are passed implicitly. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -367,8 +379,8 @@
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.tmalloc">
-<span class="target" id="group__nomp__mem__management_1ga6dc6dcc39d2208cd2227418cbb5b749e"></span><span class="sig-name descname"><span class="n"><span class="pre">tmalloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">T</span></span>, <span class="n"><span class="pre">count</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.tmalloc" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Helper macro for allocating memory blocks using <a class="reference internal" href="#group__nomp__mem__management_1ga0949b0aa8f3c09a3f801e0abb42f20bb"><span class="std std-ref">smalloc()</span></a>. File name and line number are passed implicitly. </p>
+<span class="target" id="group__nomp__mem__utils_1ga6dc6dcc39d2208cd2227418cbb5b749e"></span><span class="sig-name descname"><span class="n"><span class="pre">tmalloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">T</span></span>, <span class="n"><span class="pre">count</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.tmalloc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Helper macro for allocating memory blocks using <a class="reference internal" href="#group__nomp__mem__utils_1ga0949b0aa8f3c09a3f801e0abb42f20bb"><span class="std std-ref">smalloc()</span></a>. File name and line number are passed implicitly. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -384,8 +396,8 @@
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.tcalloc">
-<span class="target" id="group__nomp__mem__management_1ga6cc40ef03d4c48bf2fd8dfaf2a41c1c1"></span><span class="sig-name descname"><span class="n"><span class="pre">tcalloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">T</span></span>, <span class="n"><span class="pre">count</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.tcalloc" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Helper macro for allocating an array in memory with elements initialized to 0 using <a class="reference internal" href="#group__nomp__mem__management_1ga4c8d6382784529c5ba41a4bc1d2db800"><span class="std std-ref">scalloc()</span></a>. File name and line number are passed implicitly. </p>
+<span class="target" id="group__nomp__mem__utils_1ga6cc40ef03d4c48bf2fd8dfaf2a41c1c1"></span><span class="sig-name descname"><span class="n"><span class="pre">tcalloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">T</span></span>, <span class="n"><span class="pre">count</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.tcalloc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Helper macro for allocating an array in memory with elements initialized to 0 using <a class="reference internal" href="#group__nomp__mem__utils_1ga4c8d6382784529c5ba41a4bc1d2db800"><span class="std std-ref">scalloc()</span></a>. File name and line number are passed implicitly. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -401,8 +413,8 @@
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.trealloc">
-<span class="target" id="group__nomp__mem__management_1ga731acd8d8bebcfcb21746d93071cb2a1"></span><span class="sig-name descname"><span class="n"><span class="pre">trealloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ptr</span></span>, <span class="n"><span class="pre">T</span></span>, <span class="n"><span class="pre">count</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.trealloc" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Helper macro for reallocating memory blocks using <a class="reference internal" href="#group__nomp__mem__management_1ga5f56b5c6a6c86798effedc9b0bb96f24"><span class="std std-ref">srealloc()</span></a>. File name and line number are passed implicitly. </p>
+<span class="target" id="group__nomp__mem__utils_1ga731acd8d8bebcfcb21746d93071cb2a1"></span><span class="sig-name descname"><span class="n"><span class="pre">trealloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ptr</span></span>, <span class="n"><span class="pre">T</span></span>, <span class="n"><span class="pre">count</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.trealloc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Helper macro for reallocating memory blocks using <a class="reference internal" href="#group__nomp__mem__utils_1ga5f56b5c6a6c86798effedc9b0bb96f24"><span class="std std-ref">srealloc()</span></a>. File name and line number are passed implicitly. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -418,32 +430,109 @@
 </dd></dl>
 
 </section>
-<section id="other-helper-functions">
-<h3>Other helper functions<a class="headerlink" href="#other-helper-functions" title="Permalink to this heading"></a></h3>
+<section id="kernel-compilation-functions">
+<h2>Kernel compilation functions<a class="headerlink" href="#kernel-compilation-functions" title="Permalink to this heading"></a></h2>
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv413mem_if_mappedPv">
-<span id="_CPPv313mem_if_mappedPv"></span><span id="_CPPv213mem_if_mappedPv"></span><span id="mem_if_mapped__voidP"></span><span class="target" id="group__nomp__other__utils_1gaab1db545d8487741c80dcb134fe0a2f8"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">mem</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">mem_if_mapped</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413mem_if_mappedPv" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Returns the mem object corresponding to host pointer <code class="docutils literal notranslate"><span class="pre">p</span></code>. </p>
-<p>Returns the mem object corresponding to host ponter <code class="docutils literal notranslate"><span class="pre">p</span></code>. If no buffer has been allocated for <code class="docutils literal notranslate"><span class="pre">p</span></code> on the device, returns NULL.</p>
+<dt class="sig sig-object cpp" id="_CPPv411jit_compilePiPKcPKcPKcPKcPKc">
+<span id="_CPPv311jit_compilePiPKcPKcPKcPKcPKc"></span><span id="_CPPv211jit_compilePiPKcPKcPKcPKcPKc"></span><span id="jit_compile__iP.cCP.cCP.cCP.cCP.cCP"></span><span class="target" id="group__nomp__compile__utils_1ga05481df5f6cbc197705eefe5eaecc0d0"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">jit_compile</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">source</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">cc</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">cflags</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">entry</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">wrkdir</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411jit_compilePiPKcPKcPKcPKcPKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>JIT compile a source string at runtime. </p>
+<p>JIT Compile a source string at runtime using a specified compiler, flags and a working directory. <code class="docutils literal notranslate"><span class="pre">id</span></code> is set to dynamically loaded <code class="docutils literal notranslate"><span class="pre">entry</span></code> point in the JIT compiled program. <code class="docutils literal notranslate"><span class="pre">id</span></code> should be set to -1 on input and is set to a non-negative value upon successful exit. On success, <a class="reference internal" href="#group__nomp__compile__utils_1ga05481df5f6cbc197705eefe5eaecc0d0"><span class="std std-ref">jit_compile()</span></a> returns 0 and a positive value otherwise.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>p</strong> – <strong>[in]</strong> Host pointer </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> – <strong>[out]</strong> Handle to the <code class="docutils literal notranslate"><span class="pre">entry</span></code> in the compiled binary file. </p></li>
+<li><p><strong>source</strong> – <strong>[in]</strong> Source to be compiled at runtime. </p></li>
+<li><p><strong>cc</strong> – <strong>[in]</strong> Full path to the compiler. </p></li>
+<li><p><strong>cflags</strong> – <strong>[in]</strong> Compile flags to be used during compilation. </p></li>
+<li><p><strong>entry</strong> – <strong>[in]</strong> Entry point (usually the name of function to be called) to the source. </p></li>
+<li><p><strong>wrkdir</strong> – <strong>[in]</strong> Working directory to generate outputs and store temporaries.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>struct mem * </p>
+<dd class="field-even"><p>int </p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv47jit_runiA_Pv">
+<span id="_CPPv37jit_runiA_Pv"></span><span id="_CPPv27jit_runiA_Pv"></span><span id="jit_run__i.voidPA"></span><span class="target" id="group__nomp__compile__utils_1ga9e8d7f86dc581385ac06c202630e5b76"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">jit_run</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">p</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47jit_runiA_Pv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Run a JIT compiled program. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> – <strong>[in]</strong> Handle of the JIT compiled program. </p></li>
+<li><p><strong>p</strong> – <strong>[in]</strong> Array of pointers to the function arguments.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv48jit_freePi">
+<span id="_CPPv38jit_freePi"></span><span id="_CPPv28jit_freePi"></span><span id="jit_free__iP"></span><span class="target" id="group__nomp__compile__utils_1gabad7d84eec241657d7c9a62d5f8a7990"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">jit_free</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48jit_freePi" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Free a jit compiled program. </p>
+<p>Free a jit compiled program. On successful exit, <code class="docutils literal notranslate"><span class="pre">id</span></code> is set to -1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>id</strong> – <strong>[in]</strong> Handle of the JIT compiled program.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int </p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="logging-functions">
+<h2>Logging functions<a class="headerlink" href="#logging-functions" title="Permalink to this heading"></a></h2>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv48set_log_PKci13nomp_log_typePKcjz">
+<span id="_CPPv38set_log_PKci13nomp_log_typePKcjz"></span><span id="_CPPv28set_log_PKci13nomp_log_typePKcjz"></span><span id="set_log___cCP.i.nomp_log_type.cCP.unsigned.z"></span><span class="target" id="group__nomp__log__utils_1ga741b377735bd3b51dc3edf43d28b8df9"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">set_log_</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">desc</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">logno</span></span>, <span class="n"><span class="pre">nomp_log_type</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">type</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">fname</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line_no</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48set_log_PKci13nomp_log_typePKcjz" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Register a log with libnomp runtime. </p>
+<p>Register a log given a description of the log, log number and log type. Returns a unique log id that can be used to query log later on success. On failure, <a class="reference internal" href="#group__nomp__log__utils_1ga741b377735bd3b51dc3edf43d28b8df9"><span class="std std-ref">set_log_()</span></a> returns -1. Use set_log() macro to by pass the argumnets <code class="docutils literal notranslate"><span class="pre">fname</span></code> and <code class="docutils literal notranslate"><span class="pre">line_no</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logno</strong> – <strong>[in]</strong> Log number which is defined in nomp.h </p></li>
+<li><p><strong>type</strong> – <strong>[in]</strong> Type of the log (one of nomp_log_type) </p></li>
+<li><p><strong>desc</strong> – <strong>[in]</strong> Detailed description of the log. </p></li>
+<li><p><strong>fname</strong> – <strong>[in]</strong> File name in which the <a class="reference internal" href="#group__nomp__log__utils_1ga741b377735bd3b51dc3edf43d28b8df9"><span class="std std-ref">set_log_()</span></a> is called. </p></li>
+<li><p><strong>line_no</strong> – <strong>[in]</strong> Line number where the <a class="reference internal" href="#group__nomp__log__utils_1ga741b377735bd3b51dc3edf43d28b8df9"><span class="std std-ref">set_log_()</span></a> is called. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413finalize_logsv">
+<span id="_CPPv313finalize_logsv"></span><span id="_CPPv213finalize_logsv"></span><span id="finalize_logs"></span><span class="target" id="group__nomp__log__utils_1ga279fc3caf8cf504ba0699bb7392a6f43"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">finalize_logs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413finalize_logsv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Free log variables. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>void </p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="other-helper-functions">
+<h2>Other helper functions<a class="headerlink" href="#other-helper-functions" title="Permalink to this heading"></a></h2>
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv47strcatnjjz">
-<span id="_CPPv37strcatnjjz"></span><span id="_CPPv27strcatnjjz"></span><span id="strcatn__unsigned.unsigned.z"></span><span class="target" id="group__nomp__other__utils_1gae26fc9473d813698f8cad6fc95b917a7"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">strcatn</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nstr</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max_len</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47strcatnjjz" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv37strcatnjjz"></span><span id="_CPPv27strcatnjjz"></span><span id="strcatn__unsigned.unsigned.z"></span><span class="target" id="group__nomp__other__utils_1ga7dc40e1987b95c01bda9955a7e243b8c"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">strcatn</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max_len</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47strcatnjjz" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Concatenates atmost <code class="docutils literal notranslate"><span class="pre">nstr</span></code> strings. </p>
 <p>Concatenates atmost <code class="docutils literal notranslate"><span class="pre">nstr</span></code> strings and returns a pointer to resulting string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nstr</strong> – <strong>[in]</strong> Number of strings to concatenate. </p></li>
+<li><p><strong>n</strong> – <strong>[in]</strong> Number of strings to concatenate. </p></li>
 <li><p><strong>max_len</strong> – <strong>[in]</strong> Maximum length of an individual string. </p></li>
 <li><p><strong>...</strong> – <strong>[in]</strong> Strings to concatenate. </p></li>
 </ul>
@@ -492,29 +581,32 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv47pathlenPKc">
-<span id="_CPPv37pathlenPKc"></span><span id="_CPPv27pathlenPKc"></span><span id="pathlen__cCP"></span><span class="target" id="group__nomp__other__utils_1ga8b069bf4bb8559d1fb5cd4f81f57db7a"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pathlen</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">path</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47pathlenPKc" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv47pathlenP6size_tPKc">
+<span id="_CPPv37pathlenP6size_tPKc"></span><span id="_CPPv27pathlenP6size_tPKc"></span><span id="pathlen__sP.cCP"></span><span class="target" id="group__nomp__other__utils_1gae42f726141596bf85f3408fb4c907904"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pathlen</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">len</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">path</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47pathlenP6size_tPKc" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Returns maximum length of a path. </p>
 <p>Returns the maximum length of specified path.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>path</strong> – <strong>[in]</strong> Path to get the maximum length. </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>len</strong> – <strong>[in]</strong> Lenth of path specified in <code class="docutils literal notranslate"><span class="pre">path</span></code>. </p></li>
+<li><p><strong>path</strong> – <strong>[in]</strong> Path to get the maximum length. </p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>size_t </p>
+<dd class="field-even"><p>int </p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv43MAXjz">
-<span id="_CPPv33MAXjz"></span><span id="_CPPv23MAXjz"></span><span id="MAX__unsigned.z"></span><span class="target" id="group__nomp__other__utils_1ga47cd678d180f03f4637a8fc0366e0248"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MAX</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv43MAXjz" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv44maxnjz">
+<span id="_CPPv34maxnjz"></span><span id="_CPPv24maxnjz"></span><span id="maxn__unsigned.z"></span><span class="target" id="group__nomp__other__utils_1ga1aad71475c9a7bacb76d520b5351e704"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">maxn</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv44maxnjz" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Returns maximum among all integers passed. </p>
 <p>Returns the maximum between two or more integers.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>args</strong> – <strong>[in]</strong> Total number of integers. </p></li>
+<li><p><strong>n</strong> – <strong>[in]</strong> Total number of integers. </p></li>
 <li><p><strong>...</strong> – <strong>[in]</strong> List of integers to find the maximum of as a variable argument list. </p></li>
 </ul>
 </dd>
@@ -524,7 +616,26 @@
 </dl>
 </dd></dl>
 
-</section>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417check_null_input_PvPKcjPKc">
+<span id="_CPPv317check_null_input_PvPKcjPKc"></span><span id="_CPPv217check_null_input_PvPKcjPKc"></span><span id="check_null_input___voidP.cCP.unsigned.cCP"></span><span class="target" id="group__nomp__other__utils_1ga8cb8470de46e2a64d9818d56b8fe68e5"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">check_null_input_</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">p</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">func</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417check_null_input_PvPKcjPKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns a non-zero error if the input is NULL. </p>
+<p>This function call set_log() to register an error if the input is NULL. Use the macro nomp_null_input() to automatically add last three arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p</strong> – <strong>[in]</strong> Input pointer. </p></li>
+<li><p><strong>func</strong> – <strong>[in]</strong> Function in which the null check is done. </p></li>
+<li><p><strong>line</strong> – <strong>[in]</strong> Line number where the null check is done. </p></li>
+<li><p><strong>file</strong> – <strong>[in]</strong> File name in which the null check is done. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int </p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 </section>
 
