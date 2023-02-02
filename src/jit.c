@@ -43,13 +43,12 @@ static int make_knl_dir(char **dir_, const char *knl_dir, const char *src) {
   char *dir = *dir_ = strcatn(3, lmax, knl_dir, "/", hash);
   if (access(dir, F_OK) == -1) {
     if (mkdir(dir, S_IRWXU) == -1) {
-      int err = set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
-                        "Unable to create directory: %s. Error: %s.", dir,
-                        strerror(errno));
-      tfree(dir);
-      return err;
+      return set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
+                     "Unable to create directory: %s. Error: %s.", dir,
+                     strerror(errno));
     }
   }
+  tfree(hash);
 
   return 0;
 }

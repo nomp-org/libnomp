@@ -7,8 +7,6 @@
 
 extern const char *ERR_STR_USER_MAP_PTR_IS_INVALID;
 extern const char *ERR_STR_USER_DEVICE_IS_INVALID;
-extern const char *ERR_STR_RUNTIME_MEMORY_ALLOCATION_FAILURE;
-extern const char *ERR_STR_KNL_ARG_TYPE_IS_INVALID;
 
 /**
  * @defgroup nomp_log_utils Internal functions used by logging module.

@@ -107,19 +107,9 @@
 #define NOMP_RUNTIME_ALREADY_INITIALIZED -256
 /**
  * @ingroup nomp_errors
- * @brief libnomp is not initialized.
- */
-#define NOMP_RUNTIME_NOT_INITIALIZED -257
-/**
- * @ingroup nomp_errors
  * @brief Failed to finalize libnomp.
  */
 #define NOMP_RUNTIME_FINALIZE_FAILURE -258
-/**
- * @ingroup nomp_errors
- * @brief Memory allocation on host by libnomp failed.
- */
-#define NOMP_RUNTIME_MEMORY_ALLOCATION_FAILURE -259
 /**
  * @ingroup nomp_errors
  * @brief One of the inputs to a libnomp function call are not valid.
@@ -307,11 +297,15 @@ int nomp_jit(int *id, const char *c_src, const char **clauses);
  */
 int nomp_run(int id, int nargs, ...);
 
-void nomp_assert_(int cond, const char *file, unsigned line);
-#define nomp_assert(cond) nomp_assert_(cond, __FILE__, __LINE__)
-
-void nomp_chk_(int err, const char *file, unsigned line);
-#define nomp_chk(err) nomp_chk_(err, __FILE__, __LINE__)
+/**
+ * @ingroup nomp_user_api
+ * @brief Check nomp API function return values for errors.
+ *
+ * @param[in] retval Return value from a nomp API function.
+ *
+ * @return void
+ */
+void nomp_chk(int retval);
 
 /**
  * @ingroup nomp_log_type

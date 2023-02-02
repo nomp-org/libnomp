@@ -25,18 +25,10 @@ static int check_env(struct backend *backend) {
   if (tmp)
     backend->verbose = strntoui(tmp, MAX_BUFSIZ);
 
-  tmp = copy_env("NOMP_BACKEND", MAX_BUFSIZ);
+  tmp = copy_env("NOMP_BACKEND", MAX_BACKEND_NAME_SIZE);
   if (tmp) {
     backend->backend = trealloc(backend->backend, char, MAX_BACKEND_NAME_SIZE);
     strncpy(backend->backend, tmp, MAX_BACKEND_NAME_SIZE), tfree(tmp);
-  }
-
-  tmp = copy_env("NOMP_INSTALL_DIR", MAX_BUFSIZ);
-  if (tmp) {
-    size_t size;
-    return_on_err(pathlen(&size, tmp));
-    backend->install_dir = trealloc(backend->install_dir, char, size + 1);
-    strncpy(backend->install_dir, tmp, size), tfree(tmp);
   }
 
   tmp = copy_env("NOMP_ANNOTATE_SCRIPT", MAX_BUFSIZ);
@@ -51,6 +43,14 @@ static int check_env(struct backend *backend) {
     size_t size = strnlen(tmp, MAX_BUFSIZ) + 1;
     backend->annts_func = trealloc(backend->annts_func, char, size);
     strncpy(backend->annts_func, tmp, size), tfree(tmp);
+  }
+
+  tmp = copy_env("NOMP_INSTALL_DIR", MAX_BUFSIZ);
+  if (tmp) {
+    size_t size;
+    return_on_err(pathlen(&size, tmp));
+    backend->install_dir = trealloc(backend->install_dir, char, size + 1);
+    strncpy(backend->install_dir, tmp, size), tfree(tmp);
   }
 
   return 0;
@@ -169,10 +169,10 @@ int nomp_init(int argc, const char **argv) {
 
     // Append nomp python directory to sys.path.
     // nomp.install_dir should be set and we use it here.
-    size_t len, max;
+    size_t len;
     return_on_err(pathlen(&len, nomp.install_dir));
-    max = maxn(2, len, strnlen(py_dir, MAX_BUFSIZ));
-    char *abs_dir = strcatn(3, max, nomp.install_dir, "/", py_dir);
+    len = maxn(2, len, strnlen(py_dir, MAX_BUFSIZ));
+    char *abs_dir = strcatn(3, len, nomp.install_dir, "/", py_dir);
     return_on_err(py_append_to_sys_path(abs_dir));
 
     tfree(abs_dir);
@@ -368,27 +368,16 @@ int nomp_run(int id, int nargs, ...) {
                  "Kernel id %d passed to nomp_run is not valid.", id);
 }
 
-void nomp_assert_(int cond, const char *file, unsigned line) {
-  if (!cond) {
-    printf("nomp_assert failure at %s:%d\n", file, line);
-    exit(1);
-  }
-}
-
-void nomp_chk_(int id, const char *file, unsigned line) {
-  if (id == 0)
-    return;
-  if (nomp_get_log_type(id) == NOMP_ERROR) {
-    char *str = nomp_get_log_str(id);
-    fprintf(stderr, "%s:%d %s\n", file, line, str);
-    tfree(str);
+void nomp_chk(int retval) {
+  if (nomp_get_log_type(retval) == NOMP_ERROR) {
+    fprintf(stderr, "%s\n", nomp_get_log_str(retval));
     exit(1);
   }
 }
 
 int nomp_finalize(void) {
   if (!initialized) {
-    return set_log(NOMP_RUNTIME_NOT_INITIALIZED, NOMP_ERROR,
+    return set_log(NOMP_RUNTIME_FINALIZE_FAILURE, NOMP_ERROR,
                    "libnomp is not initialized.");
   }
 
