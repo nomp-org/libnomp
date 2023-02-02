@@ -104,7 +104,7 @@
  * @ingroup nomp_errors
  * @brief libnomp is already initialized.
  */
-#define NOMP_RUNTIME_ALREADY_INITIALIZED -256
+#define NOMP_RUNTIME_INITIALIZE_FAILURE -256
 /**
  * @ingroup nomp_errors
  * @brief Failed to finalize libnomp.

@@ -125,11 +125,8 @@ static int check_args(int argc, const char **argv, struct backend *backend) {
 
 int nomp_init(int argc, const char **argv) {
   if (initialized) {
-    return set_log(
-        NOMP_RUNTIME_ALREADY_INITIALIZED, NOMP_ERROR,
-        "libnomp is already initialized to use %s. Call nomp_finalize() before "
-        "calling nomp_init() again.",
-        nomp.name);
+    return set_log(NOMP_RUNTIME_INITIALIZE_FAILURE, NOMP_ERROR,
+                   "libnomp is already initialized to use %s.", nomp.name);
   }
 
   return_on_err(check_args(argc, argv, &nomp));
