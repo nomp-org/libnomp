@@ -9,32 +9,45 @@ static int make_knl_dir(char **dir_, const char *knl_dir, const char *src) {
   size_t len = strnlen(src, MAX_SRC_SIZE);
   if (len == MAX_SRC_SIZE) {
     return set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
-                   "Kernel source size exceeds maximum allowed size: %u.",
-                   MAX_SRC_SIZE);
+                   "Kernel source size exceeds maximum size %u.", MAX_SRC_SIZE);
   }
 
-  unsigned char *s = tcalloc(unsigned char, len + 1),
-                hash[SHA256_DIGEST_LENGTH];
+  // Check if knl_dir exists, otherwise create it.
+  if (access(knl_dir, F_OK) == -1) {
+    if (mkdir(knl_dir, S_IRWXU) == -1) {
+      return set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
+                     "Unable to create directory: %s. Error: %s.", knl_dir,
+                     strerror(errno));
+    }
+  }
+
+  unsigned char *s = tcalloc(unsigned char, len + 1);
   for (unsigned i = 0; i < len; i++)
     s[i] = src[i];
 
-  unsigned char *ret = SHA256(s, len, hash);
-  tfree(s);
+  unsigned char md[SHA256_DIGEST_LENGTH], *ret = SHA256(s, len, md);
   if (ret == NULL) {
     return set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
                    "Unable to calculate SHA256 hash of string: \"%s\".", s);
   }
+  tfree(s);
+
+  char *hash = tcalloc(char, 2 * SHA256_DIGEST_LENGTH + 1);
+  for (unsigned i = 0; i < SHA256_DIGEST_LENGTH; i++)
+    snprintf(&hash[2 * i], 3, "%02hhX", md[i]);
 
   return_on_err(pathlen(&len, knl_dir));
   unsigned lmax = maxn(2, len, SHA256_DIGEST_LENGTH);
 
   // Create the folder if it doesn't exist.
   char *dir = *dir_ = strcatn(3, lmax, knl_dir, "/", hash);
-  if (access(dir, F_OK)) {
-    if (mkdir(dir, S_IRUSR | S_IWUSR) == -1) {
+  if (access(dir, F_OK) == -1) {
+    if (mkdir(dir, S_IRWXU) == -1) {
+      int err = set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
+                        "Unable to create directory: %s. Error: %s.", dir,
+                        strerror(errno));
       tfree(dir);
-      return set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
-                     "Unable to create directory: %s.", dir);
+      return err;
     }
   }
 
@@ -43,7 +56,7 @@ static int make_knl_dir(char **dir_, const char *knl_dir, const char *src) {
 
 static int write_file(const char *path, const char *src) {
   // See if source.cpp exist. Otherwise create it.
-  if (access(path, F_OK)) {
+  if (access(path, F_OK) == -1) {
     FILE *fp = fopen(path, "w");
     if (fp != NULL) {
       fprintf(fp, "%s", src);
@@ -59,12 +72,10 @@ static int write_file(const char *path, const char *src) {
 
 static int compile_aux(const char *cc, const char *cflags, const char *src,
                        const char *out) {
-  size_t lcc, lsrc, lout;
-  return_on_err(pathlen(&lcc, cc));
-  return_on_err(pathlen(&lsrc, src));
-  return_on_err(pathlen(&lout, out));
+  size_t len;
+  return_on_err(pathlen(&len, cc));
+  len += strnlen(cflags, MAX_CFLAGS_SIZE) + strlen(src) + strlen(out) + 32;
 
-  size_t len = lcc + strnlen(cflags, MAX_CFLAGS_SIZE) + lsrc + lout + 32;
   char *cmd = tcalloc(char, len);
   snprintf(cmd, len, "%s %s %s -o %s", cc, cflags, src, out);
   int ret = system(cmd), failed = 0;
@@ -105,14 +116,14 @@ int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
   return_on_err(pathlen(&ldir, dir));
 
   const char *srcf = "source.c", *libf = "mylib.so";
-  unsigned max = maxn(3, ldir, strnlen(srcf, 64), strnlen(libf, 64));
+  size_t max = maxn(3, ldir, strnlen(srcf, 64), strnlen(libf, 64));
   char *src = strcatn(3, max, dir, "/", srcf);
   char *lib = strcatn(3, max, dir, "/", libf);
   tfree(dir);
 
   return_on_err(write_file(src, source));
   return_on_err(compile_aux(cc, cflags, src, lib));
-  tfree(src), tfree(lib);
+  tfree(src);
 
   if (funcs_n == funcs_max) {
     funcs_max += funcs_max / 2 + 1;
@@ -123,6 +134,7 @@ int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
   void *dlh = dlopen(lib, RTLD_LAZY | RTLD_LOCAL);
   if (dlh)
     dlf = dlsym(dlh, entry);
+  tfree(lib);
 
   if (dlh == NULL || dlf == NULL) {
     return set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
