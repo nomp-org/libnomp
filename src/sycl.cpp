@@ -1,7 +1,6 @@
 #include "nomp-impl.h"
 #include <CL/opencl.h>
 #include <CL/sycl.hpp>
-#include <CL/sycl/backend/opencl.hpp>
 #include <dlfcn.h>
 
 // TODO: Handle errors properly in SYCL backend
@@ -54,7 +53,7 @@ static int sycl_knl_free(struct prog *prg) {
 static int sycl_knl_build(struct backend *bnd, struct prog *prg,
                           const char *source, const char *name) {
   struct sycl_backend *sycl = (sycl_backend *)bnd->bptr;
-
+  printf("sycl 56 \n");
   char *path = writefile(bnd->knl_fun);
   compile(path);
   // prg->bptr = tcalloc(struct opencl_prog, 1);
@@ -113,21 +112,21 @@ static int sycl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
     sycl::nd_range<1> nd_range = sycl::nd_range(global_range, local_range);
     typedef void (*kernel_function_1)(sycl::queue, sycl::nd_range<1>,
                                       unsigned int, void **);
-    kernel_function_1 hello =
-        (kernel_function_1)dlsym(handle, "kernel_function_1");
-    if (!hello) {
+    kernel_function_1 kernel_fun =
+        (kernel_function_1)dlsym(handle, "kernel_function");
+    if (!kernel_fun) {
       std::cerr << "Error: " << dlerror() << std::endl;
       return 1;
     }
-    hello(sycl->queue, nd_range, prg->nargs, arg_list);
+    kernel_fun(sycl->queue, nd_range, prg->nargs, arg_list);
   } else if (prg->ndim == 2) {
     sycl::range global_range = sycl::range(global[0], global[1]);
     sycl::range local_range = sycl::range(prg->local[0], prg->local[1]);
     sycl::nd_range<2> nd_range = sycl::nd_range(global_range, local_range);
     typedef void (*kernel_fun_2)(sycl::queue queue, sycl::nd_range<2> nd_range,
                                  unsigned int nargs, void **args);
-    kernel_fun_2 hello = (kernel_fun_2)dlsym(handle, "kernel_function_2");
-    hello(sycl->queue, nd_range, prg->nargs, arg_list);
+    kernel_fun_2 kernel_fun = (kernel_fun_2)dlsym(handle, "kernel_function");
+    kernel_fun(sycl->queue, nd_range, prg->nargs, arg_list);
   } else {
     sycl::range global_range = sycl::range(global[0], global[1], global[2]);
     sycl::range local_range =
@@ -135,8 +134,8 @@ static int sycl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
     sycl::nd_range<3> nd_range = sycl::nd_range(global_range, local_range);
     typedef void (*kernel_fun_3)(sycl::queue queue, sycl::nd_range<3> nd_range,
                                  unsigned int nargs, void **args);
-    kernel_fun_3 hello = (kernel_fun_3)dlsym(handle, "kernel_function_3");
-    hello(sycl->queue, nd_range, prg->nargs, arg_list);
+    kernel_fun_3 kernel_fun = (kernel_fun_3)dlsym(handle, "kernel_function");
+    kernel_fun(sycl->queue, nd_range, prg->nargs, arg_list);
   }
   dlclose(handle);
   // FIXME: Wrong. Call set_log()
