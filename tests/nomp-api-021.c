@@ -10,7 +10,7 @@ static int test_invalid_backend(int argc, const char **argv) {
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
   err = nomp_finalize();
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_RUNTIME_FINALIZE_FAILURE);
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_FINALIZE_FAILURE);
 
   return 0;
 }
@@ -24,7 +24,7 @@ static int test_invalid_platform_id(int argc, const char **argv) {
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
   err = nomp_finalize();
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_RUNTIME_FINALIZE_FAILURE);
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_FINALIZE_FAILURE);
 
   return 0;
 }
@@ -38,7 +38,7 @@ static int test_invalid_device_id(int argc, const char **argv) {
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
   err = nomp_finalize();
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_RUNTIME_FINALIZE_FAILURE);
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_FINALIZE_FAILURE);
 
   return 0;
 }

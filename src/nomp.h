@@ -104,17 +104,17 @@
  * @ingroup nomp_errors
  * @brief libnomp is already initialized.
  */
-#define NOMP_RUNTIME_INITIALIZE_FAILURE -256
+#define NOMP_INITIALIZE_FAILURE -256
 /**
  * @ingroup nomp_errors
  * @brief Failed to finalize libnomp.
  */
-#define NOMP_RUNTIME_FINALIZE_FAILURE -258
+#define NOMP_FINALIZE_FAILURE -258
 /**
  * @ingroup nomp_errors
  * @brief One of the inputs to a libnomp function call are not valid.
  */
-#define NOMP_RUNTIME_NULL_INPUT_ENCOUNTERED -260
+#define NOMP_NULL_INPUT_ENCOUNTERED -260
 
 /**
  * @ingroup nomp_errors
