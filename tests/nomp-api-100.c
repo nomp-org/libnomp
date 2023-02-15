@@ -129,7 +129,7 @@ int main(int argc, const char *argv[]) {
   err |= SUBTEST(test_missing_user_callback);
   err |= SUBTEST(test_syntax_error_in_kernel);
 
-  err = nomp_finalize();
+  err |= nomp_finalize();
   nomp_test_chk(err);
 
   return err;
