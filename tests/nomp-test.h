@@ -40,10 +40,10 @@ static int subtest_(int err, const char *test_name) {
       return 1;                                                                \
   }
 
-#define nomp_test_chk(err_id)                                                  \
+#define nomp_test_chk(err)                                                     \
   {                                                                            \
-    if (nomp_get_log_type((err_id)) == NOMP_ERROR)                             \
-      return err_id;                                                           \
+    if (nomp_get_log_type((err)) == NOMP_ERROR)                                \
+      return err;                                                              \
   }
 
 static int create_knl(int *id, const char *knl_fmt, const char **clauses,
