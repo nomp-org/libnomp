@@ -31,7 +31,7 @@ static int test_invalid_argument_flag() {
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_ARG_IS_INVALID);
 
   err = nomp_finalize();
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_RUNTIME_FINALIZE_FAILURE);
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_FINALIZE_FAILURE);
 
   return 0;
 }
@@ -43,7 +43,7 @@ static int test_missing_argument() {
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_ARG_IS_INVALID);
 
   err = nomp_finalize();
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_RUNTIME_FINALIZE_FAILURE);
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_FINALIZE_FAILURE);
 
   return 0;
 }

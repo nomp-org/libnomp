@@ -69,7 +69,7 @@ int maxn(unsigned n, ...) {
 int check_null_input_(void *p, const char *func, unsigned line,
                       const char *file) {
   if (!p) {
-    return set_log(NOMP_RUNTIME_NULL_INPUT_ENCOUNTERED, NOMP_ERROR,
+    return set_log(NOMP_NULL_INPUT_ENCOUNTERED, NOMP_ERROR,
                    "Input pointer passed to function \"%s\" at line %d in file "
                    "%s is NULL.",
                    func, line, file);
