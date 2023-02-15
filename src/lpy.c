@@ -2,6 +2,8 @@
 
 static const char *loopy_api = "loopy_api";
 static const char *c_to_loopy = "c_to_loopy";
+static const char *get_ispc_entry_point_fun = "get_ispc_entry_point";
+static const char *get_ispc_wrapper_fun = "create_ispc_kernel_with_wrapper";
 
 void py_print(const char *msg, PyObject *obj) {
   PyObject *repr = PyObject_Repr(obj);
@@ -181,6 +183,61 @@ int py_get_knl_name_and_src(char **name, char **src, PyObject *knl) {
         NOMP_LOOPY_CODEGEN_FAILURE, NOMP_ERROR,
         "Backend code generation from loopy kernel \"%s\" failed.", *name);
   }
+  return 0;
+}
+
+int py_get_ispc_knl_name_and_src(char **name, char **src, PyObject *knl) {
+  int err = 1;
+  PyObject *lpy_api = PyUnicode_FromString(loopy_api);
+  if (lpy_api) {
+    PyObject *module = PyImport_Import(lpy_api);
+    if (module) {
+      PyObject *get_ispc_entry_point =
+          PyObject_GetAttrString(module, get_ispc_entry_point_fun);
+      if (get_ispc_entry_point) {
+        PyObject *py_name =
+            PyObject_CallFunctionObjArgs(get_ispc_entry_point, knl, NULL);
+        if (py_name) {
+          Py_ssize_t size;
+          const char *name_ = PyUnicode_AsUTF8AndSize(py_name, &size);
+          *name = strndup(name_, size);
+          Py_DECREF(py_name), err = 0;
+        }
+        Py_DECREF(get_ispc_entry_point);
+      }
+
+      if (err) {
+        Py_DECREF(module), Py_DECREF(lpy_api);
+        return nomp_set_log(NOMP_LOOPY_KNL_NAME_NOT_FOUND, NOMP_ERROR,
+                            "Unable to get loopy kernel name.");
+      }
+
+      err = 1;
+      PyObject *get_wrapper =
+          PyObject_GetAttrString(module, get_ispc_wrapper_fun);
+      if (get_wrapper) {
+        PyObject *wrapper =
+            PyObject_CallFunctionObjArgs(get_wrapper, knl, NULL);
+        if (wrapper) {
+          Py_ssize_t size;
+          const char *src_ = PyUnicode_AsUTF8AndSize(wrapper, &size);
+          *src = strndup(src_, size);
+          Py_DECREF(wrapper), err = 0;
+        }
+        Py_DECREF(get_wrapper);
+      }
+
+      Py_DECREF(module);
+    }
+    Py_DECREF(lpy_api);
+  }
+
+  if (err) {
+    return nomp_set_log(
+        NOMP_LOOPY_CODEGEN_FAILURE, NOMP_ERROR,
+        "Backend code generation from loopy ispc kernel \"%s\" failed.", *name);
+  }
+
   return 0;
 }
 

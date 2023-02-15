@@ -74,8 +74,8 @@ static int write_file(const char *path, const char *src) {
 static int compile_aux(const char *cc, const char *cflags, const char *src,
                        const char *out) {
   size_t len;
-  nomp_check(nomp_path_len(&len, cc));
-  len += strnlen(cflags, MAX_CFLAGS_SIZE) + strlen(src) + strlen(out) + 32;
+  // nomp_check(nomp_path_len(&len, cc));
+  len = strnlen(cflags, MAX_CFLAGS_SIZE) + strlen(src) + strlen(out) + 32;
 
   char *cmd = nomp_calloc(char, len);
   snprintf(cmd, len, "%s %s %s -o %s", cc, cflags, src, out);
@@ -111,20 +111,38 @@ static struct function **funcs = NULL;
 static unsigned funcs_n = 0, funcs_max = 0;
 
 int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
-                const char *entry, const char *wrkdir) {
+                const char *entry, const char *wrkdir, const char *srcf,
+                const char *libf, const int to_wrt) {
   char *dir = NULL;
   nomp_check(make_knl_dir(&dir, wrkdir, source));
 
   size_t ldir;
   nomp_check(nomp_path_len(&ldir, dir));
 
-  const char *srcf = "source.c", *libf = "mylib.so";
   size_t max = nomp_max(3, ldir, strnlen(srcf, 64), strnlen(libf, 64));
   char *src = nomp_str_cat(3, max, dir, "/", srcf);
   char *lib = nomp_str_cat(3, max, dir, "/", libf);
-  nomp_free(dir);
 
-  nomp_check(write_file(src, source));
+  if (to_wrt) {
+    nomp_check(write_file(src, source));
+  } else {
+    char *ld_path;
+    size_t len = ldir + 32;
+    char *tmp = getenv("LD_LIBRARY_PATH");
+    if (tmp) {
+      len += strlen(tmp);
+      ld_path = nomp_calloc(char, len);
+      snprintf(ld_path, len, "%s:%s", tmp, dir);
+      unsetenv("LD_LIBRARY_PATH");
+      setenv("LD_LIBRARY_PATH", ld_path, 1);
+    } else {
+      ld_path = nomp_calloc(char, len);
+      snprintf(ld_path, len, "%s", dir);
+      setenv("LD_LIBRARY_PATH", ld_path, 0);
+    }
+    nomp_free(ld_path);
+  }
+  nomp_free(dir);
   nomp_check(compile_aux(cc, cflags, src, lib));
   nomp_free(src);
 
@@ -135,7 +153,7 @@ int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
 
   void (*dlf)() = NULL;
   void *dlh = dlopen(lib, RTLD_LAZY | RTLD_LOCAL);
-  if (dlh)
+  if (dlh && entry)
     dlf = dlsym(dlh, entry);
   nomp_free(lib);
 

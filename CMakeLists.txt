@@ -49,8 +49,10 @@ if (ENABLE_CUDA)
   target_link_libraries(nomp PRIVATE CUDA::cudart CUDA::nvrtc)
 endif()
 if (ENABLE_ISPC)
+  find_package(OpenMP REQUIRED)
   find_package(ispcrt REQUIRED)
-  target_link_libraries(nomp PRIVATE ispcrt::ispcrt)
+  target_link_libraries(nomp PRIVATE OpenMP::OpenMP_C ispcrt::ispcrt)
+  target_compile_definitions(nomp PRIVATE ISPCRT_INCLUDE_DIR_FLAGS="-I ${ISPCRT_INCLUDE_DIR} --woff -g")
 endif()
 
 set_target_properties(nomp PROPERTIES

@@ -23,11 +23,15 @@
  * the source.
  * @param[in] wrkdir Working directory to generate outputs and store
  * temporaries.
+ * @param[in] srcf File name to store source text.
+ * @param[in] libf Output file name.
+ * @param[in] to_wrt Requierd to write to a file.
  *
  * @return int
  */
 int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
-                const char *entry, const char *wrkdir);
+                const char *entry, const char *wrkdir, const char *srcf,
+                const char *libf, const int to_wrt);
 
 /**
  * @ingroup nomp_compile_utils
