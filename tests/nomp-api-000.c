@@ -3,7 +3,7 @@
 // Calling nomp_finalize() before nomp_init() should return an error.
 static int test_first_nomp_finalize() {
   int err = nomp_finalize();
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_RUNTIME_FINALIZE_FAILURE);
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_FINALIZE_FAILURE);
 
   char *desc = nomp_get_log_str(err);
   int eq = logcmp(desc, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* "
@@ -19,11 +19,11 @@ static int test_nomp_init_twice(int argc, const char **argv) {
   int err = nomp_init(argc, argv);
   nomp_test_chk(err);
   err = nomp_init(argc, argv);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_RUNTIME_INITIALIZE_FAILURE);
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_INITIALIZE_FAILURE);
 
   char *desc = nomp_get_log_str(err);
   int eq = logcmp(desc, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* libnomp "
-                        "is already initialized to use opencl.");
+                        "is already initialized.");
   tfree(desc);
   nomp_test_assert(eq);
 
@@ -35,7 +35,7 @@ static int test_nomp_finalize_twice() {
   int err = nomp_finalize();
   nomp_test_chk(err);
   err = nomp_finalize();
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_RUNTIME_FINALIZE_FAILURE);
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_FINALIZE_FAILURE);
 
   char *desc = nomp_get_log_str(err);
   int eq = logcmp(desc, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* "

@@ -125,8 +125,8 @@ static int check_args(int argc, const char **argv, struct backend *backend) {
 
 int nomp_init(int argc, const char **argv) {
   if (initialized) {
-    return set_log(NOMP_RUNTIME_INITIALIZE_FAILURE, NOMP_ERROR,
-                   "libnomp is already initialized to use %s.", nomp.name);
+    return set_log(NOMP_INITIALIZE_FAILURE, NOMP_ERROR,
+                   "libnomp is already initialized.");
   }
 
   return_on_err(check_args(argc, argv, &nomp));
@@ -138,7 +138,7 @@ int nomp_init(int argc, const char **argv) {
     name[i] = tolower(nomp.backend[i]);
   name[n] = '\0';
 
-  int err = 0;
+  int err = 1;
   if (strncmp(name, "opencl", MAX_BACKEND_NAME_SIZE) == 0) {
 #if defined(OPENCL_ENABLED)
     err = opencl_init(&nomp, nomp.platform_id, nomp.device_id);
@@ -374,7 +374,7 @@ void nomp_chk(int retval) {
 
 int nomp_finalize(void) {
   if (!initialized) {
-    return set_log(NOMP_RUNTIME_FINALIZE_FAILURE, NOMP_ERROR,
+    return set_log(NOMP_FINALIZE_FAILURE, NOMP_ERROR,
                    "libnomp is not initialized.");
   }
 
@@ -399,7 +399,7 @@ int nomp_finalize(void) {
 
   initialized = nomp.finalize(&nomp);
   if (initialized) {
-    return set_log(NOMP_RUNTIME_FINALIZE_FAILURE, NOMP_ERROR,
+    return set_log(NOMP_FINALIZE_FAILURE, NOMP_ERROR,
                    "Failed to initialize libnomp.");
   }
 
