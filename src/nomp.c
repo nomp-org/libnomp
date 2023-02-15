@@ -118,7 +118,7 @@ int nomp_init(int argc, const char **argv) {
 #if defined(SYCL_ENABLED)
     err = sycl_init(&nomp, nomp.platform_id, nomp.device_id);
 #endif
-  } else if (strncmp(name, "ispc", MAX_BACKEND_NAME_SIZE) == 0) {
+  } else if (strncmp(name, "ispc", MAX_BACKEND_SIZE) == 0) {
 #if defined(ISPC_ENABLED)
     err = ispc_init(&nomp, nomp.platform_id, nomp.device_id);
 #endif

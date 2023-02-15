@@ -78,8 +78,10 @@ if (ENABLE_SYCL AND DPCPP_FOUND)
   target_link_libraries(nomp PRIVATE nomp::SYCL)
 endif()
 if (ENABLE_ISPC)
+  find_package(OpenMP REQUIRED)
   find_package(ispcrt REQUIRED)
-  target_link_libraries(nomp PRIVATE ispcrt::ispcrt)
+  target_link_libraries(nomp PRIVATE OpenMP::OpenMP_C ispcrt::ispcrt)
+  target_compile_definitions(nomp PRIVATE ISPCRT_INCLUDE_DIR_FLAGS="-I ${ISPCRT_INCLUDE_DIR}")
 endif()
 
 set_target_properties(nomp PROPERTIES
