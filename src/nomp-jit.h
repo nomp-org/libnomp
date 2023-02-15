@@ -7,6 +7,15 @@ extern "C" {
  * @defgroup nomp_compile_utils Functions to compile source at runtime.
  */
 
+typedef enum { NOMP_DO_NOT_WRITE = 0, NOMP_WRITE = 1 } nomp_file_write;
+
+typedef enum {
+  NOMP_DO_NOT_OVERWRITE = 0,
+  NOMP_OVERWRITE = 1
+} nomp_file_overwrite;
+
+typedef enum { NOMP_NO_NEW_DIR = 0, NOMP_NEW_DIR = 1 } nomp_make_dir;
+
 /**
  * @ingroup nomp_compile_utils
  * @brief JIT compile a source string at runtime.

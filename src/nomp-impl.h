@@ -81,7 +81,7 @@ struct mem *mem_if_mapped(void *p);
  * @brief Initializes OpenCL backend with the specified platform and device.
  *
  * Initializes OpenCL backend while creating a command queue using the
- * given platform id and device id. Returns a positive value if an error
+ * given platform id and device id. Returns a negative value if an error
  * occured during the initialization, otherwise returns 0.
  *
  * @param[in] backend Target backend for code generation.
@@ -114,7 +114,7 @@ int sycl_init(struct backend *backend, const int platform_id,
  * @brief Initializes Cuda backend with the specified platform and device.
  *
  * Initializes Cuda backend using the given device id. Platform id is not
- * used in the initialization of Cuda backend. Returns a positive value if an
+ * used in the initialization of Cuda backend. Returns a negative value if an
  * error occured during the initialization, otherwise returns 0.
  *
  * @param[in] backend Target backend for code generation.
@@ -150,7 +150,7 @@ int hip_init(struct backend *backend, const int platform_id,
  * @brief Initializes ISPC backend with the specified platform and device.
  *
  * Initializes ISPC backend using the given device id and platform type.
- * Returns a positive value if an error occured during the initialization,
+ * Returns a negative value if an error occured during the initialization,
  * otherwise returns 0.
  *
  * @param[in] backend Target backend for code generation.
