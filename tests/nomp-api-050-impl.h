@@ -48,6 +48,9 @@ static int multiple_h2d_calls(unsigned s, unsigned e) {
   err = nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_TO);
   nomp_test_chk(err);
 
+  err = nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FREE);
+  nomp_test_chk(err);
+
   return 0;
 }
 #undef multiple_h2d_calls
@@ -56,12 +59,16 @@ static int multiple_h2d_calls(unsigned s, unsigned e) {
   TOKEN_PASTE(nomp_api_050_multiple_d2h_calls, TEST_SUFFIX)
 static int multiple_d2h_calls(unsigned s, unsigned e) {
   TEST_TYPE a[10] = {0};
+
   int err = nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_TO);
   nomp_test_chk(err);
 
   err = nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FROM);
   nomp_test_chk(err);
   err = nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FROM);
+  nomp_test_chk(err);
+
+  err = nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FREE);
   nomp_test_chk(err);
 
   return 0;
@@ -98,6 +105,9 @@ static int d2h_after_h2d(unsigned s, unsigned e) {
   for (unsigned i = e; i < 10; i++)
     nomp_test_assert(a[i] == 0);
 #endif
+
+  err = nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FREE);
+  nomp_test_chk(err);
 
   return 0;
 }
