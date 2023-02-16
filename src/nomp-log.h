@@ -7,7 +7,9 @@
 
 extern const char *ERR_STR_USER_MAP_PTR_IS_INVALID;
 extern const char *ERR_STR_USER_DEVICE_IS_INVALID;
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @defgroup nomp_log_utils Internal functions used by logging module.
  */
@@ -42,4 +44,7 @@ int set_log_(const char *desc, int logno, nomp_log_type type, const char *fname,
  */
 void finalize_logs();
 
+#endif
+#ifdef __cplusplus
+}
 #endif

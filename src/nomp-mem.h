@@ -106,3 +106,6 @@ void *srealloc(void *ptr, size_t size, const char *file, unsigned line);
   ((T *)srealloc((ptr), (count) * sizeof(T), __FILE__, __LINE__))
 
 #endif // _NOMP_MEM_H_
+#ifdef __cplusplus
+}
+#endif

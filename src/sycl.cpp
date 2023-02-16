@@ -1,4 +1,5 @@
 #include "nomp-impl.h"
+#include "nomp-jit.h"
 #include <CL/opencl.h>
 #include <CL/sycl.hpp>
 #include <dlfcn.h>
@@ -53,13 +54,11 @@ static int sycl_knl_free(struct prog *prg) {
 static int sycl_knl_build(struct backend *bnd, struct prog *prg,
                           const char *source, const char *name) {
   struct sycl_backend *sycl = (sycl_backend *)bnd->bptr;
-  printf("sycl 56 \n");
-  char *path = writefile(bnd->knl_fun);
-  compile(path);
-  // prg->bptr = tcalloc(struct opencl_prog, 1);
-  // struct opencl_prog *ocl_prg = (opencl_prog *)prg->bptr;
-
-  // printf("source  %s\n",source);
+  // printf("sycl 56 \n");
+  // char *path = writefile(bnd->knl_fun);
+  // compile(path);
+  int *id;
+  jit_compile(id,bnd->knl_fun,"icpx"," -fsycl","kernel_function","./");
   return 0;
 }
 
@@ -165,14 +164,14 @@ int sycl_init(struct backend *bnd, const int platform_id, const int device_id) {
   auto sycl_pplatforms = sycl_platform.get_platforms();
 
   if (platform_id < 0 | platform_id >= sycl_pplatforms.size())
-    return set_log(NOMP_USER_PLATFORM_IS_INVALID, NOMP_ERROR,
+    return set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                    "Platform id %d provided to libnomp is not valid.",
                    platform_id);
   sycl_platform = sycl_pplatforms[platform_id];
   auto sycl_pdevices = sycl_platform.get_devices();
 
   if (device_id < 0 || device_id >= sycl_pdevices.size())
-    return set_log(NOMP_USER_DEVICE_IS_INVALID, NOMP_ERROR,
+    return set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                    ERR_STR_USER_DEVICE_IS_INVALID, device_id);
 
   sycl::device sycl_device = sycl_pdevices[device_id];
