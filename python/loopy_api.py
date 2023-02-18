@@ -94,13 +94,13 @@ class IdentityMapper:
 
     __call__ = rec
 
-    def map_integer_literal(self, expr: cindex.CursorKind) -> np.int32:
+    def map_integer_literal(self, expr: cindex.CursorKind) -> np.dtype:
         """Maps int constant"""
         (val,) = expr.get_tokens()
         ctype = expr.type.kind.spelling.lower()
         return (DtypeRegAcc.get_or_register_dtype(ctype).type)(val.spelling)
 
-    def map_floating_literal(self, expr: cindex.CursorKind) -> np.float64:
+    def map_floating_literal(self, expr: cindex.CursorKind) -> np.dtype:
         """Maps float constant"""
         (val,) = expr.get_tokens()
         ctype = expr.type.kind.spelling.lower()
@@ -529,21 +529,18 @@ def decl_to_knl_arg(decl: cindex.Cursor, dtype) -> lp.KernelArgument:
 def c_to_loopy(c_str: str, backend: str) -> lp.translation_unit.TranslationUnit:
     """Map C kernel to Loopy"""
     index = cindex.Index.create()
-    kernel_hash = hashlib.sha256(c_str.encode("utf-8")).hexdigest() + ".c"
-    translation_unit = index.parse(
-        kernel_hash, unsaved_files=[(kernel_hash, c_str)]
-    )
-    errors = [
-        diagnostic.spelling for diagnostic in translation_unit.diagnostics
-    ]
+    str_hash = hashlib.sha256(c_str.encode("utf-8")).hexdigest() + ".c"
+    tunit = index.parse(str_hash, unsaved_files=[(str_hash, c_str)])
+
     # Check for syntax errors in parsed C kernel
+    errors = [diagnostic.spelling for diagnostic in tunit.diagnostics]
     if errors:
         raise SyntaxError(
             f"Parsing C code failed with the following errors: {errors}"
         )
 
-    (node,) = translation_unit.cursor.get_children()
     # Init `var_to_decl` based on function parameters
+    (node,) = tunit.cursor.get_children()
     context = ExternalContext(function_name=node.spelling, var_to_decl={})
     knl_args = []
     *args, body = node.get_children()
