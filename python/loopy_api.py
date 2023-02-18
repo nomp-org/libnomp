@@ -476,6 +476,23 @@ class CToLoopyMapper(IdentityMapper):
             [],
         )
 
+    def map_break_stmt(
+        self, expr: cindex.CursorKind, context: CToLoopyMapperContext
+    ) -> CToLoopyMapperAccumulator:
+        return CToLoopyMapperAccumulator(
+            [],
+            [
+                lp.CInstruction(
+                    "",
+                    "break;",
+                    within_inames=context.inames,
+                    predicates=context.predicates,
+                    id=context.name_gen(LOOPY_INSN_PREFIX),
+                )
+            ],
+            [],
+        )
+
 
 @dataclass
 class ExternalContext:
