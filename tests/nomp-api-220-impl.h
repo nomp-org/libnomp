@@ -10,7 +10,7 @@ static int nomp_api_220_aux(const char *knl_fmt, TEST_TYPE *a, TEST_TYPE *b,
   err = nomp_update(c, 0, n, sizeof(TEST_TYPE), NOMP_TO);
   nomp_test_chk(err);
 
-  const char *clauses[4] = {"transform", "nomp-api-200", "transform", 0};
+  const char *clauses[4] = {"transform", "nomp-api-220", "transform", 0};
   int id = -1;
   err = create_knl(&id, knl_fmt, clauses, 3, TOSTRING(TEST_TYPE),
                    TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE));
