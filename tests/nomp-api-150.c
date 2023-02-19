@@ -20,6 +20,7 @@ static int test_invalid_kernel_id(int argc, const char **argv, int *id, int *a,
   err = nomp_run(-1, 3, "a", NOMP_PTR, sizeof(int), a, "b", NOMP_PTR,
                  sizeof(int), b, "N", NOMP_INTEGER, sizeof(int), &n);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
+
   char *desc = nomp_get_log_str(err);
   int eq = logcmp(desc, "\\[Error\\] .*\\/src\\/nomp.c:[0-9]* Kernel "
                         "id -1 passed to nomp_run is not valid.");
@@ -49,13 +50,12 @@ static int test_unmapped_variable(int id, int *a, int *b, int n) {
 
 int main(int argc, const char *argv[]) {
   const int n = 10;
-  static int a[10], b[10];
+  int a[10], b[10];
   for (int i = 0; i < n; i++)
     a[i] = n - i, b[i] = i;
 
-  int err = 0;
+  int err = 0, id = -1;
 
-  static int id = -1;
   err |= SUBTEST(test_invalid_kernel_id, argc, argv, &id, a, b, n);
   err |= SUBTEST(test_unmapped_variable, id, a, b, n);
 

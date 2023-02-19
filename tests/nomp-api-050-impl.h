@@ -47,7 +47,6 @@ static int multiple_h2d_calls(unsigned s, unsigned e) {
   nomp_test_chk(err);
   err = nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_TO);
   nomp_test_chk(err);
-
   err = nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FREE);
   nomp_test_chk(err);
 
@@ -67,7 +66,6 @@ static int multiple_d2h_calls(unsigned s, unsigned e) {
   nomp_test_chk(err);
   err = nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FROM);
   nomp_test_chk(err);
-
   err = nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FREE);
   nomp_test_chk(err);
 
@@ -134,7 +132,6 @@ static int free_after_d2h(unsigned s, unsigned e) {
 
   err = nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FROM);
   nomp_test_chk(err);
-
   err = nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FREE);
   nomp_test_chk(err);
 

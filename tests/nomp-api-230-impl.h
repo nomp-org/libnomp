@@ -13,6 +13,7 @@ static int nomp_api_230_aux(const char *knl_fmt, const char **clauses,
   err = create_knl(&id, knl_fmt, clauses, 2, TOSTRING(TEST_TYPE),
                    TOSTRING(TEST_TYPE));
   nomp_test_chk(err);
+
   nomp_run(id, 4, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
            sizeof(TEST_TYPE), b, "rows", NOMP_INTEGER, sizeof(int), &rows,
            "cols", NOMP_INTEGER, sizeof(int), &cols);
