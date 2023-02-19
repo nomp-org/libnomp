@@ -25,7 +25,9 @@ from pytools import UniqueNameGenerator
 LOOPY_LANG_VERSION = (2018, 2)
 LOOPY_INSN_PREFIX = "_nomp_insn"
 
-_C_BIN_OPS_TO_PYMBOLIC_OPS = {
+_STR_TO_LOOPY_TARGET = {"opencl": lp.OpenCLTarget(), "cuda": lp.CudaTarget()}
+
+_C_OPS_TO_PYMBOLIC_OPS = {
     "*": lambda x, y: prim.Product((x, y)),
     "+": lambda x, y: prim.Sum((x, y)),
     "-": lambda l, r: prim.Sum((l, prim.Product((-1, r)))),
@@ -198,7 +200,7 @@ class CToLoopyExpressionMapper(IdentityMapper):
         left, right = expr.get_children()
         op_str = get_op_str(expr, left)
         try:
-            oprtr = _C_BIN_OPS_TO_PYMBOLIC_OPS[op_str]
+            oprtr = _C_OPS_TO_PYMBOLIC_OPS[op_str]
         except KeyError as exc:
             raise SyntaxError(f"Invalid binary operator: {op_str}.") from exc
         return oprtr(self.rec(left), self.rec(right))
@@ -255,40 +257,41 @@ class CToLoopyLoopBoundMapper(CToLoopyExpressionMapper):
         left, right = expr.get_children()
         op_str = get_op_str(expr, left)
         try:
-            oprtr = _C_BIN_OPS_TO_PYMBOLIC_OPS[
-                "//" if op_str == "/" else op_str
-            ]
+            oprtr = _C_OPS_TO_PYMBOLIC_OPS["//" if op_str == "/" else op_str]
         except KeyError as exc:
             raise SyntaxError(f"Invalid binary operator: {op_str}.") from exc
         return oprtr(self.rec(left), self.rec(right))
 
 
 def check_and_parse_for(expr: cindex.CursorKind) -> tuple:
-    """Parse for loop to retrieve loop variable, lower bound and upper bound"""
-    if not expr:
+    """Parse for loop to get loop variable, lower and upper bound"""
+    decl, cond, update, body = expr.get_children()
+
+    var_decls = list(decl.get_children())
+    if len(var_decls) > 1:
         raise NotImplementedError(
-            "More than one initialization declarations not yet supported."
+            f"Multiple for loopy initializations not supported: {decl}"
         )
 
-    decl_stmt, cond, updt_stmt, _ = expr.get_children()
-    (var_decl,) = decl_stmt.get_children()
-    (literal,) = var_decl.get_children()
-    iname = var_decl.spelling
-    left, right = cond.get_children()
+    if cond.kind != cindex.CursorKind.BINARY_OPERATOR:
+        raise NotImplementedError("For loopy condition must be < or <=.")
+
+    (left, right) = cond.get_children()
     op_str = list(cond.get_tokens())[len(list(left.get_tokens()))].spelling
-    exs = [token.spelling for token in updt_stmt.get_tokens()]
+    if op_str not in ["<", "<="]:
+        raise NotImplementedError("For loopy condition must be < or <=.")
 
-    if not (cond.kind == cindex.CursorKind.BINARY_OPERATOR and op_str == "<"):
-        raise NotImplementedError("Only increasing domains are supported")
-
-    if updt_stmt.kind == cindex.CursorKind.UNARY_OPERATOR and "++" in exs:
+    inc = [token.spelling for token in update.get_tokens()]
+    (literal,) = var_decls[0].get_children()
+    if update.kind == cindex.CursorKind.UNARY_OPERATOR and "++" in inc:
         lbound_expr = CToLoopyLoopBoundMapper()(literal)
         ubound_expr = CToLoopyLoopBoundMapper()(right)
     else:
-        raise NotImplementedError("Only increments by 1 are supported")
+        raise NotImplementedError("For loop increment must be 1.")
 
+    iname = var_decls[0].spelling
     (left_body,) = left.get_children()
-    (next_body,) = updt_stmt.get_children()
+    (next_body,) = update.get_children()
     if not (
         left_body.kind == cindex.CursorKind.DECL_REF_EXPR
         and left_body.spelling == iname
@@ -297,11 +300,10 @@ def check_and_parse_for(expr: cindex.CursorKind) -> tuple:
         and next_body.spelling == iname
     ):
         raise SyntaxError(
-            "Loop variable has to be the same in for condition and next"
-            " operation"
+            "For Loop variable must be same in condition and increment."
         )
 
-    return (iname, lbound_expr, ubound_expr)
+    return (iname, lbound_expr, ubound_expr, body)
 
 
 class CToLoopyMapper(IdentityMapper):
@@ -359,8 +361,7 @@ class CToLoopyMapper(IdentityMapper):
         self, expr: cindex.CursorKind, context: CToLoopyMapperContext
     ) -> CToLoopyMapperAccumulator:
         """Map C for loop"""
-        _, _, _, body = expr.get_children()
-        (iname, lbound_expr, ubound_expr) = check_and_parse_for(expr)
+        (iname, lbound_expr, ubound_expr, body) = check_and_parse_for(expr)
 
         space = isl.Space.create_from_names(
             isl.DEFAULT_CONTEXT, set=[iname], params=context.value_args
@@ -658,7 +659,7 @@ def c_to_loopy(c_str: str, backend: str) -> lp.translation_unit.TranslationUnit:
         lang_version=LOOPY_LANG_VERSION,
         name=node.spelling,
         seq_dependencies=True,
-        target=_BACKEND_TO_TARGET[backend],
+        target=_STR_TO_LOOPY_TARGET[backend],
     )
 
     return knl
