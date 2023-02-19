@@ -13,17 +13,18 @@ static int nomp_api_210_aux(const char *knl_fmt, TEST_TYPE *a, TEST_TYPE *b,
   err = create_knl(&id, knl_fmt, clauses, 2, TOSTRING(TEST_TYPE),
                    TOSTRING(TEST_TYPE));
   nomp_test_chk(err);
+
   err = nomp_run(id, 3, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
                  sizeof(TEST_TYPE), b, "N", NOMP_INTEGER, sizeof(int), &n);
   nomp_test_chk(err);
 
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM);
   nomp_test_chk(err);
-
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE);
   nomp_test_chk(err);
   err = nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_FREE);
   nomp_test_chk(err);
+
   return 0;
 }
 
@@ -77,6 +78,7 @@ static int nomp_api_210_sub(int n) {
     nomp_test_assert(a[i] == n - 1);
   }
 #endif
+
   return 0;
 }
 #undef nomp_api_210_sub
@@ -103,6 +105,7 @@ static int nomp_api_210_mul_sum(int n) {
   for (unsigned i = 0; i < n; i++)
     nomp_test_assert(a[i] == (n - i) * (i + 1));
 #endif
+
   return 0;
 }
 #undef nomp_api_210_mul_sum
@@ -129,6 +132,7 @@ static int nomp_api_210_mul(int n) {
   for (unsigned i = 0; i < n; i++)
     nomp_test_assert(a[i] == (n - i) * i);
 #endif
+
   return 0;
 }
 #undef nomp_api_210_mul
@@ -155,6 +159,7 @@ static int nomp_api_210_square(int n) {
   for (unsigned i = 0; i < n; i++)
     nomp_test_assert(a[i] == (n - i) * (n - i) + i * i);
 #endif
+
   return 0;
 }
 #undef nomp_api_210_square
@@ -179,6 +184,7 @@ static int nomp_api_210_linear(int n) {
   for (int i = 0; i < n; i++)
     nomp_test_assert(a[i] == 2 * b[i] + 1);
 #endif
+
   return 0;
 }
 #undef nomp_api_210_linear
