@@ -26,15 +26,15 @@ static int opencl_update(struct backend *bnd, struct mem *m, const int op) {
 
   cl_int err;
   if (op & NOMP_ALLOC) {
-    m->bptr = tcalloc(cl_mem, 1);
-    cl_mem *clm = (cl_mem *)m->bptr;
+    cl_mem *clm = tcalloc(cl_mem, 1);
     *clm = clCreateBuffer(ocl->ctx, CL_MEM_READ_WRITE,
                           (m->idx1 - m->idx0) * m->usize, NULL, &err);
     if (err != CL_SUCCESS) {
-      tfree(m->bptr), m->bptr = NULL;
+      m->bptr = NULL;
       return set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
                      "create buffer", err);
     }
+    m->bptr = (void *)clm;
   }
 
   cl_mem *clm = (cl_mem *)m->bptr;
@@ -68,9 +68,10 @@ static int opencl_knl_build(struct backend *bnd, struct prog *prg,
   cl_int err;
   ocl_prg->prg = clCreateProgramWithSource(
       ocl->ctx, 1, (const char **)(&source), NULL, &err);
-  if (err != CL_SUCCESS)
+  if (err != CL_SUCCESS) {
     return set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
                    "kernel build", err);
+  }
 
   err = clBuildProgram(ocl_prg->prg, 0, NULL, NULL, NULL, NULL);
   if (err != CL_SUCCESS) {

@@ -32,7 +32,7 @@ static int test_vector_linear() {
 
 int main(int argc, const char *argv[]) {
   int err = nomp_init(argc, argv);
-  nomp_test_chk(err);
+  nomp_chk(err);
 
   err |= SUBTEST(test_vector_addition);
   err |= SUBTEST(test_vector_multiplication);
@@ -40,7 +40,7 @@ int main(int argc, const char *argv[]) {
   err |= SUBTEST(test_vector_linear);
 
   err |= nomp_finalize();
-  nomp_test_chk(err);
+  nomp_chk(err);
 
   return err;
 }

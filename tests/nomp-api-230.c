@@ -20,13 +20,13 @@ int main(int argc, const char *argv[]) {
   const char *args[] = {"-b", "opencl", "-d",  "0",   "-p",
                         "0",  "-as",    "sem", "-af", "annotate"};
   int err = nomp_init(10, args);
-  nomp_test_chk(err);
+  nomp_chk(err);
 
   err |= SUBTEST(test_matrix_addition);
   err |= SUBTEST(test_matrix_transform);
 
   err |= nomp_finalize();
-  nomp_test_chk(err);
+  nomp_chk(err);
 
   return err;
 }

@@ -3,6 +3,7 @@
 
 #include "nomp-mem.h"
 #include "nomp.h"
+#include <assert.h>
 #include <math.h>
 #include <regex.h>
 #include <stdarg.h>

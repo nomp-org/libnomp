@@ -70,7 +70,7 @@ static int test_free_after_d2h() {
 
 int main(int argc, const char *argv[]) {
   int err = nomp_init(argc, argv);
-  nomp_test_chk(err);
+  nomp_chk(err);
 
   err |= SUBTEST(test_free_before_mapping);
   err |= SUBTEST(test_d2h_before_h2d);
@@ -81,7 +81,7 @@ int main(int argc, const char *argv[]) {
   err |= SUBTEST(test_free_after_d2h);
 
   err = nomp_finalize();
-  nomp_test_chk(err);
+  nomp_chk(err);
 
   return err;
 }
