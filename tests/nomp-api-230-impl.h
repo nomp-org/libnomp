@@ -62,7 +62,9 @@ static int nomp_api_230_add(int rows, int cols) {
 #define nomp_api_230_transform TOKEN_PASTE(nomp_api_230_transform, TEST_SUFFIX)
 static int nomp_api_230_transform(int rows, int cols) {
   const int n = rows * cols;
-  TEST_TYPE a[n], b[n];
+  nomp_test_assert(n <= 256);
+
+  TEST_TYPE a[256], b[256];
   for (unsigned i = 0; i < rows; i++)
     for (unsigned j = 0; j < cols; j++)
       b[j + i * cols] = (TEST_TYPE)rand();
@@ -73,7 +75,7 @@ static int nomp_api_230_transform(int rows, int cols) {
       "    for (int i = 0; i < cols; i++)                                \n"
       "       a[j + i * rows] = b[i + j * cols];                         \n"
       "}                                                                 \n";
-  const char *clauses[4] = {"transform", "nomp-api-200", "matrix_transform", 0};
+  const char *clauses[4] = {"transform", "nomp-api-230", "transform", 0};
   nomp_api_230_aux(knl_fmt, clauses, a, b, rows, cols, n);
 
 #if defined(TEST_TOL)
