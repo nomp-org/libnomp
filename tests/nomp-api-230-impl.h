@@ -1,8 +1,9 @@
 #include "nomp-test.h"
 
 #define nomp_api_230_aux TOKEN_PASTE(nomp_api_230_aux, TEST_SUFFIX)
-int nomp_api_230_aux(const char *knl_fmt, const char **clauses, TEST_TYPE *a,
-                     TEST_TYPE *b, int rows, int cols, int n) {
+static int nomp_api_230_aux(const char *knl_fmt, const char **clauses,
+                            TEST_TYPE *a, TEST_TYPE *b, int rows, int cols,
+                            int n) {
   int err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO);
   nomp_test_chk(err);
   err = nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO);
@@ -28,7 +29,7 @@ int nomp_api_230_aux(const char *knl_fmt, const char **clauses, TEST_TYPE *a,
 }
 
 #define nomp_api_230_add TOKEN_PASTE(nomp_api_230_add, TEST_SUFFIX)
-int nomp_api_230_add(int rows, int cols) {
+static int nomp_api_230_add(int rows, int cols) {
   const int n = rows * cols;
   nomp_test_assert(n <= 256);
 
@@ -59,7 +60,7 @@ int nomp_api_230_add(int rows, int cols) {
 #undef nomp_api_230_add
 
 #define nomp_api_230_transform TOKEN_PASTE(nomp_api_230_transform, TEST_SUFFIX)
-int nomp_api_230_transform(int rows, int cols) {
+static int nomp_api_230_transform(int rows, int cols) {
   const int n = rows * cols;
   TEST_TYPE a[n], b[n];
   for (unsigned i = 0; i < rows; i++)

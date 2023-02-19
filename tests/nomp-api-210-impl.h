@@ -1,7 +1,8 @@
 #include "nomp-test.h"
 
 #define nomp_api_210_aux TOKEN_PASTE(nomp_api_210_aux, TEST_SUFFIX)
-int nomp_api_210_aux(const char *knl_fmt, TEST_TYPE *a, TEST_TYPE *b, int n) {
+static int nomp_api_210_aux(const char *knl_fmt, TEST_TYPE *a, TEST_TYPE *b,
+                            int n) {
   int err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO);
   nomp_test_chk(err);
   err = nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO);
@@ -27,7 +28,7 @@ int nomp_api_210_aux(const char *knl_fmt, TEST_TYPE *a, TEST_TYPE *b, int n) {
 }
 
 #define nomp_api_210_add TOKEN_PASTE(nomp_api_210_add, TEST_SUFFIX)
-int nomp_api_210_add(int n) {
+static int nomp_api_210_add(int n) {
   nomp_test_assert(n <= 20);
 
   TEST_TYPE a[20], b[20];
@@ -54,7 +55,7 @@ int nomp_api_210_add(int n) {
 #undef nomp_api_210_add
 
 #define nomp_api_210_sub TOKEN_PASTE(nomp_api_210_sub, TEST_SUFFIX)
-int nomp_api_210_sub(int n) {
+static int nomp_api_210_sub(int n) {
   nomp_test_assert(n <= 20);
 
   TEST_TYPE a[20], b[20];
@@ -81,7 +82,7 @@ int nomp_api_210_sub(int n) {
 #undef nomp_api_210_sub
 
 #define nomp_api_210_mul_sum TOKEN_PASTE(nomp_api_210_mul_sum, TEST_SUFFIX)
-int nomp_api_210_mul_sum(int n) {
+static int nomp_api_210_mul_sum(int n) {
   nomp_test_assert(n <= 20);
 
   TEST_TYPE a[20], b[20];
@@ -107,7 +108,7 @@ int nomp_api_210_mul_sum(int n) {
 #undef nomp_api_210_mul_sum
 
 #define nomp_api_210_mul TOKEN_PASTE(nomp_api_210_mul, TEST_SUFFIX)
-int nomp_api_210_mul(int n) {
+static int nomp_api_210_mul(int n) {
   nomp_test_assert(n <= 20);
 
   TEST_TYPE a[20], b[20];
@@ -133,7 +134,7 @@ int nomp_api_210_mul(int n) {
 #undef nomp_api_210_mul
 
 #define nomp_api_210_square TOKEN_PASTE(nomp_api_210_square, TEST_SUFFIX)
-int nomp_api_210_square(int n) {
+static int nomp_api_210_square(int n) {
   nomp_test_assert(n <= 20);
 
   TEST_TYPE a[20], b[20];
@@ -159,7 +160,7 @@ int nomp_api_210_square(int n) {
 #undef nomp_api_210_square
 
 #define nomp_api_210_linear TOKEN_PASTE(nomp_api_210_linear, TEST_SUFFIX)
-int nomp_api_210_linear(int n) {
+static int nomp_api_210_linear(int n) {
   nomp_test_assert(n <= 20);
 
   TEST_TYPE a[20] = {0}, b[20] = {1, 2, 3, 4, 5};
