@@ -5,7 +5,8 @@ on:
   push:
     branches: [main]
 env:
-  REQUIREMENTS_CACHE_NUMBER: 1  # increase to reset cache manually
+  # Increase to reset cache manually
+  REQUIREMENTS_CACHE_NUMBER: 1
 jobs:
   pylint-check:
     runs-on: ubuntu-latest

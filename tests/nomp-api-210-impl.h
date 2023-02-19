@@ -29,7 +29,8 @@ int nomp_api_210_aux(const char *knl_fmt, TEST_TYPE *a, TEST_TYPE *b, int n) {
 #define nomp_api_210_add TOKEN_PASTE(nomp_api_210_add, TEST_SUFFIX)
 int nomp_api_210_add(int n) {
   nomp_test_assert(n <= 20);
-  TEST_TYPE a[n], b[n];
+
+  TEST_TYPE a[20], b[20];
   for (unsigned i = 0; i < n; i++)
     a[i] = n - i, b[i] = i;
 
@@ -55,7 +56,8 @@ int nomp_api_210_add(int n) {
 #define nomp_api_210_sub TOKEN_PASTE(nomp_api_210_sub, TEST_SUFFIX)
 int nomp_api_210_sub(int n) {
   nomp_test_assert(n <= 20);
-  TEST_TYPE a[n], b[n];
+
+  TEST_TYPE a[20], b[20];
   for (unsigned i = 0; i < n; i++)
     a[i] = n + i, b[i] = i;
 
@@ -81,7 +83,8 @@ int nomp_api_210_sub(int n) {
 #define nomp_api_210_mul_sum TOKEN_PASTE(nomp_api_210_mul_sum, TEST_SUFFIX)
 int nomp_api_210_mul_sum(int n) {
   nomp_test_assert(n <= 20);
-  TEST_TYPE a[n], b[n];
+
+  TEST_TYPE a[20], b[20];
   for (unsigned i = 0; i < n; i++)
     a[i] = n - i, b[i] = i;
 
@@ -106,7 +109,8 @@ int nomp_api_210_mul_sum(int n) {
 #define nomp_api_210_mul TOKEN_PASTE(nomp_api_210_mul, TEST_SUFFIX)
 int nomp_api_210_mul(int n) {
   nomp_test_assert(n <= 20);
-  TEST_TYPE a[n], b[n];
+
+  TEST_TYPE a[20], b[20];
   for (unsigned i = 0; i < n; i++)
     a[i] = n - i, b[i] = i;
 
@@ -131,7 +135,8 @@ int nomp_api_210_mul(int n) {
 #define nomp_api_210_square TOKEN_PASTE(nomp_api_210_square, TEST_SUFFIX)
 int nomp_api_210_square(int n) {
   nomp_test_assert(n <= 20);
-  TEST_TYPE a[n], b[n];
+
+  TEST_TYPE a[20], b[20];
   for (unsigned i = 0; i < n; i++)
     a[i] = n - i, b[i] = i;
 
@@ -156,6 +161,7 @@ int nomp_api_210_square(int n) {
 #define nomp_api_210_linear TOKEN_PASTE(nomp_api_210_linear, TEST_SUFFIX)
 int nomp_api_210_linear(int n) {
   nomp_test_assert(n <= 20);
+
   TEST_TYPE a[20] = {0}, b[20] = {1, 2, 3, 4, 5};
 
   const char *knl_fmt =

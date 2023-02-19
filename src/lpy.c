@@ -246,7 +246,7 @@ int py_eval_grid_size(struct prog *prg, PyObject *dict) {
   // pymbolic. Also, we should calculate and store a hash of the dict that
   // is passed. If the hash is the same, no need of re-evaluating the grid
   // size.
-  for (unsigned i = 0; i < prg->ndim; i++)
+  for (unsigned i = 0; i < 3; i++)
     prg->global[i] = prg->local[i] = 1;
 
   int err = 1;

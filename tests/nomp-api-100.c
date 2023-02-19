@@ -120,7 +120,7 @@ static int test_syntax_error_in_kernel() {
 
 int main(int argc, const char *argv[]) {
   int err = nomp_init(argc, argv);
-  nomp_test_chk(err);
+  nomp_chk(err);
 
   err |= SUBTEST(test_invalid_file);
   err |= SUBTEST(test_invalid_transform_function);
@@ -130,7 +130,7 @@ int main(int argc, const char *argv[]) {
   err |= SUBTEST(test_syntax_error_in_kernel);
 
   err = nomp_finalize();
-  nomp_test_chk(err);
+  nomp_chk(err);
 
   return err;
 }

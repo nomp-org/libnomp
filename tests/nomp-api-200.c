@@ -4,6 +4,7 @@
 #include "nomp-generate-tests.h"
 #undef TEST_IMPL_H
 
+// Calling nomp_jit() with valid functions should not return an error.
 static int test_valid_clauses() {
   int err = 0;
   const char *clauses[4] = {"transform", "nomp-api-200", "transform", 0};

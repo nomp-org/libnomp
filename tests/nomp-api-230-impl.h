@@ -19,18 +19,20 @@ int nomp_api_230_aux(const char *knl_fmt, const char **clauses, TEST_TYPE *a,
 
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM);
   nomp_test_chk(err);
-
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE);
   nomp_test_chk(err);
   err = nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_FREE);
   nomp_test_chk(err);
+
   return 0;
 }
 
 #define nomp_api_230_add TOKEN_PASTE(nomp_api_230_add, TEST_SUFFIX)
 int nomp_api_230_add(int rows, int cols) {
   const int n = rows * cols;
-  TEST_TYPE a[n], b[n];
+  nomp_test_assert(n <= 256);
+
+  TEST_TYPE a[256], b[256];
   for (unsigned i = 0; i < n; i++)
     a[i] = 2 * n - i, b[i] = i;
 
@@ -51,6 +53,7 @@ int nomp_api_230_add(int rows, int cols) {
   for (unsigned i = 0; i < n; i++)
     nomp_test_assert(a[i] == 2 * n);
 #endif
+
   return 0;
 }
 #undef nomp_api_230_add
@@ -81,6 +84,7 @@ int nomp_api_230_transform(int rows, int cols) {
     for (unsigned j = 0; j < cols; j++)
       nomp_test_assert(b[j + i * cols] == a[i + j * rows]);
 #endif
+
   return 0;
 }
 #undef nomp_api_230_transform
