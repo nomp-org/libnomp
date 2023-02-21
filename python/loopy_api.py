@@ -391,30 +391,33 @@ class CToLoopyMapper(IdentityMapper):
         self, expr: cindex.CursorKind, context: CToLoopyMapperContext
     ) -> CToLoopyMapperAccumulator:
         """Map C variable declaration"""
-        name, init = expr.spelling, None
-        # In case expr is an array
-        if expr.type.kind == cindex.TypeKind.CONSTANTARRAY:
-            children, init, dims = list(expr.get_children()), [], []
-            for child in children:
-                if child.kind == cindex.CursorKind.INIT_LIST_EXPR:
-                    init = child
-                elif child.kind == cindex.CursorKind.INTEGER_LITERAL:
-                    dims.append(child)
-                else:
-                    raise NotImplementedError(
-                        f"{child.kind} is not a child of CONSTANTARRAY"
-                    )
-            shape = tuple(CToLoopyExpressionMapper()(dim) for dim in dims)
-        elif isinstance(expr.type.kind, cindex.TypeKind):
-            shape, children = (), list(expr.get_children())
-            if len(children) == 1:
-                init = children[0]
-        else:
-            raise NotImplementedError(
-                f"{expr.type.kind} is not a variable type"
-            )
 
-        if init:
+        def check_and_parse_decl(expr: cindex.CursorKind):
+            name, init = expr.spelling, None
+            children = list(expr.get_children())
+            if expr.type.kind == cindex.TypeKind.CONSTANTARRAY:
+                dims = []
+                for child in children:
+                    if child.kind == cindex.CursorKind.INIT_LIST_EXPR:
+                        init = child
+                    # FIXME: This is wrong.
+                    elif child.kind == cindex.CursorKind.INTEGER_LITERAL:
+                        dims.append(child)
+                    else:
+                        raise NotImplementedError(
+                            f"Unable to parse: {child.kind}"
+                        )
+                shape = tuple(CToLoopyExpressionMapper()(dim) for dim in dims)
+                return (name, shape, init)
+            elif isinstance(expr.type.kind, cindex.TypeKind):
+                if len(children) == 1:
+                    init = children[0]
+                return (name, (), init)
+            else:
+                raise NotImplementedError(f"Unable to parse: {expr.type.kind}")
+
+        (name, shape, init) = check_and_parse_decl(expr)
+        if init is not None:
             lhs = prim.Variable(name)
             rhs = CToLoopyExpressionMapper()(init)
             return CToLoopyMapperAccumulator(
