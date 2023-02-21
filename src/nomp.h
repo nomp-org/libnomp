@@ -28,7 +28,7 @@
 #define NOMP_ATTR_MASK 2047
 
 /**
- * @defgroup nomp_types Kernel argument types.
+ * @defgroup nomp_types Nomp data types.
  *
  * @brief Defines argument types for a nomp kernel. Currently, only integer,
  * float or pointer types are supported.
@@ -45,7 +45,7 @@
  */
 #define NOMP_UINT 4096
 /**
- * @ingroup nomp_types Data Types
+ * @ingroup nomp_types
  * @brief Floating point argument type.
  */
 #define NOMP_FLOAT 6144
@@ -83,6 +83,23 @@
  * @brief Free memory allocated on the device.
  */
 #define NOMP_FREE 8
+
+/**
+ * @defgroup nomp_reduction_ops Nomp reduction operations.
+ *
+ * @brief Defines reduction operations supported by nomp.
+ */
+
+/**
+ * @ingroup nomp_reduction_ops
+ * @brief Sum reduction operation.
+ */
+#define NOMP_SUM 1
+/**
+ * @ingroup nomp_reduction_ops
+ * @brief Production reduction operation.
+ */
+#define NOMP_PROD 2
 
 /**
  * @defgroup nomp_errors Errors
