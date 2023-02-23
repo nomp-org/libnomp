@@ -15,8 +15,8 @@ static int nomp_api_230_aux(const char *knl_fmt, const char **clauses,
   nomp_test_chk(err);
 
   nomp_run(id, 4, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
-           sizeof(TEST_TYPE), b, "rows", NOMP_INTEGER, sizeof(int), &rows,
-           "cols", NOMP_INTEGER, sizeof(int), &cols);
+           sizeof(TEST_TYPE), b, "rows", NOMP_INT, sizeof(int), &rows, "cols",
+           NOMP_INT, sizeof(int), &cols);
   nomp_test_chk(err);
 
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM);

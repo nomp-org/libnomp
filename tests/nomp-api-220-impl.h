@@ -18,7 +18,7 @@ static int nomp_api_220_aux(const char *knl_fmt, TEST_TYPE *a, TEST_TYPE *b,
 
   err = nomp_run(id, 4, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
                  sizeof(TEST_TYPE), b, "c", NOMP_PTR, sizeof(TEST_TYPE), c, "N",
-                 NOMP_INTEGER, sizeof(int), &n);
+                 NOMP_INT, sizeof(int), &n);
   nomp_test_chk(err);
 
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM);

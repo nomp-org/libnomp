@@ -18,7 +18,7 @@ static int test_invalid_kernel_id(int argc, const char **argv, int *id, int *a,
   nomp_test_chk(err);
 
   err = nomp_run(-1, 3, "a", NOMP_PTR, sizeof(int), a, "b", NOMP_PTR,
-                 sizeof(int), b, "N", NOMP_INTEGER, sizeof(int), &n);
+                 sizeof(int), b, "N", NOMP_INT, sizeof(int), &n);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
   char *desc = nomp_get_log_str(err);
@@ -33,7 +33,7 @@ static int test_invalid_kernel_id(int argc, const char **argv, int *id, int *a,
 // Invoke fails because b is not mapped
 static int test_unmapped_variable(int id, int *a, int *b, int n) {
   int err = nomp_run(id, 3, "a", NOMP_PTR, sizeof(int), a, "b", NOMP_PTR,
-                     sizeof(int), b, "N", NOMP_INTEGER, sizeof(int), &n);
+                     sizeof(int), b, "N", NOMP_INT, sizeof(int), &n);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_MAP_PTR_IS_INVALID);
 
   char *desc = nomp_get_log_str(err);
