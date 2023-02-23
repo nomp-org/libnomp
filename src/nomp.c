@@ -346,7 +346,7 @@ int nomp_run(int id, int nargs, ...) {
       int type = va_arg(args, int);
       size_t size = va_arg(args, size_t);
       void *val = va_arg(args, void *);
-      if (type == NOMP_INTEGER) {
+      if (type == NOMP_INT) {
         PyObject *py_key = PyUnicode_FromStringAndSize(var, strlen(var));
         PyObject *py_val = PyLong_FromLong(*((int *)val));
         PyDict_SetItem(prg->py_dict, py_key, py_val);

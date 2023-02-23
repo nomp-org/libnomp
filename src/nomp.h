@@ -2,56 +2,87 @@
 #define _LIB_NOMP_H_
 
 #include <stddef.h>
+
 /**
- * @defgroup nomp_update_direction Update Direction
+ * @defgroup nomp_attributes Additional attributes for kernel arguments.
  *
- * @brief Defines the update direction (or operation) in nomp_update().
+ * @brief Defines additional attributes for nomp kernel arguments. For example,
+ * these can be used to communicate if the argument is a reduction variable
+ * and/or if the pinned memory must be used for the argument on the device.
  */
 
 /**
- * @ingroup nomp_update_direction
- * @brief Allocate memory on the device.
+ * @ingroup nomp_attributes
+ * @brief Nomp kernel argument is an accumulator of a reduction.
  */
-#define NOMP_ALLOC 1
+#define NOMP_ATTR_REDN 1
 /**
- * @ingroup nomp_update_direction
- * @brief Copy host data to device. Memory will be allocated if not allocated
- * already.
+ * @ingroup nomp_attributes
+ * @brief Device memory for the Nomp kernel argument must be pinned.
  */
-#define NOMP_TO 2
+#define NOMP_ATTR_PINNED 2
 /**
- * @ingroup nomp_update_direction
- * @brief Copy device data to host.
+ * @ingroup nomp_attributes
+ * @brief Device memory for the Nomp kernel argument should be pinned.
  */
-#define NOMP_FROM 4
-/**
- * @ingroup nomp_update_direction
- * @brief Free memory allocated on the device.
- */
-#define NOMP_FREE 8
+#define NOMP_ATTR_MASK 2047
 
 /**
- * @defgroup nomp_types Data Types
+ * @defgroup nomp_types Kernel argument types.
  *
- * @brief Defines argument type in a kernel. Currently, only integer, float or
- * pointer types are supported.
+ * @brief Defines argument types for a nomp kernel. Currently, only integer,
+ * float or pointer types are supported.
  */
 
 /**
  * @ingroup nomp_types
- * @brief Integer argument type.
+ * @brief Signed integer argument type.
  */
-#define NOMP_INTEGER 1
+#define NOMP_INT 2048
+/**
+ * @ingroup nomp_types
+ * @brief Unsigned integer argument type.
+ */
+#define NOMP_UINT 4096
 /**
  * @ingroup nomp_types Data Types
  * @brief Floating point argument type.
  */
-#define NOMP_FLOAT 2
+#define NOMP_FLOAT 6144
 /**
  * @ingroup nomp_types
  * @brief Pointer argument type.
  */
-#define NOMP_PTR 4
+#define NOMP_PTR 8192
+
+/**
+ * @defgroup nomp_update_op Memory update operations for Nomp variable.
+ *
+ * @brief Defines update operations for a pointer type variable as passed into
+ * nomp_update().
+ */
+
+/**
+ * @ingroup nomp_update_op
+ * @brief Allocate memory on the device.
+ */
+#define NOMP_ALLOC 1
+/**
+ * @ingroup nomp_update_op
+ * @brief Copy host data to device. Memory will be allocated if necessary.
+ */
+#define NOMP_TO 2
+/**
+ * @ingroup nomp_update_op
+ * @brief Copy device data to host. User must make sure that there is enough
+ * memory available on the host.
+ */
+#define NOMP_FROM 4
+/**
+ * @ingroup nomp_update_op
+ * @brief Free memory allocated on the device.
+ */
+#define NOMP_FREE 8
 
 /**
  * @defgroup nomp_errors Errors
@@ -217,7 +248,7 @@ int nomp_init(int argc, const char **argv);
  * @param[in] start_idx Start index in the vector to start copying.
  * @param[in] end_idx End index in the vector to end the copying.
  * @param[in] unit_size Size of a single vector element.
- * @param[in] op Operation to perform (One of @ref nomp_update_direction).
+ * @param[in] op Operation to perform (One of @ref nomp_update_op).
  * @return int
  *
  * @details Operation \p op will be performed on the array slice [\p start_idx,
