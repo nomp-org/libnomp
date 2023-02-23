@@ -80,6 +80,6 @@ int maxn(unsigned n, ...);
 int check_null_input_(void *p, const char *func, unsigned line,
                       const char *file);
 #define check_null_input(p)                                                    \
-  return_on_err(check_null_input_((void *)(p), __func__, __LINE__, __FILE__))
+  nomp_check(check_null_input_((void *)(p), __func__, __LINE__, __FILE__))
 
 #endif // _NOMP_AUX_H_

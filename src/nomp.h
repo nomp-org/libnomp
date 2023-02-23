@@ -341,13 +341,17 @@ int nomp_sync();
 
 /**
  * @ingroup nomp_user_api
- * @brief Check nomp API function return values for errors.
+ * @brief Check nomp API return values for errors.
  *
- * @param[in] retval Return value from a nomp API function.
+ * @param[in] err Return value from nomp API.
  *
- * @return void
  */
-void nomp_chk(int retval);
+#define nomp_check(err)                                                        \
+  {                                                                            \
+    int err_ = (err);                                                          \
+    if (nomp_get_log_type(err_) == NOMP_ERROR)                                 \
+      return err_;                                                             \
+  }
 
 /**
  * @ingroup nomp_log_type

@@ -11,12 +11,12 @@ static int test_break() {
 
 int main(int argc, const char *argv[]) {
   int err = nomp_init(argc, argv);
-  nomp_chk(err);
+  nomp_check(err);
 
   err |= SUBTEST(test_break);
 
   err |= nomp_finalize();
-  nomp_chk(err);
+  nomp_check(err);
 
   return err;
 }

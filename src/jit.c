@@ -36,7 +36,7 @@ static int make_knl_dir(char **dir_, const char *knl_dir, const char *src) {
   for (unsigned i = 0; i < SHA256_DIGEST_LENGTH; i++)
     snprintf(&hash[2 * i], 3, "%02hhX", md[i]);
 
-  return_on_err(pathlen(&len, knl_dir));
+  nomp_check(pathlen(&len, knl_dir));
   unsigned lmax = maxn(2, len, SHA256_DIGEST_LENGTH);
 
   // Create the folder if it doesn't exist.
@@ -72,7 +72,7 @@ static int write_file(const char *path, const char *src) {
 static int compile_aux(const char *cc, const char *cflags, const char *src,
                        const char *out) {
   size_t len;
-  return_on_err(pathlen(&len, cc));
+  nomp_check(pathlen(&len, cc));
   len += strnlen(cflags, MAX_CFLAGS_SIZE) + strlen(src) + strlen(out) + 32;
 
   char *cmd = nomp_calloc(char, len);
@@ -109,10 +109,10 @@ static unsigned funcs_n = 0, funcs_max = 0;
 int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
                 const char *entry, const char *wrkdir) {
   char *dir = NULL;
-  return_on_err(make_knl_dir(&dir, wrkdir, source));
+  nomp_check(make_knl_dir(&dir, wrkdir, source));
 
   size_t ldir;
-  return_on_err(pathlen(&ldir, dir));
+  nomp_check(pathlen(&ldir, dir));
 
   const char *srcf = "source.c", *libf = "mylib.so";
   size_t max = maxn(3, ldir, strnlen(srcf, 64), strnlen(libf, 64));
@@ -120,8 +120,8 @@ int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
   char *lib = strcatn(3, max, dir, "/", libf);
   nomp_free(dir);
 
-  return_on_err(write_file(src, source));
-  return_on_err(compile_aux(cc, cflags, src, lib));
+  nomp_check(write_file(src, source));
+  nomp_check(compile_aux(cc, cflags, src, lib));
   nomp_free(src);
 
   if (funcs_n == funcs_max) {
