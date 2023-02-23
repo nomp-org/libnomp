@@ -3,7 +3,7 @@
 static char *copy_env(const char *name, size_t size) {
   const char *tmp = getenv(name);
   if (tmp != NULL) {
-    char *copy = tcalloc(char, size);
+    char *copy = nomp_calloc(char, size);
     if (copy != NULL) {
       strncpy(copy, tmp, size);
       return copy;
@@ -28,21 +28,21 @@ static int check_env(struct backend *backend) {
   tmp = copy_env("NOMP_BACKEND", MAX_BACKEND_NAME_SIZE);
   if (tmp) {
     backend->backend = trealloc(backend->backend, char, MAX_BACKEND_NAME_SIZE);
-    strncpy(backend->backend, tmp, MAX_BACKEND_NAME_SIZE), tfree(tmp);
+    strncpy(backend->backend, tmp, MAX_BACKEND_NAME_SIZE), nomp_free(tmp);
   }
 
   tmp = copy_env("NOMP_ANNOTATE_SCRIPT", MAX_BUFSIZ);
   if (tmp) {
     size_t size = strnlen(tmp, MAX_BUFSIZ) + 1;
     backend->annts_script = trealloc(backend->annts_script, char, size);
-    strncpy(backend->annts_script, tmp, size), tfree(tmp);
+    strncpy(backend->annts_script, tmp, size), nomp_free(tmp);
   }
 
   tmp = copy_env("NOMP_ANNOTATE_FUNCTION", MAX_BUFSIZ);
   if (tmp) {
     size_t size = strnlen(tmp, MAX_BUFSIZ) + 1;
     backend->annts_func = trealloc(backend->annts_func, char, size);
-    strncpy(backend->annts_func, tmp, size), tfree(tmp);
+    strncpy(backend->annts_func, tmp, size), nomp_free(tmp);
   }
 
   tmp = copy_env("NOMP_INSTALL_DIR", MAX_BUFSIZ);
@@ -50,7 +50,7 @@ static int check_env(struct backend *backend) {
     size_t size;
     return_on_err(pathlen(&size, tmp));
     backend->install_dir = trealloc(backend->install_dir, char, size + 1);
-    strncpy(backend->install_dir, tmp, size), tfree(tmp);
+    strncpy(backend->install_dir, tmp, size), nomp_free(tmp);
   }
 
   return 0;
@@ -173,7 +173,7 @@ int nomp_init(int argc, const char **argv) {
     char *abs_dir = strcatn(3, len, nomp.install_dir, "/", py_dir);
     return_on_err(py_append_to_sys_path(abs_dir));
 
-    tfree(abs_dir);
+    nomp_free(abs_dir);
   }
 
   initialized = 1;
@@ -219,9 +219,9 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
     op |= NOMP_ALLOC;
     if (mems_n == mems_max) {
       mems_max += mems_max / 2 + 1;
-      mems = trealloc(mems, struct mem *, mems_max);
+      mems = nomp_realloc(mems, struct mem *, mems_max);
     }
-    struct mem *m = mems[mems_n] = tcalloc(struct mem, 1);
+    struct mem *m = mems[mems_n] = nomp_calloc(struct mem, 1);
     m->idx0 = idx0, m->idx1 = idx1, m->usize = usize;
     m->hptr = ptr, m->bptr = NULL;
   }
@@ -230,7 +230,7 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
 
   // Device memory object was free'd
   if (mems[idx]->bptr == NULL)
-    tfree(mems[idx]), mems[idx] = NULL;
+    nomp_free(mems[idx]), mems[idx] = NULL;
   // Or new memory object got created
   else if (idx == mems_n)
     mems_n++;
@@ -291,7 +291,7 @@ int nomp_jit(int *id, const char *c_src, const char **clauses) {
   if (*id == -1) {
     if (progs_n == progs_max) {
       progs_max += progs_max / 2 + 1;
-      progs = trealloc(progs, struct prog *, progs_max);
+      progs = nomp_realloc(progs, struct prog *, progs_max);
     }
 
     // Create loopy kernel from C source
@@ -310,16 +310,16 @@ int nomp_jit(int *id, const char *c_src, const char **clauses) {
 
     // Handle transform clauase
     return_on_err(py_user_transform(&knl, usr_file, usr_func));
-    tfree(usr_file), tfree(usr_func);
+    nomp_free(usr_file), nomp_free(usr_func);
 
     // Get OpenCL, CUDA, etc. source and name from the loopy kernel
     char *name, *src;
     return_on_err(py_get_knl_name_and_src(&name, &src, knl));
 
     // Build the kernel
-    struct prog *prg = progs[progs_n] = tcalloc(struct prog, 1);
+    struct prog *prg = progs[progs_n] = nomp_calloc(struct prog, 1);
     return_on_err(nomp.knl_build(&nomp, prg, src, name));
-    tfree(src), tfree(name);
+    nomp_free(src), nomp_free(name);
 
     // Get grid size of the loopy kernel as pymbolic expressions after
     // transformations. These grid sizes will be evaluated when the kernel is
@@ -385,21 +385,21 @@ int nomp_finalize(void) {
   for (unsigned i = 0; i < mems_n; i++) {
     if (mems[i]) {
       return_on_err(nomp.update(&nomp, mems[i], NOMP_FREE));
-      tfree(mems[i]), mems[i] = NULL;
+      nomp_free(mems[i]), mems[i] = NULL;
     }
   }
-  tfree(mems), mems = NULL, mems_n = mems_max = 0;
+  nomp_free(mems), mems = NULL, mems_n = mems_max = 0;
 
   for (unsigned i = 0; i < progs_n; i++) {
     if (progs[i]) {
       return_on_err(nomp.knl_free(progs[i]));
-      tfree(progs[i]), progs[i] = NULL;
+      nomp_free(progs[i]), progs[i] = NULL;
     }
   }
-  tfree(progs), progs = NULL, progs_n = progs_max = 0;
+  nomp_free(progs), progs = NULL, progs_n = progs_max = 0;
 
-  tfree(nomp.backend), tfree(nomp.install_dir);
-  tfree(nomp.annts_script), tfree(nomp.annts_func);
+  nomp_free(nomp.backend), nomp_free(nomp.install_dir);
+  nomp_free(nomp.annts_script), nomp_free(nomp.annts_func);
 
   initialized = nomp.finalize(&nomp);
   if (initialized) {

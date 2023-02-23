@@ -5,12 +5,12 @@ char *strcatn(unsigned n, unsigned max_len, ...) {
   va_start(vargs, max_len);
 
   unsigned max = MAX_BUFSIZ, len = 0;
-  char *out = tcalloc(char, max);
+  char *out = nomp_calloc(char, max);
   for (int i = 0; i < n; i++) {
     const char *s = va_arg(vargs, const char *);
     if (max <= len + strnlen(s, max_len)) {
       max = 3 * (len + strnlen(s, max_len)) / 2 + 1;
-      out = trealloc(out, char, max);
+      out = nomp_realloc(out, char, max);
     }
     strncpy(out + len, s, strnlen(s, max_len));
     len += strnlen(s, max_len);
@@ -30,7 +30,7 @@ int strntoui(const char *str, size_t size) {
   int num = (int)strtol(copy, &end_ptr, 10);
   if (copy == end_ptr || *end_ptr != '\0' || num < 0)
     num = -1;
-  tfree(copy);
+  nomp_free(copy);
 
   return num;
 }
@@ -47,7 +47,7 @@ int pathlen(size_t *len, const char *path) {
 
   if (len)
     *len = strnlen(abs, PATH_MAX);
-  tfree(abs);
+  nomp_free(abs);
 
   return 0;
 }

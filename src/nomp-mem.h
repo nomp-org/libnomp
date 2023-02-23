@@ -17,17 +17,17 @@
  * @param line Line number in the file where the function is called.
  * @return int
  */
-int sfree(void *p, const char *file, unsigned line);
+int nomp_free_(void *p, const char *file, unsigned line);
 
 /**
  * @ingroup nomp_mem_utils
- * @brief Helper macro for deallocating or freeing a memory block using sfree().
- * File name and line number are passed implicitly.
+ * @brief Helper macro for deallocating or freeing a memory block using
+ * nomp_free_(). File name and line number are passed implicitly.
  *
  * @param x Pointer to the memory to deallocate.
  * @return int
  */
-#define tfree(x) sfree(x, __FILE__, __LINE__)
+#define nomp_free(x) nomp_free_(x, __FILE__, __LINE__)
 
 /**
  * @ingroup nomp_mem_utils
@@ -38,19 +38,19 @@ int sfree(void *p, const char *file, unsigned line);
  * @param line Line number in the file where the function is called.
  * @return Void pointer
  */
-void *smalloc(size_t size, const char *file, unsigned line);
+void *nomp_malloc_(size_t size, const char *file, unsigned line);
 
 /**
  * @ingroup nomp_mem_utils
- * @brief Helper macro for allocating memory blocks using smalloc().
+ * @brief Helper macro for allocating memory blocks using nomp_malloc_().
  * File name and line number are passed implicitly.
  *
  * @param T Type of element.
  * @param count Number of elements.
  * @return Pointer of type T.
  */
-#define tmalloc(T, count)                                                      \
-  ((T *)smalloc((count) * sizeof(T), __FILE__, __LINE__))
+#define nomp_malloc(T, count)                                                  \
+  ((T *)nomp_malloc_((count) * sizeof(T), __FILE__, __LINE__))
 
 /**
  * @ingroup nomp_mem_utils
@@ -62,19 +62,20 @@ void *smalloc(size_t size, const char *file, unsigned line);
  * @param line Line number in the file where the function is called.
  * @return Void pointer
  */
-void *scalloc(size_t nmemb, size_t size, const char *file, unsigned line);
+void *nomp_calloc_(size_t nmemb, size_t size, const char *file, unsigned line);
 
 /**
  * @ingroup nomp_mem_utils
  * @brief Helper macro for allocating an array in memory with elements
- * initialized to 0 using scalloc(). File name and line number are passed
+ * initialized to 0 using nomp_calloc_(). File name and line number are passed
  * implicitly.
  *
  * @param T Type of element.
  * @param count Number of elements.
  * @return Pointer of type T.
  */
-#define tcalloc(T, count) ((T *)scalloc((count), sizeof(T), __FILE__, __LINE__))
+#define nomp_calloc(T, count)                                                  \
+  ((T *)nomp_calloc_((count), sizeof(T), __FILE__, __LINE__))
 
 /**
  * @ingroup nomp_mem_utils
@@ -86,11 +87,11 @@ void *scalloc(size_t nmemb, size_t size, const char *file, unsigned line);
  * @param line Line number in the file where the function is called.
  * @return Void pointer
  */
-void *srealloc(void *ptr, size_t size, const char *file, unsigned line);
+void *nomp_realloc_(void *ptr, size_t size, const char *file, unsigned line);
 
 /**
  * @ingroup nomp_mem_utils
- * @brief Helper macro for reallocating memory blocks using srealloc().
+ * @brief Helper macro for reallocating memory blocks using nomp_realloc_().
  * File name and line number are passed implicitly.
  *
  * @param ptr Pointer to the memory area to be reallocated.
@@ -98,7 +99,7 @@ void *srealloc(void *ptr, size_t size, const char *file, unsigned line);
  * @param count Number of elements.
  * @return Pointer of type T
  */
-#define trealloc(ptr, T, count)                                                \
-  ((T *)srealloc((ptr), (count) * sizeof(T), __FILE__, __LINE__))
+#define nomp_realloc(ptr, T, count)                                            \
+  ((T *)nomp_realloc_((ptr), (count) * sizeof(T), __FILE__, __LINE__))
 
 #endif // _NOMP_MEM_H_

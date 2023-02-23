@@ -24,7 +24,7 @@ static int test_invalid_kernel_id(int argc, const char **argv, int *id, int *a,
   char *desc = nomp_get_log_str(err);
   int eq = logcmp(desc, "\\[Error\\] .*\\/src\\/nomp.c:[0-9]* Kernel "
                         "id -1 passed to nomp_run is not valid.");
-  tfree(desc);
+  nomp_free(desc);
   nomp_test_assert(eq);
 
   return 0;
@@ -39,7 +39,7 @@ static int test_unmapped_variable(int id, int *a, int *b, int n) {
   char *desc = nomp_get_log_str(err);
   int eq = logcmp(desc, "\\[Error\\] .*\\/src\\/.*.c:[0-9]* Map pointer "
                         "0[xX][0-9a-fA-F]* was not found on device.");
-  tfree(desc);
+  nomp_free(desc);
   nomp_test_assert(eq);
 
   err = nomp_finalize();

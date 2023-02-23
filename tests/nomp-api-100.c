@@ -17,7 +17,7 @@ static int test_invalid_file() {
   char *log = nomp_get_log_str(err);
   int eq = logcmp(log, "\\[Error\\] .*src\\/aux.c:[0-9]* Unable to find path: "
                        "\"invalid-file.py\".");
-  tfree(log);
+  nomp_free(log);
   nomp_test_assert(eq);
 
   return 0;
@@ -35,7 +35,7 @@ static int test_invalid_transform_function() {
   int eq = logcmp(
       log, "\\[Error\\] .*src\\/lpy.c:[0-9]* Failed to call user transform "
            "function: \"invalid-func\" in file: \"nomp-api-100\".");
-  tfree(log);
+  nomp_free(log);
   nomp_test_assert(eq);
 
   return 0;
@@ -53,7 +53,7 @@ static int test_invalid_clause() {
   int eq = logcmp(
       log, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* Clause "
            "\"invalid-clause\" passed into nomp_jit is not a valid caluse.");
-  tfree(log);
+  nomp_free(log);
   nomp_test_assert(eq);
 
   return 0;
@@ -72,7 +72,7 @@ static int test_missing_filename() {
       logcmp(log, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* \"transform\" "
                   "clause should be followed by a file name and a function "
                   "name. At least one of them is not provided.");
-  tfree(log);
+  nomp_free(log);
   nomp_test_assert(eq);
 
   return 0;
@@ -91,7 +91,7 @@ static int test_missing_user_callback() {
       logcmp(log, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* \"transform\" "
                   "clause should be followed by a file name and a function "
                   "name. At least one of them is not provided.");
-  tfree(log);
+  nomp_free(log);
   nomp_test_assert(eq);
 
   return 0;
@@ -112,7 +112,7 @@ static int test_syntax_error_in_kernel() {
   char *log = nomp_get_log_str(err);
   int eq = logcmp(log, "\\[Error\\] .*libnomp\\/src\\/lpy.c:[0-9]* C to Loopy "
                        "conversion failed.");
-  tfree(log);
+  nomp_free(log);
   nomp_test_assert(eq);
 
   return 0;
