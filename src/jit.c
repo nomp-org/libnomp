@@ -21,7 +21,7 @@ static int make_knl_dir(char **dir_, const char *knl_dir, const char *src) {
     }
   }
 
-  unsigned char *s = tcalloc(unsigned char, len + 1);
+  unsigned char *s = nomp_calloc(unsigned char, len + 1);
   for (unsigned i = 0; i < len; i++)
     s[i] = src[i];
 
@@ -30,9 +30,9 @@ static int make_knl_dir(char **dir_, const char *knl_dir, const char *src) {
     return set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
                    "Unable to calculate SHA256 hash of string: \"%s\".", s);
   }
-  tfree(s);
+  nomp_free(s);
 
-  char *hash = tcalloc(char, 2 * SHA256_DIGEST_LENGTH + 1);
+  char *hash = nomp_calloc(char, 2 * SHA256_DIGEST_LENGTH + 1);
   for (unsigned i = 0; i < SHA256_DIGEST_LENGTH; i++)
     snprintf(&hash[2 * i], 3, "%02hhX", md[i]);
 
@@ -48,7 +48,7 @@ static int make_knl_dir(char **dir_, const char *knl_dir, const char *src) {
                      strerror(errno));
     }
   }
-  tfree(hash);
+  nomp_free(hash);
 
   return 0;
 }
@@ -75,7 +75,7 @@ static int compile_aux(const char *cc, const char *cflags, const char *src,
   return_on_err(pathlen(&len, cc));
   len += strnlen(cflags, MAX_CFLAGS_SIZE) + strlen(src) + strlen(out) + 32;
 
-  char *cmd = tcalloc(char, len);
+  char *cmd = nomp_calloc(char, len);
   snprintf(cmd, len, "%s %s %s -o %s", cc, cflags, src, out);
   int ret = system(cmd), failed = 0;
   if (ret == -1) {
@@ -93,7 +93,7 @@ static int compile_aux(const char *cc, const char *cflags, const char *src,
     failed = set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
                      "Command: \"%s\" was terminated by a signal.", cmd);
   }
-  tfree(cmd);
+  nomp_free(cmd);
 
   return failed;
 }
@@ -118,22 +118,22 @@ int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
   size_t max = maxn(3, ldir, strnlen(srcf, 64), strnlen(libf, 64));
   char *src = strcatn(3, max, dir, "/", srcf);
   char *lib = strcatn(3, max, dir, "/", libf);
-  tfree(dir);
+  nomp_free(dir);
 
   return_on_err(write_file(src, source));
   return_on_err(compile_aux(cc, cflags, src, lib));
-  tfree(src);
+  nomp_free(src);
 
   if (funcs_n == funcs_max) {
     funcs_max += funcs_max / 2 + 1;
-    funcs = trealloc(funcs, struct function *, funcs_max);
+    funcs = nomp_realloc(funcs, struct function *, funcs_max);
   }
 
   void (*dlf)() = NULL;
   void *dlh = dlopen(lib, RTLD_LAZY | RTLD_LOCAL);
   if (dlh)
     dlf = dlsym(dlh, entry);
-  tfree(lib);
+  nomp_free(lib);
 
   if (dlh == NULL || dlf == NULL) {
     return set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
@@ -141,7 +141,7 @@ int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
                    dlerror());
   }
 
-  struct function *f = funcs[funcs_n] = tcalloc(struct function, 1);
+  struct function *f = funcs[funcs_n] = nomp_calloc(struct function, 1);
   f->dlh = dlh, f->dlf = (void (*)(void **))dlf, *id = funcs_n++;
 
   return 0;
@@ -161,7 +161,7 @@ int jit_free(int *id) {
   int fid = *id;
   if (fid >= 0 && fid < funcs_n) {
     struct function *f = funcs[fid];
-    dlclose(f->dlh), f->dlh = NULL, f->dlf = NULL, tfree(f);
+    dlclose(f->dlh), f->dlh = NULL, f->dlf = NULL, nomp_free(f);
     funcs[fid] = NULL, *id = -1;
     return 0;
   }

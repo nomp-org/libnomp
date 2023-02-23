@@ -24,7 +24,7 @@ int set_log_(const char *description, int logno, nomp_log_type type,
              const char *fname, unsigned line, ...) {
   if (logs_max <= logs_n) {
     logs_max += logs_max / 2 + 1;
-    logs = trealloc(logs, struct log, logs_max);
+    logs = nomp_realloc(logs, struct log, logs_max);
   }
 
   char buf[BUFSIZ];
@@ -39,10 +39,10 @@ int set_log_(const char *description, int logno, nomp_log_type type,
 
   // 10 for UINT_MAX, 5 for `[] : ` characters and 1 for `\0`.
   size_t len = strlen(desc) + strlen(file) + strlen(type_str) + 10 + 5 + 1;
-  logs[logs_n].description = tcalloc(char, len);
+  logs[logs_n].description = nomp_calloc(char, len);
   snprintf(logs[logs_n].description, len, "[%s] %s:%u %s", type_str, fname,
            line, desc);
-  tfree(desc), tfree(file);
+  nomp_free(desc), nomp_free(file);
   logs[logs_n].logno = logno, logs[logs_n].type = type, logs_n++;
 
   return logs_n;
@@ -69,7 +69,7 @@ nomp_log_type nomp_get_log_type(int log_id) {
 
 void finalize_logs() {
   for (unsigned i = 0; i < logs_n; i++)
-    tfree(logs[i].description);
-  tfree(logs);
+    nomp_free(logs[i].description);
+  nomp_free(logs);
   logs = NULL, logs_n = logs_max = 0;
 }

@@ -110,7 +110,7 @@ int main(int argc, const char *argv[]) {
   err |= SUBTEST(test_valid_backend, argsc, args1);
   err |= SUBTEST(test_backend_case_insensitivity, argsc, args1);
 
-  char *max_int = tcalloc(char, 100);
+  char *max_int = nomp_calloc(char, 100);
   snprintf(max_int, 100, "%d", INT_MAX);
 
   const char *args2[] = {"-b", "opencl", "-d", "0", "-p", max_int};
@@ -119,7 +119,7 @@ int main(int argc, const char *argv[]) {
   const char *args3[] = {"-b", "opencl", "-d", max_int, "-p", "0"};
   err |= SUBTEST(test_valid_device_id, argsc, args3);
 
-  tfree(max_int);
+  nomp_free(max_int);
 
   return err;
 }

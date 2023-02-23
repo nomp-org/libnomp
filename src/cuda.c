@@ -89,31 +89,31 @@ static int cuda_knl_build(struct backend *bnd, struct prog *prg,
   if (result != NVRTC_SUCCESS) {
     size_t size;
     chk_nvrtc(nvrtcGetProgramLogSize(prog, &size));
-    char *log = tcalloc(char, size + 1);
+    char *log = nomp_calloc(char, size + 1);
     chk_nvrtc(nvrtcGetProgramLog(prog, log));
 
     const char *err = nvrtcGetErrorString(result);
     size += strlen(err) + 2 + 1;
 
-    char *msg = tcalloc(char, size);
+    char *msg = nomp_calloc(char, size);
     snprintf(msg, size, "%s: %s", err, log);
 
     int id = set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE,
                      "build", msg);
-    tfree(log), tfree(msg);
+    nomp_free(log), nomp_free(msg);
     return id;
   }
 
   size_t ptx_size;
   chk_nvrtc(nvrtcGetPTXSize(prog, &ptx_size));
-  char *ptx = tcalloc(char, ptx_size);
+  char *ptx = nomp_calloc(char, ptx_size);
   chk_nvrtc(nvrtcGetPTX(prog, ptx));
 
-  struct cuda_prog *cprg = prg->bptr = tcalloc(struct cuda_prog, 1);
+  struct cuda_prog *cprg = prg->bptr = nomp_calloc(struct cuda_prog, 1);
   chk_cu(cuModuleLoadData(&cprg->module, ptx));
   chk_cu(cuModuleGetFunction(&cprg->kernel, cprg->module, name));
 
-  tfree(ptx);
+  nomp_free(ptx);
   chk_nvrtc(nvrtcDestroyProgram(&prog));
 
   return 0;
@@ -180,7 +180,7 @@ int cuda_init(struct backend *bnd, const int platform_id, const int device_id) {
 
   chk_rt(cudaSetDevice(device_id));
 
-  struct cuda_backend *cuda = bnd->bptr = tcalloc(struct cuda_backend, 1);
+  struct cuda_backend *cuda = bnd->bptr = nomp_calloc(struct cuda_backend, 1);
   cuda->device_id = device_id;
   chk_rt(cudaGetDeviceProperties(&cuda->prop, device_id));
 
