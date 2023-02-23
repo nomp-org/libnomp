@@ -19,13 +19,6 @@
 #define MAX_SRC_SIZE 16384
 #define MAX_CFLAGS_SIZE 16384
 
-#define return_on_err(err)                                                     \
-  {                                                                            \
-    int err_ = (err);                                                          \
-    if (nomp_get_log_type(err_) == NOMP_ERROR)                                 \
-      return err_;                                                             \
-  }
-
 #include "nomp-aux.h"
 #include "nomp-log.h"
 #include "nomp-lpy.h"

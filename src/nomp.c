@@ -48,7 +48,7 @@ static int check_env(struct backend *backend) {
   tmp = copy_env("NOMP_INSTALL_DIR", MAX_BUFSIZ);
   if (tmp) {
     size_t size;
-    return_on_err(pathlen(&size, tmp));
+    nomp_check(pathlen(&size, tmp));
     backend->install_dir = trealloc(backend->install_dir, char, size + 1);
     strncpy(backend->install_dir, tmp, size), nomp_free(tmp);
   }
@@ -102,7 +102,7 @@ static int check_args(int argc, const char **argv, struct backend *backend) {
                !strncmp("--install-dir", argv[i], MAX_BUFSIZ)) {
       char *install_dir = (char *)argv[i + 1];
       size_t size;
-      return_on_err(pathlen(&size, install_dir));
+      nomp_check(pathlen(&size, install_dir));
       backend->install_dir = strndup(install_dir, size + 1);
       i += 2;
     } else if (!strncmp("-as", argv[i], MAX_BUFSIZ) ||
@@ -130,8 +130,8 @@ int nomp_init(int argc, const char **argv) {
                    "libnomp is already initialized.");
   }
 
-  return_on_err(check_args(argc, argv, &nomp));
-  return_on_err(check_env(&nomp));
+  nomp_check(check_args(argc, argv, &nomp));
+  nomp_check(check_env(&nomp));
 
   char name[MAX_BACKEND_NAME_SIZE + 1];
   size_t n = strnlen(nomp.backend, MAX_BACKEND_NAME_SIZE);
@@ -152,7 +152,7 @@ int nomp_init(int argc, const char **argv) {
     err = set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                   "Failed to initialized libnomp. Invalid backend: %s", name);
   }
-  return_on_err(err);
+  nomp_check(err);
 
   strncpy(nomp.name, name, MAX_BACKEND_NAME_SIZE);
 
@@ -163,15 +163,15 @@ int nomp_init(int argc, const char **argv) {
     Py_Initialize();
 
     // Append current working directroy to sys.path.
-    return_on_err(py_append_to_sys_path("."));
+    nomp_check(py_append_to_sys_path("."));
 
     // Append nomp python directory to sys.path.
     // nomp.install_dir should be set and we use it here.
     size_t len;
-    return_on_err(pathlen(&len, nomp.install_dir));
+    nomp_check(pathlen(&len, nomp.install_dir));
     len = maxn(2, len, strnlen(py_dir, MAX_BUFSIZ));
     char *abs_dir = strcatn(3, len, nomp.install_dir, "/", py_dir);
-    return_on_err(py_append_to_sys_path(abs_dir));
+    nomp_check(py_append_to_sys_path(abs_dir));
 
     nomp_free(abs_dir);
   }
@@ -226,7 +226,7 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
     m->hptr = ptr, m->bptr = NULL;
   }
 
-  return_on_err(nomp.update(&nomp, mems[idx], op));
+  nomp_check(nomp.update(&nomp, mems[idx], op));
 
   // Device memory object was free'd
   if (mems[idx]->bptr == NULL)
@@ -256,8 +256,8 @@ static int parse_clauses(char **usr_file, char **usr_func, PyObject **dict_,
             "function name. At least one of them is not provided.");
       }
       char *file = strcatn(2, PATH_MAX, (const char *)clauses[i + 1], ".py");
-      return_on_err(pathlen(NULL, file));
-      tfree(file);
+      nomp_check(pathlen(NULL, (const char *)file));
+      nomp_free(file);
       *usr_file = strndup(clauses[i + 1], PATH_MAX);
       *usr_func = strndup(clauses[i + 2], MAX_BUFSIZ);
       i += 3;
@@ -296,36 +296,36 @@ int nomp_jit(int *id, const char *c_src, const char **clauses) {
 
     // Create loopy kernel from C source
     PyObject *knl = NULL;
-    return_on_err(py_c_to_loopy(&knl, c_src, nomp.name));
+    nomp_check(py_c_to_loopy(&knl, c_src, nomp.name));
 
     // Parse the clauses
     char *usr_file = NULL, *usr_func = NULL;
     PyObject *annts;
-    return_on_err(parse_clauses(&usr_file, &usr_func, &annts, clauses));
+    nomp_check(parse_clauses(&usr_file, &usr_func, &annts, clauses));
 
     // Handle annotate clauses if the exist
-    return_on_err(
+    nomp_check(
         py_user_annotate(&knl, annts, nomp.annts_script, nomp.annts_func));
     Py_XDECREF(annts);
 
     // Handle transform clauase
-    return_on_err(py_user_transform(&knl, usr_file, usr_func));
+    nomp_check(py_user_transform(&knl, usr_file, usr_func));
     nomp_free(usr_file), nomp_free(usr_func);
 
     // Get OpenCL, CUDA, etc. source and name from the loopy kernel
     char *name, *src;
-    return_on_err(py_get_knl_name_and_src(&name, &src, knl));
+    nomp_check(py_get_knl_name_and_src(&name, &src, knl));
 
     // Build the kernel
     struct prog *prg = progs[progs_n] = nomp_calloc(struct prog, 1);
-    return_on_err(nomp.knl_build(&nomp, prg, src, name));
+    nomp_check(nomp.knl_build(&nomp, prg, src, name));
     nomp_free(src), nomp_free(name);
 
     // Get grid size of the loopy kernel as pymbolic expressions after
     // transformations. These grid sizes will be evaluated when the kernel is
     // run.
     prg->py_dict = PyDict_New();
-    return_on_err(py_get_grid_size(prg, knl));
+    nomp_check(py_get_grid_size(prg, knl));
     Py_XDECREF(knl);
 
     *id = progs_n++;
@@ -354,10 +354,10 @@ int nomp_run(int id, int nargs, ...) {
       }
     }
     va_end(args);
-    return_on_err(py_eval_grid_size(prg, prg->py_dict));
+    nomp_check(py_eval_grid_size(prg, prg->py_dict));
 
     va_start(args, nargs);
-    return_on_err(nomp.knl_run(&nomp, prg, args));
+    nomp_check(nomp.knl_run(&nomp, prg, args));
     va_end(args);
 
     return 0;
@@ -369,13 +369,6 @@ int nomp_run(int id, int nargs, ...) {
 
 int nomp_sync() { return nomp.sync(&nomp); }
 
-void nomp_chk(int retval) {
-  if (nomp_get_log_type(retval) == NOMP_ERROR) {
-    fprintf(stderr, "%s\n", nomp_get_log_str(retval));
-    exit(1);
-  }
-}
-
 int nomp_finalize(void) {
   if (!initialized) {
     return set_log(NOMP_FINALIZE_FAILURE, NOMP_ERROR,
@@ -384,7 +377,7 @@ int nomp_finalize(void) {
 
   for (unsigned i = 0; i < mems_n; i++) {
     if (mems[i]) {
-      return_on_err(nomp.update(&nomp, mems[i], NOMP_FREE));
+      nomp_check(nomp.update(&nomp, mems[i], NOMP_FREE));
       nomp_free(mems[i]), mems[i] = NULL;
     }
   }
@@ -392,7 +385,7 @@ int nomp_finalize(void) {
 
   for (unsigned i = 0; i < progs_n; i++) {
     if (progs[i]) {
-      return_on_err(nomp.knl_free(progs[i]));
+      nomp_check(nomp.knl_free(progs[i]));
       nomp_free(progs[i]), progs[i] = NULL;
     }
   }
