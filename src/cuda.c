@@ -14,8 +14,8 @@ static const char *ERR_STR_CUDA_FAILURE = "Cuda %s failed: %s.";
     if (x != CUDA_SUCCESS) {                                                   \
       const char *msg;                                                         \
       cuGetErrorName(x, &msg);                                                 \
-      return set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE,      \
-                     "CU operation", msg);                                     \
+      return nomp_set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE, \
+                          "CU operation", msg);                                \
     }                                                                          \
   }
 
@@ -23,8 +23,8 @@ static const char *ERR_STR_CUDA_FAILURE = "Cuda %s failed: %s.";
   {                                                                            \
     nvrtcResult x = (call);                                                    \
     if (x != NVRTC_SUCCESS) {                                                  \
-      return set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE,      \
-                     "nvrtc compilation", nvrtcGetErrorString(x));             \
+      return nomp_set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE, \
+                          "nvrtc operation", nvrtcGetErrorString(x));          \
     }                                                                          \
   }
 
@@ -32,8 +32,8 @@ static const char *ERR_STR_CUDA_FAILURE = "Cuda %s failed: %s.";
   {                                                                            \
     cudaError_t x = (call);                                                    \
     if (x != cudaSuccess) {                                                    \
-      return set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE,      \
-                     "runtime operation", cudaGetErrorString(x));              \
+      return nomp_set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE, \
+                          "runtime operation", cudaGetErrorString(x));         \
     }                                                                          \
   }
 
@@ -98,8 +98,8 @@ static int cuda_knl_build(struct backend *bnd, struct prog *prg,
     char *msg = nomp_calloc(char, size);
     snprintf(msg, size, "%s: %s", err, log);
 
-    int id = set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE,
-                     "build", msg);
+    int id = nomp_set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE,
+                          "build", msg);
     nomp_free(log), nomp_free(msg);
     return id;
   }
@@ -135,13 +135,13 @@ static int cuda_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
     case NOMP_PTR:
       m = mem_if_mapped(p);
       if (m == NULL)
-        return set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
-                       ERR_STR_USER_MAP_PTR_IS_INVALID, p);
+        return nomp_set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
+                            ERR_STR_USER_MAP_PTR_IS_INVALID, p);
       p = &m->bptr;
       break;
     default:
-      return set_log(NOMP_USER_KNL_ARG_TYPE_IS_INVALID, NOMP_ERROR,
-                     "Invalid libnomp kernel argument type %d.", type);
+      return nomp_set_log(NOMP_USER_KNL_ARG_TYPE_IS_INVALID, NOMP_ERROR,
+                          "Invalid libnomp kernel argument type %d.", type);
       break;
     }
     vargs[i] = p;
@@ -174,8 +174,8 @@ int cuda_init(struct backend *bnd, const int platform_id, const int device_id) {
   chk_cu(cudaGetDeviceCount(&num_devices));
 
   if (device_id < 0 || device_id >= num_devices) {
-    return set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                   ERR_STR_USER_DEVICE_IS_INVALID, device_id);
+    return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                        ERR_STR_USER_DEVICE_IS_INVALID, device_id);
   }
 
   chk_rt(cudaSetDevice(device_id));

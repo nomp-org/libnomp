@@ -13,8 +13,8 @@ static const char *ERR_STR_OPENCL_FAILURE = "%s failed with error code: %d.";
   {                                                                            \
     cl_int err = (call);                                                       \
     if (err != CL_SUCCESS) {                                                   \
-      return set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,  \
-                     msg, err);                                                \
+      return nomp_set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR,                     \
+                          ERR_STR_OPENCL_FAILURE, msg, err);                   \
     }                                                                          \
   }
 
@@ -80,8 +80,8 @@ static int opencl_knl_build(struct backend *bnd, struct prog *prg,
     char *log = nomp_calloc(char, log_size);
     clGetProgramBuildInfo(ocl_prg->prg, ocl->device_id, CL_PROGRAM_BUILD_LOG,
                           log_size, log, NULL);
-    int err = set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR,
-                      "clBuildProgram failed with error:\n %s.", log);
+    int err = nomp_set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR,
+                           "clBuildProgram failed with error:\n %s.", log);
     nomp_free(log);
     return err;
   }
@@ -109,15 +109,15 @@ static int opencl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
     case NOMP_PTR:
       m = mem_if_mapped(p);
       if (m == NULL) {
-        return set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
-                       ERR_STR_USER_MAP_PTR_IS_INVALID, p);
+        return nomp_set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
+                            ERR_STR_USER_MAP_PTR_IS_INVALID, p);
       }
       p = m->bptr;
       size = sizeof(cl_mem);
       break;
     default:;
-      return set_log(NOMP_USER_KNL_ARG_TYPE_IS_INVALID, NOMP_ERROR,
-                     "Kernel argument type %d is not valid.", type);
+      return nomp_set_log(NOMP_USER_KNL_ARG_TYPE_IS_INVALID, NOMP_ERROR,
+                          "Kernel argument type %d is not valid.", type);
       break;
     }
 
@@ -138,35 +138,28 @@ static int opencl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
 static int opencl_knl_free(struct prog *prg) {
   struct opencl_prog *ocl_prg = prg->bptr;
 
-<<<<<<< HEAD
   chk_cl(clReleaseKernel(ocl_prg->knl), "clReleaseKernel");
   chk_cl(clReleaseProgram(ocl_prg->prg), "clReleaseProgram");
-  tfree(prg->bptr), prg->bptr = NULL;
+  nomp_free(prg->bptr), prg->bptr = NULL;
 
   return 0;
 }
 
 static int opencl_sync(struct backend *bnd) {
   struct opencl_backend *ocl = (struct opencl_backend *)bnd->bptr;
+
   chk_cl(clFinish(ocl->queue), "clFinish");
 
-=======
-  nomp_free(prg->bptr), prg->bptr = NULL;
->>>>>>> d643d94 (Namespace memory management functions)
   return 0;
 }
 
 static int opencl_finalize(struct backend *bnd) {
   struct opencl_backend *ocl = bnd->bptr;
 
-<<<<<<< HEAD
   chk_cl(clReleaseCommandQueue(ocl->queue), "clReleaseCommandQueue");
   chk_cl(clReleaseContext(ocl->ctx), "clReleaseContext");
-  tfree(bnd->bptr), bnd->bptr = NULL;
-
-=======
   nomp_free(bnd->bptr), bnd->bptr = NULL;
->>>>>>> d643d94 (Namespace memory management functions)
+
   return 0;
 }
 
@@ -175,9 +168,9 @@ int opencl_init(struct backend *bnd, const int platform_id,
   cl_uint num_platforms;
   cl_int err = clGetPlatformIDs(0, NULL, &num_platforms);
   if (platform_id < 0 | platform_id >= num_platforms) {
-    return set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                   "Platform id %d provided to libnomp is not valid.",
-                   platform_id);
+    return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                        "Platform id %d provided to libnomp is not valid.",
+                        platform_id);
   }
 
   cl_platform_id *cl_platforms = nomp_calloc(cl_platform_id, num_platforms);
@@ -188,8 +181,8 @@ int opencl_init(struct backend *bnd, const int platform_id,
   cl_uint num_devices;
   err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 0, NULL, &num_devices);
   if (device_id < 0 || device_id >= num_devices) {
-    return set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                   ERR_STR_USER_DEVICE_IS_INVALID, device_id);
+    return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                        ERR_STR_USER_DEVICE_IS_INVALID, device_id);
   }
 
   cl_device_id *cl_devices = nomp_calloc(cl_device_id, num_devices);
