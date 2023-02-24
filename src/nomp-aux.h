@@ -68,7 +68,7 @@ int maxn(unsigned n, ...);
  * @ingroup nomp_other_utils
  * @brief Returns a non-zero error if the input is NULL.
  *
- * This function call set_log() to register an error if the input is NULL.
+ * This function call nomp_set_log() to register an error if the input is NULL.
  * Use the macro nomp_null_input() to automatically add last three arguments.
  *
  * @param[in] p Input pointer.

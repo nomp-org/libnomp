@@ -25,8 +25,8 @@ int py_append_to_sys_path(const char *path) {
   }
 
   if (err) {
-    return set_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,
-                   "Appending path to the sys.path failed.");
+    return nomp_set_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,
+                        "Appending path to the sys.path failed.");
   }
   return 0;
 }
@@ -51,8 +51,8 @@ int py_c_to_loopy(PyObject **knl, const char *src, const char *backend) {
   }
 
   if (err) {
-    return set_log(NOMP_LOOPY_CONVERSION_FAILURE, NOMP_ERROR,
-                   "C to Loopy conversion failed.\n");
+    return nomp_set_log(NOMP_LOOPY_CONVERSION_FAILURE, NOMP_ERROR,
+                        "C to Loopy conversion failed.\n");
   }
   return 0;
 }
@@ -85,7 +85,7 @@ int py_user_annotate(PyObject **knl, PyObject *annts, const char *file,
   }
 
   if (err) {
-    return set_log(
+    return nomp_set_log(
         NOMP_PY_CALL_FAILURE, NOMP_ERROR,
         "Failed to call user annotate function: \"%s\" in file: \"%s\".", func,
         file);
@@ -120,7 +120,7 @@ int py_user_transform(PyObject **knl, const char *file, const char *func) {
   }
 
   if (err) {
-    return set_log(
+    return nomp_set_log(
         NOMP_PY_CALL_FAILURE, NOMP_ERROR,
         "Failed to call user transform function: \"%s\" in file: \"%s\".", func,
         file);
@@ -152,8 +152,8 @@ int py_get_knl_name_and_src(char **name, char **src, PyObject *knl) {
   }
 
   if (err) {
-    return set_log(NOMP_LOOPY_KNL_NAME_NOT_FOUND, NOMP_ERROR,
-                   "Unable to get loopy kernel name.");
+    return nomp_set_log(NOMP_LOOPY_KNL_NAME_NOT_FOUND, NOMP_ERROR,
+                        "Unable to get loopy kernel name.");
   }
 
   // Get the kernel source
@@ -183,9 +183,9 @@ int py_get_knl_name_and_src(char **name, char **src, PyObject *knl) {
   }
 
   if (err) {
-    return set_log(NOMP_LOOPY_CODEGEN_FAILURE, NOMP_ERROR,
-                   "Backend code generation from loopy kernel \"%s\" failed.",
-                   *name);
+    return nomp_set_log(
+        NOMP_LOOPY_CODEGEN_FAILURE, NOMP_ERROR,
+        "Backend code generation from loopy kernel \"%s\" failed.", *name);
   }
   return 0;
 }
@@ -220,8 +220,8 @@ int py_get_grid_size(struct prog *prg, PyObject *knl) {
   }
 
   if (err) {
-    return set_log(NOMP_LOOPY_GET_GRIDSIZE_FAILURE, NOMP_ERROR,
-                   "Unable to get grid sizes from loopy kernel.");
+    return nomp_set_log(NOMP_LOOPY_GET_GRIDSIZE_FAILURE, NOMP_ERROR,
+                        "Unable to get grid sizes from loopy kernel.");
   }
   return 0;
 }
@@ -271,9 +271,9 @@ int py_eval_grid_size(struct prog *prg, PyObject *dict) {
   }
 
   if (err) {
-    return set_log(NOMP_LOOPY_EVAL_GRIDSIZE_FAILURE, NOMP_ERROR,
-                   "libnomp was unable to evaluate the kernel launch "
-                   "parameters using pymbolic.");
+    return nomp_set_log(NOMP_LOOPY_EVAL_GRIDSIZE_FAILURE, NOMP_ERROR,
+                        "libnomp was unable to evaluate the kernel launch "
+                        "parameters using pymbolic.");
   }
   return 0;
 }

@@ -20,8 +20,8 @@ static struct log *logs = NULL;
 static unsigned logs_n = 0, logs_max = 0;
 static const char *LOG_TYPE_STRING[] = {"Error", "Warning", "Info"};
 
-int set_log_(const char *description, int logno, nomp_log_type type,
-             const char *fname, unsigned line, ...) {
+int nomp_set_log_(const char *description, int logno, nomp_log_type type,
+                  const char *fname, unsigned line, ...) {
   if (logs_max <= logs_n) {
     logs_max += logs_max / 2 + 1;
     logs = nomp_realloc(logs, struct log, logs_max);
@@ -67,7 +67,7 @@ nomp_log_type nomp_get_log_type(int log_id) {
   return logs[log_id - 1].type;
 }
 
-void finalize_logs() {
+void nomp_finalize_logs() {
   for (unsigned i = 0; i < logs_n; i++)
     nomp_free(logs[i].description);
   nomp_free(logs);

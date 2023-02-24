@@ -40,9 +40,9 @@ int pathlen(size_t *len, const char *path) {
   if (!abs) {
     if (len)
       *len = 0;
-    return set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                   "Unable to find path: \"%s\". Error: %s.", path,
-                   strerror(errno));
+    return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                        "Unable to find path: \"%s\". Error: %s.", path,
+                        strerror(errno));
   }
 
   if (len)
@@ -71,10 +71,11 @@ int maxn(unsigned n, ...) {
 int check_null_input_(void *p, const char *func, unsigned line,
                       const char *file) {
   if (!p) {
-    return set_log(NOMP_NULL_INPUT_ENCOUNTERED, NOMP_ERROR,
-                   "Input pointer passed to function \"%s\" at line %d in file "
-                   "%s is NULL.",
-                   func, line, file);
+    return nomp_set_log(
+        NOMP_NULL_INPUT_ENCOUNTERED, NOMP_ERROR,
+        "Input pointer passed to function \"%s\" at line %d in file "
+        "%s is NULL.",
+        func, line, file);
   }
   return 0;
 }
