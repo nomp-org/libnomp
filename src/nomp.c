@@ -365,6 +365,8 @@ int nomp_run(int id, int nargs, ...) {
                  "Kernel id %d passed to nomp_run is not valid.", id);
 }
 
+int nomp_sync() { return nomp.sync(&nomp); }
+
 void nomp_chk(int retval) {
   if (nomp_get_log_type(retval) == NOMP_ERROR) {
     fprintf(stderr, "%s\n", nomp_get_log_str(retval));

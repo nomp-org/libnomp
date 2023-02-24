@@ -53,6 +53,7 @@ struct backend {
   int (*knl_build)(struct backend *, struct prog *, const char *, const char *);
   int (*knl_run)(struct backend *, struct prog *, va_list);
   int (*knl_free)(struct prog *);
+  int (*sync)(struct backend *);
   int (*finalize)(struct backend *);
   void *bptr;
 };
