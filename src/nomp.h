@@ -299,6 +299,17 @@ int nomp_run(int id, int nargs, ...);
 
 /**
  * @ingroup nomp_user_api
+ * @brief Synchronize task execution on device.
+ *
+ * Implement a host-side barrier till the device finish executing all the
+ * previous nomp kernels and/or memory copies.
+ *
+ * @return int
+ */
+int nomp_sync();
+
+/**
+ * @ingroup nomp_user_api
  * @brief Check nomp API function return values for errors.
  *
  * @param[in] retval Return value from a nomp API function.

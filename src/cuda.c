@@ -159,6 +159,8 @@ static int cuda_knl_free(struct prog *prg) {
   return 0;
 }
 
+static int cuda_sync(struct backend *bnd) { chk_rt(cudaDeviceSynchronize()); }
+
 static int cuda_finalize(struct backend *bnd) {
   // Nothing to do
   return 0;
@@ -186,6 +188,7 @@ int cuda_init(struct backend *bnd, const int platform_id, const int device_id) {
   bnd->knl_build = cuda_knl_build;
   bnd->knl_run = cuda_knl_run;
   bnd->knl_free = cuda_knl_free;
+  bnd->sync = cuda_sync;
   bnd->finalize = cuda_finalize;
 
   return 0;

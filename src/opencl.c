@@ -170,6 +170,13 @@ static int opencl_knl_free(struct prog *prg) {
   return 0;
 }
 
+static int opencl_sync(struct backend *bnd) {
+  struct opencl_backend *ocl = (struct opencl_backend *)bnd->bptr;
+  // FIXME: Check return type.
+  clFinish(ocl->queue);
+  return 0;
+}
+
 static int opencl_finalize(struct backend *bnd) {
   struct opencl_backend *ocl = bnd->bptr;
   cl_int err = clReleaseCommandQueue(ocl->queue);
@@ -225,6 +232,7 @@ int opencl_init(struct backend *bnd, const int platform_id,
   bnd->knl_build = opencl_knl_build;
   bnd->knl_run = opencl_knl_run;
   bnd->knl_free = opencl_knl_free;
+  bnd->sync = opencl_sync;
   bnd->finalize = opencl_finalize;
 
   return 0;
