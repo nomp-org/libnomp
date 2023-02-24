@@ -2,13 +2,8 @@
 
 static char *copy_env(const char *name, size_t size) {
   const char *tmp = getenv(name);
-  if (tmp != NULL) {
-    char *copy = nomp_calloc(char, size);
-    if (copy != NULL) {
-      strncpy(copy, tmp, size);
-      return copy;
-    }
-  }
+  if (tmp)
+    return strndup(tmp, size);
   return NULL;
 }
 
@@ -17,40 +12,25 @@ static int check_env(struct backend *backend) {
   if (tmp)
     backend->platform_id = strntoui(tmp, MAX_BUFSIZ);
 
-  tmp = getenv("NOMP_DEVICE_ID");
-  if (tmp)
+  if ((tmp = getenv("NOMP_DEVICE_ID")))
     backend->device_id = strntoui(tmp, MAX_BUFSIZ);
 
-  tmp = getenv("NOMP_VERBOSE_LEVEL");
-  if (tmp)
+  if ((tmp = getenv("NOMP_VERBOSE_LEVEL")))
     backend->verbose = strntoui(tmp, MAX_BUFSIZ);
 
-  tmp = copy_env("NOMP_BACKEND", MAX_BACKEND_NAME_SIZE);
-  if (tmp) {
-    backend->backend = trealloc(backend->backend, char, MAX_BACKEND_NAME_SIZE);
-    strncpy(backend->backend, tmp, MAX_BACKEND_NAME_SIZE), nomp_free(tmp);
-  }
+  if ((tmp = copy_env("NOMP_BACKEND", MAX_BACKEND_NAME_SIZE)))
+    backend->backend = strndup(tmp, MAX_BACKEND_NAME_SIZE), nomp_free(tmp);
 
-  tmp = copy_env("NOMP_ANNOTATE_SCRIPT", MAX_BUFSIZ);
-  if (tmp) {
-    size_t size = strnlen(tmp, MAX_BUFSIZ) + 1;
-    backend->annts_script = trealloc(backend->annts_script, char, size);
-    strncpy(backend->annts_script, tmp, size), nomp_free(tmp);
-  }
+  if ((tmp = copy_env("NOMP_ANNOTATE_SCRIPT", MAX_BUFSIZ)))
+    backend->annts_script = strndup(tmp, MAX_BUFSIZ + 1), nomp_free(tmp);
 
-  tmp = copy_env("NOMP_ANNOTATE_FUNCTION", MAX_BUFSIZ);
-  if (tmp) {
-    size_t size = strnlen(tmp, MAX_BUFSIZ) + 1;
-    backend->annts_func = trealloc(backend->annts_func, char, size);
-    strncpy(backend->annts_func, tmp, size), nomp_free(tmp);
-  }
+  if ((tmp = copy_env("NOMP_ANNOTATE_FUNCTION", MAX_BUFSIZ)))
+    backend->annts_func = strndup(tmp, MAX_BUFSIZ + 1), nomp_free(tmp);
 
-  tmp = copy_env("NOMP_INSTALL_DIR", MAX_BUFSIZ);
-  if (tmp) {
+  if ((tmp = copy_env("NOMP_INSTALL_DIR", MAX_BUFSIZ))) {
     size_t size;
     nomp_check(pathlen(&size, tmp));
-    backend->install_dir = trealloc(backend->install_dir, char, size + 1);
-    strncpy(backend->install_dir, tmp, size), nomp_free(tmp);
+    backend->install_dir = strndup(tmp, size + 1), nomp_free(tmp);
   }
 
   return 0;
