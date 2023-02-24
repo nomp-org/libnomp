@@ -38,13 +38,15 @@ int strntoui(const char *str, size_t size) {
 int pathlen(size_t *len, const char *path) {
   char *abs = realpath(path, NULL);
   if (!abs) {
-    *len = 0;
+    if (len)
+      *len = 0;
     return set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                   "Unable to find the length of path: \"%s\". Error: %s.",
-                   path, strerror(errno));
+                   "Unable to find path: \"%s\". Error: %s.", path,
+                   strerror(errno));
   }
 
-  *len = strnlen(abs, PATH_MAX);
+  if (len)
+    *len = strnlen(abs, PATH_MAX);
   tfree(abs);
 
   return 0;

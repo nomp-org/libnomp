@@ -18,7 +18,7 @@ struct log {
 
 static struct log *logs = NULL;
 static unsigned logs_n = 0, logs_max = 0;
-static const char *LOG_TYPE_STRING[] = {"Error", "Warning", "Information"};
+static const char *LOG_TYPE_STRING[] = {"Error", "Warning", "Info"};
 
 int set_log_(const char *description, int logno, nomp_log_type type,
              const char *fname, unsigned line, ...) {
@@ -34,15 +34,11 @@ int set_log_(const char *description, int logno, nomp_log_type type,
   vsnprintf(buf, BUFSIZ, description, vargs);
   va_end(vargs);
 
-  size_t len;
-  if (pathlen(&len, fname))
-    return -1;
-
-  char *desc = strndup(buf, BUFSIZ), *file = strndup(fname, len);
+  char *desc = strndup(buf, BUFSIZ), *file = strndup(fname, PATH_MAX);
   const char *type_str = LOG_TYPE_STRING[type];
 
   // 10 for UINT_MAX, 5 for `[] : ` characters and 1 for `\0`.
-  len = strlen(desc) + strlen(file) + strlen(type_str) + 10 + 5 + 1;
+  size_t len = strlen(desc) + strlen(file) + strlen(type_str) + 10 + 5 + 1;
   logs[logs_n].description = tcalloc(char, len);
   snprintf(logs[logs_n].description, len, "[%s] %s:%u %s", type_str, fname,
            line, desc);
