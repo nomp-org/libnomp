@@ -6,6 +6,8 @@
 
 #define NARGS_MAX 64
 
+static const char *ERR_STR_CUDA_FAILURE = "Cuda %s failed: %s.";
+
 #define chk_cu(call)                                                           \
   {                                                                            \
     CUresult x = (call);                                                       \
@@ -13,7 +15,7 @@
       const char *msg;                                                         \
       cuGetErrorName(x, &msg);                                                 \
       return set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE,      \
-                     "operation", msg);                                        \
+                     "CU operation", msg);                                     \
     }                                                                          \
   }
 
@@ -22,7 +24,7 @@
     nvrtcResult x = (call);                                                    \
     if (x != NVRTC_SUCCESS) {                                                  \
       return set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE,      \
-                     "runtime compilation", nvrtcGetErrorString(x));           \
+                     "nvrtc compilation", nvrtcGetErrorString(x));             \
     }                                                                          \
   }
 
@@ -31,11 +33,9 @@
     cudaError_t x = (call);                                                    \
     if (x != cudaSuccess) {                                                    \
       return set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE,      \
-                     "operation", cudaGetErrorString(x));                      \
+                     "runtime operation", cudaGetErrorString(x));              \
     }                                                                          \
   }
-
-static const char *ERR_STR_CUDA_FAILURE = "Cuda %s failed: %s.";
 
 struct cuda_backend {
   int device_id;
