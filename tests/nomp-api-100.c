@@ -16,7 +16,7 @@ static int test_invalid_file() {
 
   char *log = nomp_get_log_str(err);
   int eq = logcmp(log, "\\[Error\\] .*src\\/aux.c:[0-9]* Unable to find path: "
-                       "\"invalid-file\".");
+                       "\"invalid-file.py\".");
   tfree(log);
   nomp_test_assert(eq);
 

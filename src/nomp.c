@@ -82,7 +82,9 @@ static int check_args(int argc, const char **argv, struct backend *backend) {
 
     if (!strncmp("-b", argv[i], MAX_BACKEND_NAME_SIZE) ||
         !strncmp("--backend", argv[i], MAX_BACKEND_NAME_SIZE)) {
-      backend->backend = strndup(argv[i + 1], MAX_BACKEND_NAME_SIZE);
+      if (argv[i + 1])
+        backend->backend =
+            strndup((const char *)argv[i + 1], MAX_BACKEND_NAME_SIZE);
       i += 2;
     } else if (!strncmp("-p", argv[i], MAX_BUFSIZ) ||
                !strncmp("--platform", argv[i], MAX_BUFSIZ)) {
@@ -105,14 +107,13 @@ static int check_args(int argc, const char **argv, struct backend *backend) {
       i += 2;
     } else if (!strncmp("-as", argv[i], MAX_BUFSIZ) ||
                !strncmp("--annts-script", argv[i], MAX_BUFSIZ)) {
-      char *annts_script = (char *)argv[i + 1];
-      if (annts_script != NULL)
-        backend->annts_script = strndup(annts_script, MAX_BUFSIZ);
+      if (argv[i + 1])
+        backend->annts_script = strndup((const char *)argv[i + 1], MAX_BUFSIZ);
       i += 2;
     } else if (!strncmp("-af", argv[i], MAX_BUFSIZ) ||
                !strncmp("--annts-func", argv[i], MAX_BUFSIZ)) {
-      char *annts_func = (char *)argv[i + 1];
-      backend->annts_func = strndup(annts_func, MAX_BUFSIZ);
+      if (argv[i + 1])
+        backend->annts_func = strndup((const char *)argv[i + 1], MAX_BUFSIZ);
       i += 2;
     } else {
       return set_log(NOMP_USER_ARG_IS_INVALID, NOMP_ERROR,
@@ -254,11 +255,12 @@ static int parse_clauses(char **usr_file, char **usr_func, PyObject **dict_,
             "\"transform\" clause should be followed by a file name and a "
             "function name. At least one of them is not provided.");
       }
-      size_t size;
-      return_on_err(pathlen(&size, clauses[i + 1]));
-      *usr_file = strndup(clauses[i + 1], size);
+      char *file = strcatn(2, PATH_MAX, (const char *)clauses[i + 1], ".py");
+      return_on_err(pathlen(NULL, file));
+      tfree(file);
+      *usr_file = strndup(clauses[i + 1], PATH_MAX);
       *usr_func = strndup(clauses[i + 2], MAX_BUFSIZ);
-      i = i + 3;
+      i += 3;
     } else if (strncmp(clauses[i], "annotate", MAX_BUFSIZ) == 0) {
       if (clauses[i + 1] == NULL || clauses[i + 2] == NULL) {
         return set_log(NOMP_USER_INPUT_NOT_PROVIDED, NOMP_ERROR,
@@ -272,7 +274,7 @@ static int parse_clauses(char **usr_file, char **usr_func, PyObject **dict_,
           PyUnicode_FromStringAndSize(val, strnlen(val, MAX_BUFSIZ));
       PyDict_SetItem(dict, pkey, pval);
       Py_XDECREF(pkey), Py_XDECREF(pval);
-      i = i + 3;
+      i += 3;
     } else {
       return set_log(
           NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
