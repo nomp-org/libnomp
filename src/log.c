@@ -19,6 +19,12 @@ struct log {
 static struct log *logs = NULL;
 static unsigned logs_n = 0, logs_max = 0;
 static const char *LOG_TYPE_STRING[] = {"Error", "Warning", "Info"};
+static int nomp_verbose_level;
+
+int nomp_log_init(const int user_verbose) {
+  nomp_verbose_level = user_verbose;
+  return 0;
+}
 
 int nomp_set_log_(const char *description, int logno, nomp_log_type type,
                   const char *fname, unsigned line, ...) {
@@ -42,6 +48,14 @@ int nomp_set_log_(const char *description, int logno, nomp_log_type type,
   logs[logs_n].description = nomp_calloc(char, len);
   snprintf(logs[logs_n].description, len, "[%s] %s:%u %s", type_str, fname,
            line, desc);
+
+  // Print the logs based on the verbose level
+  int print_log = (nomp_verbose_level > 0 && type == NOMP_ERROR) ||
+                  (nomp_verbose_level > 1 && type == NOMP_WARNING) ||
+                  (nomp_verbose_level > 2 && type == NOMP_INFORMATION);
+  if (print_log)
+    printf("%s\n", logs[logs_n].description);
+
   nomp_free(desc), nomp_free(file);
   logs[logs_n].logno = logno, logs[logs_n].type = type, logs_n++;
 

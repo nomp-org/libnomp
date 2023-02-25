@@ -80,7 +80,7 @@ int main(int argc, const char *argv[]) {
   err |= SUBTEST(test_free_after_h2d);
   err |= SUBTEST(test_free_after_d2h);
 
-  err = nomp_finalize();
+  err |= nomp_finalize();
   nomp_check(err);
 
   return err;

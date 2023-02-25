@@ -14,6 +14,15 @@ extern const char *ERR_STR_USER_DEVICE_IS_INVALID;
 
 /**
  * @ingroup nomp_log_utils
+ * @brief Set the verbose level for the log functions.
+ *
+ * @param[in] user_verbose Verbose level provided by the user.
+ * @return int
+ */
+int nomp_log_init(const int user_verbose);
+
+/**
+ * @ingroup nomp_log_utils
  * @brief Register a log with libnomp runtime.
  *
  * @details Register a log given a description of the log, log number and log
