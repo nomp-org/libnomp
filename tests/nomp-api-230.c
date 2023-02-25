@@ -17,8 +17,9 @@ static int test_matrix_transform() {
 }
 
 int main(int argc, const char *argv[]) {
-  const char *args[] = {"-b", "opencl", "-d",  "0",   "-p",
-                        "0",  "-as",    "sem", "-af", "annotate"};
+  const char *args[] = {"--nomp-backend",  "opencl",  "--nomp-device", "0",
+                        "--nomp-platform", "0",       "--nomp-script", "sem",
+                        "--nomp-function", "annotate"};
   int err = nomp_init(10, args);
   nomp_check(err);
 

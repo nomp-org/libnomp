@@ -15,7 +15,7 @@
 #include <string.h>
 
 #define MAX_BUFSIZ 64
-#define MAX_BACKEND_NAME_SIZE 32
+#define MAX_BACKEND_SIZE 32
 #define MAX_SRC_SIZE 16384
 #define MAX_CFLAGS_SIZE 16384
 

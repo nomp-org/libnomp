@@ -1,8 +1,8 @@
 #include "nomp-test.h"
 #include <limits.h>
 
-// NOMP_BACKEND environment variable with invalid value.
-static int test_invalid_backend(int argc, const char **argv) {
+// NOMP_nomp-backend environment variable with invalid value.
+static int test_invalid_nomp_backend(int argc, const char **argv) {
   setenv("NOMP_BACKEND", "invalid", 1);
   int err = nomp_init(argc, argv);
   unsetenv("NOMP_BACKEND");
@@ -43,8 +43,8 @@ static int test_invalid_device_id(int argc, const char **argv) {
   return 0;
 }
 
-// Run with a valid NOMP_BACKEND environment variable.
-static int test_valid_backend(int argc, const char **argv) {
+// Run with a valid NOMP_nomp-backend environment variable.
+static int test_valid_nomp_backend(int argc, const char **argv) {
   setenv("NOMP_BACKEND", "opencl", 1);
   int err = nomp_init(argc, argv);
   unsetenv("NOMP_BACKEND");
@@ -57,8 +57,8 @@ static int test_valid_backend(int argc, const char **argv) {
   return 0;
 }
 
-// NOMP_BACKEND value is not case sensitive.
-static int test_backend_case_insensitivity(int argc, const char **argv) {
+// NOMP_nomp-backend value is not case sensitive.
+static int test_nomp_backend_case_insensitivity(int argc, const char **argv) {
   setenv("NOMP_BACKEND", "oPenCl", 1);
   int err = nomp_init(argc, argv);
   unsetenv("NOMP_BACKEND");
@@ -101,22 +101,26 @@ static int test_valid_device_id(int argc, const char **argv) {
 
 int main(int argc, const char *argv[]) {
   int err = 0, argsc = 6;
-  const char *args0[] = {"-b", "opencl", "-d", "0", "-p", "0"};
-  err |= SUBTEST(test_invalid_backend, argsc, args0);
+  const char *args0[6] = {"--nomp-backend",  "opencl", "--nomp-device", "0",
+                          "--nomp-platform", "0"};
+  err |= SUBTEST(test_invalid_nomp_backend, argsc, args0);
   err |= SUBTEST(test_invalid_platform_id, argsc, args0);
   err |= SUBTEST(test_invalid_device_id, argsc, args0);
 
-  const char *args1[] = {"-b", "invalid", "-d", "0", "-p", "0"};
-  err |= SUBTEST(test_valid_backend, argsc, args1);
-  err |= SUBTEST(test_backend_case_insensitivity, argsc, args1);
+  const char *args1[6] = {"--nomp-backend",  "invalid", "--nomp-device", "0",
+                          "--nomp-platform", "0"};
+  err |= SUBTEST(test_valid_nomp_backend, argsc, args1);
+  err |= SUBTEST(test_nomp_backend_case_insensitivity, argsc, args1);
 
   char *max_int = nomp_calloc(char, 100);
   snprintf(max_int, 100, "%d", INT_MAX);
 
-  const char *args2[] = {"-b", "opencl", "-d", "0", "-p", max_int};
+  const char *args2[6] = {"--nomp-backend",  "opencl", "--nomp-device", "0",
+                          "--nomp-platform", max_int};
   err |= SUBTEST(test_valid_platform_id, argsc, args2);
 
-  const char *args3[] = {"-b", "opencl", "-d", max_int, "-p", "0"};
+  const char *args3[6] = {"--nomp-backend", "opencl",          "--nomp-device",
+                          max_int,          "--nomp-platform", "0"};
   err |= SUBTEST(test_valid_device_id, argsc, args3);
 
   nomp_free(max_int);
