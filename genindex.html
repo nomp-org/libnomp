@@ -74,14 +74,12 @@
 
 <div class="genindex-jumpbox">
  <a href="#C"><strong>C</strong></a>
- | <a href="#F"><strong>F</strong></a>
  | <a href="#J"><strong>J</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
  | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#S"><strong>S</strong></a>
- | <a href="#T"><strong>T</strong></a>
  
 </div>
 <h2 id="C">C</h2>
@@ -92,14 +90,6 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="internal-api.html#_CPPv49cuda_initP7backendKiKi">cuda_init (C++ function)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="F">F</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="internal-api.html#_CPPv413finalize_logsv">finalize_logs (C++ function)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -135,7 +125,11 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="user-api.html#c.NOMP_ALLOC">NOMP_ALLOC (C macro)</a>
 </li>
-      <li><a href="user-api.html#_CPPv48nomp_chki">nomp_chk (C++ function)</a>
+      <li><a href="internal-api.html#c.nomp_calloc">nomp_calloc (C macro)</a>
+</li>
+      <li><a href="internal-api.html#_CPPv412nomp_calloc_6size_t6size_tPKcj">nomp_calloc_ (C++ function)</a>
+</li>
+      <li><a href="user-api.html#c.nomp_check">nomp_check (C macro)</a>
 </li>
       <li><a href="user-api.html#c.NOMP_CUDA_FAILURE">NOMP_CUDA_FAILURE (C macro)</a>
 </li>
@@ -143,9 +137,15 @@
 </li>
       <li><a href="user-api.html#c.NOMP_FINALIZE_FAILURE">NOMP_FINALIZE_FAILURE (C macro)</a>
 </li>
+      <li><a href="internal-api.html#_CPPv418nomp_finalize_logsv">nomp_finalize_logs (C++ function)</a>
+</li>
       <li><a href="user-api.html#c.NOMP_FLOAT">NOMP_FLOAT (C macro)</a>
 </li>
       <li><a href="user-api.html#c.NOMP_FREE">NOMP_FREE (C macro)</a>
+</li>
+      <li><a href="internal-api.html#c.nomp_free">nomp_free (C macro)</a>
+</li>
+      <li><a href="internal-api.html#_CPPv410nomp_free_PvPKcj">nomp_free_ (C++ function)</a>
 </li>
       <li><a href="user-api.html#c.NOMP_FROM">NOMP_FROM (C macro)</a>
 </li>
@@ -159,7 +159,7 @@
 </li>
       <li><a href="user-api.html#c.NOMP_INITIALIZE_FAILURE">NOMP_INITIALIZE_FAILURE (C macro)</a>
 </li>
-      <li><a href="user-api.html#c.NOMP_INTEGER">NOMP_INTEGER (C macro)</a>
+      <li><a href="user-api.html#c.NOMP_INT">NOMP_INT (C macro)</a>
 </li>
       <li><a href="user-api.html#_CPPv48nomp_jitPiPKcPPKc">nomp_jit (C++ function)</a>
 </li>
@@ -169,13 +169,17 @@
 </li>
       <li><a href="user-api.html#c.NOMP_LOOPY_CONVERSION_FAILURE">NOMP_LOOPY_CONVERSION_FAILURE (C macro)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="user-api.html#c.NOMP_LOOPY_EVAL_GRIDSIZE_FAILURE">NOMP_LOOPY_EVAL_GRIDSIZE_FAILURE (C macro)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="user-api.html#c.NOMP_LOOPY_GET_GRIDSIZE_FAILURE">NOMP_LOOPY_GET_GRIDSIZE_FAILURE (C macro)</a>
 </li>
       <li><a href="user-api.html#c.NOMP_LOOPY_KNL_NAME_NOT_FOUND">NOMP_LOOPY_KNL_NAME_NOT_FOUND (C macro)</a>
+</li>
+      <li><a href="internal-api.html#c.nomp_malloc">nomp_malloc (C macro)</a>
+</li>
+      <li><a href="internal-api.html#_CPPv412nomp_malloc_6size_tPKcj">nomp_malloc_ (C++ function)</a>
 </li>
       <li><a href="user-api.html#c.NOMP_NULL_INPUT_ENCOUNTERED">NOMP_NULL_INPUT_ENCOUNTERED (C macro)</a>
 </li>
@@ -185,11 +189,19 @@
 </li>
       <li><a href="user-api.html#c.NOMP_PY_CALL_FAILURE">NOMP_PY_CALL_FAILURE (C macro)</a>
 </li>
+      <li><a href="internal-api.html#c.nomp_realloc">nomp_realloc (C macro)</a>
+</li>
+      <li><a href="internal-api.html#_CPPv413nomp_realloc_Pv6size_tPKcj">nomp_realloc_ (C++ function)</a>
+</li>
       <li><a href="user-api.html#_CPPv48nomp_runiiz">nomp_run (C++ function)</a>
+</li>
+      <li><a href="internal-api.html#_CPPv413nomp_set_log_PKci13nomp_log_typePKcjz">nomp_set_log_ (C++ function)</a>
 </li>
       <li><a href="user-api.html#_CPPv49nomp_syncv">nomp_sync (C++ function)</a>
 </li>
       <li><a href="user-api.html#c.NOMP_TO">NOMP_TO (C macro)</a>
+</li>
+      <li><a href="user-api.html#c.NOMP_UINT">NOMP_UINT (C macro)</a>
 </li>
       <li><a href="user-api.html#_CPPv411nomp_updatePv6size_t6size_t6size_ti">nomp_update (C++ function)</a>
 </li>
@@ -249,37 +261,11 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="internal-api.html#_CPPv47scalloc6size_t6size_tPKcj">scalloc (C++ function)</a>
-</li>
-      <li><a href="internal-api.html#_CPPv48set_log_PKci13nomp_log_typePKcjz">set_log_ (C++ function)</a>
-</li>
-      <li><a href="internal-api.html#_CPPv45sfreePvPKcj">sfree (C++ function)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="internal-api.html#_CPPv47smalloc6size_tPKcj">smalloc (C++ function)</a>
-</li>
-      <li><a href="internal-api.html#_CPPv48sreallocPv6size_tPKcj">srealloc (C++ function)</a>
-</li>
       <li><a href="internal-api.html#_CPPv47strcatnjjz">strcatn (C++ function)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="internal-api.html#_CPPv48strntouiPKc6size_t">strntoui (C++ function)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="T">T</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="internal-api.html#c.tcalloc">tcalloc (C macro)</a>
-</li>
-      <li><a href="internal-api.html#c.tfree">tfree (C macro)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="internal-api.html#c.tmalloc">tmalloc (C macro)</a>
-</li>
-      <li><a href="internal-api.html#c.trealloc">trealloc (C macro)</a>
 </li>
   </ul></td>
 </tr></table>
