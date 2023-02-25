@@ -14,10 +14,10 @@
 
 /**
  * @ingroup nomp_other_utils
- * @brief Concatenates atmost `nstr` strings.
+ * @brief Concatenates \p n strings.
  *
- * Concatenates atmost `nstr` strings and returns a pointer to
- * resulting string.
+ * Concatenates \p n strings and returns a pointer to the resulting string.
+ * Each string should be at most \p max_len length long.
  *
  * @param[in] n Number of strings to concatenate.
  * @param[in] max_len Maximum length of an individual string.
@@ -30,8 +30,9 @@ char *strcatn(unsigned n, unsigned max_len, ...);
  * @ingroup nomp_other_utils
  * @brief Convert a string to unsigned long value if possible.
  *
- * Convert input string `str` to an unsigned int value. Returns converted
- * unsigned int value if successful, otherwise return -1.
+ * Convert input string \p str to an unsigned int value. Returns converted
+ * unsigned int value if successful, otherwise return -1. \p size denotes
+ * the maximum length of the string \p str.
  *
  * @param[in] str String to convert into unsigned int.
  * @param[in] size Length of the string.
@@ -41,11 +42,12 @@ int strntoui(const char *str, size_t size);
 
 /**
  * @ingroup nomp_other_utils
- * @brief Returns maximum length of a path.
+ * @brief Returns the length of a posix complaint path.
  *
- * Returns the maximum length of specified path.
+ * If \p len is not NULL, it is set to the length of the path if the path length
+ * resoultion was successful. Otherwise, it is set to zero.
  *
- * @param[in] len Lenth of path specified in \p path.
+ * @param[out] len Lenth of path specified in \p path.
  * @param[in] path Path to get the maximum length.
  * @return int
  */
