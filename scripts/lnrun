@@ -126,8 +126,9 @@ function run_tests() {
   ERR=0
   cd "${NOMP_TEST_DIR}" &&
   for t in $(ls  ${TESTS}); do
-    OUTPUT=$($t -b ${NOMP_BACKEND} -d ${NOMP_DEVICE} -p ${NOMP_PLATFORM} \
-            -i ${NOMP_INSTALL_DIR} -v ${NOMP_VERBOSE})
+    OUTPUT=$($t --nomp-backend ${NOMP_BACKEND} --nomp-device ${NOMP_DEVICE} \
+      --nomp-platform ${NOMP_PLATFORM} --nomp-install-dir ${NOMP_INSTALL_DIR} \
+      --nomp-verbose ${NOMP_VERBOSE})
       
     if [ $? -eq 0 ]; then
       echo "${t}: ${green}Passed${reset}"

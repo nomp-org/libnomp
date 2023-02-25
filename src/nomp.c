@@ -18,8 +18,8 @@ static int check_env(struct backend *backend) {
   if ((tmp = getenv("NOMP_VERBOSE_LEVEL")))
     backend->verbose = strntoui(tmp, MAX_BUFSIZ);
 
-  if ((tmp = copy_env("NOMP_BACKEND", MAX_BACKEND_NAME_SIZE)))
-    backend->backend = strndup(tmp, MAX_BACKEND_NAME_SIZE), nomp_free(tmp);
+  if ((tmp = copy_env("NOMP_BACKEND", MAX_BACKEND_SIZE)))
+    backend->backend = strndup(tmp, MAX_BACKEND_SIZE), nomp_free(tmp);
 
   if ((tmp = copy_env("NOMP_ANNOTATE_SCRIPT", MAX_BUFSIZ)))
     backend->annts_script = strndup(tmp, MAX_BUFSIZ + 1), nomp_free(tmp);
@@ -40,6 +40,14 @@ static struct backend nomp;
 static int initialized = 0;
 static const char *py_dir = "python";
 
+static int check_args_aux(unsigned i, unsigned argc, const char *argv[]) {
+  if (i >= argc || argv[i] == NULL) {
+    return nomp_set_log(NOMP_USER_ARG_IS_INVALID, NOMP_ERROR,
+                        "Missing argument value after: %s.", argv[i]);
+  }
+  return 0;
+}
+
 static int check_args(int argc, const char **argv, struct backend *backend) {
   backend->device_id = 0, backend->platform_id = 0, backend->verbose = 0;
   backend->backend = backend->install_dir = NULL;
@@ -50,56 +58,29 @@ static int check_args(int argc, const char **argv, struct backend *backend) {
 
   unsigned i = 0;
   while (i < argc) {
-    if (strncmp("-", argv[i], 1)) {
-      i += 1;
-      continue;
-    }
-    if (i + 1 == argc) {
-      return nomp_set_log(
-          NOMP_USER_ARG_IS_INVALID, NOMP_ERROR,
-          strcatn(2, MAX_BUFSIZ, "Missing argument value: ", argv[i]));
-    }
-
-    if (!strncmp("-b", argv[i], MAX_BACKEND_NAME_SIZE) ||
-        !strncmp("--backend", argv[i], MAX_BACKEND_NAME_SIZE)) {
-      if (argv[i + 1])
-        backend->backend =
-            strndup((const char *)argv[i + 1], MAX_BACKEND_NAME_SIZE);
-      i += 2;
-    } else if (!strncmp("-p", argv[i], MAX_BUFSIZ) ||
-               !strncmp("--platform", argv[i], MAX_BUFSIZ)) {
-      backend->platform_id = strntoui(argv[i + 1], MAX_BUFSIZ);
-      i += 2;
-    } else if (!strncmp("-d", argv[i], MAX_BUFSIZ) ||
-               !strncmp("--device", argv[i], MAX_BUFSIZ)) {
-      backend->device_id = strntoui(argv[i + 1], MAX_BUFSIZ);
-      i += 2;
-    } else if (!strncmp("-v", argv[i], MAX_BUFSIZ) ||
-               !strncmp("--verbose", argv[i], MAX_BUFSIZ)) {
-      backend->verbose = strntoui(argv[i + 1], MAX_BUFSIZ);
-      i += 2;
-    } else if (!strncmp("-i", argv[i], MAX_BUFSIZ) ||
-               !strncmp("--install-dir", argv[i], MAX_BUFSIZ)) {
-      char *install_dir = (char *)argv[i + 1];
-      size_t size;
-      nomp_check(pathlen(&size, install_dir));
-      backend->install_dir = strndup(install_dir, size + 1);
-      i += 2;
-    } else if (!strncmp("-as", argv[i], MAX_BUFSIZ) ||
-               !strncmp("--annts-script", argv[i], MAX_BUFSIZ)) {
-      if (argv[i + 1])
+    if (!strncmp("--nomp", argv[i], 6)) {
+      nomp_check(check_args_aux(i + 1, argc, argv));
+      if (!strncmp("--nomp-backend", argv[i], MAX_BACKEND_SIZE)) {
+        backend->backend = strndup((const char *)argv[i + 1], MAX_BACKEND_SIZE);
+      } else if (!strncmp("--nomp-platform", argv[i], MAX_BUFSIZ)) {
+        backend->platform_id = strntoui(argv[i + 1], MAX_BUFSIZ);
+      } else if (!strncmp("--nomp-device", argv[i], MAX_BUFSIZ)) {
+        backend->device_id = strntoui(argv[i + 1], MAX_BUFSIZ);
+      } else if (!strncmp("--nomp-verbose", argv[i], MAX_BUFSIZ)) {
+        backend->verbose = strntoui(argv[i + 1], MAX_BUFSIZ);
+      } else if (!strncmp("--nomp-install-dir", argv[i], MAX_BUFSIZ)) {
+        const char *install_dir = (const char *)argv[i + 1];
+        size_t size;
+        nomp_check(pathlen(&size, install_dir));
+        backend->install_dir = strndup(install_dir, size + 1);
+      } else if (!strncmp("--nomp-script", argv[i], MAX_BUFSIZ)) {
         backend->annts_script = strndup((const char *)argv[i + 1], MAX_BUFSIZ);
-      i += 2;
-    } else if (!strncmp("-af", argv[i], MAX_BUFSIZ) ||
-               !strncmp("--annts-func", argv[i], MAX_BUFSIZ)) {
-      if (argv[i + 1])
+      } else if (!strncmp("--nomp-function", argv[i], MAX_BUFSIZ)) {
         backend->annts_func = strndup((const char *)argv[i + 1], MAX_BUFSIZ);
-      i += 2;
-    } else {
-      return nomp_set_log(
-          NOMP_USER_ARG_IS_INVALID, NOMP_ERROR,
-          strcatn(2, MAX_BUFSIZ, "Invalid argument : ", argv[i]));
+      }
+      i++;
     }
+    i++;
   }
 
   return 0;
@@ -114,18 +95,18 @@ int nomp_init(int argc, const char **argv) {
   nomp_check(check_args(argc, argv, &nomp));
   nomp_check(check_env(&nomp));
 
-  char name[MAX_BACKEND_NAME_SIZE + 1];
-  size_t n = strnlen(nomp.backend, MAX_BACKEND_NAME_SIZE);
+  char name[MAX_BACKEND_SIZE + 1];
+  size_t n = strnlen(nomp.backend, MAX_BACKEND_SIZE);
   for (int i = 0; i < n; i++)
     name[i] = tolower(nomp.backend[i]);
   name[n] = '\0';
 
   int err = 1;
-  if (strncmp(name, "opencl", MAX_BACKEND_NAME_SIZE) == 0) {
+  if (strncmp(name, "opencl", MAX_BACKEND_SIZE) == 0) {
 #if defined(OPENCL_ENABLED)
     err = opencl_init(&nomp, nomp.platform_id, nomp.device_id);
 #endif
-  } else if (strncmp(name, "cuda", MAX_BACKEND_NAME_SIZE) == 0) {
+  } else if (strncmp(name, "cuda", MAX_BACKEND_SIZE) == 0) {
 #if defined(CUDA_ENABLED)
     err = cuda_init(&nomp, nomp.platform_id, nomp.device_id);
 #endif
@@ -136,7 +117,7 @@ int nomp_init(int argc, const char **argv) {
   }
   nomp_check(err);
 
-  strncpy(nomp.name, name, MAX_BACKEND_NAME_SIZE);
+  strncpy(nomp.name, name, MAX_BACKEND_SIZE);
 
   if (!Py_IsInitialized()) {
     // May be we need the isolated configuration listed here:
