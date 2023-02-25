@@ -24,7 +24,7 @@
  * @param[in] ... Strings to concatenate.
  * @return char*
  */
-char *strcatn(unsigned n, unsigned max_len, ...);
+char *nomp_str_cat(unsigned n, unsigned max_len, ...);
 
 /**
  * @ingroup nomp_other_utils
@@ -38,7 +38,7 @@ char *strcatn(unsigned n, unsigned max_len, ...);
  * @param[in] size Length of the string.
  * @return int
  */
-int strntoui(const char *str, size_t size);
+int nomp_str_toui(const char *str, size_t size);
 
 /**
  * @ingroup nomp_other_utils
@@ -51,7 +51,7 @@ int strntoui(const char *str, size_t size);
  * @param[in] path Path to get the maximum length.
  * @return int
  */
-int pathlen(size_t *len, const char *path);
+int nomp_path_len(size_t *len, const char *path);
 
 /**
  * @ingroup nomp_other_utils
@@ -64,7 +64,7 @@ int pathlen(size_t *len, const char *path);
  * list.
  * @return int
  */
-int maxn(unsigned n, ...);
+int nomp_max(unsigned n, ...);
 
 /**
  * @ingroup nomp_other_utils

@@ -10,13 +10,13 @@ static char *copy_env(const char *name, size_t size) {
 static int check_env(struct backend *backend) {
   char *tmp = getenv("NOMP_PLATFORM_ID");
   if (tmp)
-    backend->platform_id = strntoui(tmp, MAX_BUFSIZ);
+    backend->platform_id = nomp_str_toui(tmp, MAX_BUFSIZ);
 
   if ((tmp = getenv("NOMP_DEVICE_ID")))
-    backend->device_id = strntoui(tmp, MAX_BUFSIZ);
+    backend->device_id = nomp_str_toui(tmp, MAX_BUFSIZ);
 
   if ((tmp = getenv("NOMP_VERBOSE_LEVEL")))
-    backend->verbose = strntoui(tmp, MAX_BUFSIZ);
+    backend->verbose = nomp_str_toui(tmp, MAX_BUFSIZ);
 
   if ((tmp = copy_env("NOMP_BACKEND", MAX_BACKEND_SIZE)))
     backend->backend = strndup(tmp, MAX_BACKEND_SIZE), nomp_free(tmp);
@@ -29,7 +29,7 @@ static int check_env(struct backend *backend) {
 
   if ((tmp = copy_env("NOMP_INSTALL_DIR", MAX_BUFSIZ))) {
     size_t size;
-    nomp_check(pathlen(&size, tmp));
+    nomp_check(nomp_path_len(&size, tmp));
     backend->install_dir = strndup(tmp, size + 1), nomp_free(tmp);
   }
 
@@ -63,15 +63,15 @@ static int check_args(int argc, const char **argv, struct backend *backend) {
       if (!strncmp("--nomp-backend", argv[i], MAX_BACKEND_SIZE)) {
         backend->backend = strndup((const char *)argv[i + 1], MAX_BACKEND_SIZE);
       } else if (!strncmp("--nomp-platform", argv[i], MAX_BUFSIZ)) {
-        backend->platform_id = strntoui(argv[i + 1], MAX_BUFSIZ);
+        backend->platform_id = nomp_str_toui(argv[i + 1], MAX_BUFSIZ);
       } else if (!strncmp("--nomp-device", argv[i], MAX_BUFSIZ)) {
-        backend->device_id = strntoui(argv[i + 1], MAX_BUFSIZ);
+        backend->device_id = nomp_str_toui(argv[i + 1], MAX_BUFSIZ);
       } else if (!strncmp("--nomp-verbose", argv[i], MAX_BUFSIZ)) {
-        backend->verbose = strntoui(argv[i + 1], MAX_BUFSIZ);
+        backend->verbose = nomp_str_toui(argv[i + 1], MAX_BUFSIZ);
       } else if (!strncmp("--nomp-install-dir", argv[i], MAX_BUFSIZ)) {
         const char *install_dir = (const char *)argv[i + 1];
         size_t size;
-        nomp_check(pathlen(&size, install_dir));
+        nomp_check(nomp_path_len(&size, install_dir));
         backend->install_dir = strndup(install_dir, size + 1);
       } else if (!strncmp("--nomp-script", argv[i], MAX_BUFSIZ)) {
         backend->annts_script = strndup((const char *)argv[i + 1], MAX_BUFSIZ);
@@ -131,9 +131,9 @@ int nomp_init(int argc, const char **argv) {
     // Append nomp python directory to sys.path.
     // nomp.install_dir should be set and we use it here.
     size_t len;
-    nomp_check(pathlen(&len, nomp.install_dir));
-    len = maxn(2, len, strnlen(py_dir, MAX_BUFSIZ));
-    char *abs_dir = strcatn(3, len, nomp.install_dir, "/", py_dir);
+    nomp_check(nomp_path_len(&len, nomp.install_dir));
+    len = nomp_max(2, len, strnlen(py_dir, MAX_BUFSIZ));
+    char *abs_dir = nomp_str_cat(3, len, nomp.install_dir, "/", py_dir);
     nomp_check(py_append_to_sys_path(abs_dir));
 
     nomp_free(abs_dir);
@@ -219,9 +219,9 @@ static int parse_clauses(char **usr_file, char **usr_func, PyObject **dict_,
             "\"transform\" clause should be followed by a file name and a "
             "function name. At least one of them is not provided.");
       }
-      char *file = strcatn(2, PATH_MAX, (const char *)clauses[i + 1], ".py");
-      nomp_check(pathlen(NULL, (const char *)file));
-      nomp_free(file);
+      char *py = nomp_str_cat(2, PATH_MAX, (const char *)clauses[i + 1], ".py");
+      nomp_check(nomp_path_len(NULL, (const char *)py));
+      nomp_free(py);
       *usr_file = strndup(clauses[i + 1], PATH_MAX);
       *usr_func = strndup(clauses[i + 2], MAX_BUFSIZ);
       i += 3;

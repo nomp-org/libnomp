@@ -52,7 +52,7 @@ int main(int argc, const char *argv[]) {
     return 1;
   }
 
-  char *wkdir = strcatn(3, BUFSIZ, cwd, "/", ".nomp_jit_cache");
+  char *wkdir = nomp_str_cat(3, BUFSIZ, cwd, "/", ".nomp_jit_cache");
 
   int err = 0;
   err |= SUBTEST(test_jit_compile_and_free, cwd, wkdir);
