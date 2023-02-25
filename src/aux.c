@@ -1,6 +1,6 @@
 #include "nomp-impl.h"
 
-char *strcatn(unsigned n, unsigned max_len, ...) {
+char *nomp_str_cat(unsigned n, unsigned max_len, ...) {
   va_list vargs;
   va_start(vargs, max_len);
 
@@ -22,7 +22,7 @@ char *strcatn(unsigned n, unsigned max_len, ...) {
   return out;
 }
 
-int strntoui(const char *str, size_t size) {
+int nomp_str_toui(const char *str, size_t size) {
   if (str == NULL)
     return -1;
 
@@ -35,8 +35,9 @@ int strntoui(const char *str, size_t size) {
   return num;
 }
 
-int pathlen(size_t *len, const char *path) {
-  char *abs = realpath(path, NULL);
+int nomp_path_len(size_t *len, const char *path) {
+  char *abs = nomp_calloc(char, PATH_MAX);
+  abs = realpath(path, abs);
   if (!abs) {
     if (len)
       *len = 0;
@@ -52,7 +53,7 @@ int pathlen(size_t *len, const char *path) {
   return 0;
 }
 
-int maxn(unsigned n, ...) {
+int nomp_max(unsigned n, ...) {
   va_list valist;
   va_start(valist, n);
 
