@@ -66,22 +66,4 @@ int nomp_path_len(size_t *len, const char *path);
  */
 int nomp_max(unsigned n, ...);
 
-/**
- * @ingroup nomp_other_utils
- * @brief Returns a non-zero error if the input is NULL.
- *
- * This function call nomp_set_log() to register an error if the input is NULL.
- * Use the macro nomp_null_input() to automatically add last three arguments.
- *
- * @param[in] p Input pointer.
- * @param[in] func Function in which the null check is done.
- * @param[in] line Line number where the null check is done.
- * @param[in] file File name in which the null check is done.
- * @return int
- */
-int check_null_input_(void *p, const char *func, unsigned line,
-                      const char *file);
-#define check_null_input(p)                                                    \
-  nomp_check(check_null_input_((void *)(p), __func__, __LINE__, __FILE__))
-
 #endif // _NOMP_AUX_H_

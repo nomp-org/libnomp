@@ -59,15 +59,13 @@ int py_c_to_loopy(PyObject **knl, const char *src, const char *backend) {
 
 int py_user_annotate(PyObject **knl, PyObject *annts, const char *file,
                      const char *func) {
-  check_null_input(*knl);
-
   // If either file, or func are NULL, we don't have to do anything:
   if (file == NULL || func == NULL)
     return 0;
 
   int err = 1;
   PyObject *pfile = PyUnicode_FromString(file);
-  if (pfile) {
+  if (knl && *knl && pfile) {
     PyObject *module = PyImport_Import(pfile);
     Py_DECREF(pfile);
     if (module) {
@@ -94,15 +92,13 @@ int py_user_annotate(PyObject **knl, PyObject *annts, const char *file,
 }
 
 int py_user_transform(PyObject **knl, const char *file, const char *func) {
-  check_null_input(*knl);
-
   // If either file, or func are NULL, we don't have to do anything:
   if (file == NULL || func == NULL)
     return 0;
 
   int err = 1;
   PyObject *pfile = PyUnicode_FromString(file);
-  if (pfile) {
+  if (knl && *knl && pfile) {
     PyObject *module = PyImport_Import(pfile);
     Py_DECREF(pfile);
     if (module) {
@@ -129,11 +125,9 @@ int py_user_transform(PyObject **knl, const char *file, const char *func) {
 }
 
 int py_get_knl_name_and_src(char **name, char **src, PyObject *knl) {
-  check_null_input(knl);
-
   int err = 1;
   PyObject *epts = PyObject_GetAttrString(knl, "entrypoints");
-  if (epts) {
+  if (knl && epts) {
     Py_ssize_t len = PySet_Size(epts);
     // FIXME: This doesn't require iterator API
     // Iterator C API: https://docs.python.org/3/c-api/iter.html
