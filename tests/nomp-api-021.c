@@ -43,6 +43,26 @@ static int test_invalid_device_id(int argc, const char **argv) {
   return 0;
 }
 
+// NOMP_VERBOSE_LEVEL environment variable with invalid value.
+static int test_invalid_nomp_verbose(int argc, const char **argv) {
+  setenv("NOMP_VERBOSE_LEVEL", "4", 1);
+  int err = nomp_init(argc, argv);
+  unsetenv("NOMP_VERBOSE_LEVEL");
+
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
+  char *desc = nomp_get_log_str(err);
+  int eq = logcmp(
+      desc, "\\[Error\\] .*libnomp\\/src\\/log.c:[0-9]* Invalid verbose level "
+            "4 is provided. The value should be within the range 0-3.");
+  nomp_test_assert(eq);
+  nomp_free(desc);
+
+  err = nomp_finalize();
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_FINALIZE_FAILURE);
+
+  return 0;
+}
+
 // Run with a valid NOMP_nomp-backend environment variable.
 static int test_valid_nomp_backend(int argc, const char **argv) {
   setenv("NOMP_BACKEND", "opencl", 1);
@@ -106,6 +126,7 @@ int main(int argc, const char *argv[]) {
   err |= SUBTEST(test_invalid_nomp_backend, argsc, args0);
   err |= SUBTEST(test_invalid_platform_id, argsc, args0);
   err |= SUBTEST(test_invalid_device_id, argsc, args0);
+  err |= SUBTEST(test_invalid_nomp_verbose, argsc, args0);
 
   const char *args1[6] = {"--nomp-backend",  "invalid", "--nomp-device", "0",
                           "--nomp-platform", "0"};

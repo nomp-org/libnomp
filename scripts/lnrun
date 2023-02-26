@@ -44,7 +44,7 @@ function print_help_test() {
     "[-t|--test-dir <test-directory>\n" \
     "\t\t\t[-b|--backend <backend-name>] [-d|--device <device-index>] " \
     "[-p|--platform <platform-index>]\n" \
-    "\t\t\t[-v|--verbose <verbose-level>] [-i|--install-dir <libnomp-directory>] \n"\
+    "\t\t\t[-v|--verbose <verbose-level>] [-i|--install-dir <libnomp-directory>] \n" \
     "\t\t\t[-as|--annts-script <annotation-script>] [-af|--annts-func <annotation-function>]\n\n" \
     "OPTIONS\n" \
     "\t${cyan}-g/--group${reset}\t Pattern to filter the tests to be run " \
@@ -74,7 +74,7 @@ function print_help_debug() {
     "\t lnrun d|debug \t[-P|--port <port-number>] " \
     "[-b|--backend <backend-name>]\n" \
     "\t\t\t[-d|--device <device-index>] [-p|--platform <platform-index>]\n" \
-    "\t\t\t[-v|--verbose <verbose-level>] [-i|--install-dir <libnomp-directory>] \n"\
+    "\t\t\t[-v|--verbose <verbose-level>] [-i|--install-dir <libnomp-directory>] \n" \
     "\t\t\t[-as|--annts-script <annotation-script>] [-af|--annts-func <annotation-function>]\n\n" \
     "OPTIONS\n" \
     "\t${cyan}-P/--port${reset}\t Port for which gdbserver host the test " \
@@ -112,7 +112,6 @@ function print_help_docs() {
 }
 
 function run_tests() {
-
   [[ ${NOMP_TEST_GROUPS} == *"*"* ]] &&
     TESTS="${NOMP_TEST_DIR}/nomp-${NOMP_TEST_GROUPS}[^.py]" ||
     TESTS="${NOMP_TEST_DIR}/nomp-${NOMP_TEST_GROUPS}"
@@ -129,7 +128,7 @@ function run_tests() {
     OUTPUT=$($t --nomp-backend ${NOMP_BACKEND} --nomp-device ${NOMP_DEVICE} \
       --nomp-platform ${NOMP_PLATFORM} --nomp-install-dir ${NOMP_INSTALL_DIR} \
       --nomp-verbose ${NOMP_VERBOSE})
-      
+
     if [ $? -eq 0 ]; then
       echo "${t}: ${green}Passed${reset}"
     else
@@ -149,8 +148,9 @@ function debug_test() {
   if [[ -f "$BUILD_TEST" ]]; then
     echo -e "\nDebugging session started for: ${cyan}${TEST_NAME}${reset}"
     cd "${NOMP_TEST_DIR}" &&
-    gdbserver "localhost:${NOMP_PORT}" "${BUILD_TEST}" "${NOMP_BACKEND}" \
-      "${NOMP_DEVICE}" "${NOMP_PLATFORM}"
+      gdbserver "localhost:${NOMP_PORT}" "${BUILD_TEST}" --nomp-backend ${NOMP_BACKEND} \
+          --nomp-device ${NOMP_DEVICE} --nomp-platform ${NOMP_PLATFORM} --nomp-install-dir ${NOMP_INSTALL_DIR} \
+          --nomp-verbose ${NOMP_VERBOSE}
     cd -
     echo "Debugging session ended"
   else
@@ -192,6 +192,7 @@ while [ $# -gt 0 ]; do
       -b | --backend) shift && NOMP_BACKEND="${1}" ;;
       -p | --platform) shift && NOMP_PLATFORM="${1}" ;;
       -d | --device) shift && NOMP_DEVICE="${1}" ;;
+      -v | --verbose) shift && NOMP_VERBOSE="${1}" ;;
       *) echo "${red}Invalid argument: ${1}${reset}" &&
         echo "See ${cyan}lnrun -h t|test ${reset} or ${cyan}lnrun" \
           "--help t|test ${reset} for the accepted commands."
@@ -211,6 +212,7 @@ while [ $# -gt 0 ]; do
       -b | --backend) shift && NOMP_BACKEND="${1}" ;;
       -p | --platform) shift && NOMP_PLATFORM="${1}" ;;
       -d | --device) shift && NOMP_DEVICE="${1}" ;;
+      -v | --verbose) shift && NOMP_VERBOSE="${1}" ;;
       *) echo "${red}Invalid argument: ${1}${reset}" &&
         echo "See ${cyan}lnrun -h d|debug ${reset} or ${cyan}lnrun" \
           "--help d|debug ${reset} for the accepted commands."

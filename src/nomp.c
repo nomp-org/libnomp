@@ -116,7 +116,7 @@ int nomp_init(int argc, const char **argv) {
                        name);
   }
   nomp_check(err);
-
+  nomp_check(nomp_log_init(nomp.verbose));
   strncpy(nomp.name, name, MAX_BACKEND_SIZE);
 
   if (!Py_IsInitialized()) {
