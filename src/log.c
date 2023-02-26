@@ -22,6 +22,11 @@ static const char *LOG_TYPE_STRING[] = {"Error", "Warning", "Info"};
 static int nomp_verbose_level;
 
 int nomp_log_init(const int user_verbose) {
+  if (user_verbose < 0 || user_verbose > 3)
+    return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                        "Invalid verbose level %u is provided. The value "
+                        "should be within the range 0-3.",
+                        user_verbose);
   nomp_verbose_level = user_verbose;
   return 0;
 }
