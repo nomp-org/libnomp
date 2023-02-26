@@ -16,10 +16,10 @@ extern const char *ERR_STR_USER_DEVICE_IS_INVALID;
  * @ingroup nomp_log_utils
  * @brief Set the verbose level for the log functions.
  *
- * @param[in] user_verbose Verbose level provided by the user.
+ * @param[in] verbose_in Verbose level provided by the user.
  * @return int
  */
-int nomp_log_init(const int user_verbose);
+int nomp_log_init(const int verbose_in);
 
 /**
  * @ingroup nomp_log_utils

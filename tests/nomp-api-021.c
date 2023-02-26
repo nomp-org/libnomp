@@ -55,6 +55,7 @@ static int test_invalid_nomp_verbose(int argc, const char **argv) {
       desc, "\\[Error\\] .*libnomp\\/src\\/log.c:[0-9]* Invalid verbose level "
             "4 is provided. The value should be within the range 0-3.");
   nomp_test_assert(eq);
+  nomp_free(desc);
 
   err = nomp_finalize();
   nomp_test_assert(nomp_get_log_no(err) == NOMP_FINALIZE_FAILURE);
