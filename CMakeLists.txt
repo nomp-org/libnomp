@@ -10,7 +10,7 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 option(ENABLE_OPENCL "Build OpenCL backend" ON)
 option(ENABLE_CUDA "Build Cuda backend" OFF)
 option(ENABLE_SYCL_OCL "Build SYCL OpenCL backend" OFF)
-option(ENABLE_SYCL "Build SYCL backend" OFF)
+option(ENABLE_SYCL "Build SYCL backend" ON)
 
 # https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling
 # Use, i.e. don't skip the full RPATH for the build tree

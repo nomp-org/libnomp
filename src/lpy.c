@@ -34,29 +34,6 @@ int py_append_to_sys_path(const char *path) {
   return 0;
 }
 
-int py_kernel_fun(char **src, PyObject *knl) {
-  *src = "sycl";
-  PyObject *kernel_py = PyUnicode_FromString(kernel_wrapper);
-  if (kernel_py) {
-    PyObject *module = PyImport_Import(kernel_py);
-    if (module) {
-      PyObject *c_to_lpy = PyObject_GetAttrString(module, create_kernel_wrapper_fun);
-      if (c_to_lpy) {
-        PyObject *kernelfun = PyObject_CallFunctionObjArgs(c_to_lpy, knl, NULL);
-        Py_ssize_t size;
-        const char *src_ = PyUnicode_AsUTF8AndSize(kernelfun, &size);
-        *src = tcalloc(char, size + 1);
-        strncpy(*src, src_, size + 1);
-        Py_DECREF(kernelfun);
-        Py_DECREF(c_to_lpy);
-      }
-      Py_DECREF(module);
-    }
-    Py_DECREF(kernel_py);
-  }
-  return 0;
-}
-
 int py_c_to_loopy(PyObject **knl, const char *src, const char *backend) {
   int err = 1;
   PyObject *lpy_api = PyUnicode_FromString(loopy_api);
@@ -208,6 +185,35 @@ int py_get_knl_name_and_src(char **name, char **src, PyObject *knl) {
         "Backend code generation from loopy kernel \"%s\" failed.", *name);
   }
   return 0;
+}
+
+int py_get_sycl_knl_name_and_src(char **name, char **src, PyObject *knl) {
+  int err = 1;
+  err = py_get_knl_name_and_src(name, src, knl);
+
+  const char *src_;
+  PyObject *kernel_py = PyUnicode_FromString(kernel_wrapper);
+  if (kernel_py) {
+    PyObject *module = PyImport_Import(kernel_py);
+    if (module) {
+      PyObject *c_to_lpy =
+          PyObject_GetAttrString(module, create_kernel_wrapper_fun);
+      if (c_to_lpy) {
+        PyObject *kernelfun = PyObject_CallFunctionObjArgs(c_to_lpy, knl, NULL);
+        Py_ssize_t size;
+        src_ = PyUnicode_AsUTF8AndSize(kernelfun, &size);
+        Py_DECREF(kernelfun);
+        Py_DECREF(c_to_lpy);
+      }
+      Py_DECREF(module);
+    }
+    Py_DECREF(kernel_py);
+  }
+  *src = strcatn(4, BUFSIZ, "#include <CL/sycl.hpp> \n", *src, "\n", src_);
+
+  if (err) {
+    printf("Something went wrong here lpy.c \n");
+  }
 }
 
 int py_get_grid_size(struct prog *prg, PyObject *knl) {

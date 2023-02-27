@@ -152,8 +152,11 @@ int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
 }
 
 int jit_run(int id, void *p[]) {
+  printf("id %d \n", id);
+  printf("function_n %d \n", funcs_n);
   if (id >= 0 && id < funcs_n && funcs[id] && funcs[id]->dlf) {
     funcs[id]->dlf(p);
+    printf("run here \n");
     return 0;
   }
 
