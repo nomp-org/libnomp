@@ -28,7 +28,8 @@ def set_args(args):
     return args_list
 
 
-def create_kernel_wrapper_fun(knl):
+def create_kernel_wrapper_fun(knl): 
+    """Create SYCL kernel wrapper"""
     knl_name = lp.generate_code_v2(knl).device_programs[0].name
     args_list = set_args(knl.callables_table[knl_name].subkernel.args)
     knl_args = args_list + [c.Value("", "queue"), c.Value("", "nd_range")]
