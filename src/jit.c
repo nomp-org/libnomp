@@ -72,8 +72,8 @@ static int write_file(const char *path, const char *src) {
 static int compile_aux(const char *cc, const char *cflags, const char *src,
                        const char *out) {
   size_t len;
-  return_on_err(pathlen(&len, cc));
-  len += strnlen(cflags, MAX_CFLAGS_SIZE) + strlen(src) + strlen(out) + 32;
+  return_on_err(strlen(cc));
+  len = strnlen(cflags, MAX_CFLAGS_SIZE) + strlen(src) + strlen(out) + 32;
 
   char *cmd = tcalloc(char, len);
   snprintf(cmd, len, "%s %s %s -o %s", cc, cflags, src, out);
@@ -114,7 +114,7 @@ int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
   size_t ldir;
   return_on_err(pathlen(&ldir, dir));
 
-  const char *srcf = "source.c", *libf = "mylib.so";
+  const char *srcf = "source.cpp", *libf = "mylib.so";
   size_t max = maxn(3, ldir, strnlen(srcf, 64), strnlen(libf, 64));
   char *src = strcatn(3, max, dir, "/", srcf);
   char *lib = strcatn(3, max, dir, "/", libf);
@@ -148,8 +148,11 @@ int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
 }
 
 int jit_run(int id, void *p[]) {
+  printf("id %d \n", id);
+  printf("function_n %d \n", funcs_n);
   if (id >= 0 && id < funcs_n && funcs[id] && funcs[id]->dlf) {
     funcs[id]->dlf(p);
+    printf("run here \n");
     return 0;
   }
 

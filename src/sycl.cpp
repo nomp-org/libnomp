@@ -9,9 +9,8 @@ struct sycl_backend {
   sycl::device device_id;
   sycl::queue queue;
   sycl::context ctx;
+  int sycl_id;
 };
-// auto mybundle = sycl::make_kernel_bundle<sycl::backend::opencl,
-// sycl::bundle_state::executable>(ocl_program, ctx);
 
 static int sycl_update(struct backend *bnd, struct mem *m, const int op) {
   struct sycl_backend *sycl = (struct sycl_backend *)bnd->bptr;
@@ -19,23 +18,16 @@ static int sycl_update(struct backend *bnd, struct mem *m, const int op) {
   if (op & NOMP_ALLOC) {
     m->bptr = sycl::malloc_device((m->idx1 - m->idx0) * m->usize,
                                   sycl->device_id, sycl->ctx);
-    // sycl->queue.wait();
   }
 
   if (op & NOMP_TO) {
     sycl->queue.memcpy(m->bptr, m->hptr, (m->idx1 - m->idx0) * m->usize);
     sycl->queue.wait();
-    // for (unsigned i = m->idx0; i < m->idx1; i++)
-    //   printf("NOMP_TO %i , %i\n",((int *)m->bptr)[i],((int *)m->hptr)[i]);
   }
 
   if (op == NOMP_FROM) {
     sycl->queue.memcpy(m->hptr, m->bptr, (m->idx1 - m->idx0) * m->usize);
     sycl->queue.wait();
-
-    // for (unsigned i = m->idx0; i < m->idx1; i++)
-    //   printf("NOMP_FROM %i , %i\n",((int *)m->hptr)[i],((int *)m->bptr)[i]);
-
   } else if (op == NOMP_FREE) {
     sycl::free(m->bptr, sycl->ctx);
     m->bptr = NULL;
@@ -46,19 +38,28 @@ static int sycl_update(struct backend *bnd, struct mem *m, const int op) {
 
 static int sycl_knl_free(struct prog *prg) {
   // struct opencl_prog *ocl_prg = (opencl_prog *)prg->bptr;
-  // tfree(prg->bptr), prg->bptr = NULL;
-
+  tfree(prg->bptr), prg->bptr = NULL;
   return 0;
 }
 
 static int sycl_knl_build(struct backend *bnd, struct prog *prg,
                           const char *source, const char *name) {
   struct sycl_backend *sycl = (sycl_backend *)bnd->bptr;
-  // printf("sycl 56 \n");
-  // char *path = writefile(bnd->knl_fun);
-  // compile(path);
-  int *id;
-  jit_compile(id,bnd->knl_fun,"icpx"," -fsycl","kernel_function","./");
+  int err;
+
+  char cwd[BUFSIZ];
+  if (getcwd(cwd, BUFSIZ) == NULL) {
+    printf("Error in cwd");
+    return 0;
+  }
+
+  // printf("cwd: %s \n",cwd);
+
+  int id = -1;
+  // char *wkdir = strcatn(3, BUFSIZ, cwd, "/", ".nomp_jit_cashe");
+  // printf("wkdir: %s \n",wkdir);
+
+  err = jit_compile(&sycl->sycl_id, source, "icpx", "-fsycl -fPIC -shared", "kernel_function", "~/.nomp/tests/.nomp_jit_cashe");
   return 0;
 }
 
@@ -95,64 +96,17 @@ static int sycl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
     arg_list[i] = p;
   }
 
-  char *nomp_dir = getenv("NOMP_INSTALL_DIR");
-
-  void *handle = dlopen("libkernellib.so.0.0.1", RTLD_LAZY);
-  if (!handle) {
-    printf("error \n");
-  }
-
-  size_t global[3];
-  for (unsigned i = 0; i < prg->ndim; i++)
-    global[i] = prg->global[i] * prg->local[i];
-  if (prg->ndim == 1) {
-    sycl::range global_range = sycl::range(global[0]);
-    sycl::range local_range = sycl::range(prg->local[0]);
-    sycl::nd_range<1> nd_range = sycl::nd_range(global_range, local_range);
-    typedef void (*kernel_function_1)(sycl::queue, sycl::nd_range<1>,
-                                      unsigned int, void **);
-    kernel_function_1 kernel_fun =
-        (kernel_function_1)dlsym(handle, "kernel_function");
-    if (!kernel_fun) {
-      std::cerr << "Error: " << dlerror() << std::endl;
-      return 1;
-    }
-    kernel_fun(sycl->queue, nd_range, prg->nargs, arg_list);
-  } else if (prg->ndim == 2) {
-    sycl::range global_range = sycl::range(global[0], global[1]);
-    sycl::range local_range = sycl::range(prg->local[0], prg->local[1]);
-    sycl::nd_range<2> nd_range = sycl::nd_range(global_range, local_range);
-    typedef void (*kernel_fun_2)(sycl::queue queue, sycl::nd_range<2> nd_range,
-                                 unsigned int nargs, void **args);
-    kernel_fun_2 kernel_fun = (kernel_fun_2)dlsym(handle, "kernel_function");
-    kernel_fun(sycl->queue, nd_range, prg->nargs, arg_list);
-  } else {
-    sycl::range global_range = sycl::range(global[0], global[1], global[2]);
-    sycl::range local_range =
-        sycl::range(prg->local[0], prg->local[1], prg->local[2]);
-    sycl::nd_range<3> nd_range = sycl::nd_range(global_range, local_range);
-    typedef void (*kernel_fun_3)(sycl::queue queue, sycl::nd_range<3> nd_range,
-                                 unsigned int nargs, void **args);
-    kernel_fun_3 kernel_fun = (kernel_fun_3)dlsym(handle, "kernel_function");
-    kernel_fun(sycl->queue, nd_range, prg->nargs, arg_list);
-  }
-  dlclose(handle);
-  // FIXME: Wrong. Call set_log()
+  printf("kernel run start \n");
+  err = jit_run(sycl->sycl_id, arg_list);
+  printf("kernel run end \n");
   return err;
 }
 
 static int sycl_finalize(struct backend *bnd) {
+  int err;
   struct sycl_backend *sycl = (sycl_backend *)bnd->bptr;
-  // cl_int err = clReleaseCommandQueue(ocl->queue);
-  // if (err != CL_SUCCESS)
-  //   return set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
-  //                  "command queue release", err);
-  // err = clReleaseContext(ocl->ctx);
-  // if (err != CL_SUCCESS)
-  //   return set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,
-  //                  "context release", err);
+  err = jit_free(&sycl->sycl_id);
   tfree(bnd->bptr), bnd->bptr = NULL;
-
   return 0;
 }
 
