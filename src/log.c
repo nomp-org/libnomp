@@ -34,37 +34,40 @@ int nomp_log_init(const int verbose_in) {
 
 int nomp_set_log_(const char *description, int logno, nomp_log_type type,
                   const char *fname, unsigned line, ...) {
-  if (logs_max <= logs_n) {
-    logs_max += logs_max / 2 + 1;
-    logs = nomp_realloc(logs, struct log, logs_max);
-  }
-
   char buf[BUFSIZ];
-
   va_list vargs;
   va_start(vargs, line);
   vsnprintf(buf, BUFSIZ, description, vargs);
   va_end(vargs);
 
-  char *desc = strndup(buf, BUFSIZ), *file = strndup(fname, PATH_MAX);
+  char *file = strndup(fname, PATH_MAX);
+  if (type < 0 || type > 2)
+    return -1;
   const char *type_str = LOG_TYPE_STRING[type];
 
   // 10 for UINT_MAX, 5 for `[] : ` characters and 1 for `\0`.
-  size_t len = strlen(desc) + strlen(file) + strlen(type_str) + 10 + 5 + 1;
-  logs[logs_n].description = nomp_calloc(char, len);
-  snprintf(logs[logs_n].description, len, "[%s] %s:%u %s", type_str, fname,
-           line, desc);
+  size_t len = strlen(buf) + strlen(file) + strlen(type_str) + 10 + 5 + 1;
+  char *desc = nomp_calloc(char, len);
+  snprintf(desc, len, "[%s] %s:%u %s", type_str, file, line, buf);
 
   // Print the logs based on the verbose level
   if ((verbose > 0 && type == NOMP_ERROR) ||
       (verbose > 1 && type == NOMP_WARNING) ||
       (verbose > 2 && type == NOMP_INFORMATION))
-    printf("%s\n", logs[logs_n].description);
+    printf("%s\n", desc);
 
+  if (type == NOMP_ERROR) {
+    if (logs_max <= logs_n) {
+      logs_max += logs_max / 2 + 1;
+      logs = nomp_realloc(logs, struct log, logs_max);
+    }
+
+    logs[logs_n].description = strndup(desc, len);
+    logs[logs_n].logno = logno, logs[logs_n].type = type, logs_n++;
+  }
   nomp_free(desc), nomp_free(file);
-  logs[logs_n].logno = logno, logs[logs_n].type = type, logs_n++;
 
-  return logs_n;
+  return type == NOMP_ERROR ? logs_n : 0;
 }
 
 char *nomp_get_log_str(int id) {

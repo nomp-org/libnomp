@@ -26,9 +26,12 @@ int nomp_log_init(const int verbose_in);
  * @brief Register a log with libnomp runtime.
  *
  * @details Register a log given a description of the log, log number and log
- * type. Returns a unique log id that can be used to query log later on success.
- * On failure, nomp_set_log_() returns -1. Use nomp_set_log() macro to by pass
- * the argumnets \p fname and \p line_no.
+ * type. Returns a unique log id in case of errors which can be used to query
+ * log later on success. In case of information or warnings, nomp_set_log()
+ * returns 0 and details are printed to stdout based on the verbose level which
+ * is either set by --nomp-verbose command line argument or NOMP_VERBOSE
+ * environment variable. On failure, nomp_set_log_() returns -1. Use
+ * nomp_set_log() macro to by pass the arguments \p fname and \p line_no.
  *
  * @param[in] logno Log number which is defined in nomp.h
  * @param[in] type Type of the log (one of @ref nomp_log_type)
