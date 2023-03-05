@@ -665,7 +665,8 @@ def get_ispc_entry_point(knl):
     gen_code = lp.generate_code_v2(knl)
     suffix = "_" + sha256(gen_code.device_code().encode("utf-8")).hexdigest()
     knl_name = gen_code.device_programs[0].name
-    return f"main_ispc"
+    return "main_ispc"
+    # return f"{knl_name}{suffix}"
 
 
 def create_ispc_kernel_with_wrapper(knl):
@@ -686,6 +687,7 @@ def create_ispc_kernel_with_wrapper(knl):
     param_count = len(knl_args)
     calling_func = c.FunctionBody(
         c.FunctionDeclaration(
+            # c.Value("task void", f"{knl_name}{suffix}"),
             c.Value("task void", f"main_ispc"),
             [
                 c.Value("void *uniform", "_p"),

@@ -42,7 +42,7 @@ static int make_knl_dir(char **dir_, const char *knl_dir, const char *src) {
   unsigned lmax = nomp_max(2, len, SHA256_DIGEST_LENGTH);
 
   // Create the folder if it doesn't exist.
-  char *dir = *dir_ = nomp_str_cat(3, lmax, knl_dir, "/", hash);
+  char *dir = *dir_ = nomp_str_cat(3, lmax, knl_dir, "/", "hash123");
   if (access(dir, F_OK) == -1) {
     if (mkdir(dir, S_IRWXU) == -1) {
       return nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
@@ -57,7 +57,7 @@ static int make_knl_dir(char **dir_, const char *knl_dir, const char *src) {
 
 static int write_file(const char *path, const char *src) {
   // See if source.cpp exist. Otherwise create it.
-  if (access(path, F_OK) == -1) {
+  // if (access(path, F_OK) == -1) {
     FILE *fp = fopen(path, "w");
     if (fp != NULL) {
       fprintf(fp, "%s", src);
@@ -66,7 +66,7 @@ static int write_file(const char *path, const char *src) {
       return nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
                           "Unable to write file: %s.", path);
     }
-  }
+  // }
 
   return 0;
 }
@@ -123,48 +123,31 @@ int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
   char *src = nomp_str_cat(3, max, dir, "/", srcf);
   char *lib = nomp_str_cat(3, max, dir, "/", libf);
 
-  if (to_wrt) {
+  if (to_wrt)
     nomp_check(write_file(src, source));
-  } else {
-    char *ld_path;
-    size_t len = ldir + 32;
-    char *tmp = getenv("LD_LIBRARY_PATH");
-    if (tmp) {
-      len += strlen(tmp);
-      ld_path = nomp_calloc(char, len);
-      snprintf(ld_path, len, "%s:%s", tmp, dir);
-      unsetenv("LD_LIBRARY_PATH");
-      setenv("LD_LIBRARY_PATH", ld_path, 1);
-    } else {
-      ld_path = nomp_calloc(char, len);
-      snprintf(ld_path, len, "%s", dir);
-      setenv("LD_LIBRARY_PATH", ld_path, 0);
-    }
-    nomp_free(ld_path);
-  }
   nomp_free(dir);
   nomp_check(compile_aux(cc, cflags, src, lib));
   nomp_free(src);
 
-  if (funcs_n == funcs_max) {
-    funcs_max += funcs_max / 2 + 1;
-    funcs = nomp_realloc(funcs, struct function *, funcs_max);
-  }
+  // if (funcs_n == funcs_max) {
+  //   funcs_max += funcs_max / 2 + 1;
+  //   funcs = nomp_realloc(funcs, struct function *, funcs_max);
+  // }
 
-  void (*dlf)() = NULL;
-  void *dlh = dlopen(lib, RTLD_LAZY | RTLD_LOCAL);
-  if (dlh && entry)
-    dlf = dlsym(dlh, entry);
-  nomp_free(lib);
+  // void (*dlf)() = NULL;
+  // void *dlh = dlopen(lib, RTLD_LAZY | RTLD_LOCAL);
+  // if (dlh && entry)
+  //   dlf = dlsym(dlh, entry);
+  // nomp_free(lib);
 
-  if (dlh == NULL || dlf == NULL) {
-    return nomp_set_log(
-        NOMP_JIT_FAILURE, NOMP_ERROR,
-        "Failed to open object/symbol \"%s\" due to error: \"%s\".", dlerror());
-  }
+  // if (dlh == NULL || dlf == NULL) {
+  //   return nomp_set_log(
+  //       NOMP_JIT_FAILURE, NOMP_ERROR,
+  //       "Failed to open object/symbol \"%s\" due to error: \"%s\".", dlerror());
+  // }
 
-  struct function *f = funcs[funcs_n] = nomp_calloc(struct function, 1);
-  f->dlh = dlh, f->dlf = (void (*)(void **))dlf, *id = funcs_n++;
+  // struct function *f = funcs[funcs_n] = nomp_calloc(struct function, 1);
+  // f->dlh = dlh, f->dlf = (void (*)(void **))dlf, *id = funcs_n++;
 
   return 0;
 }

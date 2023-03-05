@@ -17,7 +17,8 @@
  * @brief Concatenates \p n strings.
  *
  * Concatenates \p n strings and returns a pointer to the resulting string.
- * Each string should be at most \p max_len length long.
+ * Each string should be at most \p max_len length long. Retured pointered
+ * need to be freed.
  *
  * @param[in] n Number of strings to concatenate.
  * @param[in] max_len Maximum length of an individual string.
