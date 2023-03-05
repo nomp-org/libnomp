@@ -59,6 +59,7 @@ _BACKEND_TO_TARGET = {
     "cuda": lp.CudaTarget(),
     "ispc": lp.ISPCTarget(),
     "hip": lp.CudaTarget(),
+    "sycl": lp.SYCLTarget(),
 }
 _BACKEND_TO_WRAPPER = {
     "ispc": ISPCKernelWrapper(prefix="nomp_ispc"),

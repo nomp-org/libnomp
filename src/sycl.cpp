@@ -9,7 +9,7 @@ struct sycl_backend {
   sycl::device device_id;
   sycl::queue queue;
   sycl::context ctx;
-  int sycl_id;
+  int sycl_id = -1;
 };
 
 static int sycl_update(struct backend *bnd, struct mem *m, const int op) {
@@ -37,8 +37,7 @@ static int sycl_update(struct backend *bnd, struct mem *m, const int op) {
 }
 
 static int sycl_knl_free(struct prog *prg) {
-  // struct opencl_prog *ocl_prg = (opencl_prog *)prg->bptr;
-  tfree(prg->bptr), prg->bptr = NULL;
+  nomp_free(prg->bptr), prg->bptr = NULL;
   return 0;
 }
 
@@ -53,19 +52,14 @@ static int sycl_knl_build(struct backend *bnd, struct prog *prg,
     return 0;
   }
 
-  // printf("cwd: %s \n",cwd);
-
-  int id = -1;
-  // char *wkdir = strcatn(3, BUFSIZ, cwd, "/", ".nomp_jit_cashe");
-  // printf("wkdir: %s \n",wkdir);
-
-  err = jit_compile(&sycl->sycl_id, source, "icpx", "-fsycl -fPIC -shared", "kernel_function", "~/.nomp/tests/.nomp_jit_cashe");
+  char *wkdir = nomp_str_cat(3, BUFSIZ, cwd, "/", ".nomp_jit_cache");
+  err = jit_compile(&sycl->sycl_id, source, "icpx", "-fsycl -fPIC -shared",
+                    "kernel_function", wkdir);
   return 0;
 }
 
 static int sycl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
   struct sycl_backend *sycl = (sycl_backend *)bnd->bptr;
-  // struct opencl_prog *ocl_prg = (struct opencl_prog *)prg->bptr;
   struct mem *m;
   size_t size;
   sycl->queue = sycl::queue(sycl->ctx, sycl->device_id);
@@ -77,28 +71,26 @@ static int sycl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
     size = va_arg(args, size_t);
     void *p = va_arg(args, void *);
     switch (type) {
-    case NOMP_INTEGER:
+    case NOMP_INT:
     case NOMP_FLOAT:
       break;
     case NOMP_PTR:
       m = mem_if_mapped(p);
       if (m == NULL)
-        return set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
-                       ERR_STR_USER_MAP_PTR_IS_INVALID, p);
+        return nomp_set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
+                            ERR_STR_USER_MAP_PTR_IS_INVALID, p);
       p = m->bptr;
       break;
     default:;
-      return set_log(NOMP_USER_KNL_ARG_TYPE_IS_INVALID, NOMP_ERROR,
-                     "Kernel argument type %d passed to libnomp is not valid.",
-                     type);
+      return nomp_set_log(
+          NOMP_USER_KNL_ARG_TYPE_IS_INVALID, NOMP_ERROR,
+          "Kernel argument type %d passed to libnomp is not valid.", type);
       break;
     }
     arg_list[i] = p;
   }
 
-  printf("kernel run start \n");
   err = jit_run(sycl->sycl_id, arg_list);
-  printf("kernel run end \n");
   return err;
 }
 
@@ -106,27 +98,27 @@ static int sycl_finalize(struct backend *bnd) {
   int err;
   struct sycl_backend *sycl = (sycl_backend *)bnd->bptr;
   err = jit_free(&sycl->sycl_id);
-  tfree(bnd->bptr), bnd->bptr = NULL;
+  nomp_free(bnd->bptr), bnd->bptr = NULL;
   return 0;
 }
 
 int sycl_init(struct backend *bnd, const int platform_id, const int device_id) {
-  bnd->bptr = tcalloc(struct sycl_backend, 1);
+  bnd->bptr = nomp_calloc(struct sycl_backend, 1);
   struct sycl_backend *sycl = (sycl_backend *)bnd->bptr;
 
   sycl::platform sycl_platform = sycl::platform();
   auto sycl_pplatforms = sycl_platform.get_platforms();
 
   if (platform_id < 0 | platform_id >= sycl_pplatforms.size())
-    return set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                   "Platform id %d provided to libnomp is not valid.",
-                   platform_id);
+    return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                        "Platform id %d provided to libnomp is not valid.",
+                        platform_id);
   sycl_platform = sycl_pplatforms[platform_id];
   auto sycl_pdevices = sycl_platform.get_devices();
 
   if (device_id < 0 || device_id >= sycl_pdevices.size())
-    return set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                   ERR_STR_USER_DEVICE_IS_INVALID, device_id);
+    return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                        ERR_STR_USER_DEVICE_IS_INVALID, device_id);
 
   sycl::device sycl_device = sycl_pdevices[device_id];
   sycl->device_id = sycl_device;
@@ -134,7 +126,6 @@ int sycl_init(struct backend *bnd, const int platform_id, const int device_id) {
 
   sycl->ctx = sycl_ctx;
   sycl::queue sycl_queue = sycl::queue(sycl_ctx, sycl_device);
-  // clCreateContext(NULL, 1, &device, NULL, NULL, &err);
   sycl->queue = sycl_queue;
 
   bnd->update = sycl_update;

@@ -8,6 +8,10 @@
 #include <string.h>
 #include <unistd.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @defgroup nomp_other_utils Other helper functions.
  */
@@ -67,3 +71,7 @@ int nomp_path_len(size_t *len, const char *path);
 int nomp_max(unsigned n, ...);
 
 #endif // _NOMP_AUX_H_
+
+#ifdef __cplusplus
+}
+#endif
