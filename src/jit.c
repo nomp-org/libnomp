@@ -118,7 +118,7 @@ int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
   size_t ldir;
   nomp_check(nomp_path_len(&ldir, dir));
 
-  const char *srcf = "source.c", *libf = "mylib.so";
+  const char *srcf = "source.cpp", *libf = "mylib.so";
   size_t max = nomp_max(3, ldir, strnlen(srcf, 64), strnlen(libf, 64));
   char *src = nomp_str_cat(3, max, dir, "/", srcf);
   char *lib = nomp_str_cat(3, max, dir, "/", libf);
@@ -152,11 +152,8 @@ int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
 }
 
 int jit_run(int id, void *p[]) {
-  printf("id %d \n", id);
-  printf("function_n %d \n", funcs_n);
   if (id >= 0 && id < funcs_n && funcs[id] && funcs[id]->dlf) {
     funcs[id]->dlf(p);
-    printf("run here \n");
     return 0;
   }
 

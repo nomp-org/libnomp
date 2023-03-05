@@ -12,7 +12,7 @@ def get_arg_type(val):
     fill_registry_with_c_types(dtype_reg, True)
     if type(val) == lp.kernel.data.ArrayArg:
         ctype = dtype_reg.dtype_to_ctype(val.dtype)
-        arg_type = f"*(sycl::buffer<{ctype}> *)"
+        arg_type = f"({ctype} *)"
         return arg_type
     elif type(val) == lp.kernel.data.ValueArg:
         ctype = dtype_reg.dtype_to_ctype(val.dtype)
