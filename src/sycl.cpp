@@ -9,7 +9,7 @@ struct sycl_backend {
   sycl::device device_id;
   sycl::queue queue;
   sycl::context ctx;
-  int sycl_id;
+  int sycl_id = -1;
 };
 
 static int sycl_update(struct backend *bnd, struct mem *m, const int op) {
@@ -59,7 +59,7 @@ static int sycl_knl_build(struct backend *bnd, struct prog *prg,
   // char *wkdir = strcatn(3, BUFSIZ, cwd, "/", ".nomp_jit_cashe");
   // printf("wkdir: %s \n",wkdir);
 
-  err = jit_compile(&sycl->sycl_id, source, "icpx", "-fsycl -fPIC -shared", "kernel_function", "~/.nomp/tests/.nomp_jit_cashe");
+  err = jit_compile(&sycl->sycl_id, source, "icpx", "-fsycl -fPIC -shared", "kernel_function", "/home/ravindu/.nomp/tests/.nomp_jit_cashe");
   return 0;
 }
 
@@ -96,7 +96,6 @@ static int sycl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
     arg_list[i] = p;
   }
 
-  printf("kernel run start \n");
   err = jit_run(sycl->sycl_id, arg_list);
   printf("kernel run end \n");
   return err;
