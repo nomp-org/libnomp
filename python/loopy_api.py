@@ -88,13 +88,10 @@ class DtypeRegAcc:
     __instance = None
 
     def __init__(self):
-        if DtypeRegAcc.__instance is not None:
-            raise Exception(
-                "Cannot create multiple instances of a DtypeRegAcc class."
-            )
-        DtypeRegAcc.__instance = self
-        self.dtype_reg = DTypeRegistry()
-        fill_registry_with_c_types(self.dtype_reg, True)
+        if DtypeRegAcc.__instance is None:
+            DtypeRegAcc.__instance = self
+            self.dtype_reg = DTypeRegistry()
+            fill_registry_with_c_types(self.dtype_reg, True)
 
     @staticmethod
     def get_or_register_dtype(ctype: str) -> np.dtype:
@@ -409,12 +406,11 @@ class CToLoopyMapper(IdentityMapper):
                         )
                 shape = tuple(CToLoopyExpressionMapper()(dim) for dim in dims)
                 return (name, shape, init)
-            elif isinstance(expr.type.kind, cindex.TypeKind):
+            if isinstance(expr.type.kind, cindex.TypeKind):
                 if len(children) == 1:
                     init = children[0]
                 return (name, (), init)
-            else:
-                raise NotImplementedError(f"Unable to parse: {expr.type.kind}")
+            raise NotImplementedError(f"Unable to parse: {expr.type.kind}")
 
         (name, shape, init) = check_and_parse_decl(expr)
         if init is not None:
@@ -520,7 +516,7 @@ class CToLoopyMapper(IdentityMapper):
     def map_break_stmt(
         self, expr: cindex.CursorKind, context: CToLoopyMapperContext
     ) -> CToLoopyMapperAccumulator:
-        """Maps break statement"""
+        """Maps a C break statement"""
         return CToLoopyMapperAccumulator(
             [],
             [
