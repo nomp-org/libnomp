@@ -89,6 +89,8 @@ static int sycl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
     arg_list[i] = p;
   }
 
+  arg_list[prg->nargs] = (void *) &sycl->queue;
+
   size_t global[3];
   for (unsigned i = 0; i < prg->ndim; i++)
     global[i] = prg->global[i] * prg->local[i];
@@ -97,22 +99,23 @@ static int sycl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
     sycl::range global_range = sycl::range(global[0]);
     sycl::range local_range = sycl::range(prg->local[0]);
     sycl::nd_range<1> nd_range = sycl::nd_range(global_range, local_range);
-    arg_list[prg->nargs] = (void *) &nd_range;
+    arg_list[prg->nargs+1] = (void *) &nd_range;
+    err = jit_run(sycl->sycl_id, arg_list);
   }else if(prg->ndim == 2){
     sycl::range global_range = sycl::range(global[0], global[1]);
     sycl::range local_range = sycl::range(prg->local[0], prg->local[1]);
     sycl::nd_range<2> nd_range = sycl::nd_range(global_range, local_range);
-    arg_list[prg->nargs] = (void *) &nd_range;
+    arg_list[prg->nargs+1] = (void *) &nd_range;
+    err = jit_run(sycl->sycl_id, arg_list);
   }else if(prg->ndim == 3){
     sycl::range global_range = sycl::range(global[0], global[1], global[2]);
     sycl::range local_range = sycl::range(prg->local[0], prg->local[1], prg->local[2]);
     sycl::nd_range<3> nd_range = sycl::nd_range(global_range, local_range);
-    arg_list[prg->nargs] = (void *) &nd_range;
+    arg_list[prg->nargs+1] = (void *) &nd_range;
+    err = jit_run(sycl->sycl_id, arg_list);
   }
 
-  arg_list[prg->nargs+1] = (void *) &sycl->queue;
-
-  err = jit_run(sycl->sycl_id, arg_list);
+  
   return err;
 }
 
