@@ -49,7 +49,12 @@ _CLANG_TYPE_TO_C_TYPE = {
     "uchar": "unsigned char",
     "schar": "signed char",
 }
-_BACKEND_TO_TARGET = {"opencl": lp.OpenCLTarget(), "cuda": lp.CudaTarget()}
+
+_BACKEND_TO_TARGET = {
+    "opencl": lp.OpenCLTarget(),
+    "cuda": lp.CudaTarget(),
+    "hip": lp.HIPTarget(),
+}
 _ARRAY_TYPES = [cindex.TypeKind.CONSTANTARRAY, cindex.TypeKind.INCOMPLETEARRAY]
 _ARRAY_TYPES_W_PTR = _ARRAY_TYPES + [cindex.TypeKind.POINTER]
 

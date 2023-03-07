@@ -1,6 +1,4 @@
-extern "C" {
 #include "nomp-impl.h"
-}
 #include <hip/hip_runtime.h>
 #include <hip/hiprtc.h>
 
@@ -10,8 +8,8 @@ extern "C" {
   do {                                                                         \
     if (x != hipSuccess) {                                                     \
       const char *msg = hipGetErrorName(x);                                    \
-      return set_log(NOMP_HIP_FAILURE, NOMP_ERROR, ERR_STR_HIP_FAILURE,        \
-                     "operation", msg);                                        \
+      return nomp_set_log(NOMP_HIP_FAILURE, NOMP_ERROR, ERR_STR_HIP_FAILURE,   \
+                          "operation", msg);                                   \
     }                                                                          \
   } while (0)
 
@@ -21,8 +19,8 @@ extern "C" {
   do {                                                                         \
     if (x != HIPRTC_SUCCESS) {                                                 \
       const char *msg = hiprtcGetErrorString(x);                               \
-      return set_log(NOMP_HIP_FAILURE, NOMP_ERROR, ERR_STR_HIP_FAILURE,        \
-                     "runtime compilation", msg);                              \
+      return nomp_set_log(NOMP_HIP_FAILURE, NOMP_ERROR, ERR_STR_HIP_FAILURE,   \
+                          "runtime compilation", msg);                         \
     }                                                                          \
   } while (0)
 #define chk_hiprtc(x) chk_hiprtc_(__FILE__, __LINE__, x)
@@ -32,6 +30,7 @@ const char *ERR_STR_HIP_FAILURE = "HIP %s failed: %s.";
 struct hip_backend {
   int device_id;
   struct hipDeviceProp_t prop;
+  hipCtx_t ctx;
 };
 
 struct hip_prog {
@@ -40,25 +39,20 @@ struct hip_prog {
 };
 
 static int hip_update(struct backend *bnd, struct mem *m, const int op) {
-  hipError_t err;
   if (op & NOMP_ALLOC) {
-    err = hipMalloc(&m->bptr, (m->idx1 - m->idx0) * m->usize);
-    chk_hip(err);
+    chk_hip(hipMalloc(&m->bptr, (m->idx1 - m->idx0) * m->usize));
   }
 
   if (op & NOMP_TO) {
-    err = hipMemcpy(m->bptr, (char *)m->hptr + m->usize * m->idx0,
-                    (m->idx1 - m->idx0) * m->usize, hipMemcpyHostToDevice);
-    chk_hip(err);
+    chk_hip(hipMemcpy(m->bptr, (char *)m->hptr + m->usize * m->idx0,
+                      (m->idx1 - m->idx0) * m->usize, hipMemcpyHostToDevice));
   }
 
   if (op == NOMP_FROM) {
-    err = hipMemcpy((char *)m->hptr + m->usize * m->idx0, m->bptr,
-                    (m->idx1 - m->idx0) * m->usize, hipMemcpyDeviceToHost);
-    chk_hip(err);
+    chk_hip(hipMemcpy((char *)m->hptr + m->usize * m->idx0, m->bptr,
+                      (m->idx1 - m->idx0) * m->usize, hipMemcpyDeviceToHost));
   } else if (op == NOMP_FREE) {
-    err = hipFree(m->bptr);
-    chk_hip(err);
+    chk_hip(hipFree(m->bptr));
     m->bptr = NULL;
   }
 
@@ -73,52 +67,42 @@ static void hip_update_ptr(void **p, size_t *size, struct mem *m) {
 static int hip_knl_build(struct backend *bnd, struct prog *prg,
                          const char *source, const char *name) {
   hiprtcProgram prog;
-  hiprtcResult hiprtc_err =
-      hiprtcCreateProgram(&prog, source, NULL, 0, NULL, NULL);
-  chk_hiprtc(hiprtc_err);
+  chk_hiprtc(hiprtcCreateProgram(&prog, source, NULL, 0, NULL, NULL));
 
   struct hip_backend *hbnd = (struct hip_backend *)bnd->bptr;
-  char arch[NOMP_BUFSIZ];
-  snprintf(arch, NOMP_BUFSIZ, "-arch=compute_%d%d", hbnd->prop.major,
-           hbnd->prop.minor);
 
-  const char *opts[1] = {arch};
-  hiprtc_err = hiprtcCompileProgram(prog, 1, opts);
-  if (hiprtc_err != HIPRTC_SUCCESS) {
+  const char *opts[1] = {};
+  hiprtcResult result = hiprtcCompileProgram(prog, 0, opts);
+  if (result != HIPRTC_SUCCESS) {
     size_t log_size;
     hiprtcGetProgramLogSize(prog, &log_size);
-    char *log = tcalloc(char, log_size);
+    char *log = nomp_calloc(char, log_size);
     hiprtcGetProgramLog(prog, log);
-    const char *err_str = hiprtcGetErrorString(hiprtc_err);
+    const char *err_str = hiprtcGetErrorString(result);
     size_t msg_size = log_size + strlen(err_str) + 2;
-    char *msg = tcalloc(char, msg_size);
+    char *msg = nomp_calloc(char, msg_size);
     snprintf(msg, msg_size, "%s: %s", err_str, log);
-    int err_id = set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE,
-                         "build", msg);
-    tfree(log), tfree(msg);
+    int err_id = nomp_set_log(NOMP_HIP_FAILURE, NOMP_ERROR, ERR_STR_HIP_FAILURE,
+                              "build", msg);
+    nomp_free(log), nomp_free(msg);
     return err_id;
   }
 
   size_t code_size;
-  hiprtc_err = hiprtcGetCodeSize(prog, &code_size);
-  chk_hiprtc(hiprtc_err);
+  chk_hiprtc(hiprtcGetCodeSize(prog, &code_size));
 
-  char *code = tcalloc(char, code_size);
-  hiprtc_err = hiprtcGetCode(prog, code);
-  chk_hiprtc(hiprtc_err);
+  char *code = nomp_calloc(char, code_size);
+  chk_hiprtc(hiprtcGetCode(prog, code));
 
-  hiprtc_err = hiprtcDestroyProgram(&prog);
-  chk_hiprtc(hiprtc_err);
+  chk_hiprtc(hiprtcDestroyProgram(&prog));
 
-  struct hip_prog *hprg = tcalloc(struct hip_prog, 1);
+  struct hip_prog *hprg = nomp_calloc(struct hip_prog, 1);
   prg->bptr = hprg;
-  hipError_t hip_err = hipModuleLoadData(&hprg->module, code);
-  chk_hip(hip_err);
+  chk_hip(hipModuleLoadData(&hprg->module, code));
 
-  tfree(code);
+  nomp_free(code);
 
-  hip_err = hipModuleGetFunction(&hprg->kernel, hprg->module, name);
-  chk_hip(hip_err);
+  chk_hip(hipModuleGetFunction(&hprg->kernel, hprg->module, name));
 
   return 0;
 }
@@ -135,57 +119,63 @@ static int hip_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
     size_t size = va_arg(args, size_t);
     void *p = va_arg(args, void *);
     switch (type) {
-    case NOMP_INTEGER:
+    case NOMP_INT:
     case NOMP_FLOAT:
       break;
     case NOMP_PTR:
       m = mem_if_mapped(p);
-      if (m == NULL)
-        return set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
-                       ERR_STR_USER_MAP_PTR_IS_INVALID, p);
+      if (m == NULL) {
+        return nomp_set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
+                            ERR_STR_USER_MAP_PTR_IS_INVALID, p);
+      }
       p = &m->bptr;
       break;
     default:
-      return set_log(NOMP_USER_KNL_ARG_TYPE_IS_INVALID, NOMP_ERROR,
-                     ERR_STR_KNL_ARG_TYPE_IS_INVALID, type);
+      return nomp_set_log(NOMP_USER_KNL_ARG_TYPE_IS_INVALID, NOMP_ERROR,
+                          "Invalid libnomp kernel argument type %d.", type);
       break;
     }
     vargs[i] = p;
   }
 
   struct hip_prog *cprg = (struct hip_prog *)prg->bptr;
-  hipError_t err =
-      hipModuleLaunchKernel(cprg->kernel, global[0], global[1], global[2],
-                            local[0], local[1], local[2], 0, NULL, vargs, NULL);
-  return err != hipSuccess;
+  chk_hip(hipModuleLaunchKernel(cprg->kernel, global[0], global[1], global[2],
+                                local[0], local[1], local[2], 0, NULL, vargs,
+                                NULL));
+  return 0;
 }
 
 static int hip_knl_free(struct prog *prg) {
   struct hip_prog *cprg = (struct hip_prog *)prg->bptr;
-  int err = hipModuleUnload(cprg->module);
+  chk_hip(hipModuleUnload(cprg->module));
   return 0;
 }
 
 static int hip_finalize(struct backend *bnd) {
-  // Nothing to do
+#ifdef __HIP_PLATFORM_NVIDIA__
+  struct hip_backend *hbnd = (struct hip_backend *)bnd->bptr;
+  chk_hip(hipCtxDestroy(hbnd->ctx));
+#endif
   return 0;
 }
 
 int hip_init(struct backend *bnd, const int platform_id, const int device_id) {
   int num_devices;
-  hipError_t result = hipGetDeviceCount(&num_devices);
-  chk_hip(result);
-  if (device_id < 0 || device_id >= num_devices)
-    return set_log(NOMP_USER_DEVICE_IS_INVALID, NOMP_ERROR,
-                   ERR_STR_USER_DEVICE_IS_INVALID, device_id);
-  result = hipSetDevice(device_id);
-  chk_hip(result);
+  chk_hip(hipGetDeviceCount(&num_devices));
+  if (device_id < 0 || device_id >= num_devices) {
+    return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                        ERR_STR_USER_DEVICE_IS_INVALID, device_id);
+  }
+  chk_hip(hipSetDevice(device_id));
 
-  bnd->bptr = tcalloc(struct hip_backend, 1);
+  bnd->bptr = nomp_calloc(struct hip_backend, 1);
   struct hip_backend *hbnd = (struct hip_backend *)bnd->bptr;
   hbnd->device_id = device_id;
-  result = hipGetDeviceProperties(&hbnd->prop, device_id);
-  chk_hip(result);
+  chk_hip(hipGetDeviceProperties(&hbnd->prop, device_id));
+#ifdef __HIP_PLATFORM_NVIDIA__
+  chk_hip(hipInit(0));
+  chk_hip(hipCtxCreate(&hbnd->ctx, 0, hbnd->device_id));
+#endif
 
   bnd->update = hip_update;
   bnd->knl_build = hip_knl_build;

@@ -37,7 +37,7 @@ static int test_unmapped_variable(int id, int *a, int *b, int n) {
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_MAP_PTR_IS_INVALID);
 
   char *desc = nomp_get_log_str(err);
-  int eq = logcmp(desc, "\\[Error\\] .*\\/src\\/.*.c:[0-9]* Map pointer "
+  int eq = logcmp(desc, "\\[Error\\] .*\\/src\\/.*.[c|cpp]:[0-9]* Map pointer "
                         "0[xX][0-9a-fA-F]* was not found on device.");
   nomp_free(desc);
   nomp_test_assert(eq);

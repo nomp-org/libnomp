@@ -19,6 +19,10 @@
 #define MAX_SRC_SIZE 16384
 #define MAX_CFLAGS_SIZE 16384
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "nomp-aux.h"
 #include "nomp-log.h"
 #include "nomp-lpy.h"
@@ -114,5 +118,9 @@ int cuda_init(struct backend *backend, const int platform_id,
  */
 int hip_init(struct backend *backend, const int platform_id,
              const int device_id);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _LIB_NOMP_IMPL_H_
