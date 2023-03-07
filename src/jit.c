@@ -74,8 +74,9 @@ static int write_file(const char *path, const char *src) {
 static int compile_aux(const char *cc, const char *cflags, const char *src,
                        const char *out) {
   size_t len;
-  nomp_check(nomp_path_len(&len, cc));
-  len += strnlen(cflags, MAX_CFLAGS_SIZE) + strlen(src) + strlen(out) + 32;
+  //TODO: check nomp_path_len
+  // nomp_check(nomp_path_len(&len, cc));
+  len = strlen(cc) + strnlen(cflags, MAX_CFLAGS_SIZE) + strlen(src) + strlen(out) + 32;
 
   char *cmd = nomp_calloc(char, len);
   snprintf(cmd, len, "%s %s %s -o %s", cc, cflags, src, out);

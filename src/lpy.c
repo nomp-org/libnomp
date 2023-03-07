@@ -204,7 +204,7 @@ int py_get_sycl_knl_name_and_src(char **name, char **src, PyObject *knl) {
     }
     Py_DECREF(kernel_py);
   }
-  *src = nomp_str_cat(4, BUFSIZ, "#include <CL/sycl.hpp> \n", *src, "\n", src_);
+  *src = nomp_str_cat(3, BUFSIZ, *src, "\n", src_);
 
   if (err) {
     printf("Something went wrong here lpy.c \n");
