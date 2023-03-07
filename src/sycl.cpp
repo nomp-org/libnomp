@@ -21,12 +21,12 @@ static int sycl_update(struct backend *bnd, struct mem *m, const int op) {
   }
 
   if (op & NOMP_TO) {
-    sycl->queue.memcpy(m->bptr, m->hptr, (m->idx1 - m->idx0) * m->usize);
+    sycl->queue.memcpy(m->bptr, static_cast<char *>(m->hptr) + m->usize * m->idx0, (m->idx1 - m->idx0) * m->usize);
     sycl->queue.wait();
   }
 
   if (op == NOMP_FROM) {
-    sycl->queue.memcpy(m->hptr, m->bptr, (m->idx1 - m->idx0) * m->usize);
+    sycl->queue.memcpy(static_cast<char *>(m->hptr) + m->usize * m->idx0, m->bptr, (m->idx1 - m->idx0) * m->usize);
     sycl->queue.wait();
   } else if (op == NOMP_FREE) {
     sycl::free(m->bptr, sycl->ctx);
