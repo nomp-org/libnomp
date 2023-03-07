@@ -33,12 +33,17 @@ def create_kernel_wrapper_fun(knl):
     knl_name = lp.generate_code_v2(knl).device_programs[0].name
     args_list = set_args(knl.callables_table[knl_name].subkernel.args)
     args_length = len(knl.callables_table[knl_name].subkernel.args)
-    ndim = knl.default_entrypoint.get_grid_size_upper_bounds_as_exprs(
+    grid_size = knl.default_entrypoint.get_grid_size_upper_bounds_as_exprs(
         knl.callables_table
-    )[0]
+    )
+    py_global = grid_size[0]
+    py_local = grid_size[1]
+    ndim = len(py_global)
+    if len(py_global) < len(py_local):
+        ndim = len(py_local)
     knl_args = args_list + [
-        c.Value("*(sycl::queue *)", f"args[{args_length+1}]"),
-        c.Value(f"*(sycl::nd_range<{len(ndim)}> *)", f"args[{args_length}]"),
+        c.Value("*(sycl::queue *)", f"args[{args_length}]"),
+        c.Value(f"*(sycl::nd_range<{ndim}> *)", f"args[{args_length+1}]"),
     ]
     knl_function_call = c.FunctionDeclaration(c.Value("", knl_name), knl_args)
     function_args = [

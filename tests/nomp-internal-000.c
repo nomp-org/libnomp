@@ -7,7 +7,7 @@ static const char *add_src =
     "  return a + b;                                     \n"
     "}                                                   \n"
     "                                                    \n"
-    "void add_wrapper(void **p) {                        \n"
+    "extern \"C\" void add_wrapper(void **p) {           \n"
     "  int a = *((int *)p[0]);                           \n"
     "  int b = *((int *)p[1]);                           \n"
     "  *((int *)p[2]) = add(a, b);                       \n"
