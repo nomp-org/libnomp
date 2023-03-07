@@ -53,8 +53,7 @@ static int sycl_knl_build(struct backend *bnd, struct prog *prg,
   }
 
   char *wkdir = nomp_str_cat(3, BUFSIZ, cwd, "/", ".nomp_jit_cache");
-  err = jit_compile(&sycl->sycl_id, source, "icpx", "-fsycl -fPIC -shared",
-                    "kernel_function", wkdir);
+  err = jit_compile(&sycl->sycl_id, source, "icpx", "-fsycl -fPIC -shared","kernel_function", wkdir);
   return 0;
 }
 
@@ -63,7 +62,7 @@ static int sycl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
   struct mem *m;
   size_t size;
   sycl->queue = sycl::queue(sycl->ctx, sycl->device_id);
-  void *arg_list[prg->nargs];
+  void *arg_list[prg->nargs + 2];
   int err;
   for (int i = 0; i < prg->nargs; i++) {
     const char *var = va_arg(args, const char *);
@@ -89,6 +88,29 @@ static int sycl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
     }
     arg_list[i] = p;
   }
+
+  size_t global[3];
+  for (unsigned i = 0; i < prg->ndim; i++)
+    global[i] = prg->global[i] * prg->local[i];
+
+  if(prg->ndim == 1){
+    sycl::range global_range = sycl::range(global[0]);
+    sycl::range local_range = sycl::range(prg->local[0]);
+    sycl::nd_range<1> nd_range = sycl::nd_range(global_range, local_range);
+    arg_list[prg->nargs] = (void *) &nd_range;
+  }else if(prg->ndim == 2){
+    sycl::range global_range = sycl::range(global[0], global[1]);
+    sycl::range local_range = sycl::range(prg->local[0], prg->local[1]);
+    sycl::nd_range<2> nd_range = sycl::nd_range(global_range, local_range);
+    arg_list[prg->nargs] = (void *) &nd_range;
+  }else if(prg->ndim == 3){
+    sycl::range global_range = sycl::range(global[0], global[1], global[2]);
+    sycl::range local_range = sycl::range(prg->local[0], prg->local[1], prg->local[2]);
+    sycl::nd_range<3> nd_range = sycl::nd_range(global_range, local_range);
+    arg_list[prg->nargs] = (void *) &nd_range;
+  }
+
+  arg_list[prg->nargs+1] = (void *) &sycl->queue;
 
   err = jit_run(sycl->sycl_id, arg_list);
   return err;
