@@ -28,24 +28,25 @@ def set_args(args):
     return args_list
 
 
-def create_kernel_wrapper_fun(knl): 
+def create_kernel_wrapper_fun(knl):
     """Create SYCL kernel wrapper"""
     knl_name = lp.generate_code_v2(knl).device_programs[0].name
     args_list = set_args(knl.callables_table[knl_name].subkernel.args)
-    knl_args = args_list + [c.Value("", "queue"), c.Value("", "nd_range")]
+    args_length = len(knl.callables_table[knl_name].subkernel.args)
     ndim = knl.default_entrypoint.get_grid_size_upper_bounds_as_exprs(
         knl.callables_table
     )[0]
+    knl_args = args_list + [
+        c.Value("*(sycl::queue *)", f"args[{args_length+1}]"),
+        c.Value(f"*(sycl::nd_range<{len(ndim)}> *)", f"args[{args_length}]"),
+    ]
     knl_function_call = c.FunctionDeclaration(c.Value("", knl_name), knl_args)
     function_args = [
-        c.Value("sycl::queue", "queue"),
-        c.Value(f"sycl::nd_range<{len(ndim)}>", "nd_range"),
-        c.Value("unsigned int", "nargs"),
         c.Value("void", "**args"),
     ]
     function_body = c.FunctionBody(
         c.FunctionDeclaration(
-            c.Value('extern "C" void', f"kernel_function"), function_args
+            c.Value('extern "C" void', "kernel_function"), function_args
         ),
         c.Block(([knl_function_call])),
     )
