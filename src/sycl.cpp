@@ -16,19 +16,27 @@ static int sycl_update(struct backend *bnd, struct mem *m, const int op) {
   struct sycl_backend *sycl = (struct sycl_backend *)bnd->bptr;
 
   if (op & NOMP_ALLOC) {
+    // TODO: check and handle errors
     m->bptr = sycl::malloc_device((m->idx1 - m->idx0) * m->usize,
                                   sycl->device_id, sycl->ctx);
   }
 
   if (op & NOMP_TO) {
-    sycl->queue.memcpy(m->bptr, static_cast<char *>(m->hptr) + m->usize * m->idx0, (m->idx1 - m->idx0) * m->usize);
+    // TODO: check and handle errors
+    sycl->queue.memcpy(m->bptr,
+                       static_cast<char *>(m->hptr) + m->usize * m->idx0,
+                       (m->idx1 - m->idx0) * m->usize);
     sycl->queue.wait();
   }
 
   if (op == NOMP_FROM) {
-    sycl->queue.memcpy(static_cast<char *>(m->hptr) + m->usize * m->idx0, m->bptr, (m->idx1 - m->idx0) * m->usize);
+    // TODO: check and handle errors
+    sycl->queue.memcpy(static_cast<char *>(m->hptr) + m->usize * m->idx0,
+                       m->bptr, (m->idx1 - m->idx0) * m->usize);
     sycl->queue.wait();
   } else if (op == NOMP_FREE) {
+    // TODO: check and handle errors
+    // TODO: use nomp_free instead if possible
     sycl::free(m->bptr, sycl->ctx);
     m->bptr = NULL;
   }
@@ -47,13 +55,18 @@ static int sycl_knl_build(struct backend *bnd, struct prog *prg,
   int err;
 
   char cwd[BUFSIZ];
+  // TODO: use nomp_check() instead
   if (getcwd(cwd, BUFSIZ) == NULL) {
     printf("Error in cwd");
     return 0;
   }
 
   char *wkdir = nomp_str_cat(3, BUFSIZ, cwd, "/", ".nomp_jit_cache");
-  err = jit_compile(&sycl->sycl_id, source, "icpx", "-fsycl -fPIC -shared","kernel_function", wkdir);
+  // TODO: make icpx path generic
+  err = jit_compile(&sycl->sycl_id, source,
+                    "/opt/intel/oneapi/compiler/2023.0.0/linux/bin/icpx",
+                    "-fsycl -fPIC -shared", "kernel_function", wkdir);
+  // TODO: use nomp_set_log() to handle err
   return 0;
 }
 
@@ -89,33 +102,33 @@ static int sycl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
     arg_list[i] = p;
   }
 
-  arg_list[prg->nargs] = (void *) &sycl->queue;
+  arg_list[prg->nargs] = (void *)&sycl->queue;
 
   size_t global[3];
   for (unsigned i = 0; i < prg->ndim; i++)
     global[i] = prg->global[i] * prg->local[i];
 
-  if(prg->ndim == 1){
+  if (prg->ndim == 1) {
     sycl::range global_range = sycl::range(global[0]);
     sycl::range local_range = sycl::range(prg->local[0]);
     sycl::nd_range<1> nd_range = sycl::nd_range(global_range, local_range);
-    arg_list[prg->nargs+1] = (void *) &nd_range;
+    arg_list[prg->nargs + 1] = (void *)&nd_range;
     err = jit_run(sycl->sycl_id, arg_list);
-  }else if(prg->ndim == 2){
+  } else if (prg->ndim == 2) {
     sycl::range global_range = sycl::range(global[0], global[1]);
     sycl::range local_range = sycl::range(prg->local[0], prg->local[1]);
     sycl::nd_range<2> nd_range = sycl::nd_range(global_range, local_range);
-    arg_list[prg->nargs+1] = (void *) &nd_range;
+    arg_list[prg->nargs + 1] = (void *)&nd_range;
     err = jit_run(sycl->sycl_id, arg_list);
-  }else if(prg->ndim == 3){
+  } else if (prg->ndim == 3) {
     sycl::range global_range = sycl::range(global[0], global[1], global[2]);
-    sycl::range local_range = sycl::range(prg->local[0], prg->local[1], prg->local[2]);
+    sycl::range local_range =
+        sycl::range(prg->local[0], prg->local[1], prg->local[2]);
     sycl::nd_range<3> nd_range = sycl::nd_range(global_range, local_range);
-    arg_list[prg->nargs+1] = (void *) &nd_range;
+    arg_list[prg->nargs + 1] = (void *)&nd_range;
     err = jit_run(sycl->sycl_id, arg_list);
   }
-
-  
+  // TODO: use nomp_set_log() to handle err
   return err;
 }
 
@@ -123,6 +136,7 @@ static int sycl_finalize(struct backend *bnd) {
   int err;
   struct sycl_backend *sycl = (sycl_backend *)bnd->bptr;
   err = jit_free(&sycl->sycl_id);
+  // TODO: use nomp_set_log() to handle err
   nomp_free(bnd->bptr), bnd->bptr = NULL;
   return 0;
 }
