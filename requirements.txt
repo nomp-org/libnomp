@@ -1,4 +1,4 @@
-git+https://github.com/inducer/loopy.git#egg=loopy
+git+https://github.com/pubuduprabhathiya/loopy.git@sycl#egg=loopy
 libclang==14.0.6
 pymbolic==2022.1
 pytools==2022.1.12
