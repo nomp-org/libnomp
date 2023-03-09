@@ -211,9 +211,11 @@ int py_get_sycl_knl_name_and_src(char **name, char **src, PyObject *knl) {
   }
   *src = nomp_str_cat(4, BUFSIZ, "#include <CL/sycl.hpp>\n", *src, "\n", src_);
 
+  // TODO: use nomp_check instead
   if (err) {
     printf("Something went wrong here lpy.c \n");
   }
+  return err;
 }
 
 int py_get_grid_size(struct prog *prg, PyObject *knl) {
