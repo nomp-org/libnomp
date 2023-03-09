@@ -17,10 +17,16 @@ static int test_matrix_transform() {
 }
 
 int main(int argc, const char *argv[]) {
-  const char *args[] = {"--nomp-backend",  "opencl",  "--nomp-device", "0",
-                        "--nomp-platform", "0",       "--nomp-script", "sem",
-                        "--nomp-function", "annotate"};
-  int err = nomp_init(10, args);
+  const char *additionalArgs[4] = {"--nomp-script", "sem", "--nomp-function",
+                                   "annotate"};
+  const int newArgc = argc + 4;
+  const char *newArgv[newArgc];
+  for (int i = 0; i < argc; i++)
+    newArgv[i] = argv[i];
+  for (int i = 0; i < 4; i++)
+    newArgv[argc + i] = additionalArgs[i];
+
+  int err = nomp_init(newArgc, newArgv);
   nomp_check(err);
 
   err |= SUBTEST(test_matrix_addition);
