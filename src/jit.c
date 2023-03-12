@@ -129,25 +129,27 @@ int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
   nomp_check(compile_aux(cc, cflags, src, lib));
   nomp_free(src);
 
-  // if (funcs_n == funcs_max) {
-  //   funcs_max += funcs_max / 2 + 1;
-  //   funcs = nomp_realloc(funcs, struct function *, funcs_max);
-  // }
+  if (id) {
+    if (funcs_n == funcs_max) {
+      funcs_max += funcs_max / 2 + 1;
+      funcs = nomp_realloc(funcs, struct function *, funcs_max);
+    }
 
-  // void (*dlf)() = NULL;
-  // void *dlh = dlopen(lib, RTLD_LAZY | RTLD_LOCAL);
-  // if (dlh && entry)
-  //   dlf = dlsym(dlh, entry);
-  // nomp_free(lib);
+    void (*dlf)() = NULL;
+    void *dlh = dlopen(lib, RTLD_LAZY | RTLD_LOCAL);
+    if (dlh && entry)
+      dlf = dlsym(dlh, entry);
+    nomp_free(lib);
 
-  // if (dlh == NULL || dlf == NULL) {
-  //   return nomp_set_log(
-  //       NOMP_JIT_FAILURE, NOMP_ERROR,
-  //       "Failed to open object/symbol \"%s\" due to error: \"%s\".", dlerror());
-  // }
+    if (dlh == NULL || dlf == NULL) {
+      return nomp_set_log(
+          NOMP_JIT_FAILURE, NOMP_ERROR,
+          "Failed to open object/symbol \"%s\" due to error: \"%s\".", dlerror());
+    }
 
-  // struct function *f = funcs[funcs_n] = nomp_calloc(struct function, 1);
-  // f->dlh = dlh, f->dlf = (void (*)(void **))dlf, *id = funcs_n++;
+    struct function *f = funcs[funcs_n] = nomp_calloc(struct function, 1);
+    f->dlh = dlh, f->dlf = (void (*)(void **))dlf, *id = funcs_n++;
+  }
 
   return 0;
 }

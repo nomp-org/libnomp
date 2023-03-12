@@ -70,12 +70,10 @@ static int ispc_knl_build(struct backend *bnd, struct prog *prg,
   }
 
   char *wkdir = nomp_str_cat(3, BUFSIZ, cwd, "/", ".nomp_jit_cache");
-  int ispc_id = -1;
   int err =
-      jit_compile(&ispc_id, source, ispc->ispc_cc, ISPCRT_INCLUDE_DIR_FLAGS,
+      jit_compile(NULL, source, ispc->ispc_cc, ISPCRT_INCLUDE_DIR_FLAGS,
                   NULL, wkdir, "simple.ispc", "simple.dev.o", 1);
-  int cc_id = -1;
-  err = jit_compile(&cc_id, source, ispc->cc, "-fPIC -shared", NULL, wkdir,
+  err = jit_compile(NULL, source, ispc->cc, "-fPIC -shared", NULL, wkdir,
                     "simple.dev.o", "libfoo.so", 0);
   free(wkdir);
 

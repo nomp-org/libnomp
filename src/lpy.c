@@ -2,6 +2,7 @@
 
 static const char *loopy_api = "loopy_api";
 static const char *c_to_loopy = "c_to_loopy";
+static const char *ispc_api = "ispc_api";
 static const char *get_ispc_entry_point_fun = "get_ispc_entry_point";
 static const char *get_ispc_wrapper_fun = "create_ispc_kernel_with_wrapper";
 
@@ -188,9 +189,9 @@ int py_get_knl_name_and_src(char **name, char **src, PyObject *knl) {
 
 int py_get_ispc_knl_name_and_src(char **name, char **src, PyObject *knl) {
   int err = 1;
-  PyObject *lpy_api = PyUnicode_FromString(loopy_api);
-  if (lpy_api) {
-    PyObject *module = PyImport_Import(lpy_api);
+  PyObject *i_api = PyUnicode_FromString(ispc_api);
+  if (i_api) {
+    PyObject *module = PyImport_Import(i_api);
     if (module) {
       PyObject *get_ispc_entry_point =
           PyObject_GetAttrString(module, get_ispc_entry_point_fun);
@@ -207,7 +208,7 @@ int py_get_ispc_knl_name_and_src(char **name, char **src, PyObject *knl) {
       }
 
       if (err) {
-        Py_DECREF(module), Py_DECREF(lpy_api);
+        Py_DECREF(module), Py_DECREF(i_api);
         return nomp_set_log(NOMP_LOOPY_KNL_NAME_NOT_FOUND, NOMP_ERROR,
                             "Unable to get loopy kernel name.");
       }
@@ -229,7 +230,7 @@ int py_get_ispc_knl_name_and_src(char **name, char **src, PyObject *knl) {
 
       Py_DECREF(module);
     }
-    Py_DECREF(lpy_api);
+    Py_DECREF(i_api);
   }
 
   if (err) {
