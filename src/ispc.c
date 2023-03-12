@@ -7,6 +7,7 @@ static const char *ERR_STR_ISPC_FAILURE = "ISPC %s failed with error code: %d.";
 struct ispc_backend {
   char *ispc_cc, *cc;
   ISPCRTDevice device;
+  ISPCRTDeviceType device_type;
   ISPCRTTaskQueue queue;
   ISPCRTNewMemoryViewFlags flags;
 };
@@ -76,7 +77,8 @@ static int ispc_knl_build(struct backend *bnd, struct prog *prg,
   err = jit_compile(NULL, source, ispc->cc, "-fPIC -shared", NULL, wkdir,
                     "simple.dev.o", "libfoo.so", NOMP_DO_NOT_WRITE,
                     NOMP_OVERWRITE, NOMP_NO_NEW_DIR);
-  free(wkdir);
+  nomp_free(wkdir);
+  // TODO: add err checks for compile
 
   // Create module and kernel to execute
   ISPCRTModuleOptions options = {};
@@ -90,8 +92,7 @@ static int ispc_knl_build(struct backend *bnd, struct prog *prg,
   ispc_prg->kernel =
       ispcrtNewKernel(ispc->device, ispc_prg->module, "main_ispc");
   if (rt_error != ISPCRT_NO_ERROR) {
-    ispc_prg->module = NULL;
-    ispc_prg->kernel = NULL;
+    ispc_prg->module = NULL, ispc_prg->kernel = NULL;
     return nomp_set_log(NOMP_ISPC_FAILURE, NOMP_ERROR, ERR_STR_ISPC_FAILURE,
                         "kernel build", rt_error);
   }
@@ -101,11 +102,11 @@ static int ispc_knl_build(struct backend *bnd, struct prog *prg,
 static int ispc_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
   const int ndim = prg->ndim, nargs = prg->nargs;
   size_t *global = prg->global;
-  size_t num_bytes = 0;
+  size_t num_bytes = sizeof(void *) * (nargs + 3);
 
   int i;
   struct mem *m;
-  void **vargs = calloc(nargs + 3, sizeof(void *));
+  void *vargs[nargs + 3];
   for (i = 0; i < nargs; i++) {
     const char *var = va_arg(args, const char *);
     int type = va_arg(args, int);
@@ -130,6 +131,7 @@ static int ispc_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
     }
     vargs[i] = p;
   }
+
   int default_dim = 1;
   for (int d = 0; d < 3; d++) {
     if (d < ndim)
@@ -137,6 +139,7 @@ static int ispc_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
     else
       vargs[i + d] = &default_dim;
   }
+
   struct ispc_backend *ispc = (struct ispc_backend *)bnd->bptr;
   ISPCRTMemoryView params =
       ispcrtNewMemoryView(ispc->device, vargs, num_bytes, &(ispc->flags));
@@ -147,7 +150,6 @@ static int ispc_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
   ispcrtLaunch3D(ispc->queue, iprg->kernel, params, 1, 1, 1);
   ispcrtSync(ispc->queue);
   chk_ispcrt("kernel run", rt_error);
-  free(vargs);
   ispcrtRelease(iprg->kernel);
   chk_ispcrt("kernel release", rt_error);
   ispcrtRelease(iprg->module);
@@ -167,13 +169,13 @@ static int ispc_finalize(struct backend *bnd) {
   return 0;
 }
 
-static int nomp_to_ispc_device[3] = {
-    ISPCRT_DEVICE_TYPE_CPU, ISPCRT_DEVICE_TYPE_GPU, ISPCRT_DEVICE_TYPE_AUTO};
+static int nomp_to_ispc_device[2] = {
+    ISPCRT_DEVICE_TYPE_CPU, ISPCRT_DEVICE_TYPE_GPU};
 
 int ispc_init(struct backend *bnd, const int platform_type,
               const int device_id) {
   ispcrtSetErrorFunc(ispcrt_error);
-  if (platform_type < 0 | platform_type >= 3) {
+  if (platform_type < 0 | platform_type >= 2) {
     return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                         "Platform type %d provided to libnomp is not valid.",
                         platform_type);
@@ -190,6 +192,7 @@ int ispc_init(struct backend *bnd, const int platform_type,
   struct ispc_backend *ispc = bnd->bptr = nomp_calloc(struct ispc_backend, 1);
   ispc->flags.allocType = ISPCRT_ALLOC_TYPE_DEVICE;
   ispc->device = device;
+  ispc->device_type = platform_type;
   ispc->queue = ispcrtNewTaskQueue(device);
   ispc->ispc_cc = "ispc";
   ispc->cc = "/usr/bin/cc";

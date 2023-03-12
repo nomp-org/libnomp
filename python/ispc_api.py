@@ -1,4 +1,4 @@
-"""Loopy API wrapper"""
+"""ISPC loopy kernel wrapper"""
 
 import loopy as lp
 import numpy as np
