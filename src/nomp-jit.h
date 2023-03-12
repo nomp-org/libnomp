@@ -12,6 +12,8 @@ typedef enum {
   NOMP_OVERWRITE = 1
 } nomp_file_overwrite;
 
+typedef enum { NOMP_NO_NEW_DIR = 0, NOMP_NEW_DIR = 1 } nomp_make_dir;
+
 /**
  * @ingroup nomp_compile_utils
  * @brief JIT compile a source string at runtime.
@@ -34,12 +36,14 @@ typedef enum {
  * @param[in] libf Output file name.
  * @param[in] to_wrt Required to write to a file.
  * @param[in] overwrite Required to over write if the file already exists.
+ * @param[in] sub_dir Create a new directory inside the working directory.
  *
  * @return int
  */
 int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
                 const char *entry, const char *wrkdir, const char *srcf,
-                const char *libf, const int to_wrt, const int overwrite);
+                const char *libf, const int to_wrt, const int overwrite,
+                const int sub_dir);
 
 /**
  * @ingroup nomp_compile_utils

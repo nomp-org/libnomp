@@ -72,10 +72,10 @@ static int ispc_knl_build(struct backend *bnd, struct prog *prg,
   char *wkdir = nomp_str_cat(3, BUFSIZ, cwd, "/", ".nomp_jit_cache");
   int err = jit_compile(NULL, source, ispc->ispc_cc, ISPCRT_INCLUDE_DIR_FLAGS,
                         NULL, wkdir, "simple.ispc", "simple.dev.o", NOMP_WRITE,
-                        NOMP_OVERWRITE);
+                        NOMP_OVERWRITE, NOMP_NO_NEW_DIR);
   err = jit_compile(NULL, source, ispc->cc, "-fPIC -shared", NULL, wkdir,
                     "simple.dev.o", "libfoo.so", NOMP_DO_NOT_WRITE,
-                    NOMP_OVERWRITE);
+                    NOMP_OVERWRITE, NOMP_NO_NEW_DIR);
   free(wkdir);
 
   // Create module and kernel to execute

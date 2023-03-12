@@ -5,7 +5,8 @@
 #include <openssl/sha.h>
 #include <unistd.h>
 
-static int make_knl_dir(char **dir_, const char *knl_dir, const char *src) {
+static int make_knl_dir(char **dir_, const char *knl_dir, const char *src,
+                        const int sub_dir) {
   size_t len = strnlen(src, MAX_SRC_SIZE);
   if (len == MAX_SRC_SIZE) {
     return nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
@@ -22,35 +23,41 @@ static int make_knl_dir(char **dir_, const char *knl_dir, const char *src) {
     }
   }
 
-  unsigned char *s = nomp_calloc(unsigned char, len + 1);
-  for (unsigned i = 0; i < len; i++)
-    s[i] = src[i];
+  if (sub_dir) {
+    unsigned char *s = nomp_calloc(unsigned char, len + 1);
+    for (unsigned i = 0; i < len; i++)
+      s[i] = src[i];
 
-  unsigned char md[SHA256_DIGEST_LENGTH], *ret = SHA256(s, len, md);
-  if (ret == NULL) {
-    return nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
-                        "Unable to calculate SHA256 hash of string: \"%s\".",
-                        s);
-  }
-  nomp_free(s);
-
-  char *hash = nomp_calloc(char, 2 * SHA256_DIGEST_LENGTH + 1);
-  for (unsigned i = 0; i < SHA256_DIGEST_LENGTH; i++)
-    snprintf(&hash[2 * i], 3, "%02hhX", md[i]);
-
-  nomp_check(nomp_path_len(&len, knl_dir));
-  unsigned lmax = nomp_max(2, len, SHA256_DIGEST_LENGTH);
-
-  // Create the folder if it doesn't exist.
-  char *dir = *dir_ = nomp_str_cat(3, lmax, knl_dir, "/", "hash123");
-  if (access(dir, F_OK) == -1) {
-    if (mkdir(dir, S_IRWXU) == -1) {
+    unsigned char md[SHA256_DIGEST_LENGTH], *ret = SHA256(s, len, md);
+    if (ret == NULL) {
       return nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
-                          "Unable to create directory: %s. Error: %s.", dir,
-                          strerror(errno));
+                          "Unable to calculate SHA256 hash of string: \"%s\".",
+                          s);
     }
+    nomp_free(s);
+
+    char *hash = nomp_calloc(char, 2 * SHA256_DIGEST_LENGTH + 1);
+    for (unsigned i = 0; i < SHA256_DIGEST_LENGTH; i++)
+      snprintf(&hash[2 * i], 3, "%02hhX", md[i]);
+
+    nomp_check(nomp_path_len(&len, knl_dir));
+    unsigned lmax = nomp_max(2, len, SHA256_DIGEST_LENGTH);
+
+    // Create the folder if it doesn't exist.
+    char *dir = *dir_ = nomp_str_cat(3, lmax, knl_dir, "/", hash);
+    if (access(dir, F_OK) == -1) {
+      if (mkdir(dir, S_IRWXU) == -1) {
+        return nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
+                            "Unable to create directory: %s. Error: %s.", dir,
+                            strerror(errno));
+      }
+    }
+    nomp_free(hash);
+  } else {
+    size_t ldir = strnlen(knl_dir, PATH_MAX);
+    *dir_ = nomp_calloc(char, ldir);
+    strncpy(*dir_, knl_dir, ldir);
   }
-  nomp_free(hash);
 
   return 0;
 }
@@ -112,9 +119,10 @@ static unsigned funcs_n = 0, funcs_max = 0;
 
 int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
                 const char *entry, const char *wrkdir, const char *srcf,
-                const char *libf, const int to_wrt, const int overwrite) {
+                const char *libf, const int to_wrt, const int overwrite,
+                const int sub_dir) {
   char *dir = NULL;
-  nomp_check(make_knl_dir(&dir, wrkdir, source));
+  nomp_check(make_knl_dir(&dir, wrkdir, source, sub_dir));
 
   size_t ldir;
   nomp_check(nomp_path_len(&ldir, dir));
@@ -122,10 +130,10 @@ int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
   size_t max = nomp_max(3, ldir, strnlen(srcf, 64), strnlen(libf, 64));
   char *src = nomp_str_cat(3, max, dir, "/", srcf);
   char *lib = nomp_str_cat(3, max, dir, "/", libf);
+  nomp_free(dir);
 
   if (to_wrt)
     nomp_check(write_file(src, source, overwrite));
-  nomp_free(dir);
   nomp_check(compile_aux(cc, cflags, src, lib));
   nomp_free(src);
 

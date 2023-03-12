@@ -16,7 +16,6 @@ from loopy.target.c.compyte.dtypes import (
     fill_registry_with_c_types,
 )
 from pytools import UniqueNameGenerator
-import cgen as c
 
 LOOPY_LANG_VERSION = (2018, 2)
 LOOPY_INSN_PREFIX = "_nomp_insn"
