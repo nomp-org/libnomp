@@ -186,29 +186,31 @@ int py_get_sycl_knl_name_and_src(char **name, char **src, PyObject *knl) {
   int err = 1;
   err = py_get_knl_name_and_src(name, src, knl);
 
-  const char *src_;
-  PyObject *kernel_py = PyUnicode_FromString(kernel_wrapper);
-  if (kernel_py) {
-    PyObject *module = PyImport_Import(kernel_py);
-    if (module) {
-      PyObject *c_to_lpy =
-          PyObject_GetAttrString(module, create_kernel_wrapper_fun);
-      if (c_to_lpy) {
-        PyObject *kernelfun = PyObject_CallFunctionObjArgs(c_to_lpy, knl, NULL);
+  const char *knl_wrppr;
+  PyObject *knl_wrppr_py = PyUnicode_FromString(kernel_wrapper);
+  if (knl_wrppr_py) {
+    PyObject *mod = PyImport_Import(knl_wrppr_py);
+    if (mod) {
+      PyObject *knl_wrppr_func_mod =
+          PyObject_GetAttrString(mod, create_kernel_wrapper_fun);
+      if (knl_wrppr_func_mod) {
+        PyObject *knl_wrppr_func =
+            PyObject_CallFunctionObjArgs(knl_wrppr_func_mod, knl, NULL);
         Py_ssize_t size;
-        src_ = PyUnicode_AsUTF8AndSize(kernelfun, &size);
-        Py_DECREF(kernelfun);
-        Py_DECREF(c_to_lpy);
+        knl_wrppr = PyUnicode_AsUTF8AndSize(knl_wrppr_func, &size);
+        Py_DECREF(knl_wrppr_func);
+        Py_DECREF(knl_wrppr_func_mod);
       }
-      Py_DECREF(module);
+      Py_DECREF(mod);
     }
-    Py_DECREF(kernel_py);
+    Py_DECREF(knl_wrppr_py);
   }
-  *src = nomp_str_cat(4, BUFSIZ, "#include <CL/sycl.hpp>\n", *src, "\n", src_);
+  *src = nomp_str_cat(4, BUFSIZ, "#include <CL/sycl.hpp>\n", *src, "\n",
+                      knl_wrppr);
 
-  // TODO: use nomp_check instead
   if (err) {
-    printf("Something went wrong here lpy.c \n");
+    return nomp_set_log(NOMP_LOOPY_KNL_NAME_NOT_FOUND, NOMP_ERROR,
+                        "Unable to get loopy kernel name.");
   }
   return err;
 }

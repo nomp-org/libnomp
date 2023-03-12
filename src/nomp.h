@@ -197,6 +197,11 @@
  * @ingroup nomp_errors
  * @brief libnomp source compilation failure.
  */
+#define NOMP_SYCL_FAILURE -514
+/**
+ * @ingroup nomp_errors
+ * @brief libnomp source compilation failure.
+ */
 #define NOMP_JIT_FAILURE -524
 
 #ifdef __cplusplus
