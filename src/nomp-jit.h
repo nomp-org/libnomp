@@ -5,6 +5,13 @@
  * @defgroup nomp_compile_utils Functions to compile source at runtime.
  */
 
+typedef enum { NOMP_DO_NOT_WRITE = 0, NOMP_WRITE = 1 } nomp_file_write;
+
+typedef enum {
+  NOMP_DO_NOT_OVERWRITE = 0,
+  NOMP_OVERWRITE = 1
+} nomp_file_overwrite;
+
 /**
  * @ingroup nomp_compile_utils
  * @brief JIT compile a source string at runtime.
@@ -25,13 +32,14 @@
  * temporaries.
  * @param[in] srcf File name to store source text.
  * @param[in] libf Output file name.
- * @param[in] to_wrt Requierd to write to a file.
+ * @param[in] to_wrt Required to write to a file.
+ * @param[in] overwrite Required to over write if the file already exists.
  *
  * @return int
  */
 int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
                 const char *entry, const char *wrkdir, const char *srcf,
-                const char *libf, const int to_wrt);
+                const char *libf, const int to_wrt, const int overwrite);
 
 /**
  * @ingroup nomp_compile_utils

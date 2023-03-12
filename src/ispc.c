@@ -70,11 +70,12 @@ static int ispc_knl_build(struct backend *bnd, struct prog *prg,
   }
 
   char *wkdir = nomp_str_cat(3, BUFSIZ, cwd, "/", ".nomp_jit_cache");
-  int err =
-      jit_compile(NULL, source, ispc->ispc_cc, ISPCRT_INCLUDE_DIR_FLAGS,
-                  NULL, wkdir, "simple.ispc", "simple.dev.o", 1);
+  int err = jit_compile(NULL, source, ispc->ispc_cc, ISPCRT_INCLUDE_DIR_FLAGS,
+                        NULL, wkdir, "simple.ispc", "simple.dev.o", NOMP_WRITE,
+                        NOMP_OVERWRITE);
   err = jit_compile(NULL, source, ispc->cc, "-fPIC -shared", NULL, wkdir,
-                    "simple.dev.o", "libfoo.so", 0);
+                    "simple.dev.o", "libfoo.so", NOMP_DO_NOT_WRITE,
+                    NOMP_OVERWRITE);
   free(wkdir);
 
   // Create module and kernel to execute
@@ -111,21 +112,21 @@ static int ispc_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
     size_t size = va_arg(args, size_t);
     void *p = va_arg(args, void *);
     switch (type) {
-      case NOMP_INT:
-      case NOMP_UINT:
-      case NOMP_FLOAT:
-        break;
-      case NOMP_PTR:
-        m = mem_if_mapped(p);
-        if (m == NULL)
-          return nomp_set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
-                              ERR_STR_USER_MAP_PTR_IS_INVALID, p);
-        p = ispcrtDevicePtr((ISPCRTMemoryView)(m->bptr));
-        break;
-      default:
-        return nomp_set_log(NOMP_USER_KNL_ARG_TYPE_IS_INVALID, NOMP_ERROR,
-                            "Kernel argument type %d is not valid.", type);
-        break;
+    case NOMP_INT:
+    case NOMP_UINT:
+    case NOMP_FLOAT:
+      break;
+    case NOMP_PTR:
+      m = mem_if_mapped(p);
+      if (m == NULL)
+        return nomp_set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
+                            ERR_STR_USER_MAP_PTR_IS_INVALID, p);
+      p = ispcrtDevicePtr((ISPCRTMemoryView)(m->bptr));
+      break;
+    default:
+      return nomp_set_log(NOMP_USER_KNL_ARG_TYPE_IS_INVALID, NOMP_ERROR,
+                          "Kernel argument type %d is not valid.", type);
+      break;
     }
     vargs[i] = p;
   }
@@ -154,9 +155,7 @@ static int ispc_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
   return 0;
 }
 
-static int ispc_knl_free(struct prog *prg) {
-  return 0;
-}
+static int ispc_knl_free(struct prog *prg) { return 0; }
 
 static int ispc_finalize(struct backend *bnd) {
   struct ispc_backend *ispc = (struct ispc_backend *)bnd->bptr;

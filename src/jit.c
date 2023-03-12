@@ -55,9 +55,9 @@ static int make_knl_dir(char **dir_, const char *knl_dir, const char *src) {
   return 0;
 }
 
-static int write_file(const char *path, const char *src) {
-  // See if source.cpp exist. Otherwise create it.
-  // if (access(path, F_OK) == -1) {
+static int write_file(const char *path, const char *src, const int overwrite) {
+  // See if source exist. Otherwise create it.
+  if (access(path, F_OK) == -1 || overwrite) {
     FILE *fp = fopen(path, "w");
     if (fp != NULL) {
       fprintf(fp, "%s", src);
@@ -66,7 +66,7 @@ static int write_file(const char *path, const char *src) {
       return nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
                           "Unable to write file: %s.", path);
     }
-  // }
+  }
 
   return 0;
 }
@@ -112,7 +112,7 @@ static unsigned funcs_n = 0, funcs_max = 0;
 
 int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
                 const char *entry, const char *wrkdir, const char *srcf,
-                const char *libf, const int to_wrt) {
+                const char *libf, const int to_wrt, const int overwrite) {
   char *dir = NULL;
   nomp_check(make_knl_dir(&dir, wrkdir, source));
 
@@ -124,7 +124,7 @@ int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
   char *lib = nomp_str_cat(3, max, dir, "/", libf);
 
   if (to_wrt)
-    nomp_check(write_file(src, source));
+    nomp_check(write_file(src, source, overwrite));
   nomp_free(dir);
   nomp_check(compile_aux(cc, cflags, src, lib));
   nomp_free(src);
@@ -144,7 +144,8 @@ int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
     if (dlh == NULL || dlf == NULL) {
       return nomp_set_log(
           NOMP_JIT_FAILURE, NOMP_ERROR,
-          "Failed to open object/symbol \"%s\" due to error: \"%s\".", dlerror());
+          "Failed to open object/symbol \"%s\" due to error: \"%s\".",
+          dlerror());
     }
 
     struct function *f = funcs[funcs_n] = nomp_calloc(struct function, 1);
