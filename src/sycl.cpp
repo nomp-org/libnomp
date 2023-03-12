@@ -1,44 +1,67 @@
 #include "nomp-impl.h"
 #include "nomp-jit.h"
-#include <CL/opencl.h>
 #include <CL/sycl.hpp>
-#include <dlfcn.h>
 
-// TODO: Handle errors properly in SYCL backend
+static const char *ERR_STR_SYCL_FAILURE = "SYCL backend failed with error: %s.";
+
+#define chk_cl(call, msg)                                                      \
+  {                                                                            \
+    cl_int err = (call);                                                       \
+    if (err != CL_SUCCESS) {                                                   \
+      return nomp_set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR,                     \
+                          ERR_STR_OPENCL_FAILURE, msg, err);                   \
+    }                                                                          \
+  }
+
 struct sycl_backend {
   sycl::device device_id;
   sycl::queue queue;
   sycl::context ctx;
-  int sycl_id = -1;
+  int sycl_id;
 };
 
 static int sycl_update(struct backend *bnd, struct mem *m, const int op) {
   struct sycl_backend *sycl = (struct sycl_backend *)bnd->bptr;
 
   if (op & NOMP_ALLOC) {
-    // TODO: check and handle errors
-    m->bptr = sycl::malloc_device((m->idx1 - m->idx0) * m->usize,
-                                  sycl->device_id, sycl->ctx);
+    try {
+      m->bptr = sycl::malloc_device((m->idx1 - m->idx0) * m->usize,
+                                    sycl->device_id, sycl->ctx);
+    } catch (const std::exception &ex) {
+      return nomp_set_log(NOMP_SYCL_FAILURE, NOMP_ERROR, ERR_STR_SYCL_FAILURE,
+                          ex.what());
+    }
   }
 
   if (op & NOMP_TO) {
-    // TODO: check and handle errors
-    sycl->queue.memcpy(m->bptr,
-                       static_cast<char *>(m->hptr) + m->usize * m->idx0,
-                       (m->idx1 - m->idx0) * m->usize);
-    sycl->queue.wait();
+    try {
+      sycl->queue.memcpy(m->bptr,
+                         static_cast<char *>(m->hptr) + m->usize * m->idx0,
+                         (m->idx1 - m->idx0) * m->usize);
+      sycl->queue.wait();
+    } catch (const std::exception &ex) {
+      return nomp_set_log(NOMP_SYCL_FAILURE, NOMP_ERROR, ERR_STR_SYCL_FAILURE,
+                          ex.what());
+    }
   }
 
   if (op == NOMP_FROM) {
-    // TODO: check and handle errors
-    sycl->queue.memcpy(static_cast<char *>(m->hptr) + m->usize * m->idx0,
-                       m->bptr, (m->idx1 - m->idx0) * m->usize);
-    sycl->queue.wait();
+    try {
+      sycl->queue.memcpy(static_cast<char *>(m->hptr) + m->usize * m->idx0,
+                         m->bptr, (m->idx1 - m->idx0) * m->usize);
+      sycl->queue.wait();
+    } catch (const std::exception &ex) {
+      return nomp_set_log(NOMP_SYCL_FAILURE, NOMP_ERROR, ERR_STR_SYCL_FAILURE,
+                          ex.what());
+    }
   } else if (op == NOMP_FREE) {
-    // TODO: check and handle errors
-    // TODO: use nomp_free instead if possible
-    sycl::free(m->bptr, sycl->ctx);
-    m->bptr = NULL;
+    try {
+      sycl::free(m->bptr, sycl->ctx);
+      m->bptr = NULL;
+    } catch (const std::exception &ex) {
+      return nomp_set_log(NOMP_SYCL_FAILURE, NOMP_ERROR, ERR_STR_SYCL_FAILURE,
+                          ex.what());
+    }
   }
 
   return 0;
@@ -52,13 +75,13 @@ static int sycl_knl_free(struct prog *prg) {
 static int sycl_knl_build(struct backend *bnd, struct prog *prg,
                           const char *source, const char *name) {
   struct sycl_backend *sycl = (sycl_backend *)bnd->bptr;
-  int err;
+  int err = 1;
 
   char cwd[BUFSIZ];
-  // TODO: use nomp_check() instead
   if (getcwd(cwd, BUFSIZ) == NULL) {
-    printf("Error in cwd");
-    return 0;
+    return nomp_set_log(NOMP_SYCL_FAILURE, NOMP_ERROR, ERR_STR_SYCL_FAILURE,
+                        "Failed to get current working directory.");
+    ;
   }
 
   char *wkdir = nomp_str_cat(3, BUFSIZ, cwd, "/", ".nomp_jit_cache");
@@ -66,8 +89,8 @@ static int sycl_knl_build(struct backend *bnd, struct prog *prg,
   err = jit_compile(&sycl->sycl_id, source,
                     "/opt/intel/oneapi/compiler/2023.0.0/linux/bin/icpx",
                     "-fsycl -fPIC -shared", "kernel_function", wkdir);
-  // TODO: use nomp_set_log() to handle err
-  return 0;
+
+  return err;
 }
 
 static int sycl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
@@ -76,7 +99,7 @@ static int sycl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
   size_t size;
   sycl->queue = sycl::queue(sycl->ctx, sycl->device_id);
   void *arg_list[prg->nargs + 2];
-  int err;
+  int err = 1;
   for (int i = 0; i < prg->nargs; i++) {
     const char *var = va_arg(args, const char *);
     int type = va_arg(args, int);
@@ -128,22 +151,24 @@ static int sycl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
     arg_list[prg->nargs + 1] = (void *)&nd_range;
     err = jit_run(sycl->sycl_id, arg_list);
   }
-  // TODO: use nomp_set_log() to handle err
+
   return err;
 }
 
 static int sycl_finalize(struct backend *bnd) {
-  int err;
+  int err = 0;
   struct sycl_backend *sycl = (sycl_backend *)bnd->bptr;
-  err = jit_free(&sycl->sycl_id);
-  // TODO: use nomp_set_log() to handle err
+  if (sycl->sycl_id >= 0)
+    err = jit_free(&sycl->sycl_id);
   nomp_free(bnd->bptr), bnd->bptr = NULL;
-  return 0;
+
+  return err;
 }
 
 int sycl_init(struct backend *bnd, const int platform_id, const int device_id) {
   bnd->bptr = nomp_calloc(struct sycl_backend, 1);
   struct sycl_backend *sycl = (sycl_backend *)bnd->bptr;
+  sycl->sycl_id = -1;
 
   sycl::platform sycl_platform = sycl::platform();
   auto sycl_pplatforms = sycl_platform.get_platforms();
@@ -172,5 +197,6 @@ int sycl_init(struct backend *bnd, const int platform_id, const int device_id) {
   bnd->knl_run = sycl_knl_run;
   bnd->knl_free = sycl_knl_free;
   bnd->finalize = sycl_finalize;
+
   return 0;
 }

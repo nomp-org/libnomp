@@ -89,10 +89,10 @@ int opencl_init(struct backend *backend, const int platform_id,
 
 /**
  * @ingroup nomp_backend_init
- * @brief Initializes SYCL Opencl backend with the specified platform and
+ * @brief Initializes SYCL backend with the specified platform and
  * device.
  *
- * Initializes OpenCL backend while creating a command queue using the
+ * Initializes SYCL backend while creating a command queue using the
  * given platform id and device id. Returns a positive value if an error
  * occured during the initialization, otherwise returns 0.
  *

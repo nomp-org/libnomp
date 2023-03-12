@@ -282,8 +282,7 @@ int nomp_jit(int *id, const char *c_src, const char **clauses) {
     nomp_free(usr_file), nomp_free(usr_func);
 
     // Get OpenCL, CUDA, etc. source and name from the loopy kernel
-    char *name, *src;
-    char b_name[MAX_BACKEND_SIZE + 1];
+    char *name, *src, b_name[MAX_BACKEND_SIZE + 1];
     size_t n = strnlen(nomp.backend, MAX_BACKEND_SIZE);
     for (int i = 0; i < n; i++)
       b_name[i] = tolower(nomp.backend[i]);

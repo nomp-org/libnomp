@@ -24,16 +24,6 @@ int py_append_to_sys_path(const char *path);
  * @ingroup nomp_py_utils
  * @brief Creates loopy kernel from C source.
  *
- * @param[in] src C kernel source.
- * @param[in] knl Backend name.
- * @return int
- */
-int py_kernel_fun(char **src, PyObject *knl);
-
-/**
- * @ingroup nomp_py_utils
- * @brief Creates loopy kernel from C source.
- *
  * @param[out] knl Loopy kernel object.
  * @param[in] src C kernel source.
  * @param[in] backend Backend name.
