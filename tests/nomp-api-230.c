@@ -19,14 +19,15 @@ static int test_matrix_transform() {
 int main(int argc, const char *argv[]) {
   const char *additionalArgs[4] = {"--nomp-script", "sem", "--nomp-function",
                                    "annotate"};
-  const int newArgc = argc + 4;
-  const char *newArgv[newArgc];
+  const int new_argc = argc + 4;
+  const char **new_argv = (const char **)malloc(new_argc * sizeof(char *));
   for (int i = 0; i < argc; i++)
-    newArgv[i] = argv[i];
+    new_argv[i] = argv[i];
   for (int i = 0; i < 4; i++)
-    newArgv[argc + i] = additionalArgs[i];
+    new_argv[argc + i] = additionalArgs[i];
 
-  int err = nomp_init(newArgc, newArgv);
+  int err = nomp_init(new_argc, new_argv);
+  nomp_free(new_argv);
   nomp_check(err);
 
   err |= SUBTEST(test_matrix_addition);

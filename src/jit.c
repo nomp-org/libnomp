@@ -74,7 +74,6 @@ static int write_file(const char *path, const char *src) {
 static int compile_aux(const char *cc, const char *cflags, const char *src,
                        const char *out) {
   size_t len;
-  // TODO: check nomp_path_len
   nomp_check(nomp_path_len(&len, cc));
   len += strnlen(cflags, MAX_CFLAGS_SIZE) + strlen(src) + strlen(out) + 32;
 
