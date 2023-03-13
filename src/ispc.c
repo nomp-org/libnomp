@@ -70,19 +70,30 @@ static int ispc_knl_build(struct backend *bnd, struct prog *prg,
                         "get cwd");
   }
 
+  const char *src_f = "nomp_ispc.ispc", *dev_f = "nomp_ispc.dev.o",
+             *lib = "nomp_ispc";
   char *wkdir = nomp_str_cat(3, BUFSIZ, cwd, "/", ".nomp_jit_cache");
   int err = jit_compile(NULL, source, ispc->ispc_cc, ISPCRT_INCLUDE_DIR_FLAGS,
-                        NULL, wkdir, "simple.ispc", "simple.dev.o", NOMP_WRITE,
-                        NOMP_OVERWRITE, NOMP_NO_NEW_DIR);
-  err = jit_compile(NULL, source, ispc->cc, "-fPIC -shared", NULL, wkdir,
-                    "simple.dev.o", "libfoo.so", NOMP_DO_NOT_WRITE,
-                    NOMP_OVERWRITE, NOMP_NO_NEW_DIR);
-  nomp_free(wkdir);
-  // TODO: add err checks for compile
+                        NULL, wkdir, src_f, dev_f, NOMP_WRITE, NOMP_OVERWRITE,
+                        NOMP_NO_NEW_DIR);
+  if (err) {
+    nomp_free(wkdir);
+    return nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR, ERR_STR_ISPC_FAILURE,
+                        "ispc compile", rt_error);
+  }
+
+  char *lib_so = nomp_str_cat(3, BUFSIZ, "lib", lib, ".so");
+  err = jit_compile(NULL, source, ispc->cc, "-fPIC -shared", NULL, wkdir, dev_f,
+                    lib_so, NOMP_DO_NOT_WRITE, NOMP_OVERWRITE, NOMP_NO_NEW_DIR);
+  nomp_free(wkdir), nomp_free(lib_so);
+  if (err) {
+    return nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR, ERR_STR_ISPC_FAILURE,
+                        "build library", rt_error);
+  }
 
   // Create module and kernel to execute
   ISPCRTModuleOptions options = {};
-  ispc_prg->module = ispcrtLoadModule(ispc->device, "foo", options);
+  ispc_prg->module = ispcrtLoadModule(ispc->device, lib, options);
   if (rt_error != ISPCRT_NO_ERROR) {
     ispc_prg->module = NULL;
     return nomp_set_log(NOMP_ISPC_FAILURE, NOMP_ERROR, ERR_STR_ISPC_FAILURE,
@@ -169,8 +180,8 @@ static int ispc_finalize(struct backend *bnd) {
   return 0;
 }
 
-static int nomp_to_ispc_device[2] = {
-    ISPCRT_DEVICE_TYPE_CPU, ISPCRT_DEVICE_TYPE_GPU};
+static int nomp_to_ispc_device[2] = {ISPCRT_DEVICE_TYPE_CPU,
+                                     ISPCRT_DEVICE_TYPE_GPU};
 
 int ispc_init(struct backend *bnd, const int platform_type,
               const int device_id) {
