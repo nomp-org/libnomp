@@ -2,7 +2,6 @@
 
 import loopy as lp
 import numpy as np
-from hashlib import sha256
 
 from loopy.target.c.compyte.dtypes import DTypeRegistry
 import cgen as c
@@ -56,10 +55,8 @@ def get_arg(reg, index, value):
 def get_ispc_entry_point(knl):
     """Get ISPC entry point"""
     gen_code = lp.generate_code_v2(knl)
-    suffix = "_" + sha256(gen_code.device_code().encode("utf-8")).hexdigest()
     knl_name = gen_code.device_programs[0].name
-    return "main_ispc"
-    # return f"{knl_name}{suffix}"
+    return f"nomp_{knl_name}_wrapper"
 
 
 def create_ispc_kernel_with_wrapper(knl):
@@ -73,13 +70,12 @@ def create_ispc_kernel_with_wrapper(knl):
     ]
     gen_code = lp.generate_code_v2(knl)
     device_code = gen_code.device_code()
-    suffix = "_" + sha256(device_code.encode("utf-8")).hexdigest()
     knl_name = gen_code.device_programs[0].name
+    wrapper_name = get_ispc_entry_point(knl)
     param_count = len(knl_args)
     calling_func = c.FunctionBody(
         c.FunctionDeclaration(
-            # c.Value("task void", f"{knl_name}{suffix}"),
-            c.Value("task void", f"main_ispc"),
+            c.Value("task void", wrapper_name),
             [
                 c.Value("void *uniform", "_p"),
             ],
@@ -105,7 +101,7 @@ def create_ispc_kernel_with_wrapper(knl):
         ),
     )
     entry_point = c.Line(
-        f"""#include "ispcrt.isph"\nDEFINE_CPU_ENTRY_POINT(main_ispc)"""
+        f"""#include "ispcrt.isph"\nDEFINE_CPU_ENTRY_POINT({wrapper_name})"""
     )
     content = list(map(str, [device_code, calling_func, entry_point]))
     return "\n\n".join(content).strip()

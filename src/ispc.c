@@ -100,8 +100,7 @@ static int ispc_knl_build(struct backend *bnd, struct prog *prg,
                         "module load", rt_error);
   }
 
-  ispc_prg->kernel =
-      ispcrtNewKernel(ispc->device, ispc_prg->module, "main_ispc");
+  ispc_prg->kernel = ispcrtNewKernel(ispc->device, ispc_prg->module, name);
   if (rt_error != ISPCRT_NO_ERROR) {
     ispc_prg->module = NULL, ispc_prg->kernel = NULL;
     return nomp_set_log(NOMP_ISPC_FAILURE, NOMP_ERROR, ERR_STR_ISPC_FAILURE,
