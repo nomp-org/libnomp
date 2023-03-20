@@ -16,6 +16,7 @@
 
 #define MAX_BUFSIZ 64
 #define MAX_BACKEND_SIZE 32
+#define MAX_ARG_NAME_SIZE 128
 #define MAX_SRC_SIZE 16384
 #define MAX_CFLAGS_SIZE 16384
 #define MAX_KNL_ARGS 64
@@ -36,10 +37,26 @@ struct mem {
   void *hptr, *bptr;
 };
 
+struct arg {
+  char name[MAX_ARG_NAME_SIZE];
+  size_t size;
+  unsigned type;
+  void *ptr, *hptr;
+};
+
 struct prog {
-  unsigned nargs, ndim;
-  PyObject *py_global, *py_local, *py_dict;
+  // Number of arguments of the kernel and meta info about
+  // arguments.
+  unsigned nargs;
+  struct arg *args;
+  // Dimension of kernel launch parameters, their pymbolic
+  // expressions, and evaluated value of each dimension.
+  unsigned ndim;
+  PyObject *py_global, *py_local;
   size_t global[3], local[3];
+  // Map of variable names and their values use to evaluate
+  // the kernel launch parameters.
+  PyObject *py_dict;
   void *bptr;
 };
 
