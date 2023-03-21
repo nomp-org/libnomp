@@ -39,7 +39,7 @@ struct prog {
 };
 
 struct backend {
-  char *backend, *install_dir, *annts_script, *annts_func;
+  char *backend, *install_dir, *annts_script, *annts_func, *cc, *ispc;
   int platform_id, device_id, verbose;
   char name[MAX_BUFSIZ];
   int (*update)(struct backend *, struct mem *, const int);

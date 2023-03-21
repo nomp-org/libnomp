@@ -5,7 +5,7 @@
 static const char *ERR_STR_ISPC_FAILURE = "ISPC %s failed with error code: %d.";
 
 struct ispc_backend {
-  char *ispc_cc, *cc;
+  char *ispc, *cc;
   ISPCRTDevice device;
   ISPCRTDeviceType device_type;
   ISPCRTTaskQueue queue;
@@ -62,7 +62,7 @@ static int ispc_knl_build(struct backend *bnd, struct prog *prg,
                           const char *source, const char *name) {
   struct ispc_backend *ispc = (struct ispc_backend *)bnd->bptr;
   prg->bptr = nomp_calloc(struct ispc_prog, 1);
-  struct ispc_prog *ispc_prg = prg->bptr;
+  struct ispc_prog *iprg = prg->bptr;
 
   char cwd[BUFSIZ];
   if (getcwd(cwd, BUFSIZ) == NULL) {
@@ -73,7 +73,7 @@ static int ispc_knl_build(struct backend *bnd, struct prog *prg,
   const char *src_f = "nomp_ispc.ispc", *dev_f = "nomp_ispc.dev.o",
              *lib = "nomp_ispc";
   char *wkdir = nomp_str_cat(3, BUFSIZ, cwd, "/", ".nomp_jit_cache");
-  int err = jit_compile(NULL, source, ispc->ispc_cc, ISPCRT_INCLUDE_DIR_FLAGS,
+  int err = jit_compile(NULL, source, ispc->ispc, ISPCRT_INCLUDE_DIR_FLAGS,
                         NULL, wkdir, src_f, dev_f, NOMP_WRITE, NOMP_OVERWRITE,
                         NOMP_NO_NEW_DIR);
   if (err) {
@@ -93,16 +93,16 @@ static int ispc_knl_build(struct backend *bnd, struct prog *prg,
 
   // Create module and kernel to execute
   ISPCRTModuleOptions options = {};
-  ispc_prg->module = ispcrtLoadModule(ispc->device, lib, options);
+  iprg->module = ispcrtLoadModule(ispc->device, lib, options);
   if (rt_error != ISPCRT_NO_ERROR) {
-    ispc_prg->module = NULL;
+    iprg->module = NULL;
     return nomp_set_log(NOMP_ISPC_FAILURE, NOMP_ERROR, ERR_STR_ISPC_FAILURE,
                         "module load", rt_error);
   }
 
-  ispc_prg->kernel = ispcrtNewKernel(ispc->device, ispc_prg->module, name);
+  iprg->kernel = ispcrtNewKernel(ispc->device, iprg->module, name);
   if (rt_error != ISPCRT_NO_ERROR) {
-    ispc_prg->module = NULL, ispc_prg->kernel = NULL;
+    iprg->module = NULL, iprg->kernel = NULL;
     return nomp_set_log(NOMP_ISPC_FAILURE, NOMP_ERROR, ERR_STR_ISPC_FAILURE,
                         "kernel build", rt_error);
   }
@@ -204,8 +204,8 @@ int ispc_init(struct backend *bnd, const int platform_type,
   ispc->device = device;
   ispc->device_type = platform_type;
   ispc->queue = ispcrtNewTaskQueue(device);
-  ispc->ispc_cc = "ispc";
-  ispc->cc = "/usr/bin/cc";
+  ispc->ispc = bnd->ispc;
+  ispc->cc = bnd->cc;
   chk_ispcrt("context create", rt_error);
 
   bnd->update = ispc_update;
