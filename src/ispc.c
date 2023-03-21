@@ -5,7 +5,7 @@
 static const char *ERR_STR_ISPC_FAILURE = "ISPC %s failed with error code: %d.";
 
 struct ispc_backend {
-  char *ispc_cc, *cc;
+  char *ispc, *cc;
   ISPCRTDevice device;
   ISPCRTDeviceType device_type;
   ISPCRTTaskQueue queue;
@@ -13,6 +13,7 @@ struct ispc_backend {
 };
 
 struct ispc_prog {
+  int ispc_id;
   ISPCRTModule module;
   ISPCRTKernel kernel;
 };
@@ -62,7 +63,7 @@ static int ispc_knl_build(struct backend *bnd, struct prog *prg,
                           const char *source, const char *name) {
   struct ispc_backend *ispc = (struct ispc_backend *)bnd->bptr;
   prg->bptr = nomp_calloc(struct ispc_prog, 1);
-  struct ispc_prog *ispc_prg = prg->bptr;
+  struct ispc_prog *iprg = prg->bptr;
 
   char cwd[BUFSIZ];
   if (getcwd(cwd, BUFSIZ) == NULL) {
@@ -73,9 +74,8 @@ static int ispc_knl_build(struct backend *bnd, struct prog *prg,
   const char *src_f = "nomp_ispc.ispc", *dev_f = "nomp_ispc.dev.o",
              *lib = "nomp_ispc";
   char *wkdir = nomp_str_cat(3, BUFSIZ, cwd, "/", ".nomp_jit_cache");
-  int err = jit_compile(NULL, source, ispc->ispc_cc, ISPCRT_INCLUDE_DIR_FLAGS,
-                        NULL, wkdir, src_f, dev_f, NOMP_WRITE, NOMP_OVERWRITE,
-                        NOMP_NO_NEW_DIR);
+  int err = jit_compile(NULL, source, ispc->ispc, "--target=avx2-i32x8", NULL,
+                        wkdir, src_f, dev_f, NOMP_WRITE);
   if (err) {
     nomp_free(wkdir);
     return nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR, ERR_STR_ISPC_FAILURE,
@@ -83,28 +83,12 @@ static int ispc_knl_build(struct backend *bnd, struct prog *prg,
   }
 
   char *lib_so = nomp_str_cat(3, BUFSIZ, "lib", lib, ".so");
-  err = jit_compile(NULL, source, ispc->cc, "-fPIC -shared", NULL, wkdir, dev_f,
-                    lib_so, NOMP_DO_NOT_WRITE, NOMP_OVERWRITE, NOMP_NO_NEW_DIR);
+  err = jit_compile(&iprg->ispc_id, source, ispc->cc, "-fPIC -shared", name,
+                    wkdir, dev_f, lib_so, NOMP_DO_NOT_WRITE);
   nomp_free(wkdir), nomp_free(lib_so);
   if (err) {
     return nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR, ERR_STR_ISPC_FAILURE,
                         "build library", rt_error);
-  }
-
-  // Create module and kernel to execute
-  ISPCRTModuleOptions options = {};
-  ispc_prg->module = ispcrtLoadModule(ispc->device, lib, options);
-  if (rt_error != ISPCRT_NO_ERROR) {
-    ispc_prg->module = NULL;
-    return nomp_set_log(NOMP_ISPC_FAILURE, NOMP_ERROR, ERR_STR_ISPC_FAILURE,
-                        "module load", rt_error);
-  }
-
-  ispc_prg->kernel = ispcrtNewKernel(ispc->device, ispc_prg->module, name);
-  if (rt_error != ISPCRT_NO_ERROR) {
-    ispc_prg->module = NULL, ispc_prg->kernel = NULL;
-    return nomp_set_log(NOMP_ISPC_FAILURE, NOMP_ERROR, ERR_STR_ISPC_FAILURE,
-                        "kernel build", rt_error);
   }
   return 0;
 }
@@ -150,24 +134,17 @@ static int ispc_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
       vargs[i + d] = &default_dim;
   }
 
-  struct ispc_backend *ispc = (struct ispc_backend *)bnd->bptr;
-  ISPCRTMemoryView params =
-      ispcrtNewMemoryView(ispc->device, vargs, num_bytes, &(ispc->flags));
-  ispcrtCopyToDevice(ispc->queue, params);
-
   // launch kernel
   struct ispc_prog *iprg = (struct ispc_prog *)prg->bptr;
-  ispcrtLaunch3D(ispc->queue, iprg->kernel, params, 1, 1, 1);
-  ispcrtSync(ispc->queue);
-  chk_ispcrt("kernel run", rt_error);
-  ispcrtRelease(iprg->kernel);
-  chk_ispcrt("kernel release", rt_error);
-  ispcrtRelease(iprg->module);
-  chk_ispcrt("module release", rt_error);
-  return 0;
+  int err = jit_run(iprg->ispc_id, vargs);
+  return err;
 }
 
-static int ispc_knl_free(struct prog *prg) { return 0; }
+static int ispc_knl_free(struct prog *prg) {
+  struct ispc_prog *iprg = (struct ispc_prog *)prg->bptr;
+  int err = jit_free(&iprg->ispc_id);
+  return err;
+}
 
 static int ispc_finalize(struct backend *bnd) {
   struct ispc_backend *ispc = (struct ispc_backend *)bnd->bptr;
@@ -204,8 +181,8 @@ int ispc_init(struct backend *bnd, const int platform_type,
   ispc->device = device;
   ispc->device_type = platform_type;
   ispc->queue = ispcrtNewTaskQueue(device);
-  ispc->ispc_cc = "ispc";
-  ispc->cc = "/usr/bin/cc";
+  ispc->ispc = bnd->ispc;
+  ispc->cc = bnd->cc;
   chk_ispcrt("context create", rt_error);
 
   bnd->update = ispc_update;
