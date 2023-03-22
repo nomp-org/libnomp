@@ -27,6 +27,7 @@ int main(int argc, const char *argv[]) {
     new_argv[argc + i] = additionalArgs[i];
 
   int err = nomp_init(new_argc, new_argv);
+  nomp_free(new_argv);
   nomp_check(err);
 
   err |= SUBTEST(test_matrix_addition);
