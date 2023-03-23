@@ -18,6 +18,9 @@ static int nomp_api_210_aux(const char *knl_fmt, TEST_TYPE *a, TEST_TYPE *b,
                  sizeof(TEST_TYPE), b, "N", NOMP_INT, sizeof(int), &n);
   nomp_test_chk(err);
 
+  err =nomp_sync();
+  nomp_test_chk(err);
+
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM);
   nomp_test_chk(err);
   err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE);
