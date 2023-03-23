@@ -183,8 +183,7 @@ int py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
 }
 
 int py_get_sycl_knl_name_and_src(char **name, char **src, PyObject *knl) {
-  int err = 1;
-  err = py_get_knl_name_and_src(name, src, knl);
+  int err = py_get_knl_name_and_src(name, src, knl);
 
   const char *knl_wrppr;
   PyObject *knl_wrppr_py = PyUnicode_FromString(kernel_wrapper);
@@ -209,8 +208,9 @@ int py_get_sycl_knl_name_and_src(char **name, char **src, PyObject *knl) {
                       knl_wrppr);
 
   if (err) {
-    return nomp_set_log(NOMP_LOOPY_KNL_NAME_NOT_FOUND, NOMP_ERROR,
-                        "Unable to get loopy kernel name.");
+    return nomp_set_log(
+        NOMP_LOOPY_CODEGEN_FAILURE, NOMP_ERROR,
+        "Backend code generation from loopy kernel \"%s\" failed.", *name);
   }
   return err;
 }
