@@ -155,6 +155,14 @@ static int sycl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
   return err;
 }
 
+static int sycl_sync(struct backend *bnd) {
+  struct sycl_backend *sycl = (struct sycl_backend *)bnd->bptr;
+
+  sycl->queue.wait();
+
+  return 0;
+}
+
 static int sycl_finalize(struct backend *bnd) {
   int err = 0;
   struct sycl_backend *sycl = (sycl_backend *)bnd->bptr;
@@ -196,6 +204,7 @@ int sycl_init(struct backend *bnd, const int platform_id, const int device_id) {
   bnd->knl_build = sycl_knl_build;
   bnd->knl_run = sycl_knl_run;
   bnd->knl_free = sycl_knl_free;
+  bnd->sync = sycl_sync;
   bnd->finalize = sycl_finalize;
 
   return 0;
