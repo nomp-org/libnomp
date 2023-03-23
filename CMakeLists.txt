@@ -11,6 +11,8 @@ option(ENABLE_OPENCL "Build OpenCL backend" ON)
 option(ENABLE_CUDA "Build Cuda backend" OFF)
 option(ENABLE_SYCL "Build SYCL backend" OFF)
 
+option(SYCL_IMPLEMENTATION "Specify the SYCL implementation package")
+
 # https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling
 # Use, i.e. don't skip the full RPATH for the build tree
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
@@ -50,8 +52,8 @@ if (ENABLE_CUDA)
   target_link_libraries(nomp PRIVATE CUDA::cudart CUDA::nvrtc)
 endif()
 if (ENABLE_SYCL)
-  find_package(IntelDPCPP REQUIRED)
-  target_link_libraries(nomp PRIVATE -fsycl)
+  find_package(${SYCL_IMPLEMENTATION} REQUIRED)
+  target_link_libraries(nomp PRIVATE ${SYCL_IMPLEMENTATION_LIBRARIES})
 endif()
 
 set_target_properties(nomp PROPERTIES
