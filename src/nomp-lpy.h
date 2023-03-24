@@ -72,9 +72,11 @@ int py_user_transform(PyObject **knl, const char *file, const char *func);
  * @param[out] name Kernel name as a C-string.
  * @param[out] src Kernel source as a C-string.
  * @param[in] knl Loopy kernel object.
+ * @param[in] backend Backend name.
  * @return int
  */
-int py_get_knl_name_and_src(char **name, char **src, PyObject *knl);
+int py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
+                            const char *backend);
 
 /**
  * @ingroup nomp_py_utils

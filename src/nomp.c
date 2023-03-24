@@ -283,7 +283,7 @@ int nomp_jit(int *id, const char *c_src, const char **clauses) {
 
     // Get OpenCL, CUDA, etc. source and name from the loopy kernel
     char *name, *src;
-    nomp_check(py_get_knl_name_and_src(&name, &src, knl));
+    nomp_check(py_get_knl_name_and_src(&name, &src, knl, nomp.name));
 
     // Build the kernel
     struct prog *prg = progs[progs_n] = nomp_calloc(struct prog, 1);

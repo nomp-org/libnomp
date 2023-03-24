@@ -8,6 +8,11 @@ import loopy as lp
 import numpy as np
 import pymbolic.primitives as prim
 from clang import cindex
+from kernel_wrappers import (
+    BaseKernelWrapper,
+    ISPCKernelWrapper,
+    SyclKernelWrapper,
+)
 from loopy.isl_helpers import make_slab
 from loopy.kernel.data import AddressSpace
 from loopy.symbolic import aff_from_expr
@@ -16,7 +21,6 @@ from loopy.target.c.compyte.dtypes import (
     fill_registry_with_c_types,
 )
 from pytools import UniqueNameGenerator
-from wrappers import BaseWrapper, ISPCWrapper, SyclWrapper
 
 LOOPY_LANG_VERSION = (2018, 2)
 LOOPY_INSN_PREFIX = "_nomp_insn"
@@ -56,7 +60,10 @@ _BACKEND_TO_TARGET = {
     "ispc": lp.ISPCTarget(),
     "hip": lp.CudaTarget(),
 }
-_BACKEND_TO_WRAPPER = {"ispc": ISPCWrapper(), "sycl": SyclWrapper()}
+_BACKEND_TO_WRAPPER = {
+    "ispc": ISPCKernelWrapper(prefix="nomp_ispc"),
+    "sycl": SyclKernelWrapper(prefix="nomp_sycl", includes="CL/sycl.hpp"),
+}
 _ARRAY_TYPES = [cindex.TypeKind.CONSTANTARRAY, cindex.TypeKind.INCOMPLETEARRAY]
 _ARRAY_TYPES_W_PTR = _ARRAY_TYPES + [cindex.TypeKind.POINTER]
 
@@ -486,6 +493,7 @@ class CToLoopyMapper(IdentityMapper):
     def map_break_stmt(
         self, expr: cindex.CursorKind, context: CToLoopyMapperContext
     ) -> CToLoopyMapperAccumulator:
+        """Maps break statement"""
         return CToLoopyMapperAccumulator(
             [],
             [
@@ -615,22 +623,20 @@ def c_to_loopy(c_str: str, backend: str) -> lp.translation_unit.TranslationUnit:
     return knl
 
 
-
-def get_wrapper(backend):
-    wrapper = BaseWrapper()
-    if backend in _BACKEND_TO_WRAPPER.keys():
-        wrapper = _BACKEND_TO_WRAPPER[backend]
-    return wrapper
+def get_wrapper(backend: str) -> BaseKernelWrapper:
+    """Get relevant wrapper for backend"""
+    wrapper = _BACKEND_TO_WRAPPER.get(backend)
+    return wrapper if wrapper is not None else BaseKernelWrapper()
 
 
-def get_knl_src(knl, backend) -> str:
-    wrapper = get_wrapper(backend)
-    return wrapper.get_src(knl)
+def get_knl_src(knl: lp.translation_unit.TranslationUnit, backend: str) -> str:
+    """Get kernel source for backend"""
+    return get_wrapper(backend).get_src(knl)
 
 
-def get_knl_name(knl, backend) -> str:
-    wrapper = get_wrapper(backend)
-    return wrapper.get_entry_point(knl)
+def get_knl_name(knl: lp.translation_unit.TranslationUnit, backend: str) -> str:
+    """Get kernel name for backend"""
+    return get_wrapper(backend).get_entry_point(knl)
 
 
 if __name__ == "__main__":
@@ -651,7 +657,7 @@ if __name__ == "__main__":
             }
           }
           """
-    backend = "cuda"
-    lp_knl = c_to_loopy(KNL_STR, backend)
-    print(get_knl_name(lp_knl, backend))
-    print(get_knl_src(lp_knl, backend))
+    BACKEND = "cuda"
+    lp_knl = c_to_loopy(KNL_STR, BACKEND)
+    print(get_knl_name(lp_knl, BACKEND))
+    print(get_knl_src(lp_knl, BACKEND))
