@@ -34,4 +34,4 @@ jobs:
         if: (steps.requirements_cache.outputs.cache-hit != 'true')
       - name: Run pylint check
         run:
-          pylint --fail-under=8.95 ./python
+          pylint --fail-under=9.8 ./python
