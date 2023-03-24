@@ -16,6 +16,7 @@ from loopy.target.c.compyte.dtypes import (
     fill_registry_with_c_types,
 )
 from pytools import UniqueNameGenerator
+from wrappers import BaseWrapper, ISPCWrapper, SyclWrapper
 
 LOOPY_LANG_VERSION = (2018, 2)
 LOOPY_INSN_PREFIX = "_nomp_insn"
@@ -49,12 +50,13 @@ _CLANG_TYPE_TO_C_TYPE = {
     "uchar": "unsigned char",
     "schar": "signed char",
 }
-
 _BACKEND_TO_TARGET = {
     "opencl": lp.OpenCLTarget(),
     "cuda": lp.CudaTarget(),
+    "ispc": lp.ISPCTarget(),
     "hip": lp.CudaTarget(),
 }
+_BACKEND_TO_WRAPPER = {"ispc": ISPCWrapper(), "sycl": SyclWrapper()}
 _ARRAY_TYPES = [cindex.TypeKind.CONSTANTARRAY, cindex.TypeKind.INCOMPLETEARRAY]
 _ARRAY_TYPES_W_PTR = _ARRAY_TYPES + [cindex.TypeKind.POINTER]
 
@@ -613,16 +615,43 @@ def c_to_loopy(c_str: str, backend: str) -> lp.translation_unit.TranslationUnit:
     return knl
 
 
+
+def get_wrapper(backend):
+    wrapper = BaseWrapper()
+    if backend in _BACKEND_TO_WRAPPER.keys():
+        wrapper = _BACKEND_TO_WRAPPER[backend]
+    return wrapper
+
+
+def get_knl_src(knl, backend) -> str:
+    wrapper = get_wrapper(backend)
+    return wrapper.get_src(knl)
+
+
+def get_knl_name(knl, backend) -> str:
+    wrapper = get_wrapper(backend)
+    return wrapper.get_entry_point(knl)
+
+
 if __name__ == "__main__":
     import os
     import sys
 
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
     KNL_STR = """
-          void foo(double *a, int N) {
-            for (int i = 0; i < N + 1; i++)
-              a[i] = a[i] * (i + 1);
+          void foo(int *a, int N) {
+            for (int i = 0; i < N; i++) {
+              int t = 0;
+              for (int j = 0; j < 10; j++) {
+                t += 1;
+                if (j == 5)
+                  break;
+              }
+              a[i] = t;
+            }
           }
           """
-    lp_knl = c_to_loopy(KNL_STR, "cuda")
-    print(lp.generate_code_v2(lp_knl).device_code())
+    backend = "cuda"
+    lp_knl = c_to_loopy(KNL_STR, backend)
+    print(get_knl_name(lp_knl, backend))
+    print(get_knl_src(lp_knl, backend))
