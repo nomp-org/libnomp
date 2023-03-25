@@ -13,8 +13,6 @@ option(ENABLE_CUDA "Build Cuda backend" OFF)
 option(ENABLE_HIP "Build HIP backend" OFF)
 option(ENABLE_SYCL "Build SYCL backend" OFF)
 
-option(SYCL_IMPLEMENTATION "Specify the SYCL implementation package")
-
 # https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling
 # Use, i.e. don't skip the full RPATH for the build tree
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
@@ -44,7 +42,10 @@ if (ENABLE_HIP)
     message(FATAL_ERROR "ENABLE_HIP is ON but unable to find HIP runtime")
   endif()
 endif()
-
+if (ENABLE_SYCL)
+  list(APPEND SOURCES src/sycl.cpp)
+  add_compile_definitions(SYCL_ENABLED)
+endif()
 if (ENABLE_SYCL)
   list(APPEND SOURCES src/sycl.cpp)
   add_compile_definitions(SYCL_ENABLED)
@@ -67,8 +68,8 @@ if (ENABLE_HIP AND HIP_FOUND)
   target_link_libraries(nomp PRIVATE nomp::HIP)
 endif()
 if (ENABLE_SYCL)
-  find_package(${SYCL_IMPLEMENTATION} REQUIRED)
-  target_link_libraries(nomp PRIVATE ${SYCL_IMPLEMENTATION_LIBRARIES})
+  find_package(IntelDPCPP REQUIRED)
+  target_link_libraries(nomp PRIVATE -fsycl)
 endif()
 
 set_target_properties(nomp PROPERTIES
