@@ -3,10 +3,14 @@ project(libnomp VERSION 0.0.1 DESCRIPTION "nomp runtime library" LANGUAGES C CXX
 
 # Treat compiler warnings as errors
 set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
+
 set(CMAKE_C_STANDARD 99)
-# TODO: Set the CXX standard here as well.
+set (CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
+
+set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 option(ENABLE_OPENCL "Build OpenCL backend" ON)
 option(ENABLE_CUDA "Build Cuda backend" OFF)
@@ -68,8 +72,8 @@ if (ENABLE_HIP AND HIP_FOUND)
   target_link_libraries(nomp PRIVATE nomp::HIP)
 endif()
 if (ENABLE_SYCL)
-  find_package(IntelDPCPP REQUIRED)
-  target_link_libraries(nomp PRIVATE -fsycl)
+  find_package(DPCPP REQUIRED)
+  target_link_libraries(nomp PRIVATE DPCPP::SYCL)
 endif()
 
 set_target_properties(nomp PROPERTIES
