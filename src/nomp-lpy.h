@@ -24,16 +24,6 @@ int py_append_to_sys_path(const char *path);
  * @ingroup nomp_py_utils
  * @brief Creates loopy kernel from C source.
  *
- * @param[in] src C kernel source.
- * @param[in] knl Backend name.
- * @return int
- */
-int py_kernel_fun(char **src, PyObject *knl);
-
-/**
- * @ingroup nomp_py_utils
- * @brief Creates loopy kernel from C source.
- *
  * @param[out] knl Loopy kernel object.
  * @param[in] src C kernel source.
  * @param[in] backend Backend name.
@@ -87,17 +77,6 @@ int py_user_transform(PyObject **knl, const char *file, const char *func);
  */
 int py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
                             const char *backend);
-
-/**
- * @ingroup nomp_py_utils
- * @brief Get kernel name and generated source for the SYCL backend.
- *
- * @param[out] name Kernel name as a C-string.
- * @param[out] src Kernel source as a C-string.
- * @param[in] knl Loopy kernel object.
- * @return int
- */
-int py_get_sycl_knl_name_and_src(char **name, char **src, PyObject *knl);
 
 /**
  * @ingroup nomp_py_utils

@@ -3,8 +3,10 @@ project(libnomp VERSION 0.0.1 DESCRIPTION "nomp runtime library" LANGUAGES C CXX
 
 # Treat compiler warnings as errors
 set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
+
 set(CMAKE_C_STANDARD 99)
-# TODO: Set the CXX standard here as well.
+set (CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 
@@ -43,8 +45,13 @@ if (ENABLE_HIP)
   endif()
 endif()
 if (ENABLE_SYCL)
-  list(APPEND SOURCES src/sycl.cpp)
-  add_compile_definitions(SYCL_ENABLED)
+  find_package(DPCPP)
+  if(DPCPP_FOUND)
+    list(APPEND SOURCES src/sycl.cpp)
+    add_compile_definitions(SYCL_ENABLED)
+  else()
+    message(FATAL_ERROR "ENABLE_SYCL is ON but unable to find SYCL runtime")
+  endif()
 endif()
 if (ENABLE_SYCL)
   list(APPEND SOURCES src/sycl.cpp)
@@ -67,9 +74,8 @@ endif()
 if (ENABLE_HIP AND HIP_FOUND)
   target_link_libraries(nomp PRIVATE nomp::HIP)
 endif()
-if (ENABLE_SYCL)
-  find_package(IntelDPCPP REQUIRED)
-  target_link_libraries(nomp PRIVATE -fsycl)
+if (ENABLE_SYCL AND DPCPP_FOUND)
+  target_link_libraries(nomp PRIVATE nomp::SYCL)
 endif()
 
 set_target_properties(nomp PROPERTIES
