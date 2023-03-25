@@ -9,8 +9,8 @@ NOMP_LNSTATE_PATH="${NOMP_SOURCE_DIR}/.lnstate"
 : "${NOMP_BUILD_TYPE:="RelWithDebInfo"}"
 : "${NOMP_ENABLE_DOCS:="OFF"}"
 : "${NOMP_BUILD_DIR:="${NOMP_SOURCE_DIR}/build"}"
-: "${NOMP_BUILD_CMAKE_CXX_COMPILER:="-D CMAKE_CXX_COMPILER=icpx"}"
-
+: "${NOMP_BUILD_CMAKE_C_COMPILER:=""}"
+: "${NOMP_BUILD_CMAKE_CXX_COMPILER:=""}"
 
 # colors
 red=$(tput setaf 1)
@@ -48,7 +48,6 @@ while [ $# -gt 0 ]; do
   -o | --opencl-lib) shift && NOMP_OPENCL_LIBRARY=$(realpath "${1}") ;;
   -c | --c-compiler) shift && NOMP_BUILD_CMAKE_C_COMPILER="${1}" ;;
   -cxx | --cxx-compiler) shift && NOMP_BUILD_CMAKE_CXX_COMPILER="${1}" ;;
-  -sycl|--sycl-implementation) shift && NOMP_SYCL_IMPLEMENTATION="${1}";;
   *) echo "${red}Invalid argument: ${1}${reset}"
     echo "See ${cyan}./lncfg -h${reset} or ${cyan}./lncfg --help${reset} for " \
       "the accepted commands."
@@ -71,9 +70,6 @@ NOMP_CMAKE_OPTS+=("-DCMAKE_BUILD_TYPE=${NOMP_BUILD_TYPE}")
 
 [[ -n ${NOMP_BUILD_CMAKE_CXX_COMPILER} ]] &&
   NOMP_CMAKE_OPTS+=("-D CMAKE_CXX_COMPILER=${NOMP_BUILD_CMAKE_CXX_COMPILER}")
-
-[[ -n ${NOMP_SYCL_IMPLEMENTATION} ]] &&
-  NOMP_CMAKE_OPTS+=("-DSYCL_IMPLEMENTATION=${NOMP_SYCL_IMPLEMENTATION}")
 
 # update lnstate variables
 echo -e "NOMP_INSTALL_DIR=${NOMP_INSTALL_DIR}\n" \
