@@ -42,7 +42,6 @@ if (ENABLE_HIP)
     message(FATAL_ERROR "ENABLE_HIP is ON but unable to find HIP runtime")
   endif()
 endif()
-
 if (ENABLE_SYCL)
   list(APPEND SOURCES src/sycl.cpp)
   add_compile_definitions(SYCL_ENABLED)
