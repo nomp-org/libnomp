@@ -80,17 +80,6 @@ int py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
 
 /**
  * @ingroup nomp_py_utils
- * @brief Get kernel name and generated source for the SYCL backend.
- *
- * @param[out] name Kernel name as a C-string.
- * @param[out] src Kernel source as a C-string.
- * @param[in] knl Loopy kernel object.
- * @return int
- */
-int py_get_sycl_knl_name_and_src(char **name, char **src, PyObject *knl);
-
-/**
- * @ingroup nomp_py_utils
  * @brief Get global and local grid sizes as `pymoblic` expressions.
  *
  * Grid sizes are stored in the program object itself.

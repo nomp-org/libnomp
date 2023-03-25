@@ -182,39 +182,6 @@ int py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
   return 0;
 }
 
-int py_get_sycl_knl_name_and_src(char **name, char **src, PyObject *knl) {
-  int err = py_get_knl_name_and_src(name, src, knl);
-
-  const char *knl_wrppr;
-  PyObject *knl_wrppr_py = PyUnicode_FromString(kernel_wrapper);
-  if (knl_wrppr_py) {
-    PyObject *mod = PyImport_Import(knl_wrppr_py);
-    if (mod) {
-      PyObject *knl_wrppr_func_mod =
-          PyObject_GetAttrString(mod, create_kernel_wrapper_fun);
-      if (knl_wrppr_func_mod) {
-        PyObject *knl_wrppr_func =
-            PyObject_CallFunctionObjArgs(knl_wrppr_func_mod, knl, NULL);
-        Py_ssize_t size;
-        knl_wrppr = PyUnicode_AsUTF8AndSize(knl_wrppr_func, &size);
-        Py_DECREF(knl_wrppr_func);
-        Py_DECREF(knl_wrppr_func_mod);
-      }
-      Py_DECREF(mod);
-    }
-    Py_DECREF(knl_wrppr_py);
-  }
-  *src = nomp_str_cat(4, BUFSIZ, "#include <CL/sycl.hpp>\n", *src, "\n",
-                      knl_wrppr);
-
-  if (err) {
-    return nomp_set_log(
-        NOMP_LOOPY_CODEGEN_FAILURE, NOMP_ERROR,
-        "Backend code generation from loopy kernel \"%s\" failed.", *name);
-  }
-  return err;
-}
-
 int py_get_grid_size(struct prog *prg, PyObject *knl) {
   int err = 1;
   if (knl) {
