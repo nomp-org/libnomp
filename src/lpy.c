@@ -8,6 +8,9 @@ static const char *get_knl_name = "get_knl_name";
 static const char *kernel_wrapper = "kernel_wrapper";
 static const char *create_kernel_wrapper_fun = "create_kernel_wrapper_fun";
 
+static const char *kernel_wrapper = "kernel_wrapper";
+static const char *create_kernel_wrapper_fun = "create_kernel_wrapper_fun";
+
 void py_print(const char *msg, PyObject *obj) {
   PyObject *repr = PyObject_Repr(obj);
   PyObject *py_str = PyUnicode_AsEncodedString(repr, "utf-8", "~E~");
@@ -183,7 +186,8 @@ int py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
 }
 
 int py_get_sycl_knl_name_and_src(char **name, char **src, PyObject *knl) {
-  int err = py_get_knl_name_and_src(name, src, knl);
+  int err = 1;
+  err = py_get_knl_name_and_src(name, src, knl);
 
   const char *knl_wrppr;
   PyObject *knl_wrppr_py = PyUnicode_FromString(kernel_wrapper);
@@ -204,15 +208,12 @@ int py_get_sycl_knl_name_and_src(char **name, char **src, PyObject *knl) {
     }
     Py_DECREF(knl_wrppr_py);
   }
-  *src = nomp_str_cat(4, BUFSIZ, "#include <CL/sycl.hpp>\n", *src, "\n",
-                      knl_wrppr);
+  *src = nomp_str_cat(4, BUFSIZ, "#include <CL/sycl.hpp> \n", *src, "\n", src_);
 
   if (err) {
-    return nomp_set_log(
-        NOMP_LOOPY_CODEGEN_FAILURE, NOMP_ERROR,
-        "Backend code generation from loopy kernel \"%s\" failed.", *name);
+    return nomp_set_log(NOMP_LOOPY_KNL_NAME_NOT_FOUND, NOMP_ERROR,
+                        "Unable to get loopy kernel name.");
   }
-  return err;
 }
 
 int py_get_grid_size(struct prog *prg, PyObject *knl) {

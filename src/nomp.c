@@ -114,6 +114,10 @@ int nomp_init(int argc, const char **argv) {
 #if defined(HIP_ENABLED)
     err = hip_init(&nomp, nomp.platform_id, nomp.device_id);
 #endif
+  } else if (strncmp(name, "sycl", MAX_BACKEND_SIZE) == 0) {
+#if defined(SYCL_ENABLED)
+    err = sycl_init(&nomp, nomp.platform_id, nomp.device_id);
+#endif
   } else if (strncmp(name, "sycl", MAX_BACKEND_NAME_SIZE) == 0) {
 #if defined(SYCL_ENABLED)
     err = sycl_init(&nomp, nomp.platform_id, nomp.device_id);
@@ -288,6 +292,18 @@ int nomp_jit(int *id, const char *c_src, const char **clauses) {
     // Get OpenCL, CUDA, etc. source and name from the loopy kernel
     char *name, *src;
     nomp_check(py_get_knl_name_and_src(&name, &src, knl, nomp.name));
+
+    char *knl_fun;
+    err = py_kernel_fun(&knl_fun, knl);
+    return_on_err(err);
+    knl_fun = strcatn(4, BUFSIZ, "#include <stdio.h>\n", src, "\n", knl_fun);
+    nomp.knl_fun = knl_fun;
+
+    char *knl_fun;
+    err = py_kernel_fun(&knl_fun, knl);
+    return_on_err(err);
+    knl_fun = strcatn(4, BUFSIZ, "#include <stdio.h>\n", src, "\n", knl_fun);
+    nomp.knl_fun = knl_fun;
 
     // Build the kernel
     struct prog *prg = progs[progs_n] = nomp_calloc(struct prog, 1);
