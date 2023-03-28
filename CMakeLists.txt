@@ -2,15 +2,14 @@ cmake_minimum_required(VERSION 3.22)
 project(libnomp VERSION 0.0.1 DESCRIPTION "nomp runtime library" LANGUAGES C CXX)
 
 # Treat compiler warnings as errors
-set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
+set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 
 option(ENABLE_OPENCL "Build OpenCL backend" ON)
 option(ENABLE_CUDA "Build Cuda backend" OFF)
 option(ENABLE_HIP "Build HIP backend" OFF)
-set(HIP_PATH /opt/rocm)
-set(HIP_PLATFORM amd)
 
 # https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling
 # Use, i.e. don't skip the full RPATH for the build tree
@@ -33,27 +32,12 @@ if (ENABLE_CUDA)
   add_compile_definitions(CUDA_ENABLED)
 endif()
 if (ENABLE_HIP)
-  find_program(
-    HIP_CONFIG_EXECUTABLE
-    NAMES hipconfig
-    PATHS
-    ${HIP_PATH}
-    PATH_SUFFIXES bin
-  )
-  execute_process(
-    COMMAND ${HIP_CONFIG_EXECUTABLE} --cxx_config
-    OUTPUT_VARIABLE _hip_flags
-    ERROR_VARIABLE _hip_error
-  )
-  execute_process(
-    COMMAND ${HIP_CONFIG_EXECUTABLE} --platform
-    OUTPUT_VARIABLE HIP_PLATFORM
-    ERROR_VARIABLE _hip_error
-  )
-  if(NOT _hip_error)
+  find_package(HIP)
+  if(HIP_FOUND)
     list(APPEND SOURCES src/hip.cpp)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_hip_flags} ")
     add_compile_definitions(HIP_ENABLED)
+  else()
+    message(FATAL_ERROR "HIP enabled but HIP was not found!")
   endif()
 endif()
 
@@ -67,13 +51,12 @@ if (ENABLE_OPENCL)
   find_package(OpenCL REQUIRED)
   target_link_libraries(nomp PRIVATE OpenCL::OpenCL)
 endif()
-if (ENABLE_CUDA OR (ENABLE_HIP AND ${HIP_PLATFORM} STREQUAL "nvidia"))
+if (ENABLE_CUDA)
   find_package(CUDAToolkit REQUIRED)
   target_link_libraries(nomp PRIVATE CUDA::cudart CUDA::nvrtc)
 endif()
-if (ENABLE_HIP)
-  target_link_libraries(nomp PRIVATE ${HIP_PATH}/lib/libamdhip64.so)
-  target_link_libraries(nomp PRIVATE ${HIP_PATH}/lib/libhiprtc.so)
+if (ENABLE_HIP AND HIP_FOUND)
+  target_link_libraries(nomp PRIVATE nomp::HIP)
 endif()
 
 set_target_properties(nomp PROPERTIES
@@ -84,7 +67,6 @@ target_include_directories(nomp PRIVATE src)
 
 option(ENABLE_DOCS "Enable Documentation" OFF)
 if (ENABLE_DOCS)
-  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
   add_subdirectory ("docs")
 endif()
 
