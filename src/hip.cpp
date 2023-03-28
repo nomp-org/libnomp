@@ -4,26 +4,28 @@
 
 #define NARGS_MAX 64
 
-#define chk_hip_(file, line, x)                                                \
+#define chk_hip_(file, line, call)                                             \
   do {                                                                         \
-    if (x != hipSuccess) {                                                     \
-      const char *msg = hipGetErrorName(x);                                    \
+    hipError_t result = (call);                                                \
+    if (result != hipSuccess) {                                                \
+      const char *msg = hipGetErrorName(result);                               \
       return nomp_set_log(NOMP_HIP_FAILURE, NOMP_ERROR, ERR_STR_HIP_FAILURE,   \
                           "operation", msg);                                   \
     }                                                                          \
   } while (0)
 
-#define chk_hip(x) chk_hip_(__FILE__, __LINE__, x)
+#define chk_hip(call) chk_hip_(__FILE__, __LINE__, call)
 
-#define chk_hiprtc_(file, line, x)                                             \
+#define chk_hiprtc_(file, line, call)                                          \
   do {                                                                         \
-    if (x != HIPRTC_SUCCESS) {                                                 \
-      const char *msg = hiprtcGetErrorString(x);                               \
+    hiprtcResult result = (call);                                              \
+    if (result != HIPRTC_SUCCESS) {                                            \
+      const char *msg = hiprtcGetErrorString(result);                          \
       return nomp_set_log(NOMP_HIP_FAILURE, NOMP_ERROR, ERR_STR_HIP_FAILURE,   \
                           "runtime compilation", msg);                         \
     }                                                                          \
   } while (0)
-#define chk_hiprtc(x) chk_hiprtc_(__FILE__, __LINE__, x)
+#define chk_hiprtc(call) chk_hiprtc_(__FILE__, __LINE__, call)
 
 const char *ERR_STR_HIP_FAILURE = "HIP %s failed: %s.";
 
@@ -39,9 +41,8 @@ struct hip_prog {
 };
 
 static int hip_update(struct backend *bnd, struct mem *m, const int op) {
-  if (op & NOMP_ALLOC) {
+  if (op & NOMP_ALLOC)
     chk_hip(hipMalloc(&m->bptr, (m->idx1 - m->idx0) * m->usize));
-  }
 
   if (op & NOMP_TO) {
     chk_hip(hipMemcpy(m->bptr, (char *)m->hptr + m->usize * m->idx0,
@@ -71,7 +72,7 @@ static int hip_knl_build(struct backend *bnd, struct prog *prg,
 
   struct hip_backend *hbnd = (struct hip_backend *)bnd->bptr;
 
-  const char *opts[1] = {};
+  const char *opts[1] = {NULL};
   hiprtcResult result = hiprtcCompileProgram(prog, 0, opts);
   if (result != HIPRTC_SUCCESS) {
     size_t log_size;
@@ -79,7 +80,7 @@ static int hip_knl_build(struct backend *bnd, struct prog *prg,
     char *log = nomp_calloc(char, log_size);
     hiprtcGetProgramLog(prog, log);
     const char *err_str = hiprtcGetErrorString(result);
-    size_t msg_size = log_size + strlen(err_str) + 2;
+    size_t msg_size = log_size + strlen(err_str) + 3;
     char *msg = nomp_calloc(char, msg_size);
     snprintf(msg, msg_size, "%s: %s", err_str, log);
     int err_id = nomp_set_log(NOMP_HIP_FAILURE, NOMP_ERROR, ERR_STR_HIP_FAILURE,
@@ -168,14 +169,14 @@ int hip_init(struct backend *bnd, const int platform_id, const int device_id) {
   }
   chk_hip(hipSetDevice(device_id));
 
-  bnd->bptr = nomp_calloc(struct hip_backend, 1);
-  struct hip_backend *hbnd = (struct hip_backend *)bnd->bptr;
+  struct hip_backend *hbnd = nomp_calloc(struct hip_backend, 1);
   hbnd->device_id = device_id;
   chk_hip(hipGetDeviceProperties(&hbnd->prop, device_id));
 #ifdef __HIP_PLATFORM_NVIDIA__
   chk_hip(hipInit(0));
   chk_hip(hipCtxCreate(&hbnd->ctx, 0, hbnd->device_id));
 #endif
+  bnd->bptr = (void *)hbnd;
 
   bnd->update = hip_update;
   bnd->knl_build = hip_knl_build;
