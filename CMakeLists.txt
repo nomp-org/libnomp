@@ -10,8 +10,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 
-set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-
 option(ENABLE_OPENCL "Build OpenCL backend" ON)
 option(ENABLE_CUDA "Build Cuda backend" OFF)
 option(ENABLE_HIP "Build HIP backend" OFF)
@@ -73,7 +71,7 @@ if (ENABLE_HIP AND HIP_FOUND)
 endif()
 if (ENABLE_SYCL)
   find_package(DPCPP REQUIRED)
-  target_link_libraries(nomp PRIVATE DPCPP::SYCL)
+  target_link_libraries(nomp PRIVATE nomp::SYCL)
 endif()
 
 set_target_properties(nomp PROPERTIES
