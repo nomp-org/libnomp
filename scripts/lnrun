@@ -113,8 +113,8 @@ function print_help_docs() {
 
 function run_tests() {
   [[ ${NOMP_TEST_GROUPS} == *"*"* ]] &&
-    TESTS="${NOMP_TEST_DIR}/nomp-api-${NOMP_TEST_GROUPS}[^.py]" ||
-    TESTS="${NOMP_TEST_DIR}/nomp-api-${NOMP_TEST_GROUPS}"
+    TESTS="${NOMP_TEST_DIR}/nomp-${NOMP_TEST_GROUPS}[^.py]" ||
+    TESTS="${NOMP_TEST_DIR}/nomp-${NOMP_TEST_GROUPS}"
 
   if ! compgen -G "${TESTS}" >/dev/null; then
     echo -e "\n${red}No tests found for: ${TESTS}${reset}"

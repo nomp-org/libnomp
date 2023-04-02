@@ -33,12 +33,6 @@ static int check_env(struct backend *backend) {
     backend->install_dir = strndup(tmp, size + 1), nomp_free(tmp);
   }
 
-  if ((tmp = copy_env("NOMP_CC", MAX_BUFSIZ)))
-    backend->cc = strndup(tmp, MAX_BUFSIZ + 1), nomp_free(tmp);
-
-  if ((tmp = copy_env("NOMP_ISPC", MAX_BUFSIZ)))
-    backend->ispc = strndup(tmp, MAX_BUFSIZ + 1), nomp_free(tmp);
-
   return 0;
 }
 
@@ -58,7 +52,6 @@ static int check_args(int argc, const char **argv, struct backend *backend) {
   backend->device_id = 0, backend->platform_id = 0, backend->verbose = 0;
   backend->backend = backend->install_dir = NULL;
   backend->annts_script = backend->annts_func = NULL;
-  backend->cc = "/usr/bin/cc", backend->ispc = "ispc";
 
   if (argc <= 1 || argv == NULL)
     return 0;
@@ -84,10 +77,6 @@ static int check_args(int argc, const char **argv, struct backend *backend) {
         backend->annts_script = strndup((const char *)argv[i + 1], MAX_BUFSIZ);
       } else if (!strncmp("--nomp-function", argv[i], MAX_BUFSIZ)) {
         backend->annts_func = strndup((const char *)argv[i + 1], MAX_BUFSIZ);
-      } else if (!strncmp("--nomp-cc", argv[i], MAX_BUFSIZ)) {
-        backend->cc = strndup((const char *)argv[i + 1], MAX_BUFSIZ);
-      } else if (!strncmp("--nomp-ispc", argv[i], MAX_BUFSIZ)) {
-        backend->ispc = strndup((const char *)argv[i + 1], MAX_BUFSIZ);
       }
       i++;
     }

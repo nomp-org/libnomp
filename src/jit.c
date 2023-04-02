@@ -74,8 +74,8 @@ static int write_file(const char *path, const char *src) {
 static int compile_aux(const char *cc, const char *cflags, const char *src,
                        const char *out) {
   size_t len;
-  // nomp_check(nomp_path_len(&len, cc));
-  len = strnlen(cflags, MAX_CFLAGS_SIZE) + strlen(src) + strlen(out) + 32;
+  nomp_check(nomp_path_len(&len, cc));
+  len += strnlen(cflags, MAX_CFLAGS_SIZE) + strlen(src) + strlen(out) + 32;
 
   char *cmd = nomp_calloc(char, len);
   snprintf(cmd, len, "%s %s %s -o %s", cc, cflags, src, out);
@@ -124,8 +124,7 @@ int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
   char *lib = nomp_str_cat(3, max, dir, "/", libf);
   nomp_free(dir);
 
-  if (to_wrt)
-    nomp_check(write_file(src, source));
+  nomp_check(write_file(src, source));
   nomp_check(compile_aux(cc, cflags, src, lib));
   nomp_free(src);
 
@@ -143,16 +142,14 @@ int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
     dlf = dlsym(dlh, entry);
   nomp_free(lib);
 
-    if (dlh == NULL || dlf == NULL) {
-      return nomp_set_log(
-          NOMP_JIT_FAILURE, NOMP_ERROR,
-          "Failed to open object/symbol \"%s\" due to error: \"%s\".",
-          dlerror());
-    }
-
-    struct function *f = funcs[funcs_n] = nomp_calloc(struct function, 1);
-    f->dlh = dlh, f->dlf = (void (*)(void **))dlf, *id = funcs_n++;
+  if (dlh == NULL || dlf == NULL) {
+    return nomp_set_log(
+        NOMP_JIT_FAILURE, NOMP_ERROR,
+        "Failed to open object/symbol \"%s\" due to error: \"%s\".", dlerror());
   }
+
+  struct function *f = funcs[funcs_n] = nomp_calloc(struct function, 1);
+  f->dlh = dlh, f->dlf = (void (*)(void **))dlf, *id = funcs_n++;
 
   return 0;
 }
