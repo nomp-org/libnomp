@@ -37,7 +37,7 @@ if (ENABLE_HIP)
     list(APPEND SOURCES src/hip.cpp)
     add_compile_definitions(HIP_ENABLED)
   else()
-    message(FATAL_ERROR "HIP enabled but HIP was not found!")
+    message(FATAL_ERROR "ENABLE_HIP is ON but unable to find HIP runtime")
   endif()
 endif()
 
