@@ -152,6 +152,11 @@ static int hip_knl_free(struct prog *prg) {
   return 0;
 }
 
+static int hip_sync(struct backend *bnd) {
+  chk_hip(hipDeviceSynchronize());
+  return 0;
+}
+
 static int hip_finalize(struct backend *bnd) {
 #ifdef __HIP_PLATFORM_NVIDIA__
   struct hip_backend *hbnd = (struct hip_backend *)bnd->bptr;
@@ -182,6 +187,7 @@ int hip_init(struct backend *bnd, const int platform_id, const int device_id) {
   bnd->knl_build = hip_knl_build;
   bnd->knl_run = hip_knl_run;
   bnd->knl_free = hip_knl_free;
+  bnd->sync = hip_sync;
   bnd->finalize = hip_finalize;
 
   return 0;
