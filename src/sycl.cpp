@@ -137,6 +137,7 @@ static int sycl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
   size_t global[3];
   for (unsigned i = 0; i < prg->ndim; i++)
     global[i] = prg->global[i] * prg->local[i];
+
   if (prg->ndim == 1) {
     sycl::range global_range = sycl::range(global[0]);
     sycl::range local_range = sycl::range(prg->local[0]);
