@@ -195,7 +195,7 @@
 #define NOMP_OPENCL_FAILURE -513
 /**
  * @ingroup nomp_errors
- * @brief libnomp source compilation failure.
+ * @brief libnomp SYCL failure.
  */
 #define NOMP_SYCL_FAILURE -514
 /**

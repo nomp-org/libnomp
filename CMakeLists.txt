@@ -3,7 +3,6 @@ project(libnomp VERSION 0.0.1 DESCRIPTION "nomp runtime library" LANGUAGES C CXX
 
 # Treat compiler warnings as errors
 set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
-
 set(CMAKE_C_STANDARD 99)
 set (CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -52,10 +51,6 @@ if (ENABLE_SYCL)
   else()
     message(FATAL_ERROR "ENABLE_SYCL is ON but unable to find SYCL runtime")
   endif()
-endif()
-if (ENABLE_SYCL)
-  list(APPEND SOURCES src/sycl.cpp)
-  add_compile_definitions(SYCL_ENABLED)
 endif()
 add_library(nomp SHARED ${SOURCES})
 
