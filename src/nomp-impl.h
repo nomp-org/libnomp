@@ -18,6 +18,7 @@
 #define MAX_BACKEND_SIZE 32
 #define MAX_SRC_SIZE 16384
 #define MAX_CFLAGS_SIZE 16384
+#define MAX_KNL_ARGS 64
 
 #ifdef __cplusplus
 extern "C" {

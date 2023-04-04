@@ -131,15 +131,9 @@ class SyclKernelWrapper(BaseKernelWrapper):
             device_code,
             args_list,
         ) = self.get_device_code_and_args(knl, get_arg)
-        grid_size = knl.default_entrypoint.get_grid_size_upper_bounds_as_exprs(
-            knl.callables_table
-        )
-        ndim = max(len(grid_size[0]), len(grid_size[1]))
         knl_args = args_list + [
             c.Value("*(sycl::queue *)", f"args[{len(args_list)}]"),
-            c.Value(
-                f"*(sycl::nd_range<{ndim}> *)", f"args[{len(args_list) + 1}]"
-            ),
+            c.Value("*(sycl::nd_range<3> *)", f"args[{len(args_list) + 1}]"),
         ]
         function_body = c.FunctionBody(
             c.FunctionDeclaration(

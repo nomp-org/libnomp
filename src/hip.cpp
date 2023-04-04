@@ -2,8 +2,6 @@
 #include <hip/hip_runtime.h>
 #include <hip/hiprtc.h>
 
-#define NARGS_MAX 64
-
 #define chk_hip_(file, line, call)                                             \
   do {                                                                         \
     hipError_t result = (call);                                                \
@@ -113,7 +111,7 @@ static int hip_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
   const size_t *global = prg->global, *local = prg->local;
 
   struct mem *m;
-  void *vargs[NARGS_MAX];
+  void *vargs[MAX_KNL_ARGS];
   for (int i = 0; i < nargs; i++) {
     const char *var = va_arg(args, const char *);
     int type = va_arg(args, int);
@@ -192,5 +190,3 @@ int hip_init(struct backend *bnd, const int platform_id, const int device_id) {
 
   return 0;
 }
-
-#undef NARGS_MAX

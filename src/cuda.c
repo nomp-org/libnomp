@@ -4,8 +4,6 @@
 #include <cuda_runtime.h>
 #include <nvrtc.h>
 
-#define NARGS_MAX 64
-
 static const char *ERR_STR_CUDA_FAILURE = "Cuda %s failed: %s.";
 
 #define chk_cu(call)                                                           \
@@ -120,7 +118,7 @@ static int cuda_knl_build(struct backend *bnd, struct prog *prg,
 }
 
 static int cuda_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
-  void *vargs[NARGS_MAX];
+  void *vargs[MAX_KNL_ARGS];
   for (int i = 0; i < prg->nargs; i++) {
     const char *var = va_arg(args, const char *);
     int type = va_arg(args, int);
@@ -193,5 +191,3 @@ int cuda_init(struct backend *bnd, const int platform_id, const int device_id) {
 
   return 0;
 }
-
-#undef NARGS_MAX

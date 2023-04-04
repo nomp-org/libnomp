@@ -14,8 +14,7 @@ static int nomp_api_240_aux(const char *knl_fmt, const char **clauses,
            sizeof(int), &N);
   nomp_test_chk(err);
 
-  err = nomp_sync();
-  nomp_test_chk(err);
+  nomp_test_chk(nomp_sync());
 
   err = nomp_update(a, 0, N, sizeof(TEST_TYPE), NOMP_FROM);
   nomp_test_chk(err);
