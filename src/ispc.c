@@ -4,7 +4,8 @@
 
 #define NARGS_MAX 64
 
-static const char *ERR_STR_ISPC_FAILURE = "ISPC %s failed with error code: %d.";
+static const char *ERR_STR_ISPC_FAILURE =
+    "ISPC %s failed with error message: %s.";
 
 struct ispc_backend {
   char *ispc_cc, *cc, *ispc_flags, *cc_flags;
@@ -41,20 +42,20 @@ static int ispc_update(struct backend *bnd, struct mem *m, const int op) {
   if (op & NOMP_ALLOC) {
     ISPCRTMemoryView view = ispcrtNewMemoryView(
         ispc->device, m->hptr, (m->idx1 - m->idx0) * m->usize, &(ispc->flags));
-    chk_ispcrt("error in alloc", rt_error);
+    chk_ispcrt("memory allocation", rt_error);
     m->bptr = view;
   }
 
   if (op & NOMP_TO) {
     ispcrtCopyToDevice(ispc->queue, (ISPCRTMemoryView)(m->bptr));
-    chk_ispcrt("error in copy to device", rt_error);
+    chk_ispcrt("memory copy to device", rt_error);
   } else if (op == NOMP_FROM) {
     ispcrtCopyToHost(ispc->queue, (ISPCRTMemoryView)(m->bptr));
-    chk_ispcrt("error in copy to host", rt_error);
+    chk_ispcrt("memory copy from device", rt_error);
   } else if (op == NOMP_FREE) {
     ispcrtRelease((ISPCRTMemoryView)(m->bptr));
     m->bptr = NULL;
-    chk_ispcrt("error in free", rt_error);
+    chk_ispcrt("memory freeing", rt_error);
   }
 
   return 0;
@@ -160,7 +161,8 @@ static int ispc_chk_env(struct ispc_backend *ispc) {
     ispc->cc = strndup(tmp, size + 1);
   } else {
     return nomp_set_log(NOMP_ISPC_FAILURE, NOMP_ERROR,
-                        "CC compiler NOMP_CC must be set.");
+                        "Environment variable NOMP_CC is not set. Please set "
+                        "it to point to host compiler.");
   }
 
   tmp = getenv("NOMP_ISPC_CC");
@@ -170,7 +172,8 @@ static int ispc_chk_env(struct ispc_backend *ispc) {
     ispc->ispc_cc = strndup(tmp, size + 1);
   } else {
     return nomp_set_log(NOMP_ISPC_FAILURE, NOMP_ERROR,
-                        "ISPC compiler NOMP_ISPC_CC must be set.");
+                        "Environment variable NOMP_ISPC_CC is not set. Please "
+                        "set it to point to ISPC compiler.");
   }
 
   tmp = getenv("NOMP_CFLAGS");
@@ -178,7 +181,8 @@ static int ispc_chk_env(struct ispc_backend *ispc) {
     ispc->cc_flags = strndup(tmp, MAX_BUFSIZ + 1);
   } else {
     return nomp_set_log(NOMP_ISPC_FAILURE, NOMP_ERROR,
-                        "CC compiler flags NOMP_CFLAGS must be set.");
+                        "Environment variable NOMP_CFLAGS is not set. Please "
+                        "set it with suitable to host compiler flags.");
   }
 
   tmp = getenv("NOMP_ISPC_CFLAGS");
@@ -186,7 +190,8 @@ static int ispc_chk_env(struct ispc_backend *ispc) {
     ispc->ispc_flags = strndup(tmp, MAX_BUFSIZ + 1);
   } else {
     return nomp_set_log(NOMP_ISPC_FAILURE, NOMP_ERROR,
-                        "ISPC compiler flags NOMP_ISPC_CFLAGS must be set.");
+                        "Environment variable NOMP_ISPC_CFLAGS is not set. "
+                        "Please set it with suitable ISPC compiler flags.");
   }
 
   return 0;
