@@ -56,7 +56,7 @@ static int make_knl_dir(char **dir_, const char *knl_dir, const char *src) {
 }
 
 static int write_file(const char *path, const char *src) {
-  // See if source.cpp exist. Otherwise create it.
+  // See if source exist. Otherwise create it.
   if (access(path, F_OK) == -1) {
     FILE *fp = fopen(path, "w");
     if (fp != NULL) {
@@ -111,14 +111,14 @@ static struct function **funcs = NULL;
 static unsigned funcs_n = 0, funcs_max = 0;
 
 int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
-                const char *entry, const char *wrkdir) {
+                const char *entry, const char *wrkdir, const char *srcf,
+                const char *libf) {
   char *dir = NULL;
   nomp_check(make_knl_dir(&dir, wrkdir, source));
 
   size_t ldir;
   nomp_check(nomp_path_len(&ldir, dir));
 
-  const char *srcf = "source.c", *libf = "mylib.so";
   size_t max = nomp_max(3, ldir, strnlen(srcf, 64), strnlen(libf, 64));
   char *src = nomp_str_cat(3, max, dir, "/", srcf);
   char *lib = nomp_str_cat(3, max, dir, "/", libf);
@@ -128,6 +128,9 @@ int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
   nomp_check(compile_aux(cc, cflags, src, lib));
   nomp_free(src);
 
+  if (id == NULL)
+    return 0;
+
   if (funcs_n == funcs_max) {
     funcs_max += funcs_max / 2 + 1;
     funcs = nomp_realloc(funcs, struct function *, funcs_max);
@@ -135,7 +138,7 @@ int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
 
   void (*dlf)() = NULL;
   void *dlh = dlopen(lib, RTLD_LAZY | RTLD_LOCAL);
-  if (dlh)
+  if (dlh && entry)
     dlf = dlsym(dlh, entry);
   nomp_free(lib);
 
