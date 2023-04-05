@@ -15,8 +15,9 @@ static const char *add_src =
 
 static int test_jit_compile_and_free(const char *cwd, const char *wkdir) {
   const char *cc = "/usr/bin/cc", *cflags = "-shared", *entry = "add_wrapper";
+  const char *srcf = "source.c", *libf = "mylib.so";
   int id = -1;
-  int err = jit_compile(&id, add_src, cc, cflags, entry, wkdir);
+  int err = jit_compile(&id, add_src, cc, cflags, entry, wkdir, srcf, libf);
   nomp_test_chk(err);
   nomp_test_assert(id == 0);
 
@@ -29,8 +30,9 @@ static int test_jit_compile_and_free(const char *cwd, const char *wkdir) {
 
 static int test_jit_run(const char *cwd, const char *wkdir) {
   const char *cc = "/usr/bin/cc", *cflags = "-shared", *entry = "add_wrapper";
+  const char *srcf = "source.c", *libf = "mylib.so";
   int id = -1;
-  int err = jit_compile(&id, add_src, cc, cflags, entry, wkdir);
+  int err = jit_compile(&id, add_src, cc, cflags, entry, wkdir, srcf, libf);
   nomp_test_chk(err);
 
   int a = 3, b = 7, c = -1;
