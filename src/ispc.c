@@ -75,21 +75,17 @@ static int ispc_knl_build(struct backend *bnd, struct prog *prg,
   const char *lib = "nomp_ispc";
   char *wkdir = nomp_str_cat(3, BUFSIZ, cwd, "/", ".nomp_jit_cache");
   int err = jit_compile(NULL, source, ispc->ispc_cc, ispc->ispc_flags, NULL,
-                        wkdir, src_f, dev_f, NOMP_WRITE);
+                        wkdir, src_f, dev_f);
   if (err) {
     nomp_free(wkdir);
-    return nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR, ERR_STR_ISPC_FAILURE,
-                        "ispc compile", rt_error);
+    return err;
   }
 
   char *lib_so = nomp_str_cat(3, BUFSIZ, "lib", lib, ".so");
   err = jit_compile(&iprg->ispc_id, source, ispc->cc, ispc->cc_flags, name,
-                    wkdir, dev_f, lib_so, NOMP_DO_NOT_WRITE);
+                    wkdir, dev_f, lib_so);
   nomp_free(wkdir), nomp_free(lib_so);
-  if (err) {
-    return nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR, ERR_STR_ISPC_FAILURE,
-                        "build library", rt_error);
-  }
+  nomp_check(err);
   prg->bptr = (void *)iprg;
   return 0;
 }
@@ -98,10 +94,9 @@ static int ispc_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
   const int ndim = prg->ndim, nargs = prg->nargs;
   size_t *global = prg->global;
 
-  int i;
   struct mem *m;
   void *vargs[NARGS_MAX];
-  for (i = 0; i < nargs; i++) {
+  for (int i = 0; i < nargs; i++) {
     const char *var = va_arg(args, const char *);
     int type = va_arg(args, int);
     size_t size = va_arg(args, size_t);
@@ -129,9 +124,9 @@ static int ispc_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
 
   int one = 1;
   for (int d = 0; d < ndim; d++)
-    vargs[i + d] = (void *)&(global[d]);
+    vargs[nargs + d] = (void *)&(global[d]);
   for (int d = ndim; d < 3; d++)
-    vargs[i + d] = (void *)&one;
+    vargs[nargs + d] = (void *)&one;
 
   struct ispc_prog *iprg = (struct ispc_prog *)prg->bptr;
   return jit_run(iprg->ispc_id, vargs);
