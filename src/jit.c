@@ -57,7 +57,7 @@ static int make_knl_dir(char **dir_, const char *knl_dir, const char *src) {
 
 static int write_file(const char *path, const char *src) {
   // See if source exist. Otherwise create it.
-  if (access(path, F_OK) == -1) {
+  if (access(path, F_OK) == -1 && src != NULL) {
     FILE *fp = fopen(path, "w");
     if (fp != NULL) {
       fprintf(fp, "%s", src);
