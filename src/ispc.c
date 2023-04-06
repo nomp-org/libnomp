@@ -2,8 +2,6 @@
 #include "nomp-jit.h"
 #include <ispcrt/ispcrt.h>
 
-#define NARGS_MAX 64
-
 static const char *ERR_STR_ISPC_FAILURE =
     "ISPC %s failed with error message: %s.";
 
@@ -96,7 +94,7 @@ static int ispc_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
   size_t *global = prg->global;
 
   struct mem *m;
-  void *vargs[NARGS_MAX];
+  void *vargs[MAX_KNL_ARGS];
   for (int i = 0; i < nargs; i++) {
     const char *var = va_arg(args, const char *);
     int type = va_arg(args, int);

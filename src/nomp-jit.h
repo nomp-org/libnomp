@@ -58,3 +58,6 @@ int jit_run(int id, void *p[]);
 int jit_free(int *id);
 
 #endif // _NOMP_JIT_H_
+#ifdef __cplusplus
+}
+#endif
