@@ -12,11 +12,9 @@ static int test_invalid_kernel_id(int argc, const char **argv, int *id, int *a,
   nomp_test_chk(nomp_update(a, 0, n, sizeof(int), NOMP_TO));
 
   const char *clauses[4] = {"transform", "nomp-api-100", "transform", 0};
-  nomp_test_chk(nomp_jit(id, knl, clauses));
-
-  int err = nomp_run(-1, 3, "a", NOMP_PTR, sizeof(int), a, "b", NOMP_PTR,
-                     sizeof(int), b, "N", NOMP_INT, sizeof(int), &n);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
+  nomp_test_chk(nomp_jit(id, knl, clauses, 3, "a", sizeof(int *), NOMP_PTR, "b",
+                 sizeof(int *), NOMP_PTR, "N", sizeof(int), NOMP_INT));
+  nomp_test_assert(nomp_get_log_no(nomp_run(-1, a, b, &N)) == NOMP_USER_INPUT_IS_INVALID);
 
   char *desc = nomp_get_log_str(err);
   int eq = logcmp(desc, "\\[Error\\] .*\\/src\\/nomp.[c|cpp]:[0-9]* Kernel "
@@ -29,8 +27,7 @@ static int test_invalid_kernel_id(int argc, const char **argv, int *id, int *a,
 
 // Invoke fails because b is not mapped
 static int test_unmapped_variable(int id, int *a, int *b, int n) {
-  int err = nomp_run(id, 3, "a", NOMP_PTR, sizeof(int), a, "b", NOMP_PTR,
-                     sizeof(int), b, "N", NOMP_INT, sizeof(int), &n);
+  int err = nomp_run(id, a, b, &n);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_MAP_PTR_IS_INVALID);
 
   char *desc = nomp_get_log_str(err);

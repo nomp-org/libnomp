@@ -39,6 +39,7 @@ static int opencl_update(struct backend *bnd, struct mem *m, const int op) {
                           (m->idx1 - m->idx0) * m->usize, NULL, &err);
     chk_cl(err, "clCreateBuffer");
     m->bptr = (void *)clm;
+    m->bsize = sizeof(cl_mem);
   }
 
   cl_mem *clm = (cl_mem *)m->bptr;
@@ -92,36 +93,12 @@ static int opencl_knl_build(struct backend *bnd, struct prog *prg,
   return 0;
 }
 
-static int opencl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
-  struct opencl_prog *ocl_prg = (struct opencl_prog *)prg->bptr;
+static int opencl_knl_run(struct backend *bnd, struct prog *prg) {
+  struct opencl_prog *oprg = (struct opencl_prog *)prg->bptr;
 
   for (int i = 0; i < prg->nargs; i++) {
-    const char *var = va_arg(args, const char *);
-    int type = va_arg(args, int);
-    size_t size = va_arg(args, size_t);
-    void *p = va_arg(args, void *);
-
-    struct mem *m;
-    switch (type) {
-    case NOMP_INT:
-    case NOMP_FLOAT:
-      break;
-    case NOMP_PTR:
-      m = mem_if_mapped(p);
-      if (m == NULL) {
-        return nomp_set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
-                            ERR_STR_USER_MAP_PTR_IS_INVALID, p);
-      }
-      p = m->bptr;
-      size = sizeof(cl_mem);
-      break;
-    default:;
-      return nomp_set_log(NOMP_USER_KNL_ARG_TYPE_IS_INVALID, NOMP_ERROR,
-                          "Kernel argument type %d is not valid.", type);
-      break;
-    }
-
-    chk_cl(clSetKernelArg(ocl_prg->knl, i, size, p), "clSetKernelArg");
+    chk_cl(clSetKernelArg(oprg->knl, i, prg->args[i].size, prg->args[i].ptr),
+           "clSetKernelArg");
   }
 
   size_t global[3];
@@ -129,9 +106,10 @@ static int opencl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
     global[i] = prg->global[i] * prg->local[i];
 
   struct opencl_backend *ocl = (struct opencl_backend *)bnd->bptr;
-  chk_cl(clEnqueueNDRangeKernel(ocl->queue, ocl_prg->knl, prg->ndim, NULL,
-                                global, prg->local, 0, NULL, NULL),
+  chk_cl(clEnqueueNDRangeKernel(ocl->queue, oprg->knl, prg->ndim, NULL, global,
+                                prg->local, 0, NULL, NULL),
          "clEnqueueNDRangeKernel");
+
   return 0;
 }
 

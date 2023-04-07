@@ -11,7 +11,8 @@ static int test_invalid_file() {
   const char *clauses[4] = {"transform", "invalid-file", "invalid", 0};
 
   static int id = -1;
-  int err = nomp_jit(&id, valid_knl, clauses);
+  int err = nomp_jit(&id, valid_knl, clauses, 2, "a", sizeof(int *), NOMP_PTR,
+                     "N", sizeof(int), NOMP_INT);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
   char *log = nomp_get_log_str(err);
@@ -28,7 +29,8 @@ static int test_invalid_transform_function() {
   const char *clauses[4] = {"transform", "nomp-api-100", "invalid-func", 0};
 
   static int id = -1;
-  int err = nomp_jit(&id, valid_knl, clauses);
+  int err = nomp_jit(&id, valid_knl, clauses, 2, "a", sizeof(int *), NOMP_PTR,
+                     "N", sizeof(int), NOMP_INT);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_PY_CALL_FAILURE);
 
   char *log = nomp_get_log_str(err);
@@ -46,7 +48,8 @@ static int test_invalid_clause() {
   const char *clauses[4] = {"invalid-clause", "nomp-api-100", "transform", 0};
 
   static int id = -1;
-  int err = nomp_jit(&id, valid_knl, clauses);
+  int err = nomp_jit(&id, valid_knl, clauses, 2, "a", sizeof(int *), NOMP_PTR,
+                     "N", sizeof(int), NOMP_INT);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
   char *log = nomp_get_log_str(err);
@@ -64,7 +67,8 @@ static int test_missing_filename() {
   const char *clauses[4] = {"transform", NULL, "transform", 0};
 
   static int id = -1;
-  int err = nomp_jit(&id, valid_knl, clauses);
+  int err = nomp_jit(&id, valid_knl, clauses, 2, "a", sizeof(int *), NOMP_PTR,
+                     "N", sizeof(int), NOMP_INT);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_NOT_PROVIDED);
 
   char *log = nomp_get_log_str(err);
@@ -83,7 +87,8 @@ static int test_missing_user_callback() {
   const char *clauses[4] = {"transform", "nomp-api-100", NULL, 0};
 
   static int id = -1;
-  int err = nomp_jit(&id, valid_knl, clauses);
+  int err = nomp_jit(&id, valid_knl, clauses, 2, "a", sizeof(int *), NOMP_PTR,
+                     "N", sizeof(int), NOMP_INT);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_NOT_PROVIDED);
 
   char *log = nomp_get_log_str(err);
@@ -106,7 +111,8 @@ static int test_syntax_error_in_kernel() {
       "}                                                                    \n";
   static int id = -1;
   const char *clauses0[4] = {"transform", "invalid-file", "invalid", 0};
-  int err = nomp_jit(&id, invalid_knl, clauses0);
+  int err = nomp_jit(&id, invalid_knl, clauses0, 2, "a", sizeof(int *),
+                     NOMP_PTR, "N", sizeof(int), NOMP_INT);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_LOOPY_CONVERSION_FAILURE);
 
   char *log = nomp_get_log_str(err);

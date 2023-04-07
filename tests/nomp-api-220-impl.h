@@ -12,9 +12,7 @@ static int nomp_api_220_aux(const char *knl_fmt, TEST_TYPE *a, TEST_TYPE *b,
   nomp_test_chk(create_knl(&id, knl_fmt, clauses, 3, TOSTRING(TEST_TYPE),
                            TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE)));
 
-  nomp_test_chk(nomp_run(id, 4, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b",
-                         NOMP_PTR, sizeof(TEST_TYPE), b, "c", NOMP_PTR,
-                         sizeof(TEST_TYPE), c, "N", NOMP_INT, sizeof(int), &n));
+  nomp_test_chk(nomp_run(id, 4, a, b, c, &n));
 
   nomp_test_chk(nomp_sync());
 
