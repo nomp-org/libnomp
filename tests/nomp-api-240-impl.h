@@ -2,19 +2,18 @@
 
 #define nomp_api_240_aux TOKEN_PASTE(nomp_api_240_aux, TEST_SUFFIX)
 static int nomp_api_240_aux(const char *knl_fmt, const char **clauses,
-                            TEST_TYPE *a, int N) {
-  nomp_test_chk(nomp_update(a, 0, N, sizeof(TEST_TYPE), NOMP_TO));
+                            TEST_TYPE *a, int n) {
+  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO));
 
   int id = -1;
   nomp_test_chk(create_knl(&id, knl_fmt, clauses, 1, TOSTRING(TEST_TYPE)));
 
-  nomp_test_chk(nomp_run(id, 2, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "N",
-                         NOMP_INT, sizeof(int), &N));
+  nomp_test_chk(nomp_run(id, 2, a, &n));
 
   nomp_test_chk(nomp_sync());
 
-  nomp_test_chk(nomp_update(a, 0, N, sizeof(TEST_TYPE), NOMP_FROM));
-  nomp_test_chk(nomp_update(a, 0, N, sizeof(TEST_TYPE), NOMP_FREE));
+  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM));
+  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
 
   return 0;
 }

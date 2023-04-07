@@ -263,7 +263,7 @@ static int parse_clauses(char **usr_file, char **usr_func, PyObject **dict_,
   return 0;
 }
 
-int nomp_jit(int *id, const char *c_src, const char **clauses) {
+int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
   int err;
   if (*id == -1) {
     if (progs_n == progs_max) {
@@ -273,7 +273,7 @@ int nomp_jit(int *id, const char *c_src, const char **clauses) {
 
     // Create loopy kernel from C source
     PyObject *knl = NULL;
-    nomp_check(py_c_to_loopy(&knl, c_src, nomp.name));
+    nomp_check(py_c_to_loopy(&knl, csrc, nomp.name));
 
     // Parse the clauses
     char *usr_file = NULL, *usr_func = NULL;
@@ -285,7 +285,7 @@ int nomp_jit(int *id, const char *c_src, const char **clauses) {
         py_user_annotate(&knl, annts, nomp.annts_script, nomp.annts_func));
     Py_XDECREF(annts);
 
-    // Handle transform clauase
+    // Handle transform clause
     nomp_check(py_user_transform(&knl, usr_file, usr_func));
     nomp_free(usr_file), nomp_free(usr_func);
 
@@ -301,9 +301,22 @@ int nomp_jit(int *id, const char *c_src, const char **clauses) {
     // Get grid size of the loopy kernel as pymbolic expressions after
     // transformations. These grid sizes will be evaluated when the kernel is
     // run.
-    prg->py_dict = PyDict_New();
     nomp_check(py_get_grid_size(prg, knl));
     Py_XDECREF(knl);
+
+    prg->py_dict = PyDict_New();
+    prg->nargs = nargs;
+    prg->args = nomp_calloc(struct arg, nargs);
+
+    va_list args;
+    va_start(args, nargs);
+    for (unsigned i = 0; i < prg->nargs; i++) {
+      const char *name = va_arg(args, const char *);
+      strncpy(prg->args[i].name, name, MAX_ARG_NAME_SIZE);
+      prg->args[i].size = va_arg(args, size_t);
+      prg->args[i].type = va_arg(args, int);
+    }
+    va_end(args);
 
     *id = progs_n++;
   }
@@ -311,31 +324,40 @@ int nomp_jit(int *id, const char *c_src, const char **clauses) {
   return 0;
 }
 
-int nomp_run(int id, int nargs, ...) {
+int nomp_run(int id, ...) {
   if (id >= 0) {
     struct prog *prg = progs[id];
-    prg->nargs = nargs;
+    struct arg *args = prg->args;
 
-    va_list args;
-    va_start(args, nargs);
-    for (int i = 0; i < nargs; i++) {
-      const char *var = va_arg(args, const char *);
-      int type = va_arg(args, int);
-      size_t size = va_arg(args, size_t);
-      void *val = va_arg(args, void *);
-      if (type == NOMP_INT) {
-        PyObject *py_key = PyUnicode_FromStringAndSize(var, strlen(var));
-        PyObject *py_val = PyLong_FromLong(*((int *)val));
+    PyObject *py_key, *py_val;
+    struct mem *m;
+    long val;
+
+    va_list vargs;
+    va_start(vargs, id);
+    for (unsigned i = 0; i < prg->nargs; i++) {
+      args[i].ptr = va_arg(vargs, void *);
+      switch (args[i].type) {
+      case NOMP_INT:
+        py_key =
+            PyUnicode_FromStringAndSize(args[i].name, strlen(args[i].name));
+        py_val = PyLong_FromLong(*((int *)args[i].ptr));
         PyDict_SetItem(prg->py_dict, py_key, py_val);
         Py_XDECREF(py_key), Py_XDECREF(py_val);
+        break;
+      case NOMP_PTR:
+        m = mem_if_mapped(args[i].ptr);
+        if (m == NULL) {
+          return nomp_set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
+                              ERR_STR_USER_MAP_PTR_IS_INVALID, args[i].ptr);
+        }
+        args[i].ptr = m->bptr, args[i].size = m->bsize;
       }
     }
-    va_end(args);
-    nomp_check(py_eval_grid_size(prg, prg->py_dict));
+    va_end(vargs);
 
-    va_start(args, nargs);
-    nomp_check(nomp.knl_run(&nomp, prg, args));
-    va_end(args);
+    nomp_check(py_eval_grid_size(prg, prg->py_dict));
+    nomp_check(nomp.knl_run(&nomp, prg));
 
     return 0;
   }

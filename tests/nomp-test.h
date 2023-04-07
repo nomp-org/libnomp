@@ -61,14 +61,15 @@ static int subtest_(int err, const char *test_name) {
 static int create_knl(int *id, const char *knl_fmt, const char **clauses,
                       const int args_n, ...) {
   size_t len = strlen(knl_fmt) + args_n * strlen(TOSTRING(TEST_TYPE)) + 1;
-  char knl[len];
+  char *knl = nomp_calloc(char, len);
 
   va_list vargs;
   va_start(vargs, args_n);
   vsnprintf(knl, len, knl_fmt, vargs);
+  nomp_test_chk(nomp_jit(id, knl, clauses, args_n, vargs));
+  nomp_free(knl);
   va_end(vargs);
 
-  nomp_test_chk(nomp_jit(id, knl, clauses));
   return 0;
 }
 

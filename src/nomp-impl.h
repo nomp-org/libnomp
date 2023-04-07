@@ -35,13 +35,14 @@ extern "C" {
 struct mem {
   size_t idx0, idx1, usize;
   void *hptr, *bptr;
+  size_t bsize;
 };
 
 struct arg {
   char name[MAX_ARG_NAME_SIZE];
   size_t size;
   unsigned type;
-  void *ptr, *hptr;
+  void *ptr;
 };
 
 struct prog {
@@ -66,7 +67,7 @@ struct backend {
   char name[MAX_BUFSIZ];
   int (*update)(struct backend *, struct mem *, const int);
   int (*knl_build)(struct backend *, struct prog *, const char *, const char *);
-  int (*knl_run)(struct backend *, struct prog *, va_list);
+  int (*knl_run)(struct backend *, struct prog *);
   int (*knl_free)(struct prog *);
   int (*sync)(struct backend *);
   int (*finalize)(struct backend *);
