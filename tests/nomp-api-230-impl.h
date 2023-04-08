@@ -1,17 +1,20 @@
 #include "nomp-test.h"
 
 #define nomp_api_230_aux TOKEN_PASTE(nomp_api_230_aux, TEST_SUFFIX)
-static int nomp_api_230_aux(const char *knl_fmt, const char **clauses,
-                            TEST_TYPE *a, TEST_TYPE *b, int rows, int cols,
-                            int n) {
+static int nomp_api_230_aux(const char *fmt, const char **clauses, TEST_TYPE *a,
+                            TEST_TYPE *b, int rows, int cols, int n) {
   nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO));
   nomp_test_chk(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO));
 
   int id = -1;
-  nomp_test_chk(create_knl(&id, knl_fmt, clauses, 2, TOSTRING(TEST_TYPE),
-                           TOSTRING(TEST_TYPE)));
+  char *knl = generate_knl(fmt, 2, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE));
+  nomp_test_chk(create_knl(&id, knl, clauses, 4, "a", sizeof(TEST_TYPE *),
+                           NOMP_PTR, "b", sizeof(TEST_TYPE *), NOMP_PTR, "rows",
+                           sizeof(int), NOMP_INT, "cols", sizeof(int),
+                           NOMP_INT));
+  nomp_free(knl);
 
-  nomp_test_chk(nomp_run(id, 4, a, b, &rows, &cols));
+  nomp_test_chk(nomp_run(id, a, b, &rows, &cols));
 
   nomp_test_chk(nomp_sync());
 

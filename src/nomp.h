@@ -370,7 +370,7 @@ int nomp_jit(int *id, const char *src, const char **clauses, int narg, ...);
  * const char *clauses[4] = {"transform", "file", "function", 0};
  * int err = nomp_jit(&id, knl, clauses, 3, "a", sizeof(a), NOMP_PTR, "b",
  * sizeof(b), NOMP_PTR, "N", sizeof(int), NOMP_INT);
- * err = nomp_run(id, 3, a, b, N);
+ * err = nomp_run(id, a, b, &N);
  * @endcode
  *
  * @param[in] id Id of the kernel to be run.

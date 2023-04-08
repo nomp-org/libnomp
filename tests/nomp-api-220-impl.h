@@ -1,18 +1,23 @@
 #include "nomp-test.h"
 
 #define nomp_api_220_aux TOKEN_PASTE(nomp_api_220_aux, TEST_SUFFIX)
-static int nomp_api_220_aux(const char *knl_fmt, TEST_TYPE *a, TEST_TYPE *b,
+static int nomp_api_220_aux(const char *fmt, TEST_TYPE *a, TEST_TYPE *b,
                             TEST_TYPE *c, int n) {
   nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO));
   nomp_test_chk(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO));
   nomp_test_chk(nomp_update(c, 0, n, sizeof(TEST_TYPE), NOMP_TO));
 
-  const char *clauses[4] = {"transform", "nomp-api-220", "transform", 0};
   int id = -1;
-  nomp_test_chk(create_knl(&id, knl_fmt, clauses, 3, TOSTRING(TEST_TYPE),
-                           TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE)));
+  const char *clauses[4] = {"transform", "nomp-api-220", "transform", 0};
+  char *knl = generate_knl(fmt, 3, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE),
+                           TOSTRING(TEST_TYPE));
+  nomp_test_chk(create_knl(&id, knl, clauses, 4, "a", sizeof(TEST_TYPE *),
+                           NOMP_PTR, "b", sizeof(TEST_TYPE *), NOMP_PTR, "c",
+                           sizeof(TEST_TYPE *), NOMP_PTR, "N", sizeof(int),
+                           NOMP_INT));
+  nomp_free(knl);
 
-  nomp_test_chk(nomp_run(id, 4, a, b, c, &n));
+  nomp_test_chk(nomp_run(id, a, b, c, &n));
 
   nomp_test_chk(nomp_sync());
 

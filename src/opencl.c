@@ -38,8 +38,7 @@ static int opencl_update(struct backend *bnd, struct mem *m, const int op) {
     *clm = clCreateBuffer(ocl->ctx, CL_MEM_READ_WRITE,
                           (m->idx1 - m->idx0) * m->usize, NULL, &err);
     chk_cl(err, "clCreateBuffer");
-    m->bptr = (void *)clm;
-    m->bsize = sizeof(cl_mem);
+    m->bptr = (void *)clm, m->bsize = sizeof(cl_mem);
   }
 
   cl_mem *clm = (cl_mem *)m->bptr;
