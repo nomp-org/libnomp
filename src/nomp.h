@@ -13,22 +13,22 @@
 
 /**
  * @ingroup nomp_attributes
- * @brief Nomp kernel argument is an accumulator of a reduction.
+ * @brief nomp kernel argument is an accumulator of a reduction.
  */
 #define NOMP_ATTR_REDN 1
 /**
  * @ingroup nomp_attributes
- * @brief Device memory for the Nomp kernel argument must be pinned.
+ * @brief Device memory for the nomp kernel argument must be pinned.
  */
 #define NOMP_ATTR_PINNED 2
 /**
  * @ingroup nomp_attributes
- * @brief Device memory for the Nomp kernel argument should be pinned.
+ * @brief Device memory for the nomp kernel argument should be pinned.
  */
 #define NOMP_ATTR_MASK 2047
 
 /**
- * @defgroup nomp_types Nomp data types.
+ * @defgroup nomp_types nomp data types.
  *
  * @brief Defines argument types for a nomp kernel. Currently, only integer,
  * float or pointer types are supported.
@@ -56,7 +56,7 @@
 #define NOMP_PTR 8192
 
 /**
- * @defgroup nomp_update_op Memory update operations for Nomp variable.
+ * @defgroup nomp_update_op Memory update operations for nomp variable.
  *
  * @brief Defines update operations for a pointer type variable as passed into
  * nomp_update().
@@ -85,7 +85,7 @@
 #define NOMP_FREE 8
 
 /**
- * @defgroup nomp_reduction_ops Nomp reduction operations.
+ * @defgroup nomp_reduction_ops nomp reduction operations.
  *
  * @brief Defines reduction operations supported by nomp.
  */
@@ -104,7 +104,7 @@
 /**
  * @defgroup nomp_errors Errors
  *
- * @brief Different types of errors returned by libnomp api calls.
+ * @brief Different types of errors returned by libnomp API calls.
  */
 
 /**
@@ -337,7 +337,7 @@ int nomp_update(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
  * static int id = -1;
  * const char *clauses[4] = {"transform", "file", "function", 0};
  * int err = nomp_jit(&id, knl, clauses, 3, "a", sizeof(a), NOMP_PTR, "b",
- * sizeof(b), NOMP_PTR, "N", sizeof(int), NOMP_INT);
+ *   sizeof(b), NOMP_PTR, "N", sizeof(int), NOMP_INT);
  * @endcode
  *
  * @param[out] id Id of the generated kernel.
@@ -365,11 +365,12 @@ int nomp_jit(int *id, const char *src, const char **clauses, int narg, ...);
  *   a[i] = i;
  *   b[i] = 10 -i
  * }
- * const char *knl = "for (unsigned i = 0; i < N; i++) a[i] += b[i];"
+ *
  * static int id = -1;
+ * const char *knl = "for (unsigned i = 0; i < N; i++) a[i] += b[i];"
  * const char *clauses[4] = {"transform", "file", "function", 0};
  * int err = nomp_jit(&id, knl, clauses, 3, "a", sizeof(a), NOMP_PTR, "b",
- * sizeof(b), NOMP_PTR, "N", sizeof(int), NOMP_INT);
+ *   sizeof(b), NOMP_PTR, "N", sizeof(int), NOMP_INT);
  * err = nomp_run(id, a, b, &N);
  * @endcode
  *
@@ -407,7 +408,7 @@ int nomp_sync();
 
 /**
  * @ingroup nomp_log_type
- * @brief NOMP logs can be of an error, warning or an information.
+ * @brief nomp log type can be an error, warning or information.
  */
 typedef enum {
   NOMP_ERROR = 0,
