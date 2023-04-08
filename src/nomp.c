@@ -357,7 +357,7 @@ int nomp_run(int id, ...) {
     }
     va_end(vargs);
 
-    nomp_check(py_eval_grid_size(prg, prg->py_dict));
+    nomp_check(py_eval_grid_size(prg));
     nomp_check(nomp.knl_run(&nomp, prg));
 
     return 0;
