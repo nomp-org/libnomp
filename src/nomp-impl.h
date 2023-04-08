@@ -100,7 +100,7 @@ struct mem *mem_if_mapped(void *p);
  *
  * Initializes OpenCL backend while creating a command queue using the
  * given platform id and device id. Returns a negative value if an error
- * occured during the initialization, otherwise returns 0.
+ * occurred during the initialization, otherwise returns 0.
  *
  * @param[in] backend Target backend for code generation.
  * @param[in] platform_id Target platform id.
@@ -117,7 +117,7 @@ int opencl_init(struct backend *backend, const int platform_id,
  *
  * Initializes SYCL backend while creating a command queue using the
  * given platform id and device id. Returns a positive value if an error
- * occured during the initialization, otherwise returns 0.
+ * occurred during the initialization, otherwise returns 0.
  *
  * @param[in] backend Target backend for code generation.
  * @param[in] platform_id Target platform id.
@@ -133,7 +133,7 @@ int sycl_init(struct backend *backend, const int platform_id,
  *
  * Initializes Cuda backend using the given device id. Platform id is not
  * used in the initialization of Cuda backend. Returns a negative value if an
- * error occured during the initialization, otherwise returns 0.
+ * error occurred during the initialization, otherwise returns 0.
  *
  * @param[in] backend Target backend for code generation.
  * @param[in] platform_id Target platform id.
@@ -149,7 +149,7 @@ int cuda_init(struct backend *backend, const int platform_id,
  *
  * Initializes HIP backend using the given device id. Platform id is not
  * used in the initialization of HIP backend. Returns a negative value if an
- * error occured during the initialization, otherwise returns 0.
+ * error occurred during the initialization, otherwise returns 0.
  *
  * @param[in] backend Target backend for code generation.
  * @param[in] platform_id Target platform id.
@@ -168,7 +168,7 @@ int hip_init(struct backend *backend, const int platform_id,
  * @brief Initializes ISPC backend with the specified platform and device.
  *
  * Initializes ISPC backend using the given device id and platform type.
- * Returns a negative value if an error occured during the initialization,
+ * Returns a negative value if an error occurred during the initialization,
  * otherwise returns 0.
  *
  * @param[in] backend Target backend for code generation.
