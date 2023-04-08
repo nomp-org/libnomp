@@ -95,11 +95,9 @@ int py_get_grid_size(struct prog *prg, PyObject *knl);
  * @brief Evaluate global and local grid sizes based on the dictionary `dict`.
  *
  * @param[in] prg Nomp program.
- * @param[in] dict Dictionary with variable name as keys, variable value as
- * values.
  * @return int
  */
-int py_eval_grid_size(struct prog *prg, PyObject *dict);
+int py_eval_grid_size(struct prog *prg);
 
 /**
  * @ingroup nomp_py_utils

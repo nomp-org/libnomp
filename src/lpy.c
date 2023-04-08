@@ -228,12 +228,13 @@ static int py_eval_grid_size_aux(size_t *out, PyObject *grid, unsigned dim,
       out[dim] = PyLong_AsLong(rslt);
       Py_DECREF(rslt), err = 0;
     }
+    Py_DECREF(py_dim);
   }
 
   return err;
 }
 
-int py_eval_grid_size(struct prog *prg, PyObject *dict) {
+int py_eval_grid_size(struct prog *prg) {
   // If the expressions are not NULL, iterate through them and evaluate with
   // pymbolic. Also, we should calculate and store a hash of the dict that
   // is passed. If the hash is the same, no need of re-evaluating the grid
@@ -246,19 +247,19 @@ int py_eval_grid_size(struct prog *prg, PyObject *dict) {
     PyObject *mapper = PyImport_ImportModule("pymbolic.mapper.evaluator");
     if (mapper) {
       PyObject *evaluate = PyObject_GetAttrString(mapper, "evaluate");
-      Py_DECREF(mapper);
       if (evaluate) {
         err = 0;
         // Iterate through grid sizes, evaluate and set `global` and `local`
         // sizes respectively.
         for (unsigned i = 0; i < PyTuple_Size(prg->py_global); i++)
           err |= py_eval_grid_size_aux(prg->global, prg->py_global, i, evaluate,
-                                       dict);
+                                       prg->py_dict);
         for (unsigned i = 0; i < PyTuple_Size(prg->py_local); i++)
           err |= py_eval_grid_size_aux(prg->local, prg->py_local, i, evaluate,
-                                       dict);
+                                       prg->py_dict);
         Py_DECREF(evaluate);
       }
+      Py_DECREF(mapper);
     }
   }
 
