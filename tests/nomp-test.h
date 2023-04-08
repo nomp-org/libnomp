@@ -76,16 +76,6 @@ static char *generate_knl(const char *fmt, int nargs, ...) {
   return knl;
 }
 
-static int create_knl(int *id, const char *knl, const char **clauses, int nargs,
-                      ...) {
-  va_list vargs;
-  va_start(vargs, nargs);
-  nomp_test_chk(nomp_jit(id, knl, clauses, nargs, vargs));
-  va_end(vargs);
-
-  return 0;
-}
-
 static int logcmp(const char *log, const char *pattern) {
   regex_t regex;
   int result = regcomp(&regex, pattern, 0);
