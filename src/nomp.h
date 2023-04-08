@@ -343,12 +343,12 @@ int nomp_update(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
  * @param[out] id Id of the generated kernel.
  * @param[in] src Kernel source in C.
  * @param[in] clauses Clauses to provide meta information about the kernel.
- * @param[in] narg Number of arguments to the kernel.
+ * @param[in] nargs Number of arguments to the kernel.
  * @param[in] ... Three values for each argument: identifier, sizeof(argument)
  * and argument type.
  * @return int
  */
-int nomp_jit(int *id, const char *src, const char **clauses, int narg, ...);
+int nomp_jit(int *id, const char *src, const char **clauses, int nargs, ...);
 
 /**
  * @ingroup nomp_user_api

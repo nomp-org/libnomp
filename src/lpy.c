@@ -228,7 +228,6 @@ static int py_eval_grid_size_aux(size_t *out, PyObject *grid, unsigned dim,
       out[dim] = PyLong_AsLong(rslt);
       Py_DECREF(rslt), err = 0;
     }
-    Py_DECREF(py_dim);
   }
 
   return err;

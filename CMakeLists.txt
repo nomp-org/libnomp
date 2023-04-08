@@ -102,7 +102,7 @@ install(DIRECTORY ${CMAKE_SOURCE_DIR}/python DESTINATION ${CMAKE_INSTALL_PREFIX}
 configure_file(nomp.pc.in nomp.pc @ONLY)
 install(FILES ${CMAKE_BINARY_DIR}/nomp.pc DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
 
-file(GLOB TESTS tests/nomp-api-*.c)
+file(GLOB TESTS tests/nomp-*.c)
 foreach(test ${TESTS})
   string(REPLACE "${CMAKE_SOURCE_DIR}/tests/" "" temp ${test})
   string(REPLACE ".c" "" test_exe ${temp})
