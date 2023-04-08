@@ -15,7 +15,7 @@ static int check_env(struct backend *backend) {
   if ((tmp = getenv("NOMP_DEVICE_ID")))
     backend->device_id = nomp_str_toui(tmp, MAX_BUFSIZ);
 
-  if ((tmp = getenv("NOMP_VERBOSE_LEVEL")))
+  if ((tmp = getenv("NOMP_VERBOSE")))
     backend->verbose = nomp_str_toui(tmp, MAX_BUFSIZ);
 
   if ((tmp = copy_env("NOMP_BACKEND", MAX_BACKEND_SIZE)))
