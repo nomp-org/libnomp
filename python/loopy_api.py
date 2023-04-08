@@ -38,6 +38,12 @@ _C_BIN_OPS_TO_PYMBOLIC_OPS = {
     ">=": lambda l, r: prim.Comparison(l, ">=", r),
     "==": lambda l, r: prim.Comparison(l, "==", r),
     "!=": lambda l, r: prim.Comparison(l, "!=", r),
+    "<<": prim.LeftShift,
+    ">>": prim.RightShift,
+    "&": lambda l, r: prim.BitwiseAnd((l, r)),
+    "|": lambda l, r: prim.BitwiseOr((l, r)),
+    "^": lambda l, r: prim.BitwiseXor((l, r)),
+    "~": prim.BitwiseNot,
 }
 _CLANG_TYPE_TO_C_TYPE = {
     "bool": "bool",
@@ -170,6 +176,17 @@ class CToLoopyExpressionMapper(IdentityMapper):
             f"{child.kind} is not recognized as a child of a"
             " ARRAY_SUBSCRIPT_EXPR"
         )
+
+    def map_unary_operator(self, expr: cindex.CursorKind) -> prim.Expression:
+        """Maps C unary operation"""
+        (var,) = expr.get_children()
+        exs = [token.spelling for token in expr.get_tokens()]
+        op_str = exs[0]  # TODO: get operator string in an appropriate manner.
+        try:
+            oprtr = _C_BIN_OPS_TO_PYMBOLIC_OPS[op_str]
+        except KeyError as exc:
+            raise SyntaxError(f"Invalid unary operator: {op_str}.") from exc
+        return oprtr(self.rec(var))
 
     def map_binary_operator(self, expr: cindex.CursorKind) -> prim.Expression:
         """Maps C binary operation"""
@@ -509,6 +526,24 @@ class CToLoopyMapper(IdentityMapper):
             [],
         )
 
+    def map_continue_stmt(
+        self, expr: cindex.CursorKind, context: CToLoopyMapperContext
+    ) -> CToLoopyMapperAccumulator:
+        """Maps continue statement"""
+        return CToLoopyMapperAccumulator(
+            [],
+            [
+                lp.CInstruction(
+                    "",
+                    "continue;",
+                    within_inames=context.inames,
+                    predicates=context.predicates,
+                    id=context.name_gen(LOOPY_INSN_PREFIX),
+                )
+            ],
+            [],
+        )
+
 
 @dataclass
 class ExternalContext:
@@ -648,11 +683,12 @@ if __name__ == "__main__":
     KNL_STR = """
           void foo(int *a, int N) {
             for (int i = 0; i < N; i++) {
-              int t = 0;
+              int t = 1;
               for (int j = 0; j < 10; j++) {
-                t += 1;
+                t = ~t;
+                t = t << 1;
                 if (j == 5)
-                  break;
+                  continue;
               }
               a[i] = t;
             }
