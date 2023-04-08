@@ -37,11 +37,11 @@ static int test_invalid_device_id(int argc, const char **argv) {
   return 0;
 }
 
-// NOMP_VERBOSE_LEVEL environment variable with invalid value.
+// NOMP_VERBOSE environment variable with invalid value.
 static int test_invalid_nomp_verbose(int argc, const char **argv) {
-  setenv("NOMP_VERBOSE_LEVEL", "4", 1);
+  setenv("NOMP_VERBOSE", "4", 1);
   int err = nomp_init(argc, argv);
-  unsetenv("NOMP_VERBOSE_LEVEL");
+  unsetenv("NOMP_VERBOSE");
 
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
   char *desc = nomp_get_log_str(err);
