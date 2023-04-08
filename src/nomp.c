@@ -351,7 +351,8 @@ int nomp_run(int id, ...) {
           return nomp_set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
                               ERR_STR_USER_MAP_PTR_IS_INVALID, args[i].ptr);
         }
-        args[i].ptr = m->bptr, args[i].size = m->bsize;
+        args[i].size = m->bsize, args[i].ptr = m->bptr;
+        break;
       }
     }
     va_end(vargs);
