@@ -38,12 +38,17 @@ _C_BIN_OPS_TO_PYMBOLIC_OPS = {
     ">=": lambda l, r: prim.Comparison(l, ">=", r),
     "==": lambda l, r: prim.Comparison(l, "==", r),
     "!=": lambda l, r: prim.Comparison(l, "!=", r),
-    "<<": prim.LeftShift,
-    ">>": prim.RightShift,
+    "&&": lambda l, r: prim.LogicalAnd((l, r)),
+    "||": lambda l, r: prim.LogicalOr((l, r)),
     "&": lambda l, r: prim.BitwiseAnd((l, r)),
     "|": lambda l, r: prim.BitwiseOr((l, r)),
     "^": lambda l, r: prim.BitwiseXor((l, r)),
+    "<<": prim.LeftShift,
+    ">>": prim.RightShift,
+}
+_C_UNARY_OPS_TO_PYMBOLIC_OPS = {
     "~": prim.BitwiseNot,
+    "!": prim.LogicalNot,
 }
 _CLANG_TYPE_TO_C_TYPE = {
     "bool": "bool",
@@ -179,13 +184,13 @@ class CToLoopyExpressionMapper(IdentityMapper):
 
     def map_unary_operator(self, expr: cindex.CursorKind) -> prim.Expression:
         """Maps C unary operation"""
-        (var,) = expr.get_children()
         exs = [token.spelling for token in expr.get_tokens()]
-        op_str = exs[0]  # TODO: get operator string in an appropriate manner.
+        op_str = exs[0] if exs[0] in _C_UNARY_OPS_TO_PYMBOLIC_OPS else exs[-1]
         try:
-            oprtr = _C_BIN_OPS_TO_PYMBOLIC_OPS[op_str]
+            oprtr = _C_UNARY_OPS_TO_PYMBOLIC_OPS[op_str]
         except KeyError as exc:
             raise SyntaxError(f"Invalid unary operator: {op_str}.") from exc
+        (var,) = expr.get_children()
         return oprtr(self.rec(var))
 
     def map_binary_operator(self, expr: cindex.CursorKind) -> prim.Expression:
@@ -687,7 +692,7 @@ if __name__ == "__main__":
               for (int j = 0; j < 10; j++) {
                 t = ~t;
                 t = t << 1;
-                if (j == 5)
+                if (j == 5 || !(j == 6))
                   continue;
               }
               a[i] = t;

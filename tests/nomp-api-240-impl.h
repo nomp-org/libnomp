@@ -58,4 +58,75 @@ static int nomp_api_240_break(int N) {
   return 0;
 }
 #undef nomp_api_240_break
+
+#define nomp_api_240_continue TOKEN_PASTE(nomp_api_240_continue, TEST_SUFFIX)
+static int nomp_api_240_continue(int N) {
+  nomp_test_assert(N <= 10);
+
+  TEST_TYPE a[10];
+  for (unsigned i = 0; i < N; i++)
+    a[i] = 0;
+
+  const char *knl_fmt =
+      "void foo(%s *a,  int N) {                                       \n"
+      "  for (int i = 0; i < N; i++) {                                 \n"
+      "    int t = 0;                                                  \n"
+      "    for (int j = 0; j < 10; j++) {                              \n"
+      "      if (j == 5)                                               \n"
+      "        continue;                                               \n"
+      "      t += 1;                                                   \n"
+      "    }                                                           \n"
+      "    a[i] = t;                                                   \n"
+      "  }                                                             \n"
+      "}                                                               \n";
+  const char *clauses[4] = {"transform", "nomp-api-240", "transform", 0};
+  nomp_api_240_aux(knl_fmt, clauses, a, N);
+
+#if defined(TEST_TOL)
+  for (unsigned i = 0; i < N; i++)
+    nomp_test_assert(fabs(a[i] - 9) < TEST_TOL);
+#else
+  for (unsigned i = 0; i < N; i++)
+    nomp_test_assert(a[i] == 9);
+#endif
+
+  return 0;
+}
+#undef nomp_api_240_continue
+
+#define nomp_api_240_logical_ops                                               \
+  TOKEN_PASTE(nomp_api_240_logical_ops, TEST_SUFFIX)
+static int nomp_api_240_logical_ops(int N) {
+  nomp_test_assert(N <= 10);
+
+  TEST_TYPE a[10];
+  for (unsigned i = 0; i < N; i++)
+    a[i] = 0;
+
+  const char *knl_fmt =
+      "void foo(%s *a,  int N) {                                       \n"
+      "  for (int i = 0; i < N; i++) {                                 \n"
+      "    int t = 0;                                                  \n"
+      "    for (int j = 0; j < 10; j++) {                              \n"
+      "      if ((!(j < 3) && (j < 5)) || j == 1)                      \n"
+      "        continue;                                               \n"
+      "      t += 1;                                                   \n"
+      "    }                                                           \n"
+      "    a[i] = t;                                                   \n"
+      "  }                                                             \n"
+      "}                                                               \n";
+  const char *clauses[4] = {"transform", "nomp-api-240", "transform", 0};
+  nomp_api_240_aux(knl_fmt, clauses, a, N);
+
+#if defined(TEST_TOL)
+  for (unsigned i = 0; i < N; i++)
+    nomp_test_assert(fabs(a[i] - 7) < TEST_TOL);
+#else
+  for (unsigned i = 0; i < N; i++)
+    nomp_test_assert(a[i] == 7);
+#endif
+
+  return 0;
+}
+#undef nomp_api_240_logical_ops
 #undef nomp_api_240_aux
