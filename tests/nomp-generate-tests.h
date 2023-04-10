@@ -22,6 +22,8 @@
 #undef TEST_TYPE
 #undef TEST_SUFFIX
 
+#ifndef TEST_INT_ONLY
+
 #define TEST_TOL 1e-12
 #define TEST_TYPE double
 #define TEST_SUFFIX _double
@@ -37,3 +39,5 @@
 #undef TEST_TYPE
 #undef TEST_SUFFIX
 #undef TEST_TOL
+
+#endif // TEST_INT_ONLY

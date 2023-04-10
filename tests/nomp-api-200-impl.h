@@ -13,8 +13,8 @@ static int nomp_api_200(const char **clauses) {
 
 #define nomp_api_200_err TOKEN_PASTE(nomp_api_200_err, TEST_SUFFIX)
 static int nomp_api_200_err(const char **clauses) {
-  int err = nomp_api_200(clauses);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
+  nomp_test_assert(nomp_get_log_no(nomp_api_200(clauses)) ==
+                   NOMP_USER_INPUT_IS_INVALID);
   return 0;
 }
 #undef nomp_api_200_err

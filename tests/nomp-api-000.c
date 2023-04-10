@@ -16,9 +16,8 @@ static int test_first_nomp_finalize() {
 
 // Calling nomp_init() twice must return an error, but must not segfault.
 static int test_nomp_init_twice(int argc, const char **argv) {
+  nomp_test_chk(nomp_init(argc, argv));
   int err = nomp_init(argc, argv);
-  nomp_test_chk(err);
-  err = nomp_init(argc, argv);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_INITIALIZE_FAILURE);
 
   char *desc = nomp_get_log_str(err);
@@ -32,9 +31,8 @@ static int test_nomp_init_twice(int argc, const char **argv) {
 
 // Calling nomp_finalize() twice must return an error, but must not segfault.
 static int test_nomp_finalize_twice() {
+  nomp_test_chk(nomp_finalize());
   int err = nomp_finalize();
-  nomp_test_chk(err);
-  err = nomp_finalize();
   nomp_test_assert(nomp_get_log_no(err) == NOMP_FINALIZE_FAILURE);
 
   char *desc = nomp_get_log_str(err);

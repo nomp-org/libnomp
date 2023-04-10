@@ -3,29 +3,23 @@
 #define nomp_api_210_aux TOKEN_PASTE(nomp_api_210_aux, TEST_SUFFIX)
 static int nomp_api_210_aux(const char *knl_fmt, TEST_TYPE *a, TEST_TYPE *b,
                             int n) {
-  int err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO);
-  nomp_test_chk(err);
-  err = nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO);
-  nomp_test_chk(err);
+  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO));
+  nomp_test_chk(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO));
 
   const char *clauses[4] = {"transform", "nomp-api-210", "transform", 0};
   int id = -1;
-  err = create_knl(&id, knl_fmt, clauses, 2, TOSTRING(TEST_TYPE),
-                   TOSTRING(TEST_TYPE));
-  nomp_test_chk(err);
+  nomp_test_chk(create_knl(&id, knl_fmt, clauses, 2, TOSTRING(TEST_TYPE),
+                           TOSTRING(TEST_TYPE)));
 
-  err = nomp_run(id, 3, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
-                 sizeof(TEST_TYPE), b, "N", NOMP_INT, sizeof(int), &n);
-  nomp_test_chk(err);
+  nomp_test_chk(nomp_run(id, 3, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b",
+                         NOMP_PTR, sizeof(TEST_TYPE), b, "N", NOMP_INT,
+                         sizeof(int), &n));
 
   nomp_test_chk(nomp_sync());
 
-  err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM);
-  nomp_test_chk(err);
-  err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE);
-  nomp_test_chk(err);
-  err = nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_FREE);
-  nomp_test_chk(err);
+  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM));
+  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
+  nomp_test_chk(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
 
   return 0;
 }

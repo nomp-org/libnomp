@@ -8,17 +8,14 @@ static int test_invalid_kernel_id(int argc, const char **argv, int *id, int *a,
                     "    a[i] = a[i] * b[i];                                \n"
                     "}                                                      \n";
 
-  int err = nomp_init(argc, argv);
-  nomp_test_chk(err);
-  err = nomp_update(a, 0, n, sizeof(int), NOMP_TO);
-  nomp_test_chk(err);
+  nomp_test_chk(nomp_init(argc, argv));
+  nomp_test_chk(nomp_update(a, 0, n, sizeof(int), NOMP_TO));
 
   const char *clauses[4] = {"transform", "nomp-api-100", "transform", 0};
-  err = nomp_jit(id, knl, clauses);
-  nomp_test_chk(err);
+  nomp_test_chk(nomp_jit(id, knl, clauses));
 
-  err = nomp_run(-1, 3, "a", NOMP_PTR, sizeof(int), a, "b", NOMP_PTR,
-                 sizeof(int), b, "N", NOMP_INT, sizeof(int), &n);
+  int err = nomp_run(-1, 3, "a", NOMP_PTR, sizeof(int), a, "b", NOMP_PTR,
+                     sizeof(int), b, "N", NOMP_INT, sizeof(int), &n);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
   char *desc = nomp_get_log_str(err);
@@ -42,8 +39,7 @@ static int test_unmapped_variable(int id, int *a, int *b, int n) {
   nomp_free(desc);
   nomp_test_assert(eq);
 
-  err = nomp_finalize();
-  nomp_test_chk(err);
+  nomp_test_chk(nomp_finalize());
 
   return 0;
 }
