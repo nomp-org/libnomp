@@ -4,13 +4,11 @@
 // NOMP_nomp-backend environment variable with invalid value.
 static int test_invalid_nomp_backend(int argc, const char **argv) {
   setenv("NOMP_BACKEND", "invalid", 1);
-  int err = nomp_init(argc, argv);
+  nomp_test_assert(nomp_get_log_no(nomp_init(argc, argv)) ==
+                   NOMP_USER_INPUT_IS_INVALID);
   unsetenv("NOMP_BACKEND");
 
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
-
-  err = nomp_finalize();
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_FINALIZE_FAILURE);
+  nomp_test_assert(nomp_get_log_no(nomp_finalize()) == NOMP_FINALIZE_FAILURE);
 
   return 0;
 }
@@ -18,13 +16,11 @@ static int test_invalid_nomp_backend(int argc, const char **argv) {
 // NOMP_PLATFORM_ID environment variable with invalid value.
 static int test_invalid_platform_id(int argc, const char **argv) {
   setenv("NOMP_PLATFORM_ID", "invalid", 1);
-  int err = nomp_init(argc, argv);
+  nomp_test_assert(nomp_get_log_no(nomp_init(argc, argv)) ==
+                   NOMP_USER_INPUT_IS_INVALID);
   unsetenv("NOMP_PLATFORM_ID");
 
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
-
-  err = nomp_finalize();
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_FINALIZE_FAILURE);
+  nomp_test_assert(nomp_get_log_no(nomp_finalize()) == NOMP_FINALIZE_FAILURE);
 
   return 0;
 }
@@ -32,13 +28,11 @@ static int test_invalid_platform_id(int argc, const char **argv) {
 // NOMP_DEVICE_ID environment variable with invalid value.
 static int test_invalid_device_id(int argc, const char **argv) {
   setenv("NOMP_DEVICE_ID", "invalid", 1);
-  int err = nomp_init(argc, argv);
+  nomp_test_assert(nomp_get_log_no(nomp_init(argc, argv)) ==
+                   NOMP_USER_INPUT_IS_INVALID);
   unsetenv("NOMP_DEVICE_ID");
 
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
-
-  err = nomp_finalize();
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_FINALIZE_FAILURE);
+  nomp_test_assert(nomp_get_log_no(nomp_finalize()) == NOMP_FINALIZE_FAILURE);
 
   return 0;
 }
@@ -57,8 +51,7 @@ static int test_invalid_nomp_verbose(int argc, const char **argv) {
   nomp_test_assert(eq);
   nomp_free(desc);
 
-  err = nomp_finalize();
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_FINALIZE_FAILURE);
+  nomp_test_assert(nomp_get_log_no(nomp_finalize()) == NOMP_FINALIZE_FAILURE);
 
   return 0;
 }
@@ -66,13 +59,10 @@ static int test_invalid_nomp_verbose(int argc, const char **argv) {
 // Run with a valid NOMP_nomp-backend environment variable.
 static int test_valid_nomp_backend(int argc, const char **argv) {
   setenv("NOMP_BACKEND", "opencl", 1);
-  int err = nomp_init(argc, argv);
+  nomp_test_chk(nomp_init(argc, argv));
   unsetenv("NOMP_BACKEND");
 
-  nomp_test_chk(err);
-
-  err = nomp_finalize();
-  nomp_test_chk(err);
+  nomp_test_chk(nomp_finalize());
 
   return 0;
 }
@@ -80,13 +70,10 @@ static int test_valid_nomp_backend(int argc, const char **argv) {
 // NOMP_nomp-backend value is not case sensitive.
 static int test_nomp_backend_case_insensitivity(int argc, const char **argv) {
   setenv("NOMP_BACKEND", "oPenCl", 1);
-  int err = nomp_init(argc, argv);
+  nomp_test_chk(nomp_init(argc, argv));
   unsetenv("NOMP_BACKEND");
 
-  nomp_test_chk(err);
-
-  err = nomp_finalize();
-  nomp_test_chk(err);
+  nomp_test_chk(nomp_finalize());
 
   return 0;
 }
@@ -94,13 +81,10 @@ static int test_nomp_backend_case_insensitivity(int argc, const char **argv) {
 // Run with a valid NOMP_PLATFORM_ID environment variable.
 static int test_valid_platform_id(int argc, const char **argv) {
   setenv("NOMP_PLATFORM_ID", "0", 1);
-  int err = nomp_init(argc, argv);
+  nomp_test_chk(nomp_init(argc, argv));
   unsetenv("NOMP_PLATFORM_ID");
 
-  nomp_test_chk(err);
-
-  err = nomp_finalize();
-  nomp_test_chk(err);
+  nomp_test_chk(nomp_finalize());
 
   return 0;
 }
@@ -108,13 +92,10 @@ static int test_valid_platform_id(int argc, const char **argv) {
 // Run with a valid NOMP_DEVICE_ID  environment variable.
 static int test_valid_device_id(int argc, const char **argv) {
   setenv("NOMP_DEVICE_ID", "0", 1);
-  int err = nomp_init(argc, argv);
+  nomp_test_chk(nomp_init(argc, argv));
   unsetenv("NOMP_DEVICE_ID");
 
-  nomp_test_chk(err);
-
-  err = nomp_finalize();
-  nomp_test_chk(err);
+  nomp_test_chk(nomp_finalize());
 
   return 0;
 }

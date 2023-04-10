@@ -17,12 +17,11 @@ static int test_jit_compile_and_free(const char *cwd, const char *wkdir) {
   const char *cc = "/usr/bin/cc", *cflags = "-shared", *entry = "add_wrapper";
   const char *srcf = "source.c", *libf = "mylib.so";
   int id = -1;
-  int err = jit_compile(&id, add_src, cc, cflags, entry, wkdir, srcf, libf);
-  nomp_test_chk(err);
+  nomp_test_chk(
+      jit_compile(&id, add_src, cc, cflags, entry, wkdir, srcf, libf));
   nomp_test_assert(id == 0);
 
-  err = jit_free(&id);
-  nomp_test_chk(err);
+  nomp_test_chk(jit_free(&id));
   nomp_test_assert(id == -1);
 
   return 0;
@@ -32,17 +31,15 @@ static int test_jit_run(const char *cwd, const char *wkdir) {
   const char *cc = "/usr/bin/cc", *cflags = "-shared", *entry = "add_wrapper";
   const char *srcf = "source.c", *libf = "mylib.so";
   int id = -1;
-  int err = jit_compile(&id, add_src, cc, cflags, entry, wkdir, srcf, libf);
-  nomp_test_chk(err);
+  nomp_test_chk(
+      jit_compile(&id, add_src, cc, cflags, entry, wkdir, srcf, libf));
 
   int a = 3, b = 7, c = -1;
   void *p[3] = {(void *)&a, (void *)&b, (void *)&c};
-  err = jit_run(id, p);
-  nomp_test_chk(err);
+  nomp_test_chk(jit_run(id, p));
   nomp_test_assert(c == 10);
 
-  err = jit_free(&id);
-  nomp_test_chk(err);
+  nomp_test_chk(jit_free(&id));
 
   return 0;
 }

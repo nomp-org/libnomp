@@ -17,6 +17,7 @@
 #define TOSTRING_(x) #x
 #define TOSTRING(x) TOSTRING_(x)
 
+#ifndef TEST_INT_ONLY
 #define TEST_BUILTIN_TYPES(api, ...)                                           \
   {                                                                            \
     err |= TOKEN_PASTE(TOKEN_PASTE(nomp_api_, api), _int)(__VA_ARGS__);        \
@@ -27,6 +28,16 @@
     err |= TOKEN_PASTE(TOKEN_PASTE(nomp_api_, api), _double)(__VA_ARGS__);     \
     err |= TOKEN_PASTE(TOKEN_PASTE(nomp_api_, api), _float)(__VA_ARGS__);      \
   }
+#else
+#define TEST_BUILTIN_TYPES(api, ...)                                           \
+  {                                                                            \
+    err |= TOKEN_PASTE(TOKEN_PASTE(nomp_api_, api), _int)(__VA_ARGS__);        \
+    err |= TOKEN_PASTE(TOKEN_PASTE(nomp_api_, api), _long)(__VA_ARGS__);       \
+    err |= TOKEN_PASTE(TOKEN_PASTE(nomp_api_, api), _unsigned)(__VA_ARGS__);   \
+    err |=                                                                     \
+        TOKEN_PASTE(TOKEN_PASTE(nomp_api_, api), _unsigned_long)(__VA_ARGS__); \
+  }
+#endif
 
 static int subtest_(int err, const char *test_name) {
   char *result = err ? "\033[31mFailed" : "\033[32mPassed";
@@ -57,8 +68,7 @@ static int create_knl(int *id, const char *knl_fmt, const char **clauses,
   vsnprintf(knl, len, knl_fmt, vargs);
   va_end(vargs);
 
-  int err = nomp_jit(id, knl, clauses);
-  nomp_test_chk(err);
+  nomp_test_chk(nomp_jit(id, knl, clauses));
   return 0;
 }
 

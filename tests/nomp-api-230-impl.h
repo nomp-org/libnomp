@@ -4,29 +4,23 @@
 static int nomp_api_230_aux(const char *knl_fmt, const char **clauses,
                             TEST_TYPE *a, TEST_TYPE *b, int rows, int cols,
                             int n) {
-  int err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO);
-  nomp_test_chk(err);
-  err = nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO);
-  nomp_test_chk(err);
+  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO));
+  nomp_test_chk(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO));
 
   int id = -1;
-  err = create_knl(&id, knl_fmt, clauses, 2, TOSTRING(TEST_TYPE),
-                   TOSTRING(TEST_TYPE));
-  nomp_test_chk(err);
+  nomp_test_chk(create_knl(&id, knl_fmt, clauses, 2, TOSTRING(TEST_TYPE),
+                           TOSTRING(TEST_TYPE)));
 
-  nomp_run(id, 4, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b", NOMP_PTR,
-           sizeof(TEST_TYPE), b, "rows", NOMP_INT, sizeof(int), &rows, "cols",
-           NOMP_INT, sizeof(int), &cols);
-  nomp_test_chk(err);
+  nomp_test_chk(nomp_run(id, 4, "a", NOMP_PTR, sizeof(TEST_TYPE), a, "b",
+                         NOMP_PTR, sizeof(TEST_TYPE), b, "rows", NOMP_INT,
+                         sizeof(int), &rows, "cols", NOMP_INT, sizeof(int),
+                         &cols));
 
   nomp_test_chk(nomp_sync());
 
-  err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM);
-  nomp_test_chk(err);
-  err = nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE);
-  nomp_test_chk(err);
-  err = nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_FREE);
-  nomp_test_chk(err);
+  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM));
+  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
+  nomp_test_chk(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
 
   return 0;
 }
