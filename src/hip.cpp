@@ -65,10 +65,10 @@ static void hip_update_ptr(void **p, size_t *size, struct mem *m) {
 
 static int hip_knl_build(struct backend *bnd, struct prog *prg,
                          const char *source, const char *name) {
+  struct hip_backend *hbnd = (struct hip_backend *)bnd->bptr;
+
   hiprtcProgram prog;
   chk_hiprtc(hiprtcCreateProgram(&prog, source, NULL, 0, NULL, NULL));
-
-  struct hip_backend *hbnd = (struct hip_backend *)bnd->bptr;
 
   const char *opts[1] = {NULL};
   hiprtcResult result = hiprtcCompileProgram(prog, 0, opts);
@@ -106,37 +106,17 @@ static int hip_knl_build(struct backend *bnd, struct prog *prg,
   return 0;
 }
 
-static int hip_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
-  const int ndim = prg->ndim, nargs = prg->nargs;
-  const size_t *global = prg->global, *local = prg->local;
-
-  struct mem *m;
+static int hip_knl_run(struct backend *bnd, struct prog *prg) {
   void *vargs[MAX_KNL_ARGS];
-  for (int i = 0; i < nargs; i++) {
-    const char *var = va_arg(args, const char *);
-    int type = va_arg(args, int);
-    size_t size = va_arg(args, size_t);
-    void *p = va_arg(args, void *);
-    switch (type) {
-    case NOMP_INT:
-    case NOMP_FLOAT:
-      break;
-    case NOMP_PTR:
-      m = mem_if_mapped(p);
-      if (m == NULL) {
-        return nomp_set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
-                            ERR_STR_USER_MAP_PTR_IS_INVALID, p);
-      }
-      p = &m->bptr;
-      break;
-    default:
-      return nomp_set_log(NOMP_USER_KNL_ARG_TYPE_IS_INVALID, NOMP_ERROR,
-                          "Invalid libnomp kernel argument type %d.", type);
-      break;
-    }
-    vargs[i] = p;
+  struct arg *args = prg->args;
+  for (int i = 0; i < prg->nargs; i++) {
+    if (args[i].type == NOMP_PTR)
+      vargs[i] = &args[i].ptr;
+    else
+      vargs[i] = args[i].ptr;
   }
 
+  const size_t *global = prg->global, *local = prg->local;
   struct hip_prog *cprg = (struct hip_prog *)prg->bptr;
   chk_hip(hipModuleLaunchKernel(cprg->kernel, global[0], global[1], global[2],
                                 local[0], local[1], local[2], 0, NULL, vargs,
