@@ -74,13 +74,13 @@ static void cuda_update_ptr(void **p, size_t *size, struct mem *m) {
 
 static int cuda_knl_build(struct backend *bnd, struct prog *prg,
                           const char *source, const char *name) {
-  nvrtcProgram prog;
-  chk_nvrtc(nvrtcCreateProgram(&prog, source, NULL, 0, NULL, NULL));
-
   struct cuda_backend *cuda = (struct cuda_backend *)bnd->bptr;
   char arch[MAX_BUFSIZ];
   snprintf(arch, MAX_BUFSIZ, "-arch=compute_%d%d", cuda->prop.major,
            cuda->prop.minor);
+
+  nvrtcProgram prog;
+  chk_nvrtc(nvrtcCreateProgram(&prog, source, NULL, 0, NULL, NULL));
 
   const char *opts[1] = {arch};
   nvrtcResult result = nvrtcCompileProgram(prog, 1, opts);
@@ -89,13 +89,11 @@ static int cuda_knl_build(struct backend *bnd, struct prog *prg,
     chk_nvrtc(nvrtcGetProgramLogSize(prog, &size));
     char *log = nomp_calloc(char, size + 1);
     chk_nvrtc(nvrtcGetProgramLog(prog, log));
-
     const char *err = nvrtcGetErrorString(result);
     size += strlen(err) + 2 + 1;
 
     char *msg = nomp_calloc(char, size);
     snprintf(msg, size, "%s: %s", err, log);
-
     int id = nomp_set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_CUDA_FAILURE,
                           "build", msg);
     nomp_free(log), nomp_free(msg);
@@ -117,32 +115,14 @@ static int cuda_knl_build(struct backend *bnd, struct prog *prg,
   return 0;
 }
 
-static int cuda_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
+static int cuda_knl_run(struct backend *bnd, struct prog *prg) {
   void *vargs[MAX_KNL_ARGS];
+  struct arg *args = prg->args;
   for (int i = 0; i < prg->nargs; i++) {
-    const char *var = va_arg(args, const char *);
-    int type = va_arg(args, int);
-    size_t size = va_arg(args, size_t);
-    void *p = va_arg(args, void *);
-
-    struct mem *m;
-    switch (type) {
-    case NOMP_INT:
-    case NOMP_FLOAT:
-      break;
-    case NOMP_PTR:
-      m = mem_if_mapped(p);
-      if (m == NULL)
-        return nomp_set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
-                            ERR_STR_USER_MAP_PTR_IS_INVALID, p);
-      p = &m->bptr;
-      break;
-    default:
-      return nomp_set_log(NOMP_USER_KNL_ARG_TYPE_IS_INVALID, NOMP_ERROR,
-                          "Invalid libnomp kernel argument type %d.", type);
-      break;
-    }
-    vargs[i] = p;
+    if (args[i].type == NOMP_PTR)
+      vargs[i] = &args[i].ptr;
+    else
+      vargs[i] = args[i].ptr;
   }
 
   const size_t *global = prg->global, *local = prg->local;

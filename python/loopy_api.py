@@ -25,8 +25,6 @@ from pytools import UniqueNameGenerator
 LOOPY_LANG_VERSION = (2018, 2)
 LOOPY_INSN_PREFIX = "_nomp_insn"
 
-_STR_TO_LOOPY_TARGET = {"opencl": lp.OpenCLTarget(), "cuda": lp.CudaTarget()}
-
 _C_OPS_TO_PYMBOLIC_OPS = {
     "*": lambda x, y: prim.Product((x, y)),
     "+": lambda x, y: prim.Sum((x, y)),
@@ -658,7 +656,7 @@ def c_to_loopy(c_str: str, backend: str) -> lp.translation_unit.TranslationUnit:
         lang_version=LOOPY_LANG_VERSION,
         name=node.spelling,
         seq_dependencies=True,
-        target=_STR_TO_LOOPY_TARGET[backend],
+        target=_BACKEND_TO_TARGET[backend],
     )
 
     return knl
