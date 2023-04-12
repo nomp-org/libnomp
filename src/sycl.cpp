@@ -16,8 +16,7 @@ struct sycl_backend {
   sycl::device device_id;
   sycl::queue queue;
   sycl::context ctx;
-  char *compiler;
-  char *compiler_flags;
+  char *compiler, *compiler_flags;
 };
 
 struct sycl_prog {
@@ -83,39 +82,13 @@ static int sycl_knl_build(struct backend *bnd, struct prog *prg,
   return err;
 }
 
-static int sycl_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
+static int sycl_knl_run(struct backend *bnd, struct prog *prg) {
   struct sycl_backend *sycl = (struct sycl_backend *)bnd->bptr;
   struct sycl_prog *sycl_prg = (struct sycl_prog *)prg->bptr;
 
-  struct mem *m;
-  size_t size;
   void *arg_list[MAX_KNL_ARGS];
-  for (int i = 0; i < prg->nargs; i++) {
-    const char *var = va_arg(args, const char *);
-    int type = va_arg(args, int);
-    size = va_arg(args, size_t);
-    void *p = va_arg(args, void *);
-    switch (type) {
-    case NOMP_INT:
-    case NOMP_FLOAT:
-      break;
-    case NOMP_PTR:
-      m = mem_if_mapped(p);
-      if (m == NULL) {
-        return nomp_set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
-                            ERR_STR_USER_MAP_PTR_IS_INVALID, p);
-      }
-      p = m->bptr;
-      break;
-    default:;
-      return nomp_set_log(
-          NOMP_USER_KNL_ARG_TYPE_IS_INVALID, NOMP_ERROR,
-          "Kernel argument type %d passed to libnomp is not valid.", type);
-      break;
-    }
-    arg_list[i] = p;
-  }
-
+  for (unsigned i = 0; i < prg->nargs; i++)
+    arg_list[i] = prg->args[i].ptr;
   arg_list[prg->nargs] = (void *)&sycl->queue;
 
   size_t global[3];
