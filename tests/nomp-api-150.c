@@ -13,13 +13,14 @@ static int test_invalid_kernel_id(int argc, const char **argv, int *id, int *a,
 
   const char *clauses[4] = {"transform", "nomp-api-100", "transform", 0};
   nomp_test_chk(nomp_jit(id, knl, clauses, 3, "a", sizeof(int *), NOMP_PTR, "b",
-                 sizeof(int *), NOMP_PTR, "N", sizeof(int), NOMP_INT));
-  nomp_test_assert(nomp_get_log_no(nomp_run(-1, a, b, &N)) == NOMP_USER_INPUT_IS_INVALID);
+                         sizeof(int *), NOMP_PTR, "N", sizeof(int), NOMP_INT));
 
-  char *desc = nomp_get_log_str(err);
-  int eq = logcmp(desc, "\\[Error\\] .*\\/src\\/nomp.[c|cpp]:[0-9]* Kernel "
-                        "id -1 passed to nomp_run is not valid.");
-  nomp_free(desc);
+  int err = nomp_run(-1, a, b, &n);
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
+  char *log = nomp_get_log_str(err);
+  int eq = logcmp(log, "\\[Error\\] .*\\/src\\/nomp.[c|cpp]:[0-9]* Kernel "
+                       "id -1 passed to nomp_run is not valid.");
+  nomp_free(log);
   nomp_test_assert(eq);
 
   return 0;
