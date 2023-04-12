@@ -89,36 +89,17 @@ static int ispc_knl_build(struct backend *bnd, struct prog *prg,
   return 0;
 }
 
-static int ispc_knl_run(struct backend *bnd, struct prog *prg, va_list args) {
+static int ispc_knl_run(struct backend *bnd, struct prog *prg) {
   const int ndim = prg->ndim, nargs = prg->nargs;
+  struct arg *args = prg->args;
   size_t *global = prg->global;
 
-  struct mem *m;
   void *vargs[MAX_KNL_ARGS];
   for (int i = 0; i < nargs; i++) {
-    const char *var = va_arg(args, const char *);
-    int type = va_arg(args, int);
-    size_t size = va_arg(args, size_t);
-    void *p = va_arg(args, void *);
-    switch (type) {
-    case NOMP_INT:
-    case NOMP_UINT:
-    case NOMP_FLOAT:
-      break;
-    case NOMP_PTR:
-      m = mem_if_mapped(p);
-      if (m == NULL) {
-        return nomp_set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
-                            ERR_STR_USER_MAP_PTR_IS_INVALID, p);
-      }
-      p = ispcrtDevicePtr((ISPCRTMemoryView)(m->bptr));
-      break;
-    default:
-      return nomp_set_log(NOMP_USER_KNL_ARG_TYPE_IS_INVALID, NOMP_ERROR,
-                          "Kernel argument type %d is not valid.", type);
-      break;
-    }
-    vargs[i] = p;
+    if (args[i].type == NOMP_PTR)
+      vargs[i] = ispcrtDevicePtr((ISPCRTMemoryView)(args[i].ptr));
+    else
+      vargs[i] = args[i].ptr;
   }
 
   int one = 1;
