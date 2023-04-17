@@ -258,47 +258,52 @@ class CToLoopyLoopBoundMapper(CToLoopyExpressionMapper):
         return oprtr(self.rec(left), self.rec(right))
 
 
-def check_and_parse_for(expr: cindex.CursorKind) -> tuple:
-    """Parse for loop to get loop variable, lower and upper bound"""
-    decl, cond, update, body = expr.get_children()
+class ForLoopInfo:
+    """Store meta information about For loops."""
 
-    var_decls = list(decl.get_children())
-    if len(var_decls) > 1:
-        raise NotImplementedError(
-            f"Multiple for loopy initializations not supported: {decl}"
-        )
+    def __init__(self, expr: cindex.CursorKind.FOR_STMT):
+        (self.decl, self.cond, self.update, self.body) = expr.get_children()
 
-    if cond.kind != cindex.CursorKind.BINARY_OPERATOR:
-        raise NotImplementedError("For loopy condition must be < or <=.")
+    def check_and_parse(self):
+        """Check and parse For-loop components."""
+        decls = list(self.decl.get_children())
+        if len(decls) == 0:
+            raise NotImplementedError(
+                "For loop variable must be initialized in loop initializer."
+            )
+        if len(decls) > 1:
+            raise NotImplementedError(
+                f"Multiple variable initializations are not supported: {decls}"
+            )
 
-    (left, right) = cond.get_children()
-    op_str = list(cond.get_tokens())[len(list(left.get_tokens()))].spelling
-    if op_str not in ["<", "<="]:
-        raise NotImplementedError("For loopy condition must be < or <=.")
+        cond_ok, cname, cleft, cright = False, None, None, None
+        if self.cond.kind == cindex.CursorKind.BINARY_OPERATOR:
+            (cleft, cright) = self.cond.get_children()
+            if get_op_str(self.cond, cleft) in ["<", "<="]:
+                cond_ok, cname = True, list(cleft.get_children())[0].spelling
+        if not cond_ok:
+            raise NotImplementedError("For loop condition must be < or <=.")
 
-    inc = [token.spelling for token in update.get_tokens()]
-    (literal,) = var_decls[0].get_children()
-    if update.kind == cindex.CursorKind.UNARY_OPERATOR and "++" in inc:
-        lbound_expr = CToLoopyLoopBoundMapper()(literal)
-        ubound_expr = CToLoopyLoopBoundMapper()(right)
-    else:
-        raise NotImplementedError("For loop increment must be 1.")
+        update_ok, uname = False, None
+        if self.update.kind == cindex.CursorKind.UNARY_OPERATOR:
+            if "++" in [token.spelling for token in self.update.get_tokens()]:
+                update_ok, uname = (
+                    True,
+                    list(self.update.get_children())[0].spelling,
+                )
+        if not update_ok:
+            raise NotImplementedError("For loop update must be ++")
 
-    iname = var_decls[0].spelling
-    (left_body,) = left.get_children()
-    (next_body,) = update.get_children()
-    if not (
-        left_body.kind == cindex.CursorKind.DECL_REF_EXPR
-        and left_body.spelling == iname
-    ) or not (
-        next_body.kind == cindex.CursorKind.DECL_REF_EXPR
-        and next_body.spelling == iname
-    ):
-        raise SyntaxError(
-            "For Loop variable must be same in condition and increment."
-        )
+        if uname != cname:
+            raise SyntaxError(
+                "For loop variable must be same in initialization, condition"
+                f" and increment. {uname} {cname}"
+            )
 
-    return (iname, lbound_expr, ubound_expr, body)
+        (var,) = decls[0].get_children()
+        lbound_expr = CToLoopyLoopBoundMapper()(var)
+        ubound_expr = CToLoopyLoopBoundMapper()(cright)
+        return (cname, lbound_expr, ubound_expr, self.body)
 
 
 class CToLoopyMapper(IdentityMapper):
@@ -353,10 +358,10 @@ class CToLoopyMapper(IdentityMapper):
         return true_result
 
     def map_for_stmt(
-        self, expr: cindex.CursorKind, context: CToLoopyMapperContext
+        self, expr: cindex.Cursor, context: CToLoopyMapperContext
     ) -> CToLoopyMapperAccumulator:
         """Map C for loop"""
-        (iname, lbound_expr, ubound_expr, body) = check_and_parse_for(expr)
+        (iname, lbound, ubound, body) = ForLoopInfo(expr).check_and_parse()
 
         space = isl.Space.create_from_names(
             isl.DEFAULT_CONTEXT, set=[iname], params=context.value_args
@@ -365,8 +370,8 @@ class CToLoopyMapper(IdentityMapper):
         domain = make_slab(
             space,
             iname,
-            aff_from_expr(space, lbound_expr),
-            aff_from_expr(space, ubound_expr),
+            aff_from_expr(space, lbound),
+            aff_from_expr(space, ubound),
         )
 
         new_inames = context.inames | {iname}
