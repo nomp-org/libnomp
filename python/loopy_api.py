@@ -1,7 +1,7 @@
 """Loopy API wrapper"""
 import hashlib
-from dataclasses import dataclass, fields, replace
-from typing import Dict, FrozenSet, List, Optional, Union
+from dataclasses import dataclass, replace
+from typing import Dict, FrozenSet, List, Union
 
 import islpy as isl
 import loopy as lp
@@ -341,18 +341,22 @@ class CToLoopyMapper(IdentityMapper):
     ) -> CToLoopyMapperAccumulator:
         """Maps a C if condition."""
         (cond_expr, if_true, *rest) = expr.get_children()
-        cond = CToLoopyExpressionMapper()(cond_expr)
-        # Map expr.iftrue with cond
-        true_predicates = context.predicates | {cond}
-        true_context = context.copy(predicates=true_predicates)
-        true_result = self.rec(if_true, true_context)
 
-        # Map expr.iffalse with !cond
+        # Map expr.iftrue with cond.
+        cond = CToLoopyExpressionMapper()(cond_expr)
+        true_result = self.rec(
+            if_true, context.copy(predicates=context.predicates | {cond})
+        )
+
+        # Map expr.iffalse with !cond if it exists.
         if len(rest) > 0:
             (if_false,) = rest
-            false_predicates = context.predicates | {prim.LogicalNot(cond)}
-            false_context = context.copy(predicates=false_predicates)
-            false_result = self.rec(if_false, false_context)
+            false_result = self.rec(
+                if_false,
+                context.copy(
+                    predicates=context.predicates | {prim.LogicalNot(cond)}
+                ),
+            )
 
             true_insn_ids, false_insn_ids = frozenset(), frozenset()
             for stmt in true_result.statements:
@@ -571,86 +575,81 @@ class CToLoopyMapper(IdentityMapper):
         )
 
 
-@dataclass
-class ExternalContext:
-    """Maintain information on variable declaration in a function."""
+class CKernel:
+    """Store the plain C kernel."""
 
-    function_name: Optional[str]
+    knl_name: str
+    knl_body: cindex.Cursor
     var_to_decl: Dict[str, cindex.Cursor]
 
-    def copy(self, **kwargs):
-        """Return external context with updated variable values."""
-        updated_kwargs = kwargs.copy()
-        for field in fields(self):
-            if field.name not in updated_kwargs:
-                updated_kwargs[field.name] = getattr(self, field.name)
+    def __init__(self, function: cindex.CursorKind.FUNCTION_DECL):
+        self.knl_name = function.spelling
+        self.var_to_decl = {}
 
-        return ExternalContext(**updated_kwargs)
+        (*args, self.knl_body) = function.get_children()
+        for arg in args:
+            if arg.kind == cindex.CursorKind.PARM_DECL:
+                self.var_to_decl[arg.spelling] = arg
 
-    def add_decl(self, var_name: str, decl: cindex.Cursor) -> None:
-        """Adds kernel parameter variable to the context."""
-        new_var_to_decl = self.var_to_decl.copy()
-        new_var_to_decl[var_name] = decl
-        return self.copy(var_to_decl=new_var_to_decl)
+    def get_knl_args(self) -> List[lp.KernelArgument]:
+        """Return Loopy kernel arguments for C function argument."""
+        knl_args = []
+        for arg in self.var_to_decl.values():
+            dtype = _get_dtype_from_decl_type(arg.type)
+            if arg.type.kind in _ARRAY_TYPES_W_PTR:
+                knl_args.append(
+                    lp.ArrayArg(
+                        arg.spelling,
+                        dtype=dtype,
+                        address_space=AddressSpace.GLOBAL,
+                    )
+                )
+            elif isinstance(arg.type.kind, cindex.TypeKind):
+                knl_args.append(lp.ValueArg(arg.spelling, dtype=dtype))
+            else:
+                raise NotImplementedError(
+                    f"get_knl_args: {arg.type.kind} is of invalid type:"
+                    f" {dtype}."
+                )
+        return knl_args
 
-    def var_to_dtype(self, var_name: str) -> None:
-        """Returns the data type of a variable."""
-        return _get_dtype_from_decl_type(self.var_to_decl[var_name].type)
-
-    def get_typedecl(self) -> dict:
-        """Returns type declarations."""
-        return {
-            k: v
+    def get_value_types(self) -> dict:
+        """Return value type declarations."""
+        return [
+            k
             for k, v in self.var_to_decl.items()
             if v.type.kind not in _ARRAY_TYPES_W_PTR
-        }
+        ]
 
+    def get_knl_body(self) -> cindex.Cursor:
+        """Return the C kernel body."""
+        return self.knl_body
 
-def decl_to_knl_arg(decl: cindex.Cursor, dtype) -> lp.KernelArgument:
-    """Returns the kernel arg from a declaration."""
-    decl_type = decl.type.kind
-    if decl_type in _ARRAY_TYPES_W_PTR:
-        return lp.ArrayArg(
-            decl.spelling, dtype=dtype, address_space=AddressSpace.GLOBAL
-        )
-    if isinstance(decl_type, cindex.TypeKind):
-        return lp.ValueArg(decl.spelling, dtype=dtype)
-    raise NotImplementedError(
-        f"decl_to_knl_arg: {decl.kind} is of invalid type: {decl_type}."
-    )
+    def get_knl_name(self) -> str:
+        """Return the C kernel name."""
+        return self.knl_name
 
 
 def c_to_loopy(c_str: str, backend: str) -> lp.translation_unit.TranslationUnit:
     """Returns a Loopy kernel for a C loop band."""
-    index = cindex.Index.create()
-    str_hash = hashlib.sha256(c_str.encode("utf-8")).hexdigest() + ".c"
-    tunit = index.parse(str_hash, unsaved_files=[(str_hash, c_str)])
+    fname = hashlib.sha256(c_str.encode("utf-8")).hexdigest() + ".c"
+    tunit = cindex.Index.create().parse(fname, unsaved_files=[(fname, c_str)])
 
     # Check for syntax errors in parsed C kernel
     errors = [diagnostic.spelling for diagnostic in tunit.diagnostics]
-    if errors:
-        raise SyntaxError(
-            f"Parsing C code failed with the following errors: {errors}"
-        )
+    if len(errors) > 0:
+        raise SyntaxError(f"Failed to parse C source due to errors: {errors}")
 
     # Init `var_to_decl` based on function parameters
-    (node,) = tunit.cursor.get_children()
-    context = ExternalContext(function_name=node.spelling, var_to_decl={})
-    knl_args = []
-    *args, body = node.get_children()
-    for arg in args:
-        if arg.kind == cindex.CursorKind.PARM_DECL:
-            context = context.add_decl(arg.spelling, arg)
-            knl_args.append(
-                decl_to_knl_arg(arg, context.var_to_dtype(arg.spelling))
-            )
+    (function,) = tunit.cursor.get_children()
+    c_knl = CKernel(function)
 
     # Map C for loop to loopy kernel
     acc = CToLoopyMapper()(
-        body,
+        c_knl.get_knl_body(),
         CToLoopyMapperContext(
             frozenset(),
-            context.get_typedecl().keys(),
+            c_knl.get_value_types(),
             frozenset(),
             UniqueNameGenerator(),
         ),
@@ -675,9 +674,9 @@ def c_to_loopy(c_str: str, backend: str) -> lp.translation_unit.TranslationUnit:
     knl = lp.make_kernel(
         unique_domains,
         acc.statements,
-        knl_args + acc.kernel_data + [...],
+        c_knl.get_knl_args() + acc.kernel_data + [...],
         lang_version=LOOPY_LANG_VERSION,
-        name=node.spelling,
+        name=c_knl.get_knl_name(),
         seq_dependencies=True,
         target=_BACKEND_TO_TARGET[backend],
     )
