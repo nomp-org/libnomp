@@ -80,6 +80,9 @@ _ARRAY_TYPES = [cindex.TypeKind.CONSTANTARRAY, cindex.TypeKind.INCOMPLETEARRAY]
 _ARRAY_TYPES_W_PTR = _ARRAY_TYPES + [cindex.TypeKind.POINTER]
 
 
+# pylint-disable-reason: Prefer the Singleton pattern instead of a global
+# variable.
+# pylint: disable=R0903
 class DtypeRegAcc:
     """Accessor class for DTypeRegistry"""
 
@@ -271,6 +274,9 @@ class CToLoopyLoopBoundMapper(CToLoopyExpressionMapper):
         return oprtr(self.rec(left), self.rec(right))
 
 
+# pylint-disable-reason: check_and_parse can be split to two methods but it is
+# not necessary to do so.
+# pylint: disable=R0903
 class ForLoopInfo:
     """Store meta information about For loops."""
 
@@ -536,8 +542,12 @@ class CToLoopyMapper(IdentityMapper):
             [],
         )
 
+    # pylint-disable-reason: `expr` has to be present even though unused
+    # since all the members of the mapper must have the same API
     def map_break_stmt(
-        self, expr: cindex.CursorKind.BREAK_STMT, context: CToLoopyMapperContext
+        self,
+        expr: cindex.CursorKind.BREAK_STMT,  # pylint: disable=W0613
+        context: CToLoopyMapperContext,
     ) -> CToLoopyMapperAccumulator:
         """Maps a C break statement."""
         return CToLoopyMapperAccumulator(
@@ -554,9 +564,11 @@ class CToLoopyMapper(IdentityMapper):
             [],
         )
 
+    # pylint-disable-reason: `expr` has to be present even though unused
+    # since all the members of the mapper must have the same API
     def map_continue_stmt(
         self,
-        expr: cindex.CursorKind.CONTINUE_STMT,
+        expr: cindex.CursorKind.CONTINUE_STMT,  # pylint: disable=W0613
         context: CToLoopyMapperContext,
     ) -> CToLoopyMapperAccumulator:
         """Maps a C continue statement."""
