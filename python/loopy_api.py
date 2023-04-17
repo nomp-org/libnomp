@@ -93,7 +93,7 @@ class DtypeRegAcc:
 
     @staticmethod
     def get_or_register_dtype(ctype: str) -> np.dtype:
-        """Return a dtype given a ctype"""
+        """Return a dtype given a ctype."""
         if DtypeRegAcc.__instance is None:
             DtypeRegAcc()
         return DtypeRegAcc.__instance.dtype_reg.get_or_register_dtype(
@@ -102,10 +102,10 @@ class DtypeRegAcc:
 
 
 class IdentityMapper:
-    """AST node mapper"""
+    """AST node mapper."""
 
     def rec(self, node, *args, **kwargs):
-        """Visit a node."""
+        """Visit a node in the AST."""
         class_name = str(node.kind).split(".")[1]
         try:
             mapper_method = getattr(self, "map_" + class_name.lower())
@@ -117,21 +117,25 @@ class IdentityMapper:
 
     __call__ = rec
 
-    def map_integer_literal(self, expr: cindex.CursorKind) -> np.dtype:
-        """Maps int constant"""
+    def map_integer_literal(
+        self, expr: cindex.CursorKind.INTEGER_LITERAL
+    ) -> np.dtype:
+        """Maps a integer literal."""
         (val,) = expr.get_tokens()
         ctype = expr.type.kind.spelling.lower()
         return (DtypeRegAcc.get_or_register_dtype(ctype).type)(val.spelling)
 
-    def map_floating_literal(self, expr: cindex.CursorKind) -> np.dtype:
-        """Maps float constant"""
+    def map_floating_literal(
+        self, expr: cindex.CursorKind.FLOATING_LITERAL
+    ) -> np.dtype:
+        """Maps a float literal."""
         (val,) = expr.get_tokens()
         ctype = expr.type.kind.spelling.lower()
         return (DtypeRegAcc.get_or_register_dtype(ctype).type)(val.spelling)
 
 
 def _get_dtype_from_decl_type(decl) -> np.dtype:
-    """Retrieve data type from declaration type"""
+    """Retrieve data type from declaration."""
     if (
         isinstance(decl.kind, cindex.TypeKind)
         and decl.kind == cindex.TypeKind.POINTER
@@ -148,28 +152,30 @@ def _get_dtype_from_decl_type(decl) -> np.dtype:
 
 
 def get_op_str(expr: cindex.CursorKind, lhs: cindex.CursorKind) -> str:
-    """Get operator as string from a binary expression"""
+    """Get operator as string from a binary expression."""
     return list(expr.get_tokens())[len(list(lhs.get_tokens()))].spelling
 
 
 class CToLoopyExpressionMapper(IdentityMapper):
-    """Functions for mapping C expressions to Loopy"""
+    """Functions for mapping C expressions to Loopy expressions."""
 
-    def map_decl_ref_expr(self, expr: cindex.CursorKind) -> prim.Variable:
-        """Maps reference to a C declaration"""
+    def map_decl_ref_expr(
+        self, expr: cindex.CursorKind.DECL_REF_EXPR
+    ) -> prim.Variable:
+        """Maps a variable reference to a C declaration."""
         (var_name,) = expr.get_tokens()
         return prim.Variable(var_name.spelling)
 
     def map_array_subscript_expr(
-        self, expr: cindex.CursorKind
+        self, expr: cindex.CursorKind.ARRAY_SUBSCRIPT_EXPR
     ) -> prim.Subscript:
-        """Maps C array reference"""
-        unexpsd_expr, index = expr.get_children()
+        """Maps a C array subscript expression."""
+        (unexpsd_expr, index) = expr.get_children()
         (child,) = unexpsd_expr.get_children()
         if child.kind == cindex.CursorKind.DECL_REF_EXPR:
             return prim.Subscript(self.rec(child), self.rec(index))
         if child.kind == cindex.CursorKind.ARRAY_SUBSCRIPT_EXPR:
-            unexpsd_expr_2, index_2 = child.get_children()
+            (unexpsd_expr_2, index_2) = child.get_children()
             (child_2,) = unexpsd_expr_2.get_children()
             return prim.Subscript(
                 self.rec(child_2), (self.rec(index_2), self.rec(index))
@@ -179,8 +185,10 @@ class CToLoopyExpressionMapper(IdentityMapper):
             " ARRAY_SUBSCRIPT_EXPR"
         )
 
-    def map_unary_operator(self, expr: cindex.CursorKind) -> prim.Expression:
-        """Maps C unary operation"""
+    def map_unary_operator(
+        self, expr: cindex.CursorKind.UNARY_OPERATOR
+    ) -> prim.Expression:
+        """Maps a C unary operator."""
         exs = [token.spelling for token in expr.get_tokens()]
         op_str = exs[0] if exs[0] in _C_UNARY_OPS_TO_PYMBOLIC_OPS else exs[-1]
         try:
@@ -190,8 +198,10 @@ class CToLoopyExpressionMapper(IdentityMapper):
         (var,) = expr.get_children()
         return oprtr(self.rec(var))
 
-    def map_binary_operator(self, expr: cindex.CursorKind) -> prim.Expression:
-        """Maps C binary operation"""
+    def map_binary_operator(
+        self, expr: cindex.CursorKind.BINARY_OPERATOR
+    ) -> prim.Expression:
+        """Maps a C binary operator."""
         left, right = expr.get_children()
         op_str = get_op_str(expr, left)
         try:
@@ -200,21 +210,24 @@ class CToLoopyExpressionMapper(IdentityMapper):
             raise SyntaxError(f"Invalid binary operator: {op_str}.") from exc
         return oprtr(self.rec(left), self.rec(right))
 
-    def map_unexposed_expr(self, expr: cindex.CursorKind) -> prim.Expression:
-        """Maps unexposed expression"""
+    def map_unexposed_expr(
+        self, expr: cindex.CursorKind.UNEXPOSED_EXPR
+    ) -> prim.Expression:
+        """Maps an unexposed expression."""
         (child,) = expr.get_children()
         return self.rec(child)
 
-    def map_paren_expr(self, expr: cindex.CursorKind) -> prim.Expression:
-        """Maps parenthesized expression"""
+    def map_paren_expr(
+        self, expr: cindex.CursorKind.PAREN_EXPR
+    ) -> prim.Expression:
+        """Maps a parenthesized expression."""
         (child,) = expr.get_children()
         return self.rec(child)
 
 
-# @dataclass automatically adds special methods like __init__ and __repr__
 @dataclass
 class CToLoopyMapperContext:
-    """Record expression context information"""
+    """Keep track of kernel context information."""
 
     # We don't need inner/outer inames. User should do these
     # transformations with loopy API. So we should just track inames.
@@ -224,20 +237,20 @@ class CToLoopyMapperContext:
     name_gen: UniqueNameGenerator
 
     def copy(self, **kwargs) -> "CToLoopyMapperContext":
-        """Update class variables"""
+        """Return a copy of the context by replacing fields."""
         return replace(self, **kwargs)
 
 
 @dataclass
 class CToLoopyMapperAccumulator:
-    """Record C expressions"""
+    """Record C statements and expressions."""
 
     domains: List[isl.BasicSet]
     statements: List[lp.InstructionBase]
     kernel_data: List[Union[lp.ValueArg, lp.TemporaryVariable]]
 
     def copy(self, *, domains=None, statements=None, kernel_data=None):
-        """Update class variables"""
+        """Return a copy of the current object."""
         domains = domains or self.domains
         statements = statements or self.statements
         kernel_data = kernel_data or self.kernel_data
@@ -245,11 +258,11 @@ class CToLoopyMapperAccumulator:
 
 
 class CToLoopyLoopBoundMapper(CToLoopyExpressionMapper):
-    """Map loop bounds"""
+    """Map loop bounds."""
 
     def map_binary_operator(self, expr: cindex.CursorKind) -> prim.Expression:
-        """Maps C binary operation"""
-        left, right = expr.get_children()
+        """Maps a C binary operator."""
+        (left, right) = expr.get_children()
         op_str = get_op_str(expr, left)
         try:
             oprtr = _C_OPS_TO_PYMBOLIC_OPS["//" if op_str == "/" else op_str]
@@ -301,22 +314,21 @@ class ForLoopInfo:
             )
 
         (var,) = decls[0].get_children()
-        lbound_expr = CToLoopyLoopBoundMapper()(var)
-        ubound_expr = CToLoopyLoopBoundMapper()(cright)
-        return (cname, lbound_expr, ubound_expr, self.body)
+        lbound = CToLoopyLoopBoundMapper()(var)
+        ubound = CToLoopyLoopBoundMapper()(cright)
+        return (cname, lbound, ubound, self.body)
 
 
 class CToLoopyMapper(IdentityMapper):
-    """Map C expressions"""
+    """Map C expressions and statemements to Loopy expressions."""
 
     def combine(self, values):
-        """Combine mapped expressions"""
+        """Combine mapped expressions."""
         # FIXME: Needs slightly more sophisticated checks here..
         # For example.
         # 1. No domain should have the dim_sets repeated.
         # 2. No arguments should have conflicting infos. like either being an
         #    ArrayArg or a ValueArg.
-
         new_domains = sum((value.domains for value in values), start=[])
         new_statements = sum((value.statements for value in values), start=[])
         new_kernel_data = sum((value.kernel_data for value in values), start=[])
@@ -325,10 +337,10 @@ class CToLoopyMapper(IdentityMapper):
         )
 
     def map_if_stmt(
-        self, expr: cindex.CursorKind, context: CToLoopyMapperContext
+        self, expr: cindex.CursorKind.IF_STMT, context: CToLoopyMapperContext
     ) -> CToLoopyMapperAccumulator:
-        """Map C if condition"""
-        cond_expr, if_true, *rest = expr.get_children()
+        """Maps a C if condition."""
+        (cond_expr, if_true, *rest) = expr.get_children()
         cond = CToLoopyExpressionMapper()(cond_expr)
         # Map expr.iftrue with cond
         true_predicates = context.predicates | {cond}
@@ -358,9 +370,9 @@ class CToLoopyMapper(IdentityMapper):
         return true_result
 
     def map_for_stmt(
-        self, expr: cindex.Cursor, context: CToLoopyMapperContext
+        self, expr: cindex.CursorKind.FOR_STMT, context: CToLoopyMapperContext
     ) -> CToLoopyMapperAccumulator:
-        """Map C for loop"""
+        """Maps a C For loop."""
         (iname, lbound, ubound, body) = ForLoopInfo(expr).check_and_parse()
 
         space = isl.Space.create_from_names(
@@ -381,16 +393,16 @@ class CToLoopyMapper(IdentityMapper):
         return children_result.copy(domains=children_result.domains + [domain])
 
     def map_decl_stmt(
-        self, expr: cindex.CursorKind, context: CToLoopyMapperContext
+        self, expr: cindex.CursorKind.DECL_STMT, context: CToLoopyMapperContext
     ) -> CToLoopyMapperAccumulator:
-        """Map C declaration statements"""
+        """Maps a C declaration statements."""
         (decl,) = expr.get_children()
         return self.rec(decl, context)
 
     def map_var_decl(
-        self, expr: cindex.CursorKind, context: CToLoopyMapperContext
+        self, expr: cindex.CursorKind.VAR_DECL, context: CToLoopyMapperContext
     ) -> CToLoopyMapperAccumulator:
-        """Map C variable declaration"""
+        """Maps a C variable declaration."""
 
         def check_and_parse_decl(expr: cindex.CursorKind):
             name, init = expr.spelling, None
@@ -455,7 +467,7 @@ class CToLoopyMapper(IdentityMapper):
         expr: cindex.CursorKind.COMPOUND_STMT,
         context: CToLoopyMapperContext,
     ) -> CToLoopyMapperAccumulator:
-        """Map C compound expression"""
+        """Maps a C compound expression."""
         if expr.get_children() is not None:
             return self.combine(
                 [self.rec(child, context) for child in expr.get_children()]
@@ -463,9 +475,11 @@ class CToLoopyMapper(IdentityMapper):
         return CToLoopyMapperAccumulator([], [], [])
 
     def map_binary_operator(
-        self, expr: cindex.CursorKind, context: CToLoopyMapperContext
+        self,
+        expr: cindex.CursorKind.BINARY_OPERATOR,
+        context: CToLoopyMapperContext,
     ) -> CToLoopyMapperAccumulator:
-        """Maps C binary operation"""
+        """Maps a C binary operator."""
         left, right = expr.get_children()
         lhs = CToLoopyExpressionMapper()(left)
         rhs = CToLoopyExpressionMapper()(right)
@@ -485,9 +499,11 @@ class CToLoopyMapper(IdentityMapper):
         )
 
     def map_compound_assignment_operator(
-        self, expr: cindex.CursorKind, context: CToLoopyMapperContext
+        self,
+        expr: cindex.CursorKind.COMPOUND_ASSIGNMENT_OPERATOR,
+        context: CToLoopyMapperContext,
     ) -> CToLoopyMapperAccumulator:
-        """Maps C binary operation"""
+        """Maps a C compound assignment operator."""
         left, right = expr.get_children()
         lhs = CToLoopyExpressionMapper()(left)
         rhs = CToLoopyExpressionMapper()(right)
@@ -517,9 +533,9 @@ class CToLoopyMapper(IdentityMapper):
         )
 
     def map_break_stmt(
-        self, expr: cindex.CursorKind, context: CToLoopyMapperContext
+        self, expr: cindex.CursorKind.BREAK_STMT, context: CToLoopyMapperContext
     ) -> CToLoopyMapperAccumulator:
-        """Maps a C break statement"""
+        """Maps a C break statement."""
         return CToLoopyMapperAccumulator(
             [],
             [
@@ -535,9 +551,11 @@ class CToLoopyMapper(IdentityMapper):
         )
 
     def map_continue_stmt(
-        self, expr: cindex.CursorKind, context: CToLoopyMapperContext
+        self,
+        expr: cindex.CursorKind.CONTINUE_STMT,
+        context: CToLoopyMapperContext,
     ) -> CToLoopyMapperAccumulator:
-        """Maps continue statement"""
+        """Maps a C continue statement."""
         return CToLoopyMapperAccumulator(
             [],
             [
@@ -555,13 +573,13 @@ class CToLoopyMapper(IdentityMapper):
 
 @dataclass
 class ExternalContext:
-    "Maintain information on variable declaration in a function"
+    """Maintain information on variable declaration in a function."""
 
     function_name: Optional[str]
     var_to_decl: Dict[str, cindex.Cursor]
 
     def copy(self, **kwargs):
-        """Get external context with updated variable values"""
+        """Return external context with updated variable values."""
         updated_kwargs = kwargs.copy()
         for field in fields(self):
             if field.name not in updated_kwargs:
@@ -570,17 +588,17 @@ class ExternalContext:
         return ExternalContext(**updated_kwargs)
 
     def add_decl(self, var_name: str, decl: cindex.Cursor) -> None:
-        """Adds kernel parameter variable declaration to the context"""
+        """Adds kernel parameter variable to the context."""
         new_var_to_decl = self.var_to_decl.copy()
         new_var_to_decl[var_name] = decl
         return self.copy(var_to_decl=new_var_to_decl)
 
     def var_to_dtype(self, var_name: str) -> None:
-        """Converts variable to data type"""
+        """Returns the data type of a variable."""
         return _get_dtype_from_decl_type(self.var_to_decl[var_name].type)
 
     def get_typedecl(self) -> dict:
-        """Get type declarations"""
+        """Returns type declarations."""
         return {
             k: v
             for k, v in self.var_to_decl.items()
@@ -589,7 +607,7 @@ class ExternalContext:
 
 
 def decl_to_knl_arg(decl: cindex.Cursor, dtype) -> lp.KernelArgument:
-    """Type declaration to kernel arg"""
+    """Returns the kernel arg from a declaration."""
     decl_type = decl.type.kind
     if decl_type in _ARRAY_TYPES_W_PTR:
         return lp.ArrayArg(
@@ -603,7 +621,7 @@ def decl_to_knl_arg(decl: cindex.Cursor, dtype) -> lp.KernelArgument:
 
 
 def c_to_loopy(c_str: str, backend: str) -> lp.translation_unit.TranslationUnit:
-    """Map C kernel to Loopy"""
+    """Returns a Loopy kernel for a C loop band."""
     index = cindex.Index.create()
     str_hash = hashlib.sha256(c_str.encode("utf-8")).hexdigest() + ".c"
     tunit = index.parse(str_hash, unsaved_files=[(str_hash, c_str)])
@@ -668,18 +686,18 @@ def c_to_loopy(c_str: str, backend: str) -> lp.translation_unit.TranslationUnit:
 
 
 def get_wrapper(backend: str) -> BaseKernelWrapper:
-    """Get relevant wrapper for backend"""
+    """Returns the wrapper for a given backend."""
     wrapper = _BACKEND_TO_WRAPPER.get(backend)
     return wrapper if wrapper is not None else BaseKernelWrapper()
 
 
 def get_knl_src(knl: lp.translation_unit.TranslationUnit, backend: str) -> str:
-    """Get kernel source for backend"""
+    """Returns the kernel source for a given backend."""
     return get_wrapper(backend).get_src(knl)
 
 
 def get_knl_name(knl: lp.translation_unit.TranslationUnit, backend: str) -> str:
-    """Get kernel name for backend"""
+    """Returns the kernel name for a given backend."""
     return get_wrapper(backend).get_entry_point(knl)
 
 
