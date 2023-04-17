@@ -91,7 +91,7 @@
 <dt class="sig sig-object cpp" id="_CPPv411opencl_initP7backendKiKi">
 <span id="_CPPv311opencl_initP7backendKiKi"></span><span id="_CPPv211opencl_initP7backendKiKi"></span><span id="opencl_init__backendP.iC.iC"></span><span class="target" id="group__nomp__backend__utils_1gac76f1949c40487b03ed06b587b82474d"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">opencl_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411opencl_initP7backendKiKi" title="opencl_init::backend"><span class="n"><span class="pre">backend</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">backend</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">platform_id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">device_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411opencl_initP7backendKiKi" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Initializes OpenCL backend with the specified platform and device. </p>
-<p>Initializes OpenCL backend while creating a command queue using the given platform id and device id. Returns a negative value if an error occured during the initialization, otherwise returns 0.</p>
+<p>Initializes OpenCL backend while creating a command queue using the given platform id and device id. Returns a negative value if an error occurred during the initialization, otherwise returns 0.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -218,15 +218,12 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv417py_eval_grid_sizeP4progP8PyObject">
-<span id="_CPPv317py_eval_grid_sizeP4progP8PyObject"></span><span id="_CPPv217py_eval_grid_sizeP4progP8PyObject"></span><span id="py_eval_grid_size__progP.PyObjectP"></span><span class="target" id="group__nomp__py__utils_1gae19ccae5faa049494b5ed1a1dc5bfdf8"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">py_eval_grid_size</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">prog</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">prg</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">dict</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417py_eval_grid_sizeP4progP8PyObject" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv417py_eval_grid_sizeP4prog">
+<span id="_CPPv317py_eval_grid_sizeP4prog"></span><span id="_CPPv217py_eval_grid_sizeP4prog"></span><span id="py_eval_grid_size__progP"></span><span class="target" id="group__nomp__py__utils_1ga591ac6a3a8d1015d3b2529d54d08c1bb"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">py_eval_grid_size</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">prog</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">prg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417py_eval_grid_sizeP4prog" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Evaluate global and local grid sizes based on the dictionary <code class="docutils literal notranslate"><span class="pre">dict</span></code>. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>prg</strong> – <strong>[in]</strong> Nomp program. </p></li>
-<li><p><strong>dict</strong> – <strong>[in]</strong> Dictionary with variable name as keys, variable value as values. </p></li>
-</ul>
+<dd class="field-odd"><p><strong>prg</strong> – <strong>[in]</strong> Nomp program. </p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>int </p>
