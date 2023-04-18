@@ -52,7 +52,7 @@ int nomp_set_log_(const char *desc, int logno, nomp_log_type type,
 
 /**
  * @ingroup nomp_log_utils
- * @brief Free log variables.
+ * @brief Free variables used to keep track of logs.
  *
  * @return void
  */
