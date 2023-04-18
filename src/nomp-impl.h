@@ -21,10 +21,6 @@
 #define MAX_CFLAGS_SIZE 16384
 #define MAX_KNL_ARGS 64
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "nomp-aux.h"
 #include "nomp-log.h"
 #include "nomp-lpy.h"
@@ -159,10 +155,6 @@ int cuda_init(struct backend *backend, const int platform_id,
 int hip_init(struct backend *backend, const int platform_id,
              const int device_id);
 
-#ifdef __cplusplus
-}
-#endif
-
 /**
  * @ingroup nomp_backend_init
  * @brief Initializes ISPC backend with the specified platform and device.
@@ -179,8 +171,8 @@ int hip_init(struct backend *backend, const int platform_id,
 int ispc_init(struct backend *backend, const int platform_type,
               const int device_id);
 
-#endif // _LIB_NOMP_IMPL_H_
-
 #ifdef __cplusplus
 }
 #endif
+
+#endif // _LIB_NOMP_IMPL_H_

@@ -7,6 +7,10 @@
 // Forward declare the `struct prog`.
 struct prog;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @defgroup nomp_py_utils Python helper functions
  */
@@ -108,5 +112,9 @@ int py_eval_grid_size(struct prog *prg);
  * @return void
  */
 void py_print(const char *msg, PyObject *obj);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _NOMP_LPY_H_
