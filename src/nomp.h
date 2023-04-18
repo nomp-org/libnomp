@@ -23,7 +23,7 @@
 #define NOMP_ATTR_PINNED 2
 /**
  * @ingroup nomp_attributes
- * @brief Device memory for the nomp kernel argument should be pinned.
+ * @brief Mask to separate the type and attributes of a kernel argument.
  */
 #define NOMP_ATTR_MASK 2047
 
@@ -83,23 +83,6 @@
  * @brief Free memory allocated on the device.
  */
 #define NOMP_FREE 8
-
-/**
- * @defgroup nomp_reduction_ops nomp reduction operations.
- *
- * @brief Defines reduction operations supported by nomp.
- */
-
-/**
- * @ingroup nomp_reduction_ops
- * @brief Sum reduction operation.
- */
-#define NOMP_SUM 1
-/**
- * @ingroup nomp_reduction_ops
- * @brief Production reduction operation.
- */
-#define NOMP_PROD 2
 
 /**
  * @defgroup nomp_errors Errors
