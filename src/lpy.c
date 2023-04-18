@@ -5,9 +5,6 @@ static const char *c_to_loopy = "c_to_loopy";
 static const char *get_knl_src = "get_knl_src";
 static const char *get_knl_name = "get_knl_name";
 
-static const char *kernel_wrapper = "kernel_wrapper";
-static const char *create_kernel_wrapper_fun = "create_kernel_wrapper_fun";
-
 void py_print(const char *msg, PyObject *obj) {
   PyObject *repr = PyObject_Repr(obj);
   PyObject *py_str = PyUnicode_AsEncodedString(repr, "utf-8", "~E~");
