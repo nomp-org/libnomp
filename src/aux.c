@@ -36,11 +36,10 @@ int nomp_str_toui(const char *str, size_t size) {
 }
 
 int nomp_path_len(size_t *len, const char *path) {
-  char *abs = nomp_calloc(char, PATH_MAX);
-  abs = realpath(path, abs);
+  if (len)
+    *len = 0;
+  char *abs = realpath(path, NULL);
   if (!abs) {
-    if (len)
-      *len = 0;
     return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                         "Unable to find path: \"%s\". Error: %s.", path,
                         strerror(errno));
