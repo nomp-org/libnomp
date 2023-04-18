@@ -1,4 +1,4 @@
-#include "nomp-impl.h"
+#include "nomp-reduction.h"
 
 #define NOMP_DO_SUM(a, b) (a) += (b)
 #define NOMP_DO_PROD(a, b) (a) *= (b)
@@ -52,11 +52,12 @@ DEFINE_REDUCTION
     }                                                                          \
   }
 
-int host_side_reduction(struct backend *nomp, struct prog *prg, struct mem *m) {
-  nomp_check(nomp->update(nomp, m, NOMP_FROM));
+int host_side_reduction(struct backend *backend, struct prog *prg,
+                        struct mem *m) {
+  nomp_check(backend->update(backend, m, NOMP_FROM));
 
-  // struct arg *args = prg->args;
-  // int i = prg->reduction_indx, op = prg->reduction_op;
+  struct arg *args = prg->args;
+  // int index = prg->reduction_indx, op = prg->reduction_op;
   int dom, op;
   void *ptr;
 
@@ -66,5 +67,37 @@ int host_side_reduction(struct backend *nomp, struct prog *prg, struct mem *m) {
 #undef WITH_DOMAIN
 #undef WITH_OP
 
+  return 0;
+}
+
+int py_handle_reduction(PyObject **knl, int *operator, const char * backend) {
+  // check_null_input(*knl);
+
+  int err = 1;
+  PyObject *reduction = PyUnicode_FromString("reduction");
+  PyObject *ret = NULL, *op = NULL;
+  if (reduction) {
+    PyObject *module = PyImport_Import(reduction);
+    Py_DECREF(reduction);
+    if (module) {
+      PyObject *function = PyObject_GetAttrString(module, "realize_reduction");
+      Py_DECREF(module);
+      if (function && PyCallable_Check(function)) {
+        PyObject *bnd = PyUnicode_FromString(backend);
+        PyObject *ret = PyObject_CallFunctionObjArgs(function, *knl, bnd, NULL);
+        Py_DECREF(function);
+        if (PyTuple_Check(ret) && PyTuple_GET_SIZE(ret) == 2) {
+          Py_DECREF(*knl), *knl = PyTuple_GetItem(ret, 0);
+          PyObject *op = PyTuple_GetItem(ret, 1);
+          *operator= PyLong_AsLong(op), Py_DECREF(op), err = 0;
+        }
+        Py_XDECREF(bnd);
+      }
+    }
+  }
+  if (err) {
+    return nomp_set_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,
+                        "Calling realize_reduction failed.");
+  }
   return 0;
 }
