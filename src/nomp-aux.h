@@ -71,8 +71,8 @@ int nomp_path_len(size_t *len, const char *path);
  */
 int nomp_max(unsigned n, ...);
 
-#endif // _NOMP_AUX_H_
-
 #ifdef __cplusplus
 }
 #endif
+
+#endif // _NOMP_AUX_H_
