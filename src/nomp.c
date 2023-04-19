@@ -1,6 +1,10 @@
 #include "nomp-impl.h"
 
-static char *copy_env(const char *name, size_t size) {
+static const char *py_dir = "python";
+static struct backend nomp;
+static int initialized = 0;
+
+static inline char *copy_env(const char *name, size_t size) {
   const char *tmp = getenv(name);
   if (tmp)
     return strndup(tmp, size);
@@ -36,11 +40,8 @@ static int check_env(struct backend *backend) {
   return 0;
 }
 
-static struct backend nomp;
-static int initialized = 0;
-static const char *py_dir = "python";
-
-static int check_args_aux(unsigned i, unsigned argc, const char *argv[]) {
+static inline int check_args_aux(unsigned i, unsigned argc,
+                                 const char *argv[]) {
   if (i >= argc || argv[i] == NULL) {
     return nomp_set_log(NOMP_USER_ARG_IS_INVALID, NOMP_ERROR,
                         "Missing argument value after: %s.", argv[i]);
@@ -69,10 +70,9 @@ static int check_args(int argc, const char **argv, struct backend *backend) {
       } else if (!strncmp("--nomp-verbose", argv[i], MAX_BUFSIZ)) {
         backend->verbose = nomp_str_toui(argv[i + 1], MAX_BUFSIZ);
       } else if (!strncmp("--nomp-install-dir", argv[i], MAX_BUFSIZ)) {
-        const char *install_dir = (const char *)argv[i + 1];
         size_t size;
-        nomp_check(nomp_path_len(&size, install_dir));
-        backend->install_dir = strndup(install_dir, size + 1);
+        nomp_check(nomp_path_len(&size, (const char *)argv[i + 1]));
+        backend->install_dir = strndup((const char *)argv[i + 1], size + 1);
       } else if (!strncmp("--nomp-script", argv[i], MAX_BUFSIZ)) {
         backend->annts_script = strndup((const char *)argv[i + 1], MAX_BUFSIZ);
       } else if (!strncmp("--nomp-function", argv[i], MAX_BUFSIZ)) {
@@ -159,9 +159,17 @@ static struct mem **mems = NULL;
 static int mems_n = 0;
 static int mems_max = 0;
 
-/// Returns the pointer to the allocated memory corresponding to 'p'.
-/// If no buffer has been allocated for 'p' returns *mems_n*.
-struct mem *mem_if_mapped(void *p) {
+/**
+ * @ingroup nomp_mem_utils
+ * @brief Returns the mem object corresponding to host pointer \p p.
+ *
+ * Returns the mem object corresponding to host ponter \p p. If no buffer has
+ * been allocated for \p p on the device, returns NULL.
+ *
+ * @param[in] p Host pointer
+ * @return struct mem *
+ */
+static inline struct mem *mem_if_mapped(void *p) {
   // FIXME: This is O(N) in number of allocations.
   // Needs to go. Must store a hashmap.
   for (unsigned i = 0; i < mems_n; i++) {
@@ -275,10 +283,11 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
     PyObject *knl = NULL;
     nomp_check(py_c_to_loopy(&knl, csrc, nomp.name));
 
-    // Parse the clauses
-    char *usr_file = NULL, *usr_func = NULL;
-    PyObject *annts;
-    nomp_check(parse_clauses(&usr_file, &usr_func, &annts, clauses));
+    // Parse the clauses to find transformations file, function and other
+    // annotations. Annotations are returned as a Python dictionary.
+    char *file = NULL, *func = NULL;
+    PyObject *annts = NULL;
+    nomp_check(parse_clauses(&file, &func, &annts, clauses));
 
     // Handle annotate clauses if the exist
     nomp_check(
@@ -286,8 +295,8 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
     Py_XDECREF(annts);
 
     // Handle transform clause
-    nomp_check(py_user_transform(&knl, usr_file, usr_func));
-    nomp_free(usr_file), nomp_free(usr_func);
+    nomp_check(py_user_transform(&knl, file, func));
+    nomp_free(file), nomp_free(func);
 
     // Get OpenCL, CUDA, etc. source and name from the loopy kernel
     char *name, *src;
