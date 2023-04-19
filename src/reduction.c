@@ -71,8 +71,6 @@ int host_side_reduction(struct backend *backend, struct prog *prg,
 }
 
 int py_handle_reduction(PyObject **knl, int *operator, const char * backend) {
-  // check_null_input(*knl);
-
   int err = 1;
   PyObject *reduction = PyUnicode_FromString("reduction");
   PyObject *ret = NULL, *op = NULL;

@@ -77,18 +77,6 @@ extern "C" {
 #endif
 
 /**
- * @ingroup nomp_mem_utils
- * @brief Returns the mem object corresponding to host pointer \p p.
- *
- * Returns the mem object corresponding to host ponter \p p. If no buffer has
- * been allocated for \p p on the device, returns NULL.
- *
- * @param[in] p Host pointer
- * @return struct mem *
- */
-struct mem *mem_if_mapped(void *p);
-
-/**
  * @defgroup nomp_backend_utils Backend init functions
  */
 

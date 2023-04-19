@@ -15,17 +15,17 @@
  * @ingroup nomp_attributes
  * @brief nomp kernel argument is an accumulator of a reduction.
  */
-#define NOMP_ATTR_REDN 1
+#define NOMP_ATTRIBUTE_REDUCTION 1
 /**
  * @ingroup nomp_attributes
  * @brief Device memory for the nomp kernel argument must be pinned.
  */
-#define NOMP_ATTR_PINNED 2
+#define NOMP_ATTRIBUTE_PINNED 2
 /**
  * @ingroup nomp_attributes
  * @brief Mask to separate the type and attributes of a kernel argument.
  */
-#define NOMP_ATTR_MASK 2047
+#define NOMP_ATTRIBUTE_MASK 2047
 
 /**
  * @defgroup nomp_types nomp data types.
