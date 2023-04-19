@@ -60,7 +60,7 @@ static int check_args(int argc, const char **argv, struct backend *backend) {
   while (i < argc) {
     if (!strncmp("--nomp", argv[i], 6)) {
       nomp_check(check_args_aux(i + 1, argc, argv));
-      if (!strncmp("--nomp-backend", argv[i], MAX_BACKEND_SIZE)) {
+      if (!strncmp("--nomp-backend", argv[i], MAX_BUFSIZ)) {
         backend->backend = strndup((const char *)argv[i + 1], MAX_BACKEND_SIZE);
       } else if (!strncmp("--nomp-platform", argv[i], MAX_BUFSIZ)) {
         backend->platform_id = nomp_str_toui(argv[i + 1], MAX_BUFSIZ);
@@ -235,7 +235,7 @@ static int parse_clauses(char **usr_file, char **usr_func, PyObject **dict_,
       nomp_check(nomp_path_len(NULL, (const char *)py));
       nomp_free(py);
       *usr_file = strndup(clauses[i + 1], PATH_MAX);
-      *usr_func = strndup(clauses[i + 2], MAX_BUFSIZ);
+      *usr_func = strndup(clauses[i + 2], MAX_FUNC_NAME_SIZE);
       i += 3;
     } else if (strncmp(clauses[i], "annotate", MAX_BUFSIZ) == 0) {
       if (clauses[i + 1] == NULL || clauses[i + 2] == NULL) {
@@ -246,9 +246,9 @@ static int parse_clauses(char **usr_file, char **usr_func, PyObject **dict_,
       }
       const char *key = clauses[i + 1], *val = clauses[i + 2];
       PyObject *pkey =
-          PyUnicode_FromStringAndSize(key, strnlen(key, MAX_BUFSIZ));
+          PyUnicode_FromStringAndSize(key, strnlen(key, MAX_KEY_SIZE));
       PyObject *pval =
-          PyUnicode_FromStringAndSize(val, strnlen(val, MAX_BUFSIZ));
+          PyUnicode_FromStringAndSize(val, strnlen(val, MAX_KEY_SIZE));
       PyDict_SetItem(dict, pkey, pval);
       Py_XDECREF(pkey), Py_XDECREF(pval);
       i += 3;

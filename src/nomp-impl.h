@@ -16,9 +16,11 @@
 
 #define MAX_BUFSIZ 64
 #define MAX_BACKEND_SIZE 32
-#define MAX_ARG_NAME_SIZE 128
+#define MAX_KEY_SIZE 128
 #define MAX_SRC_SIZE 16384
 #define MAX_CFLAGS_SIZE 16384
+#define MAX_ARG_NAME_SIZE 128
+#define MAX_FUNC_NAME_SIZE 128
 #define MAX_KNL_ARGS 64
 
 #include "nomp-aux.h"
@@ -60,7 +62,7 @@ struct prog {
 struct backend {
   char *backend, *install_dir, *annts_script, *annts_func;
   int platform_id, device_id, verbose;
-  char name[MAX_BUFSIZ];
+  char name[MAX_BACKEND_SIZE];
   int (*update)(struct backend *, struct mem *, const int);
   int (*knl_build)(struct backend *, struct prog *, const char *, const char *);
   int (*knl_run)(struct backend *, struct prog *);
