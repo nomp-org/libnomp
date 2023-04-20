@@ -22,18 +22,29 @@ static int check_env(struct backend *backend) {
   if ((tmp = getenv("NOMP_VERBOSE")))
     backend->verbose = nomp_str_toui(tmp, MAX_BUFSIZ);
 
-  if ((tmp = copy_env("NOMP_BACKEND", MAX_BACKEND_SIZE)))
+  if ((tmp = copy_env("NOMP_BACKEND", MAX_BACKEND_SIZE))) {
+    if (backend->backend)
+      nomp_free(backend->backend);
     backend->backend = strndup(tmp, MAX_BACKEND_SIZE), nomp_free(tmp);
+  }
 
-  if ((tmp = copy_env("NOMP_ANNOTATE_SCRIPT", MAX_BUFSIZ)))
+  if ((tmp = copy_env("NOMP_ANNOTATE_SCRIPT", MAX_BUFSIZ))) {
+    if (backend->annts_script)
+      nomp_free(backend->annts_script);
     backend->annts_script = strndup(tmp, MAX_BUFSIZ + 1), nomp_free(tmp);
+  }
 
-  if ((tmp = copy_env("NOMP_ANNOTATE_FUNCTION", MAX_BUFSIZ)))
+  if ((tmp = copy_env("NOMP_ANNOTATE_FUNCTION", MAX_BUFSIZ))) {
+    if (backend->annts_func)
+      nomp_free(backend->annts_func);
     backend->annts_func = strndup(tmp, MAX_BUFSIZ + 1), nomp_free(tmp);
+  }
 
   if ((tmp = copy_env("NOMP_INSTALL_DIR", MAX_BUFSIZ))) {
     size_t size;
     nomp_check(nomp_path_len(&size, tmp));
+    if (backend->install_dir)
+      nomp_free(backend->install_dir);
     backend->install_dir = strndup(tmp, size + 1), nomp_free(tmp);
   }
 
