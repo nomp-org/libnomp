@@ -92,14 +92,9 @@
 
 /**
  * @ingroup nomp_errors
- * @brief One of the inputs to a libnomp function call are not provided.
- */
-#define NOMP_USER_INPUT_NOT_PROVIDED -128
-/**
- * @ingroup nomp_errors
  * @brief One of the inputs to a libnomp function call are not valid.
  */
-#define NOMP_USER_INPUT_IS_INVALID -129
+#define NOMP_USER_INPUT_IS_INVALID -128
 /**
  * @ingroup nomp_errors
  * @brief Map pointer provided to libnomp is not valid.
@@ -109,27 +104,22 @@
  * @ingroup nomp_errors
  * @brief Map operation provided to libnomp is not applicable.
  */
-#define NOMP_USER_MAP_OP_IS_INVALID -131
+#define NOMP_USER_MAP_OP_IS_INVALID -132
 /**
  * @ingroup nomp_errors
  * @brief Log id provided to libnomp is not valid.
  */
-#define NOMP_USER_LOG_ID_IS_INVALID -132
+#define NOMP_USER_LOG_ID_IS_INVALID -134
 /**
  * @ingroup nomp_errors
  * @brief User callback function failed during execution.
  */
-#define NOMP_USER_CALLBACK_FAILURE -133
+#define NOMP_USER_CALLBACK_FAILURE -136
 /**
  * @ingroup nomp_errors
  * @brief Kernel argument type provided to libnomp is not valid.
  */
-#define NOMP_USER_KNL_ARG_TYPE_IS_INVALID -134
-/**
- * @ingroup nomp_errors
- * @brief User argument provided to libnomp is not valid.
- */
-#define NOMP_USER_ARG_IS_INVALID -135
+#define NOMP_USER_KNL_ARG_TYPE_IS_INVALID -138
 
 /**
  * @ingroup nomp_errors

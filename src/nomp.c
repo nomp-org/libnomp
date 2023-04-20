@@ -12,11 +12,11 @@ static inline char *copy_env(const char *name, size_t size) {
 }
 
 static int check_env(struct backend *backend) {
-  char *tmp = getenv("NOMP_PLATFORM_ID");
+  char *tmp = getenv("NOMP_PLATFORM");
   if (tmp)
     backend->platform_id = nomp_str_toui(tmp, MAX_BUFSIZ);
 
-  if ((tmp = getenv("NOMP_DEVICE_ID")))
+  if ((tmp = getenv("NOMP_DEVICE")))
     backend->device_id = nomp_str_toui(tmp, MAX_BUFSIZ);
 
   if ((tmp = getenv("NOMP_VERBOSE")))
@@ -40,17 +40,20 @@ static int check_env(struct backend *backend) {
   return 0;
 }
 
-static inline int check_args_aux(unsigned i, unsigned argc,
-                                 const char *argv[]) {
+static inline int check_cmd_line_arg(unsigned i, unsigned argc,
+                                     const char *argv[]) {
   if (i >= argc || argv[i] == NULL) {
-    return nomp_set_log(NOMP_USER_ARG_IS_INVALID, NOMP_ERROR,
-                        "Missing argument value after: %s.", argv[i]);
+    return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                        "Missing argument value after: %s.", argv[i - 1]);
   }
   return 0;
 }
 
-static int check_args(int argc, const char **argv, struct backend *backend) {
-  backend->device_id = 0, backend->platform_id = 0, backend->verbose = 0;
+static int init_configs(int argc, const char **argv, struct backend *backend) {
+  // We only a provide default value for verbose. Everything else has to be set
+  // by user explicitly.
+  backend->verbose = 0;
+  backend->device_id = backend->platform_id = -1;
   backend->backend = backend->install_dir = NULL;
   backend->annts_script = backend->annts_func = NULL;
 
@@ -60,7 +63,7 @@ static int check_args(int argc, const char **argv, struct backend *backend) {
   unsigned i = 0;
   while (i < argc) {
     if (!strncmp("--nomp", argv[i], 6)) {
-      nomp_check(check_args_aux(i + 1, argc, argv));
+      nomp_check(check_cmd_line_arg(i + 1, argc, argv));
       if (!strncmp("--nomp-backend", argv[i], MAX_BUFSIZ)) {
         backend->backend = strndup((const char *)argv[i + 1], MAX_BACKEND_SIZE);
       } else if (!strncmp("--nomp-platform", argv[i], MAX_BUFSIZ)) {
@@ -83,6 +86,27 @@ static int check_args(int argc, const char **argv, struct backend *backend) {
     i++;
   }
 
+  nomp_check(check_env(&nomp));
+
+#define check_if_initialized(param, value, cmd_arg, env_var)                   \
+  {                                                                            \
+    if (backend->param == value) {                                             \
+      return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,              \
+                          #param                                               \
+                          " is missing or invalid. Set it with " cmd_arg       \
+                          " command line argument or " env_var                 \
+                          " environment variable.");                           \
+    }                                                                          \
+  }
+
+  check_if_initialized(device_id, -1, "--nomp-device", "NOMP_DEVICE");
+  check_if_initialized(platform_id, -1, "--nomp-platform", "NOMP_PLATFORM");
+  check_if_initialized(backend, NULL, "--nomp-backend", "NOMP_BACKEND");
+  check_if_initialized(install_dir, NULL, "--nomp-install-dir",
+                       "NOMP_INSTALL_DIR");
+
+#undef check_if_initialized
+
   return 0;
 }
 
@@ -92,8 +116,7 @@ int nomp_init(int argc, const char **argv) {
                         "libnomp is already initialized.");
   }
 
-  nomp_check(check_args(argc, argv, &nomp));
-  nomp_check(check_env(&nomp));
+  nomp_check(init_configs(argc, argv, &nomp));
 
   char name[MAX_BACKEND_SIZE + 1];
   size_t n = strnlen(nomp.backend, MAX_BACKEND_SIZE);
@@ -235,7 +258,7 @@ static int parse_clauses(char **usr_file, char **usr_func, PyObject **dict_,
     if (strncmp(clauses[i], "transform", MAX_BUFSIZ) == 0) {
       if (clauses[i + 1] == NULL || clauses[i + 2] == NULL) {
         return nomp_set_log(
-            NOMP_USER_INPUT_NOT_PROVIDED, NOMP_ERROR,
+            NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
             "\"transform\" clause should be followed by a file name and a "
             "function name. At least one of them is not provided.");
       }
@@ -248,7 +271,7 @@ static int parse_clauses(char **usr_file, char **usr_func, PyObject **dict_,
     } else if (strncmp(clauses[i], "annotate", MAX_BUFSIZ) == 0) {
       if (clauses[i + 1] == NULL || clauses[i + 2] == NULL) {
         return nomp_set_log(
-            NOMP_USER_INPUT_NOT_PROVIDED, NOMP_ERROR,
+            NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
             "\"annotate\" clause should be followed by a key value "
             "pair. At least one of them is not provided.");
       }
