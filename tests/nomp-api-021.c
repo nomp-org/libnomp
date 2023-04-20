@@ -13,24 +13,24 @@ static int test_invalid_nomp_backend(int argc, const char **argv) {
   return 0;
 }
 
-// NOMP_PLATFORM_ID environment variable with invalid value.
+// NOMP_PLATFORM environment variable with invalid value.
 static int test_invalid_platform_id(int argc, const char **argv) {
-  setenv("NOMP_PLATFORM_ID", "invalid", 1);
+  setenv("NOMP_PLATFORM", "invalid", 1);
   nomp_test_assert(nomp_get_log_no(nomp_init(argc, argv)) ==
                    NOMP_USER_INPUT_IS_INVALID);
-  unsetenv("NOMP_PLATFORM_ID");
+  unsetenv("NOMP_PLATFORM");
 
   nomp_test_assert(nomp_get_log_no(nomp_finalize()) == NOMP_FINALIZE_FAILURE);
 
   return 0;
 }
 
-// NOMP_DEVICE_ID environment variable with invalid value.
+// NOMP_DEVICE environment variable with invalid value.
 static int test_invalid_device_id(int argc, const char **argv) {
-  setenv("NOMP_DEVICE_ID", "invalid", 1);
+  setenv("NOMP_DEVICE", "invalid", 1);
   nomp_test_assert(nomp_get_log_no(nomp_init(argc, argv)) ==
                    NOMP_USER_INPUT_IS_INVALID);
-  unsetenv("NOMP_DEVICE_ID");
+  unsetenv("NOMP_DEVICE");
 
   nomp_test_assert(nomp_get_log_no(nomp_finalize()) == NOMP_FINALIZE_FAILURE);
 
@@ -78,22 +78,22 @@ static int test_nomp_backend_case_insensitivity(int argc, const char **argv) {
   return 0;
 }
 
-// Run with a valid NOMP_PLATFORM_ID environment variable.
+// Run with a valid NOMP_PLATFORM environment variable.
 static int test_valid_platform_id(int argc, const char **argv) {
-  setenv("NOMP_PLATFORM_ID", "0", 1);
+  setenv("NOMP_PLATFORM", "0", 1);
   nomp_test_chk(nomp_init(argc, argv));
-  unsetenv("NOMP_PLATFORM_ID");
+  unsetenv("NOMP_PLATFORM");
 
   nomp_test_chk(nomp_finalize());
 
   return 0;
 }
 
-// Run with a valid NOMP_DEVICE_ID  environment variable.
+// Run with a valid NOMP_DEVICE  environment variable.
 static int test_valid_device_id(int argc, const char **argv) {
-  setenv("NOMP_DEVICE_ID", "0", 1);
+  setenv("NOMP_DEVICE", "0", 1);
   nomp_test_chk(nomp_init(argc, argv));
-  unsetenv("NOMP_DEVICE_ID");
+  unsetenv("NOMP_DEVICE");
 
   nomp_test_chk(nomp_finalize());
 

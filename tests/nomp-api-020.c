@@ -39,7 +39,7 @@ static int test_missing_argument() {
                          "--nomp-platform"};
   int argc = 5;
   nomp_test_assert(nomp_get_log_no(nomp_init(argc, argv)) ==
-                   NOMP_USER_ARG_IS_INVALID);
+                   NOMP_USER_INPUT_IS_INVALID);
 
   nomp_test_assert(nomp_get_log_no(nomp_finalize()) == NOMP_FINALIZE_FAILURE);
 

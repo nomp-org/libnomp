@@ -69,7 +69,7 @@ static int test_missing_filename() {
   static int id = -1;
   int err = nomp_jit(&id, valid_knl, clauses, 2, "a", sizeof(int *), NOMP_PTR,
                      "N", sizeof(int), NOMP_INT);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_NOT_PROVIDED);
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
   char *log = nomp_get_log_str(err);
   int eq =
@@ -89,7 +89,7 @@ static int test_missing_user_callback() {
   static int id = -1;
   int err = nomp_jit(&id, valid_knl, clauses, 2, "a", sizeof(int *), NOMP_PTR,
                      "N", sizeof(int), NOMP_INT);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_NOT_PROVIDED);
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
   char *log = nomp_get_log_str(err);
   int eq =
