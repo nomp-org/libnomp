@@ -62,7 +62,6 @@ struct prog {
 struct backend {
   char *backend, *install_dir, *annts_script, *annts_func;
   int platform_id, device_id, verbose;
-  char name[MAX_BACKEND_SIZE];
   int (*update)(struct backend *, struct mem *, const int);
   int (*knl_build)(struct backend *, struct prog *, const char *, const char *);
   int (*knl_run)(struct backend *, struct prog *);
