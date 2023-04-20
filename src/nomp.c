@@ -129,41 +129,36 @@ int nomp_init(int argc, const char **argv) {
 
   nomp_check(init_configs(argc, argv, &nomp));
 
-  char name[MAX_BACKEND_SIZE + 1];
   size_t n = strnlen(nomp.backend, MAX_BACKEND_SIZE);
   for (int i = 0; i < n; i++)
-    name[i] = tolower(nomp.backend[i]);
-  name[n] = '\0';
+    nomp.backend[i] = tolower(nomp.backend[i]);
 
-  int err = 1;
-  if (strncmp(name, "opencl", MAX_BACKEND_SIZE) == 0) {
+  if (strncmp(nomp.backend, "opencl", MAX_BACKEND_SIZE) == 0) {
 #if defined(OPENCL_ENABLED)
-    err = opencl_init(&nomp, nomp.platform_id, nomp.device_id);
+    nomp_check(opencl_init(&nomp, nomp.platform_id, nomp.device_id));
 #endif
-  } else if (strncmp(name, "cuda", MAX_BACKEND_SIZE) == 0) {
+  } else if (strncmp(nomp.backend, "cuda", MAX_BACKEND_SIZE) == 0) {
 #if defined(CUDA_ENABLED)
-    err = cuda_init(&nomp, nomp.platform_id, nomp.device_id);
+    nomp_check(cuda_init(&nomp, nomp.platform_id, nomp.device_id));
 #endif
-  } else if (strncmp(name, "hip", MAX_BACKEND_SIZE) == 0) {
+  } else if (strncmp(nomp.backend, "hip", MAX_BACKEND_SIZE) == 0) {
 #if defined(HIP_ENABLED)
-    err = hip_init(&nomp, nomp.platform_id, nomp.device_id);
+    nomp_check(hip_init(&nomp, nomp.platform_id, nomp.device_id));
 #endif
-  } else if (strncmp(name, "sycl", MAX_BACKEND_SIZE) == 0) {
+  } else if (strncmp(nomp.backend, "sycl", MAX_BACKEND_SIZE) == 0) {
 #if defined(SYCL_ENABLED)
-    err = sycl_init(&nomp, nomp.platform_id, nomp.device_id);
+    nomp_check(sycl_init(&nomp, nomp.platform_id, nomp.device_id));
 #endif
-  } else if (strncmp(name, "ispc", MAX_BACKEND_SIZE) == 0) {
+  } else if (strncmp(nomp.backend, "ispc", MAX_BACKEND_SIZE) == 0) {
 #if defined(ISPC_ENABLED)
-    err = ispc_init(&nomp, nomp.platform_id, nomp.device_id);
+    nomp_check(ispc_init(&nomp, nomp.platform_id, nomp.device_id));
 #endif
   } else {
-    err = nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                       "Failed to initialized libnomp. Invalid backend: %s",
-                       name);
+    return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                        "Failed to initialize libnomp. Invalid backend: %s",
+                        nomp.backend);
   }
-  nomp_check(err);
   nomp_check(nomp_log_init(nomp.verbose));
-  strncpy(nomp.name, name, MAX_BACKEND_SIZE);
 
   if (!Py_IsInitialized()) {
     // May be we need the isolated configuration listed here:
@@ -315,7 +310,7 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
 
     // Create loopy kernel from C source
     PyObject *knl = NULL;
-    nomp_check(py_c_to_loopy(&knl, csrc, nomp.name));
+    nomp_check(py_c_to_loopy(&knl, csrc, nomp.backend));
 
     // Parse the clauses to find transformations file, function and other
     // annotations. Annotations are returned as a Python dictionary.
@@ -334,7 +329,7 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
 
     // Get OpenCL, CUDA, etc. source and name from the loopy kernel
     char *name, *src;
-    nomp_check(py_get_knl_name_and_src(&name, &src, knl, nomp.name));
+    nomp_check(py_get_knl_name_and_src(&name, &src, knl, nomp.backend));
 
     // Build the kernel
     struct prog *prg = progs[progs_n] = nomp_calloc(struct prog, 1);
