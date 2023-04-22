@@ -8,7 +8,7 @@ static const char *get_knl_src = "get_knl_src";
 static const char *get_knl_name = "get_knl_name";
 static const char *realize_reduction = "realize_reduction";
 
-void py_print(const char *msg, PyObject *obj) {
+void nomp_py_print(const char *msg, PyObject *obj) {
   PyObject *repr = PyObject_Repr(obj);
   PyObject *py_str = PyUnicode_AsEncodedString(repr, "utf-8", "~E~");
   const char *str = PyBytes_AS_STRING(py_str);
@@ -16,7 +16,7 @@ void py_print(const char *msg, PyObject *obj) {
   Py_XDECREF(repr), Py_XDECREF(py_str);
 }
 
-int py_append_to_sys_path(const char *path) {
+int nomp_py_append_to_sys_path(const char *path) {
   int err = 1;
   PyObject *sys = PyImport_ImportModule("sys");
   if (sys) {
@@ -140,7 +140,7 @@ int py_apply_annotations(PyObject **knl, PyObject *func, PyObject *annts) {
   return 0;
 }
 
-int py_user_transform(PyObject **knl, const char *file, const char *func) {
+int nomp_py_user_transform(PyObject **knl, const char *file, const char *func) {
   // If either file, or func are NULL, we don't have to do anything:
   if (file == NULL || func == NULL)
     return 0;
@@ -171,7 +171,7 @@ int py_user_transform(PyObject **knl, const char *file, const char *func) {
   return 0;
 }
 
-int py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
+int nomp_py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
                             const char *backend) {
   int err = 1;
   PyObject *lpy_api = PyUnicode_FromString(module_loopy_api);
@@ -223,7 +223,7 @@ int py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
   return 0;
 }
 
-int py_get_grid_size(struct nomp_prog *prg, PyObject *knl) {
+int nomp_py_get_grid_size(struct nomp_prog *prg, PyObject *knl) {
   int err = 1;
   if (knl) {
     PyObject *callables = PyObject_GetAttrString(knl, "callables_table");
@@ -273,7 +273,7 @@ static int py_eval_grid_size_aux(size_t *out, PyObject *grid, unsigned dim,
   return err;
 }
 
-int py_eval_grid_size(struct nomp_prog *prg) {
+int nomp_py_eval_grid_size(struct nomp_prog *prg) {
   // If the expressions are not NULL, iterate through them and evaluate with
   // pymbolic. Also, we should calculate and store a hash of the dict that
   // is passed. If the hash is the same, no need of re-evaluating the grid

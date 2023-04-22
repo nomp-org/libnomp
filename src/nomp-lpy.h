@@ -22,7 +22,7 @@ extern "C" {
  * @param[in] path Path to be appended to system path.
  * @return int
  */
-int py_append_to_sys_path(const char *path);
+int nomp_py_append_to_sys_path(const char *path);
 
 /**
  * @ingroup nomp_py_utils
@@ -79,7 +79,7 @@ int py_apply_annotations(PyObject **knl, PyObject *func, PyObject *annts);
  * @param[in] func Transform function.
  * @return int
  */
-int py_user_transform(PyObject **knl, const char *file, const char *func);
+int nomp_py_user_transform(PyObject **knl, const char *file, const char *func);
 
 /**
  * @ingroup nomp_py_utils
@@ -91,7 +91,7 @@ int py_user_transform(PyObject **knl, const char *file, const char *func);
  * @param[in] backend Backend name.
  * @return int
  */
-int py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
+int nomp_py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
                             const char *backend);
 
 /**
@@ -104,7 +104,7 @@ int py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
  * @param[in] knl Python kernel object.
  * @return int
  */
-int py_get_grid_size(struct nomp_prog *prg, PyObject *knl);
+int nomp_py_get_grid_size(struct nomp_prog *prg, PyObject *knl);
 
 /**
  * @ingroup nomp_py_utils
@@ -113,7 +113,7 @@ int py_get_grid_size(struct nomp_prog *prg, PyObject *knl);
  * @param[in] prg Nomp program.
  * @return int
  */
-int py_eval_grid_size(struct nomp_prog *prg);
+int nomp_py_eval_grid_size(struct nomp_prog *prg);
 
 /**
  * @ingroup nomp_py_utils
@@ -123,7 +123,7 @@ int py_eval_grid_size(struct nomp_prog *prg);
  * @param obj Python object.
  * @return void
  */
-void py_print(const char *msg, PyObject *obj);
+void nomp_py_print(const char *msg, PyObject *obj);
 
 #ifdef __cplusplus
 }
