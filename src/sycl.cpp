@@ -56,7 +56,7 @@ static int sycl_update(struct nomp_backend *bnd, struct nomp_mem *m,
 
 static int sycl_knl_free(struct nomp_prog *prg) {
   struct sycl_prog *sycl_prg = (struct sycl_prog *)prg->bptr;
-  int err = jit_free(&sycl_prg->sycl_id);
+  int err = nomp_jit_free(&sycl_prg->sycl_id);
   nomp_free(prg->bptr), prg->bptr = NULL;
 
   return err;
@@ -76,9 +76,9 @@ static int sycl_knl_build(struct nomp_backend *bnd, struct nomp_prog *prg,
   }
 
   char *wkdir = nomp_str_cat(3, BUFSIZ, cwd, "/", ".nomp_jit_cache");
-  int err = jit_compile(&sycl_prg->sycl_id, source, sycl->compiler,
-                        sycl->compiler_flags, name, wkdir, "nomp_sycl_src.cpp",
-                        "lib.so");
+  int err = nomp_jit_compile(&sycl_prg->sycl_id, source, sycl->compiler,
+                             sycl->compiler_flags, name, wkdir,
+                             "nomp_sycl_src.cpp", "lib.so");
   nomp_free(wkdir);
   return err;
 }
@@ -100,7 +100,7 @@ static int sycl_knl_run(struct nomp_backend *bnd, struct nomp_prog *prg) {
       sycl::nd_range(sycl::range(global[0], global[1], global[2]),
                      sycl::range(prg->local[0], prg->local[1], prg->local[2]));
   arg_list[prg->nargs + 1] = (void *)&nd_range;
-  return jit_run(sycl_prg->sycl_id, arg_list);
+  return nomp_jit_run(sycl_prg->sycl_id, arg_list);
 }
 
 static int sycl_sync(struct nomp_backend *bnd) {

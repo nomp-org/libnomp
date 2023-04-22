@@ -74,16 +74,16 @@ static int ispc_knl_build(struct nomp_backend *bnd, struct nomp_prog *prg,
   const char *src_f = "nomp_ispc.ispc", *dev_f = "nomp_ispc.dev.o";
   const char *lib = "nomp_ispc";
   char *wkdir = nomp_str_cat(3, BUFSIZ, cwd, "/", ".nomp_jit_cache");
-  int err = jit_compile(NULL, source, ispc->ispc_cc, ispc->ispc_flags, NULL,
-                        wkdir, src_f, dev_f);
+  int err = nomp_jit_compile(NULL, source, ispc->ispc_cc, ispc->ispc_flags,
+                             NULL, wkdir, src_f, dev_f);
   if (err) {
     nomp_free(wkdir);
     return err;
   }
 
   char *lib_so = nomp_str_cat(3, BUFSIZ, "lib", lib, ".so");
-  err = jit_compile(&iprg->ispc_id, source, ispc->cc, ispc->cc_flags, name,
-                    wkdir, dev_f, lib_so);
+  err = nomp_jit_compile(&iprg->ispc_id, source, ispc->cc, ispc->cc_flags, name,
+                         wkdir, dev_f, lib_so);
   nomp_free(wkdir), nomp_free(lib_so);
   nomp_check(err);
   prg->bptr = (void *)iprg;
@@ -110,12 +110,12 @@ static int ispc_knl_run(struct nomp_backend *bnd, struct nomp_prog *prg) {
     vargs[nargs + d] = (void *)&one;
 
   struct ispc_prog *iprg = (struct ispc_prog *)prg->bptr;
-  return jit_run(iprg->ispc_id, vargs);
+  return nomp_jit_run(iprg->ispc_id, vargs);
 }
 
 static int ispc_knl_free(struct nomp_prog *prg) {
   struct ispc_prog *iprg = (struct ispc_prog *)prg->bptr;
-  return jit_free(&iprg->ispc_id);
+  return nomp_jit_free(&iprg->ispc_id);
 }
 
 static int ispc_finalize(struct nomp_backend *bnd) {

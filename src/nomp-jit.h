@@ -16,8 +16,8 @@ extern "C" {
  * JIT Compile a source string at runtime using a specified compiler, flags and
  * a working directory. \p id is set to dynamically loaded \p entry point in the
  * JIT compiled program. \p id should be set to -1 on input and is set to a
- * non-negative value upon successful exit. On success, jit_compile() returns 0
- * and a positive value otherwise.
+ * non-negative value upon successful exit. On success, nomp_jit_compile()
+ * returns 0 and a positive value otherwise.
  *
  * @param[out] id Handle to the \p entry in the compiled binary file.
  * @param[in] source Source to be compiled at runtime.
