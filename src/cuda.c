@@ -31,8 +31,8 @@ static const char *ERR_STR_GPU_FAILURE = "Cuda %s failed: %s.";
 #include "unified-cuda-hip-impl.h"
 
 nvrtcResult cuda_compile(nvrtcProgram prog, struct cuda_backend *nbnd) {
-  char arch[MAX_BUFSIZ];
-  snprintf(arch, MAX_BUFSIZ, "-arch=compute_%d%d", nbnd->prop.major,
+  char arch[NOMP_MAX_BUFSIZ];
+  snprintf(arch, NOMP_MAX_BUFSIZ, "-arch=compute_%d%d", nbnd->prop.major,
            nbnd->prop.minor);
   const char *opts[1] = {arch};
   return nvrtcCompileProgram(prog, 1, opts);

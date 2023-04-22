@@ -21,8 +21,8 @@
 NOMP_FOR_EACH_DOMAIN(NOMP_REDUCTION, SUM)
 NOMP_FOR_EACH_DOMAIN(NOMP_REDUCTION, PROD)
 
-int host_side_reduction(struct backend *backend, struct prog *prg,
-                        struct mem *m) {
+int nomp_host_side_reduction(struct nomp_backend *backend,
+                             struct nomp_prog *prg, struct nomp_mem *m) {
   nomp_check(backend->update(backend, m, NOMP_FROM));
   backend->sync(backend);
 

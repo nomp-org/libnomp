@@ -4,8 +4,8 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
-// Forward declare the `struct prog`.
-struct prog;
+// Forward declare the `struct nomp_prog`.
+struct nomp_prog;
 
 #ifdef __cplusplus
 extern "C" {
@@ -104,7 +104,7 @@ int py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
  * @param[in] knl Python kernel object.
  * @return int
  */
-int py_get_grid_size(struct prog *prg, PyObject *knl);
+int py_get_grid_size(struct nomp_prog *prg, PyObject *knl);
 
 /**
  * @ingroup nomp_py_utils
@@ -113,7 +113,7 @@ int py_get_grid_size(struct prog *prg, PyObject *knl);
  * @param[in] prg Nomp program.
  * @return int
  */
-int py_eval_grid_size(struct prog *prg);
+int py_eval_grid_size(struct nomp_prog *prg);
 
 /**
  * @ingroup nomp_py_utils

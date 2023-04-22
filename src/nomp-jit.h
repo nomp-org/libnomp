@@ -32,9 +32,9 @@ extern "C" {
  *
  * @return int
  */
-int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
-                const char *entry, const char *wrkdir, const char *srcf,
-                const char *libf);
+int nomp_jit_compile(int *id, const char *source, const char *cc,
+                     const char *cflags, const char *entry, const char *wrkdir,
+                     const char *srcf, const char *libf);
 
 /**
  * @ingroup nomp_compile_utils
@@ -45,7 +45,7 @@ int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
  *
  * @return int
  */
-int jit_run(int id, void *p[]);
+int nomp_jit_run(int id, void *p[]);
 
 /**
  * @ingroup nomp_compile_utils
@@ -57,7 +57,7 @@ int jit_run(int id, void *p[]);
  *
  * @return int
  */
-int jit_free(int *id);
+int nomp_jit_free(int *id);
 
 #ifdef __cplusplus
 }

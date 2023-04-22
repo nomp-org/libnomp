@@ -29,7 +29,8 @@ struct opencl_prog {
   cl_kernel knl;
 };
 
-static int opencl_update(struct backend *bnd, struct mem *m, const int op) {
+static int opencl_update(struct nomp_backend *bnd, struct nomp_mem *m,
+                         const int op) {
   struct opencl_backend *ocl = (struct opencl_backend *)bnd->bptr;
 
   cl_int err;
@@ -60,7 +61,7 @@ static int opencl_update(struct backend *bnd, struct mem *m, const int op) {
   return 0;
 }
 
-static int opencl_knl_build(struct backend *bnd, struct prog *prg,
+static int opencl_knl_build(struct nomp_backend *bnd, struct nomp_prog *prg,
                             const char *source, const char *name) {
   struct opencl_backend *ocl = bnd->bptr;
   struct opencl_prog *ocl_prg = prg->bptr = nomp_calloc(struct opencl_prog, 1);
@@ -92,7 +93,7 @@ static int opencl_knl_build(struct backend *bnd, struct prog *prg,
   return 0;
 }
 
-static int opencl_knl_run(struct backend *bnd, struct prog *prg) {
+static int opencl_knl_run(struct nomp_backend *bnd, struct nomp_prog *prg) {
   struct opencl_prog *oprg = (struct opencl_prog *)prg->bptr;
 
   for (int i = 0; i < prg->nargs; i++) {
@@ -112,7 +113,7 @@ static int opencl_knl_run(struct backend *bnd, struct prog *prg) {
   return 0;
 }
 
-static int opencl_knl_free(struct prog *prg) {
+static int opencl_knl_free(struct nomp_prog *prg) {
   struct opencl_prog *ocl_prg = prg->bptr;
 
   chk_cl(clReleaseKernel(ocl_prg->knl), "clReleaseKernel");
@@ -122,7 +123,7 @@ static int opencl_knl_free(struct prog *prg) {
   return 0;
 }
 
-static int opencl_sync(struct backend *bnd) {
+static int opencl_sync(struct nomp_backend *bnd) {
   struct opencl_backend *ocl = (struct opencl_backend *)bnd->bptr;
 
   chk_cl(clFinish(ocl->queue), "clFinish");
@@ -130,7 +131,7 @@ static int opencl_sync(struct backend *bnd) {
   return 0;
 }
 
-static int opencl_finalize(struct backend *bnd) {
+static int opencl_finalize(struct nomp_backend *bnd) {
   struct opencl_backend *ocl = bnd->bptr;
 
   chk_cl(clReleaseCommandQueue(ocl->queue), "clReleaseCommandQueue");
@@ -140,7 +141,7 @@ static int opencl_finalize(struct backend *bnd) {
   return 0;
 }
 
-int opencl_init(struct backend *bnd, const int platform_id,
+int opencl_init(struct nomp_backend *bnd, const int platform_id,
                 const int device_id) {
   cl_uint num_platforms;
   cl_int err = clGetPlatformIDs(0, NULL, &num_platforms);
