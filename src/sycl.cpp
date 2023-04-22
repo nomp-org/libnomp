@@ -23,7 +23,8 @@ struct sycl_prog {
   int sycl_id;
 };
 
-static int sycl_update(struct backend *bnd, struct mem *m, const int op) {
+static int sycl_update(struct nomp_backend *bnd, struct nomp_mem *m,
+                       const int op) {
   struct sycl_backend *sycl = (struct sycl_backend *)bnd->bptr;
 
   if (op & NOMP_ALLOC) {
@@ -53,7 +54,7 @@ static int sycl_update(struct backend *bnd, struct mem *m, const int op) {
   return 0;
 }
 
-static int sycl_knl_free(struct prog *prg) {
+static int sycl_knl_free(struct nomp_prog *prg) {
   struct sycl_prog *sycl_prg = (struct sycl_prog *)prg->bptr;
   int err = jit_free(&sycl_prg->sycl_id);
   nomp_free(prg->bptr), prg->bptr = NULL;
@@ -61,7 +62,7 @@ static int sycl_knl_free(struct prog *prg) {
   return err;
 }
 
-static int sycl_knl_build(struct backend *bnd, struct prog *prg,
+static int sycl_knl_build(struct nomp_backend *bnd, struct nomp_prog *prg,
                           const char *source, const char *name) {
   struct sycl_backend *sycl = (struct sycl_backend *)bnd->bptr;
   struct sycl_prog *sycl_prg = nomp_calloc(struct sycl_prog, 1);
@@ -82,11 +83,11 @@ static int sycl_knl_build(struct backend *bnd, struct prog *prg,
   return err;
 }
 
-static int sycl_knl_run(struct backend *bnd, struct prog *prg) {
+static int sycl_knl_run(struct nomp_backend *bnd, struct nomp_prog *prg) {
   struct sycl_backend *sycl = (struct sycl_backend *)bnd->bptr;
   struct sycl_prog *sycl_prg = (struct sycl_prog *)prg->bptr;
 
-  void *arg_list[MAX_KNL_ARGS];
+  void *arg_list[NOMP_MAX_KNL_ARGS];
   for (unsigned i = 0; i < prg->nargs; i++)
     arg_list[i] = prg->args[i].ptr;
   arg_list[prg->nargs] = (void *)&sycl->queue;
@@ -102,13 +103,13 @@ static int sycl_knl_run(struct backend *bnd, struct prog *prg) {
   return jit_run(sycl_prg->sycl_id, arg_list);
 }
 
-static int sycl_sync(struct backend *bnd) {
+static int sycl_sync(struct nomp_backend *bnd) {
   struct sycl_backend *sycl = (struct sycl_backend *)bnd->bptr;
   sycl->queue.wait();
   return 0;
 }
 
-static int sycl_finalize(struct backend *bnd) {
+static int sycl_finalize(struct nomp_backend *bnd) {
   struct sycl_backend *sycl = (struct sycl_backend *)bnd->bptr;
   nomp_free(sycl->compiler), sycl->compiler = NULL;
   nomp_free(sycl->compiler_flags), sycl->compiler_flags = NULL;
@@ -126,14 +127,14 @@ static char *copy_env(const char *name, size_t size) {
 
 static int check_env(struct sycl_backend *sycl) {
   char *tmp;
-  if (tmp = copy_env("NOMP_SYCL_CC", MAX_BUFSIZ)) {
-    sycl->compiler = strndup(tmp, MAX_BUFSIZ + 1), nomp_free(tmp);
+  if (tmp = copy_env("NOMP_SYCL_CC", NOMP_MAX_BUFSIZ)) {
+    sycl->compiler = strndup(tmp, NOMP_MAX_BUFSIZ + 1), nomp_free(tmp);
   } else {
     return nomp_set_log(NOMP_SYCL_FAILURE, NOMP_ERROR,
                         "SYCL compiler NOMP_SYCL_CC must be set.");
   }
-  if (tmp = copy_env("NOMP_SYCL_CFLAGS", MAX_BUFSIZ)) {
-    sycl->compiler_flags = strndup(tmp, MAX_BUFSIZ + 1), nomp_free(tmp);
+  if (tmp = copy_env("NOMP_SYCL_CFLAGS", NOMP_MAX_BUFSIZ)) {
+    sycl->compiler_flags = strndup(tmp, NOMP_MAX_BUFSIZ + 1), nomp_free(tmp);
   } else {
     return nomp_set_log(NOMP_SYCL_FAILURE, NOMP_ERROR,
                         "SYCL compiler flags NOMP_SYCL_CFLAGS must be set.");
@@ -141,7 +142,8 @@ static int check_env(struct sycl_backend *sycl) {
   return 0;
 }
 
-int sycl_init(struct backend *bnd, const int platform_id, const int device_id) {
+int sycl_init(struct nomp_backend *bnd, const int platform_id,
+              const int device_id) {
   struct sycl_backend *sycl = nomp_calloc(struct sycl_backend, 1);
   bnd->bptr = (void *)sycl;
 

@@ -6,11 +6,11 @@
 #include <unistd.h>
 
 static int make_knl_dir(char **dir_, const char *knl_dir, const char *src) {
-  size_t len = strnlen(src, MAX_SRC_SIZE);
-  if (len == MAX_SRC_SIZE) {
+  size_t len = strnlen(src, NOMP_MAX_SRC_SIZE);
+  if (len == NOMP_MAX_SRC_SIZE) {
     return nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
                         "Kernel source size exceeds maximum size %u.",
-                        MAX_SRC_SIZE);
+                        NOMP_MAX_SRC_SIZE);
   }
 
   // Check if knl_dir exists, otherwise create it.
@@ -75,7 +75,7 @@ static int compile_aux(const char *cc, const char *cflags, const char *src,
                        const char *out) {
   size_t len;
   nomp_check(nomp_path_len(&len, cc));
-  len += strnlen(cflags, MAX_CFLAGS_SIZE) + strlen(src) + strlen(out) + 32;
+  len += strnlen(cflags, NOMP_MAX_CFLAGS_SIZE) + strlen(src) + strlen(out) + 32;
 
   char *cmd = nomp_calloc(char, len);
   snprintf(cmd, len, "%s %s %s -o %s", cc, cflags, src, out);

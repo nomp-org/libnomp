@@ -69,7 +69,8 @@ struct gpu_prog {
 
 gpurtcResult gpu_compile(gpurtcProgram prog, struct gpu_backend *nbnd);
 
-static int gpu_update(struct backend *bnd, struct mem *m, const int op) {
+static int gpu_update(struct nomp_backend *bnd, struct nomp_mem *m,
+                      const int op) {
   if (op & NOMP_ALLOC)
     chk_gpu(gpuMalloc(&m->bptr, (m->idx1 - m->idx0) * m->usize));
 
@@ -89,12 +90,12 @@ static int gpu_update(struct backend *bnd, struct mem *m, const int op) {
   return 0;
 }
 
-static void gpu_update_ptr(void **p, size_t *size, struct mem *m) {
+static void gpu_update_ptr(void **p, size_t *size, struct nomp_mem *m) {
   *p = (void *)m->bptr;
   *size = sizeof(m->bptr);
 }
 
-static int gpu_knl_build(struct backend *bnd, struct prog *prg,
+static int gpu_knl_build(struct nomp_backend *bnd, struct nomp_prog *prg,
                          const char *source, const char *name) {
   struct gpu_backend *nbnd = (struct gpu_backend *)bnd->bptr;
 
@@ -133,9 +134,9 @@ static int gpu_knl_build(struct backend *bnd, struct prog *prg,
   return 0;
 }
 
-static int gpu_knl_run(struct backend *bnd, struct prog *prg) {
-  void *vargs[MAX_KNL_ARGS];
-  struct arg *args = prg->args;
+static int gpu_knl_run(struct nomp_backend *bnd, struct nomp_prog *prg) {
+  void *vargs[NOMP_MAX_KNL_ARGS];
+  struct nomp_arg *args = prg->args;
   for (int i = 0; i < prg->nargs; i++) {
     if (args[i].type == NOMP_PTR)
       vargs[i] = &args[i].ptr;
@@ -151,18 +152,18 @@ static int gpu_knl_run(struct backend *bnd, struct prog *prg) {
   return 0;
 }
 
-static int gpu_knl_free(struct prog *prg) {
+static int gpu_knl_free(struct nomp_prog *prg) {
   struct gpu_prog *cprg = (struct gpu_prog *)prg->bptr;
   GPU_CHECK(gpuModuleUnload(cprg->module));
   return 0;
 }
 
-static int gpu_sync(struct backend *bnd) {
+static int gpu_sync(struct nomp_backend *bnd) {
   chk_gpu(gpuDeviceSynchronize());
   return 0;
 }
 
-static int gpu_finalize(struct backend *bnd) {
+static int gpu_finalize(struct nomp_backend *bnd) {
 #ifndef __HIP_PLATFORM_HCC__
   struct gpu_backend *nbnd = (struct gpu_backend *)bnd->bptr;
   GPU_CHECK(gpuCtxDestroy(nbnd->ctx));
@@ -170,7 +171,8 @@ static int gpu_finalize(struct backend *bnd) {
   return 0;
 }
 
-int gpu_init(struct backend *bnd, const int platform_id, const int device_id) {
+int gpu_init(struct nomp_backend *bnd, const int platform_id,
+             const int device_id) {
   gpuFree(0);
 
   int num_devices;

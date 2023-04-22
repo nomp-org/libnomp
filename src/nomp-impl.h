@@ -14,12 +14,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_BUFSIZ 128
-#define MAX_IDENT_SIZE 128
-#define MAX_SRC_SIZE 16384
-#define MAX_CFLAGS_SIZE 16384
-#define MAX_KNL_ARGS 64
-#define MAX_SCRATCH_SIZE (1024 * sizeof(double))
+#define NOMP_MAX_BUFSIZ 128
+#define NOMP_MAX_IDENT_SIZE 128
+#define NOMP_MAX_SRC_SIZE 16384
+#define NOMP_MAX_CFLAGS_SIZE 16384
+#define NOMP_MAX_KNL_ARGS 64
+#define NOMP_MAX_SCRATCH_SIZE (1024 * sizeof(double))
 
 #include "nomp-aux.h"
 #include "nomp-log.h"
@@ -28,24 +28,24 @@
 
 #include "nomp.h"
 
-struct mem {
+struct nomp_mem {
   size_t idx0, idx1, usize;
   void *hptr, *bptr;
   size_t bsize;
 };
 
-struct arg {
-  char name[MAX_IDENT_SIZE];
+struct nomp_arg {
+  char name[NOMP_MAX_IDENT_SIZE];
   size_t size;
   unsigned type;
   void *ptr;
 };
 
-struct prog {
+struct nomp_prog {
   // Number of arguments of the kernel and meta info about
   // arguments.
   unsigned nargs;
-  struct arg *args;
+  struct nomp_arg *args;
   // Dimension of kernel launch parameters, their pymbolic
   // expressions, and evaluated value of each dimension.
   unsigned ndim;
@@ -61,24 +61,25 @@ struct prog {
   void *reduction_ptr;
 };
 
-struct backend {
+struct nomp_backend {
   // User configurations of the backend.
   int platform_id, device_id, verbose;
   char *backend, *install_dir;
   // Python function object which will be called to perform annotations.
   PyObject *py_annotate;
   // Pointers to backend functions used for backend dispatch.
-  int (*update)(struct backend *, struct mem *, const int);
-  int (*knl_build)(struct backend *, struct prog *, const char *, const char *);
-  int (*knl_run)(struct backend *, struct prog *);
-  int (*knl_free)(struct prog *);
-  int (*sync)(struct backend *);
-  int (*finalize)(struct backend *);
+  int (*update)(struct nomp_backend *, struct nomp_mem *, const int);
+  int (*knl_build)(struct nomp_backend *, struct nomp_prog *, const char *,
+                   const char *);
+  int (*knl_run)(struct nomp_backend *, struct nomp_prog *);
+  int (*knl_free)(struct nomp_prog *);
+  int (*sync)(struct nomp_backend *);
+  int (*finalize)(struct nomp_backend *);
   // Pointer to keep track of backend specific data.
   void *bptr;
   // Scratch memory to be used as temporary memory for kernels (like
   // reductions).
-  struct mem *scratch;
+  struct nomp_mem *scratch;
 };
 
 #ifdef __cplusplus
@@ -102,7 +103,7 @@ extern "C" {
  * @param[in] device_id Target device id.
  * @return int
  */
-int opencl_init(struct backend *backend, const int platform_id,
+int opencl_init(struct nomp_backend *backend, const int platform_id,
                 const int device_id);
 
 /**
@@ -119,7 +120,7 @@ int opencl_init(struct backend *backend, const int platform_id,
  * @param[in] device_id Target device id.
  * @return int
  */
-int sycl_init(struct backend *backend, const int platform_id,
+int sycl_init(struct nomp_backend *backend, const int platform_id,
               const int device_id);
 
 /**
@@ -135,7 +136,7 @@ int sycl_init(struct backend *backend, const int platform_id,
  * @param[in] device_id Target device id.
  * @return int
  */
-int cuda_init(struct backend *backend, const int platform_id,
+int cuda_init(struct nomp_backend *backend, const int platform_id,
               const int device_id);
 
 /**
@@ -151,7 +152,7 @@ int cuda_init(struct backend *backend, const int platform_id,
  * @param[in] device_id Target device id.
  * @return int
  */
-int hip_init(struct backend *backend, const int platform_id,
+int hip_init(struct nomp_backend *backend, const int platform_id,
              const int device_id);
 
 /**
@@ -167,7 +168,7 @@ int hip_init(struct backend *backend, const int platform_id,
  * @param[in] device_id Target device id.
  * @return int
  */
-int ispc_init(struct backend *backend, const int platform_type,
+int ispc_init(struct nomp_backend *backend, const int platform_type,
               const int device_id);
 
 #ifdef __cplusplus

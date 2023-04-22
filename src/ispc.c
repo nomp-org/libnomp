@@ -34,7 +34,8 @@ static void ispcrt_error(ISPCRTError err_code, const char *message) {
     }                                                                          \
   }
 
-static int ispc_update(struct backend *bnd, struct mem *m, const int op) {
+static int ispc_update(struct nomp_backend *bnd, struct nomp_mem *m,
+                       const int op) {
   struct ispc_backend *ispc = (struct ispc_backend *)bnd->bptr;
 
   if (op & NOMP_ALLOC) {
@@ -59,7 +60,7 @@ static int ispc_update(struct backend *bnd, struct mem *m, const int op) {
   return 0;
 }
 
-static int ispc_knl_build(struct backend *bnd, struct prog *prg,
+static int ispc_knl_build(struct nomp_backend *bnd, struct nomp_prog *prg,
                           const char *source, const char *name) {
   struct ispc_backend *ispc = (struct ispc_backend *)bnd->bptr;
   struct ispc_prog *iprg = nomp_calloc(struct ispc_prog, 1);
@@ -89,12 +90,12 @@ static int ispc_knl_build(struct backend *bnd, struct prog *prg,
   return 0;
 }
 
-static int ispc_knl_run(struct backend *bnd, struct prog *prg) {
+static int ispc_knl_run(struct nomp_backend *bnd, struct nomp_prog *prg) {
   const int ndim = prg->ndim, nargs = prg->nargs;
-  struct arg *args = prg->args;
+  struct nomp_arg *args = prg->args;
   size_t *global = prg->global;
 
-  void *vargs[MAX_KNL_ARGS];
+  void *vargs[NOMP_MAX_KNL_ARGS];
   for (int i = 0; i < nargs; i++) {
     if (args[i].type == NOMP_PTR)
       vargs[i] = ispcrtDevicePtr((ISPCRTMemoryView)(args[i].ptr));
@@ -112,12 +113,12 @@ static int ispc_knl_run(struct backend *bnd, struct prog *prg) {
   return jit_run(iprg->ispc_id, vargs);
 }
 
-static int ispc_knl_free(struct prog *prg) {
+static int ispc_knl_free(struct nomp_prog *prg) {
   struct ispc_prog *iprg = (struct ispc_prog *)prg->bptr;
   return jit_free(&iprg->ispc_id);
 }
 
-static int ispc_finalize(struct backend *bnd) {
+static int ispc_finalize(struct nomp_backend *bnd) {
   struct ispc_backend *ispc = (struct ispc_backend *)bnd->bptr;
   ispcrtRelease(ispc->device);
   chk_ispcrt("device release", rt_error);
@@ -157,7 +158,7 @@ static int ispc_chk_env(struct ispc_backend *ispc) {
 
   tmp = getenv("NOMP_CFLAGS");
   if (tmp) {
-    ispc->cc_flags = strndup(tmp, MAX_BUFSIZ + 1);
+    ispc->cc_flags = strndup(tmp, NOMP_MAX_BUFSIZ + 1);
   } else {
     return nomp_set_log(NOMP_ISPC_FAILURE, NOMP_ERROR,
                         "Environment variable NOMP_CFLAGS is not set. Please "
@@ -166,7 +167,7 @@ static int ispc_chk_env(struct ispc_backend *ispc) {
 
   tmp = getenv("NOMP_ISPC_CFLAGS");
   if (tmp) {
-    ispc->ispc_flags = strndup(tmp, MAX_BUFSIZ + 1);
+    ispc->ispc_flags = strndup(tmp, NOMP_MAX_BUFSIZ + 1);
   } else {
     return nomp_set_log(NOMP_ISPC_FAILURE, NOMP_ERROR,
                         "Environment variable NOMP_ISPC_CFLAGS is not set. "
@@ -176,9 +177,9 @@ static int ispc_chk_env(struct ispc_backend *ispc) {
   return 0;
 }
 
-static int ispc_sync(struct backend *bnd) { return 0; }
+static int ispc_sync(struct nomp_backend *bnd) { return 0; }
 
-int ispc_init(struct backend *bnd, const int platform_type,
+int ispc_init(struct nomp_backend *bnd, const int platform_type,
               const int device_id) {
   ispcrtSetErrorFunc(ispcrt_error);
   if (platform_type < 0 | platform_type >= 2) {

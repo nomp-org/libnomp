@@ -97,7 +97,7 @@ int py_c_to_loopy(PyObject **knl, const char *src, const char *backend,
 
 int py_set_annotate_func(PyObject **annotate_func, const char *path_) {
   // Find file and function from path.
-  char *path = strndup(path_, PATH_MAX + MAX_IDENT_SIZE);
+  char *path = strndup(path_, PATH_MAX + NOMP_MAX_IDENT_SIZE);
   char *file = strtok(path, "::"), *func = strtok(NULL, "::");
   if (file == NULL || path == NULL) {
     nomp_free(path);
@@ -223,7 +223,7 @@ int py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
   return 0;
 }
 
-int py_get_grid_size(struct prog *prg, PyObject *knl) {
+int py_get_grid_size(struct nomp_prog *prg, PyObject *knl) {
   int err = 1;
   if (knl) {
     PyObject *callables = PyObject_GetAttrString(knl, "callables_table");
@@ -273,7 +273,7 @@ static int py_eval_grid_size_aux(size_t *out, PyObject *grid, unsigned dim,
   return err;
 }
 
-int py_eval_grid_size(struct prog *prg) {
+int py_eval_grid_size(struct nomp_prog *prg) {
   // If the expressions are not NULL, iterate through them and evaluate with
   // pymbolic. Also, we should calculate and store a hash of the dict that
   // is passed. If the hash is the same, no need of re-evaluating the grid
