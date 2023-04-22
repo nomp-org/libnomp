@@ -92,7 +92,7 @@ int nomp_py_user_transform(PyObject **knl, const char *file, const char *func);
  * @return int
  */
 int nomp_py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
-                            const char *backend);
+                                 const char *backend);
 
 /**
  * @ingroup nomp_py_utils

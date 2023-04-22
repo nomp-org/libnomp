@@ -172,7 +172,7 @@ int nomp_py_user_transform(PyObject **knl, const char *file, const char *func) {
 }
 
 int nomp_py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
-                            const char *backend) {
+                                 const char *backend) {
   int err = 1;
   PyObject *lpy_api = PyUnicode_FromString(module_loopy_api);
   if (lpy_api) {

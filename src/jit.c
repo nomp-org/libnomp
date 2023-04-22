@@ -110,9 +110,9 @@ struct function {
 static struct function **funcs = NULL;
 static unsigned funcs_n = 0, funcs_max = 0;
 
-int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
-                const char *entry, const char *wrkdir, const char *srcf,
-                const char *libf) {
+int nomp_jit_compile(int *id, const char *source, const char *cc,
+                     const char *cflags, const char *entry, const char *wrkdir,
+                     const char *srcf, const char *libf) {
   char *dir = NULL;
   nomp_check(make_knl_dir(&dir, wrkdir, source));
 
@@ -154,7 +154,7 @@ int jit_compile(int *id, const char *source, const char *cc, const char *cflags,
   return 0;
 }
 
-int jit_run(int id, void *p[]) {
+int nomp_jit_run(int id, void *p[]) {
   if (id >= 0 && id < funcs_n && funcs[id] && funcs[id]->dlf) {
     funcs[id]->dlf(p);
     return 0;
@@ -164,7 +164,7 @@ int jit_run(int id, void *p[]) {
                       "Failed to run program with handle: %d", id);
 }
 
-int jit_free(int *id) {
+int nomp_jit_free(int *id) {
   int fid = *id;
   if (fid >= 0 && fid < funcs_n) {
     struct function *f = funcs[fid];

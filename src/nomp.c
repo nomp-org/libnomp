@@ -116,7 +116,7 @@ static int init_configs(int argc, const char **argv,
   nomp_check(nomp_path_len(&len, nomp.install_dir));
   len = nomp_max(2, len, NOMP_MAX_BUFSIZ);
   char *abs_dir = nomp_str_cat(2, len, nomp.install_dir, "/python");
-  nomp_check(py_append_to_sys_path(abs_dir));
+  nomp_check(nomp_py_append_to_sys_path(abs_dir));
   nomp_free(abs_dir);
 
   return 0;
@@ -157,7 +157,7 @@ int nomp_init(int argc, const char **argv) {
     Py_Initialize();
 
     // Append current working directory to sys.path.
-    nomp_check(py_append_to_sys_path("."));
+    nomp_check(nomp_py_append_to_sys_path("."));
   }
 
   nomp_check(init_configs(argc, argv, &nomp));
@@ -380,19 +380,19 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
     Py_XDECREF(meta.dict);
 
     // Handle transform clauses.
-    nomp_check(py_user_transform(&knl, meta.file, meta.func));
+    nomp_check(nomp_py_user_transform(&knl, meta.file, meta.func));
     nomp_free(meta.file), nomp_free(meta.func);
 
     // Get OpenCL, CUDA, etc. source and name from the loopy kernel and build
     // the program.
     char *name, *src;
-    nomp_check(py_get_knl_name_and_src(&name, &src, knl, nomp.backend));
+    nomp_check(nomp_py_get_knl_name_and_src(&name, &src, knl, nomp.backend));
     nomp_check(nomp.knl_build(&nomp, prg, src, name));
     nomp_free(src), nomp_free(name);
 
     // Get grid size of the loopy kernel as pymbolic expressions.
     // These grid sizes will be evaluated each time the kernel is run.
-    nomp_check(py_get_grid_size(prg, knl));
+    nomp_check(nomp_py_get_grid_size(prg, knl));
     Py_XDECREF(knl);
 
     *id = progs_n++;
@@ -443,7 +443,7 @@ int nomp_run(int id, ...) {
     }
     va_end(vargs);
 
-    nomp_check(py_eval_grid_size(prg));
+    nomp_check(nomp_py_eval_grid_size(prg));
 
     // FIXME: Our kernel doesn't have the local problem size for some
     // reason.
