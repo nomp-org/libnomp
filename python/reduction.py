@@ -1,6 +1,5 @@
 """Module to do reductions with using Loopy."""
 from dataclasses import dataclass
-from typing import NamedTuple
 
 import loopy as lp
 import pymbolic.primitives as prim
@@ -15,7 +14,7 @@ _LOOPY_REDN_TO_C_REDN = {
 
 
 @dataclass
-class ReductionInfo(NamedTuple):
+class ReductionInfo:
     """Store meta information about reductions."""
 
     var: str = ""
@@ -35,8 +34,9 @@ def realize_reduction(
 
     if len(tunit.callables_table.keys()) > 1:
         raise NotImplementedError(
-            "Don't know how to handle more than 1 callable in TU!"
+            "Don't know how to handle more than 1 callable in translation unit!"
         )
+    (knl_name,) = tunit.callables_table.keys()
 
     knl, redn = tunit.default_entrypoint, ReductionInfo()
     for insn in knl.instructions:
@@ -78,13 +78,14 @@ def realize_reduction(
         default_tag="l.auto",
     )
     tunit = lp.realize_reduction(tunit)
+    knl = tunit[knl_name]
 
     for arg in knl.args:
         if arg.name == redn.var:
             redn.arg = arg
             break
 
-    tvar = knl.temporary_values.pop(f"{redn.tmp}_0")
+    tvar = knl.temporary_variables.pop(f"{redn.tmp}_0")
     knl.args.append(
         lp.GlobalArg(
             tvar.name,
@@ -102,7 +103,7 @@ def realize_reduction(
     tunit = lp.make_kernel(
         knl.domains,
         knl.instructions,
-        knl.args + list(knl.temporary_values.values()),
+        knl.args + list(knl.temporary_variables.values()),
         name=knl.name,
         lang_version=LOOPY_LANG_VERSION,
     )
