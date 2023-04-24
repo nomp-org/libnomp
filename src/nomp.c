@@ -1,6 +1,5 @@
 #include "nomp-impl.h"
 
-static const char *py_dir = "python";
 static struct backend nomp;
 static int initialized = 0;
 
@@ -109,6 +108,15 @@ static int init_configs(int argc, const char **argv, struct backend *backend) {
 
 #undef check_if_initialized
 
+  // Append nomp python directory to sys.path.
+  // nomp.install_dir should be set and we use it here.
+  size_t len;
+  nomp_check(nomp_path_len(&len, nomp.install_dir));
+  len = nomp_max(2, len, MAX_BUFSIZ);
+  char *abs_dir = nomp_str_cat(2, len, nomp.install_dir, "/python");
+  nomp_check(py_append_to_sys_path(abs_dir));
+  nomp_free(abs_dir);
+
   return 0;
 }
 
@@ -124,20 +132,11 @@ int nomp_init(int argc, const char **argv) {
     // But for now, we do the simplest thing possible.
     Py_Initialize();
 
-    // Append current working directroy to sys.path.
+    // Append current working directory to sys.path.
     nomp_check(py_append_to_sys_path("."));
   }
 
   nomp_check(init_configs(argc, argv, &nomp));
-
-  // Append nomp python directory to sys.path.
-  // nomp.install_dir should be set and we use it here.
-  size_t len;
-  nomp_check(nomp_path_len(&len, nomp.install_dir));
-  len = nomp_max(2, len, strnlen(py_dir, MAX_BUFSIZ));
-  char *abs_dir = nomp_str_cat(3, len, nomp.install_dir, "/", py_dir);
-  nomp_check(py_append_to_sys_path(abs_dir));
-  nomp_free(abs_dir);
 
   size_t n = strnlen(nomp.backend, MAX_BACKEND_SIZE);
   for (int i = 0; i < n; i++)
@@ -200,7 +199,7 @@ static inline struct mem *mem_if_mapped(void *p) {
 
 static unsigned mem_if_exist(void *p, size_t idx0, size_t idx1) {
   // FIXME: This is O(N) in number of allocations.
-  // Needs to go. Must store a hashmap.
+  // Needs to go. Must store a hash map.
   for (unsigned i = 0; i < mems_n; i++) {
     if (mems[i] && mems[i]->hptr == p && mems[i]->idx0 == idx0 &&
         mems[i]->idx1 == idx1)
@@ -212,7 +211,7 @@ static unsigned mem_if_exist(void *p, size_t idx0, size_t idx1) {
 int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
   unsigned idx = mem_if_exist(ptr, idx0, idx1);
   if (idx == mems_n) {
-    // A new entry can't be created with NOMP_FREE or NOMP_FROM
+    // A new entry can't be created with NOMP_FREE or NOMP_FROM.
     if (op == NOMP_FROM || op == NOMP_FREE) {
       return nomp_set_log(
           NOMP_USER_MAP_OP_IS_INVALID, NOMP_ERROR,
@@ -231,10 +230,10 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
 
   nomp_check(nomp.update(&nomp, mems[idx], op));
 
-  // Device memory object was free'd
+  // Device memory object was released.
   if (mems[idx]->bptr == NULL)
     nomp_free(mems[idx]), mems[idx] = NULL;
-  // Or new memory object got created
+  // Or new memory object got created.
   else if (idx == mems_n)
     mems_n++;
 
@@ -273,14 +272,14 @@ static int parse_clauses(char **usr_file, char **usr_func, PyObject **dict_,
       PyObject *pkey =
           PyUnicode_FromStringAndSize(key, strnlen(key, MAX_KEY_SIZE));
       PyObject *pval =
-          PyUnicode_FromStringAndSize(val, strnlen(val, MAX_KEY_SIZE));
+          PyUnicode_FromStringAndSize(val, strnlen(val, MAX_VAL_SIZE));
       PyDict_SetItem(dict, pkey, pval);
       Py_XDECREF(pkey), Py_XDECREF(pval);
       i += 3;
     } else {
       return nomp_set_log(
           NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-          "Clause \"%s\" passed into nomp_jit is not a valid caluse.",
+          "Clause \"%s\" passed into nomp_jit is not a valid clause.",
           clauses[i]);
     }
   }
