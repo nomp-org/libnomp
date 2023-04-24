@@ -55,7 +55,7 @@ static int test_invalid_clause() {
   char *log = nomp_get_log_str(err);
   int eq = logcmp(
       log, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* Clause "
-           "\"invalid-clause\" passed into nomp_jit is not a valid caluse.");
+           "\"invalid-clause\" passed into nomp_jit is not a valid clause.");
   nomp_free(log);
   nomp_test_assert(eq);
 
