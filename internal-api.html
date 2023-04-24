@@ -142,17 +142,33 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv416py_user_annotatePP8PyObjectP8PyObjectPKcPKc">
-<span id="_CPPv316py_user_annotatePP8PyObjectP8PyObjectPKcPKc"></span><span id="_CPPv216py_user_annotatePP8PyObjectP8PyObjectPKcPKc"></span><span id="py_user_annotate__PyObjectPP.PyObjectP.cCP.cCP"></span><span class="target" id="group__nomp__py__utils_1ga9fdc2860584db7325c14c7f8d19366b1"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">py_user_annotate</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">knl</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">annts</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">func</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416py_user_annotatePP8PyObjectP8PyObjectPKcPKc" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv420py_set_annotate_funcPP8PyObjectPKc">
+<span id="_CPPv320py_set_annotate_funcPP8PyObjectPKc"></span><span id="_CPPv220py_set_annotate_funcPP8PyObjectPKc"></span><span id="py_set_annotate_func__PyObjectPP.cCP"></span><span class="target" id="group__nomp__py__utils_1ga253be91a6c5312ebd321759d05a2feb7"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">py_set_annotate_func</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">func</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">path</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420py_set_annotate_funcPP8PyObjectPKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Set the annotate function based on the path to annotation script and function. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> – <strong>[out]</strong> Pointer to the annotate function. </p></li>
+<li><p><strong>path</strong> – <strong>[in]</strong> Path to the annotation script followed by function name (path and function name must be separated by “::”). </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv420py_apply_annotationsPP8PyObjectP8PyObjectP8PyObject">
+<span id="_CPPv320py_apply_annotationsPP8PyObjectP8PyObjectP8PyObject"></span><span id="_CPPv220py_apply_annotationsPP8PyObjectP8PyObjectP8PyObject"></span><span id="py_apply_annotations__PyObjectPP.PyObjectP.PyObjectP"></span><span class="target" id="group__nomp__py__utils_1ga8563df8f6b06056c6de681930c078daa"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">py_apply_annotations</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">knl</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">func</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">annts</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420py_apply_annotationsPP8PyObjectP8PyObjectP8PyObject" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Apply transformations on a loopy kernel based on annotations. </p>
-<p>Apply the transformations defined in function <code class="docutils literal notranslate"><span class="pre">func</span></code> in file <code class="docutils literal notranslate"><span class="pre">file</span></code> on the loopy kernel <code class="docutils literal notranslate"><span class="pre">knl</span></code> based on the key value pairs (annotations) passed in <code class="docutils literal notranslate"><span class="pre">annts</span></code>. <code class="docutils literal notranslate"><span class="pre">knl</span></code> will be modified based on the transformations. Function will return a non-zero value if there was an error after registering a log.</p>
+<p>Apply the transformations to the loopy kernel <code class="docutils literal notranslate"><span class="pre">knl</span></code> based on the annotation function <code class="docutils literal notranslate"><span class="pre">func</span></code> and the key value pairs (annotations) passed in <code class="docutils literal notranslate"><span class="pre">annts</span></code>. <code class="docutils literal notranslate"><span class="pre">knl</span></code> will be modified based on the transformations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>knl</strong> – <strong>[inout]</strong> Pointer to loopy kernel object. </p></li>
+<li><p><strong>func</strong> – <strong>[in]</strong> Function which performs transformations based on annotations. </p></li>
 <li><p><strong>annts</strong> – <strong>[in]</strong> Annotations (as a PyDict) to specify which transformations to apply. </p></li>
-<li><p><strong>file</strong> – <strong>[in]</strong> Path to the file containing transform function <code class="docutils literal notranslate"><span class="pre">func</span></code>. </p></li>
-<li><p><strong>func</strong> – <strong>[in]</strong> Transform function. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -248,24 +264,29 @@
 </dl>
 </dd></dl>
 
-</section>
-<section id="memory-management-functions">
-<h2>Memory management functions<a class="headerlink" href="#memory-management-functions" title="Permalink to this heading"></a></h2>
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv413mem_if_mappedPv">
-<span id="_CPPv313mem_if_mappedPv"></span><span id="_CPPv213mem_if_mappedPv"></span><span id="mem_if_mapped__voidP"></span><span class="target" id="group__nomp__mem__utils_1gaab1db545d8487741c80dcb134fe0a2f8"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">mem</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">mem_if_mapped</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413mem_if_mappedPv" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Returns the mem object corresponding to host pointer <code class="docutils literal notranslate"><span class="pre">p</span></code>. </p>
-<p>Returns the mem object corresponding to host ponter <code class="docutils literal notranslate"><span class="pre">p</span></code>. If no buffer has been allocated for <code class="docutils literal notranslate"><span class="pre">p</span></code> on the device, returns NULL.</p>
+<dt class="sig sig-object cpp" id="_CPPv419py_handle_reductionPP8PyObjectPiPKc">
+<span id="_CPPv319py_handle_reductionPP8PyObjectPiPKc"></span><span id="_CPPv219py_handle_reductionPP8PyObjectPiPKc"></span><span id="py_handle_reduction__PyObjectPP.iP.cCP"></span><span class="target" id="group__nomp__py__utils_1gaca07a9e9c57957ba6d6ce69863fcdde0"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">py_handle_reduction</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">knl</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">redn_op</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">backend</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419py_handle_reductionPP8PyObjectPiPKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Get kernal name and generated source for the backend. </p>
+<p>Handle reductions (if present) in a loopy kernel.</p>
+<p>Handle the reduction in the loopy kernel <code class="docutils literal notranslate"><span class="pre">knl</span></code>. <code class="docutils literal notranslate"><span class="pre">knl</span></code> will be modified in the process. Function will return a non-zero value if there was an error after registering a log.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>p</strong> – <strong>[in]</strong> Host pointer </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>knl</strong> – <strong>[inout]</strong> Pointer to loopy kernel object. </p></li>
+<li><p><strong>redn_op</strong> – <strong>[out]</strong> Reduction operation. </p></li>
+<li><p><strong>backend</strong> – <strong>[in]</strong> Backend for the reduction. </p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>struct mem * </p>
+<dd class="field-even"><p>int </p>
 </dd>
 </dl>
 </dd></dl>
 
+</section>
+<section id="memory-management-functions">
+<h2>Memory management functions<a class="headerlink" href="#memory-management-functions" title="Permalink to this heading"></a></h2>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv410nomp_free_PvPKcj">
 <span id="_CPPv310nomp_free_PvPKcj"></span><span id="_CPPv210nomp_free_PvPKcj"></span><span id="nomp_free___voidP.cCP.unsigned"></span><span class="target" id="group__nomp__mem__utils_1gaa58cc8013119e2e4e3257521f0083975"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_free_</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">p</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410nomp_free_PvPKcj" title="Permalink to this definition"></a><br /></dt>
@@ -508,7 +529,7 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv418nomp_finalize_logsv">
 <span id="_CPPv318nomp_finalize_logsv"></span><span id="_CPPv218nomp_finalize_logsv"></span><span id="nomp_finalize_logs"></span><span class="target" id="group__nomp__log__utils_1ga1ac04f1cd37ab2f4aafe7ebaa8b355e5"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_finalize_logs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418nomp_finalize_logsv" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Free log variables. </p>
+<dd><p>Free variables used to keep track of logs. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>void </p>
@@ -585,6 +606,21 @@
 <li><p><strong>n</strong> – <strong>[in]</strong> Total number of integers. </p></li>
 <li><p><strong>...</strong> – <strong>[in]</strong> List of integers to find the maximum of as a variable argument list. </p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv425nomp_check_py_script_pathPKc">
+<span id="_CPPv325nomp_check_py_script_pathPKc"></span><span id="_CPPv225nomp_check_py_script_pathPKc"></span><span id="nomp_check_py_script_path__cCP"></span><span class="target" id="group__nomp__other__utils_1ga55caaef28103f787bb6a480ed2cef09f"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_check_py_script_path</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">path</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425nomp_check_py_script_pathPKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Check if the python script path exists. </p>
+<p><code class="docutils literal notranslate"><span class="pre">path</span></code> shouldn’t contain the “.py” extension.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> – <strong>[in]</strong> Total number of integers. </p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>int </p>
