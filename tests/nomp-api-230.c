@@ -2,6 +2,8 @@
 #include "nomp-generate-tests.h"
 #undef TEST_IMPL_H
 
+#include "nomp-aux.h"
+
 static int test_matrix_addition() {
   int err = 0;
   TEST_BUILTIN_TYPES(230_add, 32, 4)
@@ -17,14 +19,13 @@ static int test_matrix_transform() {
 }
 
 int main(int argc, const char *argv[]) {
-  const char *additional_args[4] = {"--nomp-script", "sem", "--nomp-function",
-                                    "annotate"};
-  const int new_argc = argc + 4;
+  const char *additional_args[2] = {"--nomp-function", "sem::annotate"};
   const char *new_argv[64];
+  const int new_argc = argc + 2;
   for (int i = 0; i < argc; i++)
     new_argv[i] = argv[i];
-  for (int i = 0; i < 4; i++)
-    new_argv[argc + i] = additional_args[i];
+  for (int i = argc; i < new_argc; i++)
+    new_argv[i] = additional_args[i - argc];
 
   int err = nomp_init(new_argc, new_argv);
   nomp_check(err);

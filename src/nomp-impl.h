@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_BUFSIZ 64
+#define MAX_BUFSIZ 128
 #define MAX_BACKEND_SIZE 32
 #define MAX_KEY_SIZE 128
 #define MAX_SRC_SIZE 16384
@@ -56,18 +56,24 @@ struct prog {
   // Map of variable names and their values use to evaluate
   // the kernel launch parameters.
   PyObject *py_dict;
+  // Pointer to keep track of backend specific data.
   void *bptr;
 };
 
 struct backend {
-  char *backend, *install_dir, *annts_script, *annts_func;
+  // User configurations of the backend.
   int platform_id, device_id, verbose;
+  char *backend, *install_dir;
+  // Python function object which will be called to perform annotations.
+  PyObject *py_annotate;
+  // Pointers to backend functions used for backend dispatch.
   int (*update)(struct backend *, struct mem *, const int);
   int (*knl_build)(struct backend *, struct prog *, const char *, const char *);
   int (*knl_run)(struct backend *, struct prog *);
   int (*knl_free)(struct prog *);
   int (*sync)(struct backend *);
   int (*finalize)(struct backend *);
+  // Pointer to keep track of backend specific data.
   void *bptr;
 };
 

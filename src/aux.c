@@ -67,3 +67,10 @@ int nomp_max(unsigned n, ...) {
 
   return max;
 }
+
+int nomp_check_py_script_path(const char *path) {
+  char *py = nomp_str_cat(2, PATH_MAX, path, ".py");
+  int err = nomp_path_len(NULL, (const char *)py);
+  nomp_free(py);
+  return err;
+}

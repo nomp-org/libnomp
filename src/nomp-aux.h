@@ -71,6 +71,17 @@ int nomp_path_len(size_t *len, const char *path);
  */
 int nomp_max(unsigned n, ...);
 
+/**
+ * @ingroup nomp_other_utils
+ * @brief Check if the python script path exists.
+ *
+ * \p path shouldn't contain the ".py" extension.
+ *
+ * @param[in] path Total number of integers.
+ * @return int
+ */
+int nomp_check_py_script_path(const char *path);
+
 #ifdef __cplusplus
 }
 #endif
