@@ -59,37 +59,48 @@ int py_c_to_loopy(PyObject **knl, const char *src, const char *backend) {
   return 0;
 }
 
-int py_user_annotate(PyObject **knl, PyObject *annts, const char *file,
-                     const char *func) {
-  // If either file, or func are NULL, we don't have to do anything:
-  if (file == NULL || func == NULL)
+int py_set_annotate_func(PyObject **annotate_func, const char *path_) {
+  // Find file and function from path.
+  char *path = strndup(path_, PATH_MAX + MAX_FUNC_NAME_SIZE);
+  char *file = strtok(path, "::"), *func = strtok(NULL, "::");
+  if (file == NULL || path == NULL) {
+    nomp_free(path);
     return 0;
+  }
+
+  nomp_check(nomp_check_py_script_path(file));
 
   int err = 1;
   PyObject *pfile = PyUnicode_FromString(file);
-  if (knl && *knl && pfile) {
+  if (pfile) {
     PyObject *module = PyImport_Import(pfile);
     Py_DECREF(pfile);
     if (module) {
       PyObject *pfunc = PyObject_GetAttrString(module, func);
       Py_DECREF(module);
-      if (pfunc && PyCallable_Check(pfunc)) {
-        PyObject *tknl = PyObject_CallFunctionObjArgs(pfunc, *knl, annts, NULL);
-        Py_DECREF(pfunc);
-        if (tknl) {
-          Py_DECREF(*knl), *knl = tknl;
-          err = 0;
-        }
-      }
+      if (pfunc && PyCallable_Check(pfunc))
+        Py_XDECREF(*annotate_func), *annotate_func = pfunc, err = 0;
+    }
+  }
+  if (err) {
+    err = nomp_set_log(
+        NOMP_PY_CALL_FAILURE, NOMP_ERROR,
+        "Failed to find annotate function \"%s\" in file \"%s\".", func, file);
+  }
+
+  nomp_free(path);
+  return err;
+}
+
+int py_apply_annotations(PyObject **knl, PyObject *func, PyObject *annts) {
+  if (knl && *knl && func) {
+    if (PyCallable_Check(func)) {
+      PyObject *tknl = PyObject_CallFunctionObjArgs(func, *knl, annts, NULL);
+      if (tknl)
+        Py_DECREF(*knl), *knl = tknl;
     }
   }
 
-  if (err) {
-    return nomp_set_log(
-        NOMP_PY_CALL_FAILURE, NOMP_ERROR,
-        "Failed to call user annotate function: \"%s\" in file: \"%s\".", func,
-        file);
-  }
   return 0;
 }
 

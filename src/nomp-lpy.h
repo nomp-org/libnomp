@@ -37,30 +37,40 @@ int py_c_to_loopy(PyObject **knl, const char *src, const char *backend);
 
 /**
  * @ingroup nomp_py_utils
- * @brief Apply transformations on a loopy kernel based on annotations.
+ * @brief Set the annotate function based on the path to annotation script and
+ * function.
  *
- * Apply the transformations defined in function \p func in file \p file on the
- * loopy kernel \p knl based on the key value pairs (annotations) passed in \p
- * annts. \p knl will be modified based on the transformations. Function will
- * return a non-zero value if there was an error after registering a log.
- *
- * @param[in,out] knl Pointer to loopy kernel object.
- * @param[in] annts Annotations (as a PyDict) to specify which transformations
- * to apply.
- * @param[in] file Path to the file containing transform function \p func.
- * @param[in] func Transform function.
+ * @param[out] func Pointer to the annotate function.
+ * @param[in] path Path to the annotation script followed by function name (path
+ * and function name must be separated by "::").
  * @return int
  */
-int py_user_annotate(PyObject **knl, PyObject *annts, const char *file,
-                     const char *func);
+int py_set_annotate_func(PyObject **func, const char *path);
+
+/**
+ * @ingroup nomp_py_utils
+ * @brief Apply transformations on a loopy kernel based on annotations.
+ *
+ * Apply the transformations to the loopy kernel \p knl based on the annotation
+ * function \p func and the key value pairs (annotations) passed in \p annts.
+ * \p knl will be modified based on the transformations.
+ *
+ * @param[in,out] knl Pointer to loopy kernel object.
+ * @param[in] func Function which performs transformations based on annotations.
+ * @param[in] annts Annotations (as a PyDict) to specify which transformations
+ * to apply.
+ * @return int
+ */
+int py_apply_annotations(PyObject **knl, PyObject *func, PyObject *annts);
 
 /**
  * @ingroup nomp_py_utils
  * @brief Apply kernel specific user transformations on a loopy kernel.
  *
- * Call the user transform function \p func in file \p file on the loopy kernel
- * \p knl. \p knl will be modified based on the transformations. Function will
- * return a non-zero value if there was an error after registering a log.
+ * Call the user transform function \p func in file \p file on the loopy
+ * kernel \p knl. \p knl will be modified based on the transformations.
+ * Function will return a non-zero value if there was an error after
+ * registering a log.
  *
  * @param[in,out] knl Pointer to loopy kernel object.
  * @param[in] file Path to the file containing transform function \p func.

@@ -28,16 +28,9 @@ static int check_env(struct backend *backend) {
     backend->backend = strndup(tmp, MAX_BACKEND_SIZE), nomp_free(tmp);
   }
 
-  if ((tmp = copy_env("NOMP_ANNOTATE_SCRIPT", MAX_BUFSIZ))) {
-    if (backend->annts_script)
-      nomp_free(backend->annts_script);
-    backend->annts_script = strndup(tmp, MAX_BUFSIZ + 1), nomp_free(tmp);
-  }
-
   if ((tmp = copy_env("NOMP_ANNOTATE_FUNCTION", MAX_BUFSIZ))) {
-    if (backend->annts_func)
-      nomp_free(backend->annts_func);
-    backend->annts_func = strndup(tmp, MAX_BUFSIZ + 1), nomp_free(tmp);
+    nomp_check(py_set_annotate_func(&backend->py_annotate, tmp));
+    nomp_free(tmp);
   }
 
   if ((tmp = copy_env("NOMP_INSTALL_DIR", MAX_BUFSIZ))) {
@@ -66,7 +59,6 @@ static int init_configs(int argc, const char **argv, struct backend *backend) {
   backend->verbose = 0;
   backend->device_id = backend->platform_id = -1;
   backend->backend = backend->install_dir = NULL;
-  backend->annts_script = backend->annts_func = NULL;
 
   if (argc <= 1 || argv == NULL)
     return 0;
@@ -87,10 +79,9 @@ static int init_configs(int argc, const char **argv, struct backend *backend) {
         size_t size;
         nomp_check(nomp_path_len(&size, (const char *)argv[i + 1]));
         backend->install_dir = strndup((const char *)argv[i + 1], size + 1);
-      } else if (!strncmp("--nomp-script", argv[i], MAX_BUFSIZ)) {
-        backend->annts_script = strndup((const char *)argv[i + 1], MAX_BUFSIZ);
       } else if (!strncmp("--nomp-function", argv[i], MAX_BUFSIZ)) {
-        backend->annts_func = strndup((const char *)argv[i + 1], MAX_BUFSIZ);
+        nomp_check(py_set_annotate_func(&backend->py_annotate,
+                                        (const char *)argv[i + 1]));
       }
       i++;
     }
@@ -127,7 +118,26 @@ int nomp_init(int argc, const char **argv) {
                         "libnomp is already initialized.");
   }
 
+  if (!Py_IsInitialized()) {
+    // May be we need the isolated configuration listed here:
+    // https://docs.python.org/3/c-api/init_config.html#init-config
+    // But for now, we do the simplest thing possible.
+    Py_Initialize();
+
+    // Append current working directroy to sys.path.
+    nomp_check(py_append_to_sys_path("."));
+  }
+
   nomp_check(init_configs(argc, argv, &nomp));
+
+  // Append nomp python directory to sys.path.
+  // nomp.install_dir should be set and we use it here.
+  size_t len;
+  nomp_check(nomp_path_len(&len, nomp.install_dir));
+  len = nomp_max(2, len, strnlen(py_dir, MAX_BUFSIZ));
+  char *abs_dir = nomp_str_cat(3, len, nomp.install_dir, "/", py_dir);
+  nomp_check(py_append_to_sys_path(abs_dir));
+  nomp_free(abs_dir);
 
   size_t n = strnlen(nomp.backend, MAX_BACKEND_SIZE);
   for (int i = 0; i < n; i++)
@@ -159,26 +169,6 @@ int nomp_init(int argc, const char **argv) {
                         nomp.backend);
   }
   nomp_check(nomp_log_init(nomp.verbose));
-
-  if (!Py_IsInitialized()) {
-    // May be we need the isolated configuration listed here:
-    // https://docs.python.org/3/c-api/init_config.html#init-config
-    // But for now, we do the simplest thing possible.
-    Py_Initialize();
-
-    // Append current working directroy to sys.path.
-    nomp_check(py_append_to_sys_path("."));
-
-    // Append nomp python directory to sys.path.
-    // nomp.install_dir should be set and we use it here.
-    size_t len;
-    nomp_check(nomp_path_len(&len, nomp.install_dir));
-    len = nomp_max(2, len, strnlen(py_dir, MAX_BUFSIZ));
-    char *abs_dir = nomp_str_cat(3, len, nomp.install_dir, "/", py_dir);
-    nomp_check(py_append_to_sys_path(abs_dir));
-
-    nomp_free(abs_dir);
-  }
 
   initialized = 1;
   return 0;
@@ -268,9 +258,7 @@ static int parse_clauses(char **usr_file, char **usr_func, PyObject **dict_,
             "\"transform\" clause should be followed by a file name and a "
             "function name. At least one of them is not provided.");
       }
-      char *py = nomp_str_cat(2, PATH_MAX, (const char *)clauses[i + 1], ".py");
-      nomp_check(nomp_path_len(NULL, (const char *)py));
-      nomp_free(py);
+      nomp_check(nomp_check_py_script_path((const char *)clauses[i + 1]));
       *usr_file = strndup(clauses[i + 1], PATH_MAX);
       *usr_func = strndup(clauses[i + 2], MAX_FUNC_NAME_SIZE);
       i += 3;
@@ -315,13 +303,12 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
     // Parse the clauses to find transformations file, function and other
     // annotations. Annotations are returned as a Python dictionary.
     char *file = NULL, *func = NULL;
-    PyObject *annts = NULL;
-    nomp_check(parse_clauses(&file, &func, &annts, clauses));
+    PyObject *annotations = NULL;
+    nomp_check(parse_clauses(&file, &func, &annotations, clauses));
 
     // Handle annotate clauses if the exist
-    nomp_check(
-        py_user_annotate(&knl, annts, nomp.annts_script, nomp.annts_func));
-    Py_XDECREF(annts);
+    nomp_check(py_apply_annotations(&knl, nomp.py_annotate, annotations));
+    Py_XDECREF(annotations);
 
     // Handle transform clause
     nomp_check(py_user_transform(&knl, file, func));
@@ -432,7 +419,7 @@ int nomp_finalize(void) {
   nomp_free(progs), progs = NULL, progs_n = progs_max = 0;
 
   nomp_free(nomp.backend), nomp_free(nomp.install_dir);
-  nomp_free(nomp.annts_script), nomp_free(nomp.annts_func);
+  Py_XDECREF(nomp.py_annotate);
 
   initialized = nomp.finalize(&nomp);
   if (initialized) {
