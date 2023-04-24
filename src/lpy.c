@@ -195,7 +195,6 @@ int py_get_grid_size(struct prog *prg, PyObject *knl) {
   if (knl) {
     PyObject *callables = PyObject_GetAttrString(knl, "callables_table");
     if (callables) {
-      // knl.default_entrypoint.get_grid_size_upper_bounds_as_exprs
       PyObject *entry = PyObject_GetAttrString(knl, "default_entrypoint");
       if (entry) {
         PyObject *expr = PyObject_GetAttrString(
