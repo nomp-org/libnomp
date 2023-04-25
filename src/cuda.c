@@ -35,14 +35,20 @@ static const char *ERR_STR_CUDA_FAILURE = "Cuda %s failed: %s.";
     }                                                                          \
   }
 
+/**
+ * @brief Struct to store device ID and device properties for a CUDA backend.
+ */
 struct cuda_backend {
-  int device_id;
-  struct cudaDeviceProp prop;
+  int device_id;              /**< Device ID of the CUDA backend */
+  struct cudaDeviceProp prop; /**< Device properties of the CUDA backend */
 };
 
+/**
+ * @brief Struct to store CUDA module and kernel function
+ */
 struct cuda_prog {
-  CUmodule module;
-  CUfunction kernel;
+  CUmodule module;   /**< CUDA module containing the kernel function */
+  CUfunction kernel; /**< CUDA kernel function */
 };
 
 static int cuda_update(struct backend *bnd, struct mem *m, const int op) {

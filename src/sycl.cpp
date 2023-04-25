@@ -12,15 +12,22 @@ static const char *ERR_STR_SYCL_FAILURE = "SYCL backend failed with error: %s.";
                         ex.what());                                            \
   }
 
+/**
+ * @brief Struct to store SYCL backend specific data.
+ */
 struct sycl_backend {
-  sycl::device device_id;
-  sycl::queue queue;
-  sycl::context ctx;
-  char *compiler, *compiler_flags;
+  sycl::device device_id; /**< SYCL device ID */
+  sycl::queue queue;      /**< SYCL queue */
+  sycl::context ctx;      /**< SYCL context */
+  char *compiler;         /**< SYCL compiler path */
+  char *compiler_flags;   /**< SYCL compiler flags */
 };
 
+/**
+ * @brief Struct to store SYCL program information.
+ */
 struct sycl_prog {
-  int sycl_id;
+  int sycl_id; /**< ID of the SYCL program */
 };
 
 static int sycl_update(struct backend *bnd, struct mem *m, const int op) {

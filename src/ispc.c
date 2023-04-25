@@ -5,18 +5,28 @@
 static const char *ERR_STR_ISPC_FAILURE =
     "ISPC %s failed with error message: %s.";
 
+/**
+ * @brief Struct to store information about the ISPC backend.
+ */
 struct ispc_backend {
-  char *ispc_cc, *cc, *ispc_flags, *cc_flags;
-  ISPCRTDevice device;
-  ISPCRTDeviceType device_type;
-  ISPCRTTaskQueue queue;
-  ISPCRTNewMemoryViewFlags flags;
+  char *ispc_cc;                /**< Path to the ISPC compiler */
+  char *cc;                     /**< Path to the C/C++ compiler */
+  char *ispc_flags;             /**< ISPC compiler flags */
+  char *cc_flags;               /**< C/C++ compiler flags */
+  ISPCRTDevice device;          /**< Handle to the selected device */
+  ISPCRTDeviceType device_type; /**< Type of device */
+  ISPCRTTaskQueue queue;        /**< Handle to the task queue */
+  ISPCRTNewMemoryViewFlags
+      flags; /**< Flags to configure the creation of new memory views */
 };
 
+/**
+ * @brief Struct to store ISPC program information.
+ */
 struct ispc_prog {
-  int ispc_id;
-  ISPCRTModule module;
-  ISPCRTKernel kernel;
+  int ispc_id;         /**< ID of the ISPC program */
+  ISPCRTModule module; /**< Module of the ISPC program */
+  ISPCRTKernel kernel; /**< Kernel of the ISPC program */
 };
 
 static ISPCRTError rt_error = ISPCRT_NO_ERROR;

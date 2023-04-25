@@ -27,15 +27,21 @@
 
 const char *ERR_STR_HIP_FAILURE = "HIP %s failed: %s.";
 
+/**
+ * @brief Struct to store HIP backend specific data.
+ */
 struct hip_backend {
-  int device_id;
-  struct hipDeviceProp_t prop;
-  hipCtx_t ctx;
+  int device_id;               /**< Device ID of the HIP backend */
+  struct hipDeviceProp_t prop; /**< Device properties of the HIP backend */
+  hipCtx_t ctx; /**< Context of the HIP backend (Used in Nvidia devices only) */
 };
 
+/**
+ * @brief Struct to store the HIP module and kernel function.
+ */
 struct hip_prog {
-  hipModule_t module;
-  hipFunction_t kernel;
+  hipModule_t module;   /**< HIP module of the compiled program */
+  hipFunction_t kernel; /**< Kernel function of the compiled program */
 };
 
 static int hip_update(struct backend *bnd, struct mem *m, const int op) {

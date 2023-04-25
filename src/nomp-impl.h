@@ -31,51 +31,70 @@
 
 #include "nomp.h"
 
+/**
+ * @brief Represents a memory block that can be used for data storage and
+ * transfer between a host and a device.
+ */
 struct mem {
-  size_t idx0, idx1, usize;
-  void *hptr, *bptr;
-  size_t bsize;
+  size_t idx0;  /**< Starting index of a memory block */
+  size_t idx1;  /**< Ending index of a memory block */
+  size_t usize; /**< Size (in bytes) of each element in the memory block */
+  void *hptr;   /**< Pointer to the host memory */
+  void *bptr;   /**< Pointer to the device memory */
+  size_t bsize; /**< Size (in bytes) of allocated memory on device */
 };
 
+/**
+ * @brief Represents a kernel argument.
+ */
 struct arg {
-  char name[MAX_ARG_NAME_SIZE];
-  size_t size;
-  unsigned type;
-  void *ptr;
+  char name[MAX_ARG_NAME_SIZE]; /**< The name of the argument */
+  size_t size;                  /**< The size of the argument data */
+  unsigned type;                /**< The type of the argument */
+  void *ptr;                    /**< A pointer to the argument data */
 };
 
+/**
+ * @brief Struct to store meta information about kernel arguments.
+ */
 struct prog {
-  // Number of arguments of the kernel and meta info about
-  // arguments.
-  unsigned nargs;
-  struct arg *args;
-  // Dimension of kernel launch parameters, their pymbolic
-  // expressions, and evaluated value of each dimension.
-  unsigned ndim;
-  PyObject *py_global, *py_local;
-  size_t global[3], local[3];
-  // Map of variable names and their values use to evaluate
-  // the kernel launch parameters.
-  PyObject *py_dict;
-  // Pointer to keep track of backend specific data.
-  void *bptr;
+  unsigned nargs;      /**< Number of kernel arguments */
+  struct arg *args;    /**< Pointer to an array of kernel arguments */
+  unsigned ndim;       /**< Dimension of kernel launch parameters */
+  PyObject *py_global; /**< Pymbolic expressions for global dimensions */
+  PyObject *py_local;  /**< Pymbolic expressions for local dimensions */
+  size_t global[3];    /**< Sizes of each global dimension */
+  size_t local[3];     /**< Sizes of each local dimension */
+  PyObject *py_dict; /**< Map of variable names to their values used to evaluate
+                        the kernel launch parameters */
+  void *bptr;        /**< Pointer to backend specific data */
 };
 
+/**
+ * @brief Struct to store user configurations and pointers to backend functions.
+ */
 struct backend {
-  // User configurations of the backend.
-  int platform_id, device_id, verbose;
-  char *backend, *install_dir;
-  // Python function object which will be called to perform annotations.
-  PyObject *py_annotate;
-  // Pointers to backend functions used for backend dispatch.
-  int (*update)(struct backend *, struct mem *, const int);
-  int (*knl_build)(struct backend *, struct prog *, const char *, const char *);
-  int (*knl_run)(struct backend *, struct prog *);
-  int (*knl_free)(struct prog *);
-  int (*sync)(struct backend *);
-  int (*finalize)(struct backend *);
-  // Pointer to keep track of backend specific data.
-  void *bptr;
+  int platform_id;       /**< Platform ID of the backend */
+  int device_id;         /**< Device ID of the backend */
+  int verbose;           /**< Verbosity level */
+  char *backend;         /**< Name of the backend */
+  char *install_dir;     /**< Nomp installation directory */
+  PyObject *py_annotate; /**< Python function object which will be called to
+                            perform annotations */
+  int (*update)(struct backend *, struct mem *,
+                const int); /**< Pointer to backend memory update function */
+  int (*knl_build)(
+      struct backend *, struct prog *, const char *,
+      const char *); /**< Pointer to backend kernel build function */
+  int (*knl_run)(struct backend *,
+                 struct prog *); /**< Pointer to backend kernel run function */
+  int (*knl_free)(
+      struct prog *); /**< Pointer to backend kernel free function */
+  int (*sync)(
+      struct backend *); /**< Pointer to backend synchronization function */
+  int (*finalize)(
+      struct backend *); /**< Pointer to backend finalizing function */
+  void *bptr;            /**< Pointer to backend specific data */
 };
 
 #ifdef __cplusplus

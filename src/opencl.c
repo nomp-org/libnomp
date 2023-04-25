@@ -18,15 +18,21 @@ static const char *ERR_STR_OPENCL_FAILURE = "%s failed with error code: %d.";
     }                                                                          \
   }
 
+/**
+ * @brief Struct to store OpenCL backend-specific data.
+ */
 struct opencl_backend {
-  cl_device_id device_id;
-  cl_command_queue queue;
-  cl_context ctx;
+  cl_device_id device_id; /**< OpenCL device ID */
+  cl_command_queue queue; /**< OpenCL command queue */
+  cl_context ctx;         /**< OpenCL context */
 };
 
+/**
+ * @brief Struct to store an OpenCL program and kernel.
+ */
 struct opencl_prog {
-  cl_program prg;
-  cl_kernel knl;
+  cl_program prg; /**< OpenCL program */
+  cl_kernel knl;  /**< OpenCL kernel */
 };
 
 static int opencl_update(struct backend *bnd, struct mem *m, const int op) {

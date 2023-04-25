@@ -102,9 +102,12 @@ static int compile_aux(const char *cc, const char *cflags, const char *src,
   return failed;
 }
 
+/**
+ * @brief Struct to store information about a dynamic loaded function.
+ */
 struct function {
-  void *dlh;
-  void (*dlf)(void **);
+  void *dlh; /**< Handle to the dynamic library that contains the function */
+  void (*dlf)(void **); /**< Pointer to the function */
 };
 
 static struct function **funcs = NULL;

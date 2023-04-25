@@ -10,10 +10,13 @@ const char *ERR_STR_USER_MAP_PTR_IS_INVALID =
 const char *ERR_STR_USER_DEVICE_IS_INVALID =
     "Device id %d passed into libnomp is not valid.";
 
+/**
+ * @brief Struct to store information about a log entry.
+ */
 struct log {
-  char *description;
-  int logno;
-  nomp_log_type type;
+  char *description;  /**< Description of the log entry */
+  int logno;          /**< Log number associated with the entry */
+  nomp_log_type type; /**< Type of log */
 };
 
 static struct log *logs = NULL;
