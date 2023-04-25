@@ -64,6 +64,7 @@ while [ $# -gt 0 ]; do
   -idir | --install-dir) shift && NOMP_INSTALL_DIR=$(realpath "${1}") ;;
   -docs | --enable-docs) NOMP_ENABLE_DOCS="ON" ;;
   -opencl | --enable-opencl) NOMP_ENABLE_OPENCL="ON" ;;
+  -sycl | --enable-sycl) NOMP_ENABLE_SYCL="ON" ;;
   --opencl-lib) shift && NOMP_OPENCL_LIBRARY=$(realpath "${1}") ;;
   --opencl-inc) shift && NOMP_OPENCL_INCLUDE_DIR=$(realpath "${1}") ;;
   -hip | --enable-hip) NOMP_ENABLE_HIP="ON" ;;
@@ -87,6 +88,7 @@ NOMP_CMAKE_OPTS+=("-DENABLE_DOCS=${NOMP_ENABLE_DOCS}")
 NOMP_CMAKE_OPTS+=("-DENABLE_OPENCL=${NOMP_ENABLE_OPENCL}")
 NOMP_CMAKE_OPTS+=("-DENABLE_HIP=${NOMP_ENABLE_HIP}")
 NOMP_CMAKE_OPTS+=("-DENABLE_CUDA=${NOMP_ENABLE_CUDA}")
+NOMP_CMAKE_OPTS+=("-DENABLE_SYCL=${NOMP_ENABLE_SYCL}")
 
 [[ -n ${NOMP_PREFIX_PATH} ]] &&
   NOMP_CMAKE_OPTS+=("-DCMAKE_PREFIX_PATH=${NOMP_PREFIX_PATH}")

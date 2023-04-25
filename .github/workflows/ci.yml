@@ -15,6 +15,13 @@ env:
   # Increase to reset cache manually
   CACHE_NUMBER: 1
   POCL_CACHE_NUMBER: 1
+  DPCPP_CACHE_NUMBER: 0
+  
+  LINUX_BASEKIT_URL: https:/registrationcenter-download.intel.com/akdlm/IRC_NAS/7deeaac4-f605-4bcf-a81b-ea7531577c61/l_BaseKit_p_2023.1.0.46401_offline.sh
+  LINUX_DPCPP_COMPONENTS_WEB: intel.oneapi.lin.dpcpp-cpp-compiler
+  NOMP_SYCL_CC: "/opt/intel/oneapi/compiler/latest/linux/bin/icpx"
+  NOMP_SYCL_CFLAGS: "-fsycl -fPIC -shared"
+
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -24,10 +31,12 @@ jobs:
     strategy:
       matrix:
         compiler: [gcc-10, clang-12]
+        backend: [opencl, sycl]
       fail-fast: false
-    name: "${{ matrix.compiler }}"
+    name: "${{ matrix.compiler }} - ${{matrix.backend}}"
     env:
       CC: ${{ matrix.compiler }}
+      LD_LIBRARY_PATH: /opt/intel/oneapi/compiler/latest/linux/compiler/lib/intel64
     steps:
       - name: Setup Github actions
         uses: actions/checkout@v3
@@ -52,25 +61,54 @@ jobs:
           conda env update -n libnomp -f environment.yml
         if: steps.cache.outputs.cache-hit != 'true'
       - uses: actions/cache@v3
+        if: ${{matrix.backend== 'sycl'}} 
+        with:
+          path: ${CONDA_PKGS_DIR}/*dpcpp_cpp_rt*
+          key:  ${{ runner.os }}-build-dpcpp_cpp_rt-${{ env.DPCPP_CACHE_NUMBER }}
+        id:  dpcpp_cpp_rt_cache
+      - name: Install Intel DPCPP Runtime
+        id: install_dpcpp_cpp_rt
+        run: |
+          conda install -c intel dpcpp_cpp_rt
+        if: steps.dpcpp_cpp_rt_cache.outputs.cache-hit != 'true' && ${{matrix.backend== 'sycl'}} 
+      - uses: actions/cache@v3
         id: pocl_cache
         with:
-          path: ~/conda_pkgs_dir/pocl
+          path: ${CONDA_PKGS_DIR}/*pocl*
           key:  ${{ runner.os }}-build-pocl-${{ env.POCL_CACHE_NUMBER }}
       - name: Install pocl
         id: install_pocl
         run: |
           conda install -c conda-forge pocl
         if: (steps.pocl_cache.outputs.cache-hit != 'true') || (steps.cache.outputs.cache-hit != 'true')
+      - name: Cache Dpcpp
+        id: dpcpp_cache
+        if: ${{matrix.backend== 'sycl'}} 
+        uses: actions/cache@v3
+        with:
+          path: |
+            /opt/intel/oneapi/compiler
+            /opt/intel/oneapi/tbb
+          key: install-dpcpp-${{ env.DPCPP_CACHE_NUMBER }}-${{ env.LINUX_BASEKIT_URL }}-${{ env.LINUX_DPCPP_COMPONENTS_WEB }}-compiler
+      - name: Dpcpp install
+        if: steps.dpcpp_cache.outputs.cache-hit != 'true' && ${{matrix.backend== 'sycl'}} 
+        run: scripts/install_dpcpp.sh $LINUX_BASEKIT_URL $LINUX_DPCPP_COMPONENTS_WEB
+      - name: build
+        if: ${{matrix.backend== 'sycl'}} 
+        run: scripts/build_linux.sh
+      - name: exclude unused files from cache
+        if: steps.dpcpp_cache.outputs.cache-hit != 'true' &&  ${{matrix.backend== 'sycl'}} 
+        run: scripts/cache_exclude_linux.sh
       - name: Build libnomp
         id: build_libnomp
         run: |
           echo "NOMP_INSTALL_DIR=${PWD}/../install" >> $GITHUB_ENV
-          ./lncfg -idir ../install --prefix-path ${CONDA_PREFIX} -opencl --opencl-lib ${CONDA_PREFIX}/lib/libOpenCL.so
+          ./lncfg -idir ../install --prefix-path ${CONDA_PREFIX} -${{ matrix.backend }}  --opencl-lib ${CONDA_PREFIX}/lib/libOpenCL.so
           ./lninstall --no
       - name: Run libnomp tests
         id: run_libnomp
         run: |
-          ${NOMP_INSTALL_DIR}/bin/lnrun test -b opencl
+          ${NOMP_INSTALL_DIR}/bin/lnrun test -b ${{ matrix.backend }} -p 1
       - name: Block to allow inspecting failures
         run: sleep 30m
         if: ${{ failure() && inputs.debug_enabled }}
