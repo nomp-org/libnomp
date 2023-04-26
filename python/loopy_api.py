@@ -227,6 +227,16 @@ class CToLoopyExpressionMapper(IdentityMapper):
         (child,) = expr.get_children()
         return self.rec(child)
 
+    def map_conditional_operator(
+        self, expr: cindex.CursorKind.CONDITIONAL_OPERATOR
+    ) -> prim.Expression:
+        """Maps an ternary operator expression."""
+        cond_expr, if_true_right, if_false_right = expr.get_children()
+        cond = CToLoopyExpressionMapper()(cond_expr)
+        if_true_rhs = CToLoopyExpressionMapper()(if_true_right)
+        if_false_rhs = CToLoopyExpressionMapper()(if_false_right)
+        return cond, if_true_rhs, if_false_rhs
+
 
 @dataclass
 class CToLoopyMapperContext:
@@ -258,6 +268,26 @@ class CToLoopyMapperAccumulator:
         statements = statements or self.statements
         kernel_data = kernel_data or self.kernel_data
         return CToLoopyMapperAccumulator(domains, statements, kernel_data)
+
+
+def set_result_stmts(
+    true_result: CToLoopyMapperAccumulator,
+    false_result: CToLoopyMapperAccumulator,
+) -> tuple:
+    """Set insn ids for results."""
+    true_insn_ids, false_insn_ids = frozenset(), frozenset()
+    for stmt in true_result.statements:
+        true_insn_ids = true_insn_ids | {(stmt.id, "any")}
+    for stmt in false_result.statements:
+        false_insn_ids = false_insn_ids | {(stmt.id, "any")}
+
+    for i, stmt in enumerate(true_result.statements):
+        stmt.no_sync_with = false_insn_ids
+        true_result.statements[i] = stmt
+    for i, stmt in enumerate(false_result.statements):
+        stmt.no_sync_with = true_insn_ids
+        false_result.statements[i] = stmt
+    return true_result, false_result
 
 
 class CToLoopyLoopBoundMapper(CToLoopyExpressionMapper):
@@ -364,19 +394,7 @@ class CToLoopyMapper(IdentityMapper):
                 ),
             )
 
-            true_insn_ids, false_insn_ids = frozenset(), frozenset()
-            for stmt in true_result.statements:
-                true_insn_ids = true_insn_ids | {(stmt.id, "any")}
-            for stmt in false_result.statements:
-                false_insn_ids = false_insn_ids | {(stmt.id, "any")}
-
-            for i, stmt in enumerate(true_result.statements):
-                stmt.no_sync_with = false_insn_ids
-                true_result.statements[i] = stmt
-            for i, stmt in enumerate(false_result.statements):
-                stmt.no_sync_with = true_insn_ids
-                false_result.statements[i] = stmt
-            return self.combine([true_result, false_result])
+            return self.combine(set_result_stmts(true_result, false_result))
         return true_result
 
     def map_for_stmt(
@@ -494,6 +512,41 @@ class CToLoopyMapper(IdentityMapper):
         lhs = CToLoopyExpressionMapper()(left)
         rhs = CToLoopyExpressionMapper()(right)
 
+        # Map assignment to an if-else if rhs is a conditional operator 
+        # statement
+        if isinstance(rhs, tuple):
+            true_result = CToLoopyMapperAccumulator(
+                [],
+                [
+                    lp.Assignment(
+                        lhs,
+                        expression=rhs[1],
+                        within_inames=context.inames,
+                        predicates=context.copy(
+                            predicates=context.predicates | {rhs[0]}
+                        ).predicates,
+                        id=context.name_gen(LOOPY_INSN_PREFIX),
+                    )
+                ],
+                [],
+            )
+            false_result = CToLoopyMapperAccumulator(
+                [],
+                [
+                    lp.Assignment(
+                        lhs,
+                        expression=rhs[2],
+                        within_inames=context.inames,
+                        predicates=context.copy(
+                            predicates=context.predicates
+                            | {prim.LogicalNot(rhs[0])}
+                        ).predicates,
+                        id=context.name_gen(LOOPY_INSN_PREFIX),
+                    )
+                ],
+                [],
+            )
+            return self.combine(set_result_stmts(true_result, false_result))
         return CToLoopyMapperAccumulator(
             [],
             [
@@ -517,6 +570,54 @@ class CToLoopyMapper(IdentityMapper):
         left, right = expr.get_children()
         lhs = CToLoopyExpressionMapper()(left)
         rhs = CToLoopyExpressionMapper()(right)
+
+        if isinstance(rhs, tuple):
+            rhs = list(rhs)
+            op_str = get_op_str(expr, left)
+            for i in range(1, 3):
+                if op_str == "+=":
+                    rhs[i] = lhs + rhs[i]
+                elif op_str == "-=":
+                    rhs[i] = lhs - rhs[i]
+                elif op_str == "*=":
+                    rhs[i] = lhs * rhs[i]
+                elif op_str != "=":
+                    raise NotImplementedError(
+                        f"Mapping not implemented for {op_str}"
+                    )
+
+            true_result = CToLoopyMapperAccumulator(
+                [],
+                [
+                    lp.Assignment(
+                        lhs,
+                        expression=rhs[1],
+                        within_inames=context.inames,
+                        predicates=context.copy(
+                            predicates=context.predicates | {rhs[0]}
+                        ).predicates,
+                        id=context.name_gen(LOOPY_INSN_PREFIX),
+                    )
+                ],
+                [],
+            )
+            false_result = CToLoopyMapperAccumulator(
+                [],
+                [
+                    lp.Assignment(
+                        lhs,
+                        expression=rhs[2],
+                        within_inames=context.inames,
+                        predicates=context.copy(
+                            predicates=context.predicates
+                            | {prim.LogicalNot(rhs[0])}
+                        ).predicates,
+                        id=context.name_gen(LOOPY_INSN_PREFIX),
+                    )
+                ],
+                [],
+            )
+            return self.combine(set_result_stmts(true_result, false_result))
 
         op_str = get_op_str(expr, left)
         if op_str == "+=":
@@ -722,8 +823,7 @@ if __name__ == "__main__":
             for (int i = 0; i < N; i++) {
               int t = 1;
               for (int j = 0; j < 10; j++) {
-                t = ~t;
-                t = t << 1;
+                t = N < 5 ? i : (i + 3);
                 if (j == 5 || !(j == 6))
                   continue;
               }
