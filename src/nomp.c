@@ -507,8 +507,9 @@ int nomp_finalize(void) {
   for (unsigned i = 0; i < progs_n; i++) {
     if (progs[i]) {
       nomp_check(nomp.knl_free(progs[i]));
-      Py_XDECREF(progs[i]->py_global), Py_XDECREF(progs[i]->py_local);
-      Py_XDECREF(progs[i]->py_dict), nomp_free(&progs[i]->args);
+      vecbasic_free(progs[i]->sym_global), vecbasic_free(progs[i]->sym_local);
+      Py_XDECREF(progs[i]->py_dict);
+      nomp_free(progs[i]->args), nomp_free(progs[i]), progs[i] = NULL;
     }
     nomp_free(&progs[i]);
   }
