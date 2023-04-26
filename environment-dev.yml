@@ -17,3 +17,4 @@ dependencies:
     - pylint==2.15.5
   - clang-format=15.0.3
   - doxygen
+  - symengine

@@ -5,6 +5,7 @@
 
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
+#include <symengine/cwrapper.h>
 
 #include <assert.h>
 #include <ctype.h>
@@ -48,7 +49,7 @@ struct nomp_prog {
   // Dimension of kernel launch parameters, their pymbolic
   // expressions, and evaluated value of each dimension.
   unsigned ndim;
-  PyObject *py_global, *py_local;
+  CVecBasic *sym_global, *sym_local;
   size_t global[3], local[3];
   // Map of variable names and their values use to evaluate
   // the kernel launch parameters.
