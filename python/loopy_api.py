@@ -252,7 +252,7 @@ class CToLoopyMapperContext:
     value_args: FrozenSet[str]
     predicates: FrozenSet[Union[prim.Comparison, prim.LogicalNot]]
     name_gen: UniqueNameGenerator
-    reduction_var: str
+    reduction_index: int
 
     def copy(self, **kwargs) -> "CToLoopyMapperContext":
         """Return a copy of the context by replacing fields."""
@@ -604,7 +604,7 @@ class CToLoopyMapper(IdentityMapper):
 
         inames = context.inames
         if (
-            context.reduction_var is not None
+            context.reduction_index >= 0
             and isinstance(lhs, prim.Subscript)
             and isinstance(lhs.aggregate, prim.Variable)
         ):
@@ -744,7 +744,7 @@ class CKernel:
 
 
 def c_to_loopy(
-    c_str: str, backend: str, reduction_var: str = None
+    c_str: str, backend: str, reduction_index: int = -1
 ) -> lp.translation_unit.TranslationUnit:
     """Returns a Loopy kernel for a C loop band."""
     fname = hashlib.sha256(c_str.encode("utf-8")).hexdigest() + ".c"
@@ -767,7 +767,7 @@ def c_to_loopy(
             c_knl.get_value_types(),
             frozenset(),
             UniqueNameGenerator(),
-            reduction_var,
+            reduction_index,
         ),
     )
 

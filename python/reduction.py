@@ -100,7 +100,7 @@ def realize_reduction(
     )
     knl.args.sort(key=lambda arg: arg.name.lower())
 
-    tunit = lp.make_kernel(
+    knl = lp.make_kernel(
         knl.domains,
         knl.instructions,
         knl.args + list(knl.temporary_variables.values()),
@@ -108,9 +108,7 @@ def realize_reduction(
         lang_version=LOOPY_LANG_VERSION,
     )
 
-    tunit = lp.tag_inames(tunit, {i_inner: "l.0"})
-    tunit = lp.tag_inames(tunit, {f"{i_outer}_0": "g.0"})
-    tunit = lp.add_dependency(
-        tunit, "writes:acc_i_outer", f"id:{redn.tmp}_barrier"
-    )
-    return (tunit, redn.oprtr)
+    knl = lp.tag_inames(knl, {i_inner: "l.0"})
+    knl = lp.tag_inames(knl, {f"{i_outer}_0": "g.0"})
+    knl = lp.add_dependency(knl, "writes:acc_i_outer", f"id:{redn.tmp}_barrier")
+    return (knl, redn.oprtr)

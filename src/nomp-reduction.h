@@ -31,20 +31,4 @@
  */
 int host_side_reduction(struct backend *bnd, struct prog *prg, struct mem *m);
 
-/**
- * @ingroup nomp_py_utils
- * @brief Get kernal name and generated source for the backend.
- * @brief Handle reductions (if present) in a loopy kernel.
- *
- * Handle the reduction in the loopy kernel \p knl. \p knl will be modified
- * in the process. Function will return a non-zero value if there was an error
- * after registering a log.
- *
- * @param[in,out] knl Pointer to loopy kernel object.
- * @param[out] redn_op Reduction operation.
- * @param[in] backend Backend for the reduction.
- * @return int
- */
-int py_handle_reduction(PyObject **knl, int *redn_op, const char *backend);
-
 #endif
