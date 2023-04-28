@@ -750,16 +750,16 @@ def c_to_loopy(
     fname = hashlib.sha256(c_str.encode("utf-8")).hexdigest() + ".c"
     tunit = cindex.Index.create().parse(fname, unsaved_files=[(fname, c_str)])
 
-    # Check for syntax errors in parsed C kernel
+    # Check for syntax errors in parsed C kernel.
     errors = [diagnostic.spelling for diagnostic in tunit.diagnostics]
     if len(errors) > 0:
         raise SyntaxError(f"Failed to parse C source due to errors: {errors}")
 
-    # Init `var_to_decl` based on function parameters
+    # Init `var_to_decl` based on function parameters.
     (function,) = tunit.cursor.get_children()
     c_knl = CKernel(function)
 
-    # Map C for loop to loopy kernel
+    # Map C for loop to loopy kernel.
     acc = CToLoopyMapper()(
         c_knl.get_knl_body(),
         CToLoopyMapperContext(

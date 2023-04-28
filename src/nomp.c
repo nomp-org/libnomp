@@ -89,9 +89,9 @@ static int init_configs(int argc, const char **argv, struct backend *backend) {
 
   nomp_check(check_env(&nomp));
 
-#define check_if_initialized(param, value, cmd_arg, env_var)                   \
+#define check_if_initialized(param, dummy, cmd_arg, env_var)                   \
   {                                                                            \
-    if (backend->param == value) {                                             \
+    if (backend->param == dummy) {                                             \
       return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,              \
                           #param                                               \
                           " is missing or invalid. Set it with " cmd_arg       \
@@ -138,6 +138,8 @@ int nomp_init(int argc, const char **argv) {
 
   nomp_check(init_configs(argc, argv, &nomp));
 
+  nomp_check(nomp_log_init(nomp.verbose));
+
   size_t n = strnlen(nomp.backend, MAX_BACKEND_SIZE);
   for (int i = 0; i < n; i++)
     nomp.backend[i] = tolower(nomp.backend[i]);
@@ -167,7 +169,9 @@ int nomp_init(int argc, const char **argv) {
                         "Failed to initialize libnomp. Invalid backend: %s",
                         nomp.backend);
   }
-  nomp_check(nomp_log_init(nomp.verbose));
+
+  nomp.scratch = NULL;
+  nomp_check(allocate_scratch_memory(&nomp));
 
   initialized = 1;
   return 0;

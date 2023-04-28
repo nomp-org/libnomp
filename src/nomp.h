@@ -112,14 +112,9 @@
 #define NOMP_USER_LOG_ID_IS_INVALID -134
 /**
  * @ingroup nomp_errors
- * @brief User callback function failed during execution.
- */
-#define NOMP_USER_CALLBACK_FAILURE -136
-/**
- * @ingroup nomp_errors
  * @brief Kernel argument type provided to libnomp is not valid.
  */
-#define NOMP_USER_KNL_ARG_TYPE_IS_INVALID -138
+#define NOMP_USER_KNL_ARG_TYPE_IS_INVALID -136
 
 /**
  * @ingroup nomp_errors
@@ -133,20 +128,18 @@
 #define NOMP_FINALIZE_FAILURE -258
 /**
  * @ingroup nomp_errors
- * @brief One of the inputs to a libnomp function call are not valid.
  */
-#define NOMP_NULL_INPUT_ENCOUNTERED -260
 
 /**
  * @ingroup nomp_errors
  * @brief A python call made by libnomp failed.
  */
-#define NOMP_PY_CALL_FAILURE -385
+#define NOMP_PY_CALL_FAILURE -384
 /**
  * @ingroup nomp_errors
  * @brief Loopy conversion failed.
  */
-#define NOMP_LOOPY_CONVERSION_FAILURE -387
+#define NOMP_LOOPY_CONVERSION_FAILURE -386
 /**
  * @ingroup nomp_errors
  * @brief Failed to find loopy kernel.
@@ -156,17 +149,17 @@
  * @ingroup nomp_errors
  * @brief Code generation from loopy kernel failed.
  */
-#define NOMP_LOOPY_CODEGEN_FAILURE -389
+#define NOMP_LOOPY_CODEGEN_FAILURE -390
 /**
  * @ingroup nomp_errors
  * @brief Code generation from loopy kernel failed.
  */
-#define NOMP_LOOPY_GET_GRIDSIZE_FAILURE -390
+#define NOMP_LOOPY_GET_GRIDSIZE_FAILURE -392
 /**
  * @ingroup nomp_errors
  * @brief Grid size calculation failed.
  */
-#define NOMP_LOOPY_EVAL_GRIDSIZE_FAILURE -391
+#define NOMP_LOOPY_EVAL_GRIDSIZE_FAILURE -394
 
 /**
  * @ingroup nomp_errors
@@ -177,27 +170,27 @@
  * @ingroup nomp_errors
  * @brief libnomp HIP operation failed.
  */
-#define NOMP_HIP_FAILURE -145
+#define NOMP_HIP_FAILURE -514
 /**
  * @ingroup nomp_errors
  * @brief libnomp OpenCL failure.
  */
-#define NOMP_OPENCL_FAILURE -513
+#define NOMP_OPENCL_FAILURE -516
 /**
  * @ingroup nomp_errors
  * @brief libnomp SYCL failure.
  */
-#define NOMP_SYCL_FAILURE -514
+#define NOMP_SYCL_FAILURE -518
 /**
  * @ingroup nomp_errors
  * @brief libnomp ISPC failure.
  */
-#define NOMP_ISPC_FAILURE -515
+#define NOMP_ISPC_FAILURE -520
 /**
  * @ingroup nomp_errors
  * @brief libnomp source compilation failure.
  */
-#define NOMP_JIT_FAILURE -524
+#define NOMP_JIT_FAILURE -522
 
 #ifdef __cplusplus
 extern "C" {
