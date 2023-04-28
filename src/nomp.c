@@ -1,4 +1,5 @@
 #include "nomp-impl.h"
+#include "nomp-reduction.h"
 
 static struct backend nomp;
 static int initialized = 0;
@@ -117,6 +118,29 @@ static int init_configs(int argc, const char **argv, struct backend *backend) {
   nomp_check(py_append_to_sys_path(abs_dir));
   nomp_free(abs_dir);
 
+  return 0;
+}
+
+static int allocate_scratch_memory(struct backend *backend) {
+  if (backend->scratch == NULL) {
+    struct mem *m = backend->scratch = nomp_calloc(struct mem, 1);
+    m->idx0 = 0, m->idx1 = MAX_SCRATCH_SIZE, m->usize = sizeof(char);
+    m->hptr = nomp_calloc(double, m->idx1 - m->idx0);
+    nomp_check(backend->update(backend, m, NOMP_ALLOC));
+    return 0;
+  }
+  // FIXME: Return an error.
+  return 0;
+}
+
+static int deallocate_scratch_memory(struct backend *backend) {
+  if (backend->scratch) {
+    nomp_check(backend->update(backend, backend->scratch, NOMP_FREE));
+    nomp_free(backend->scratch->hptr);
+    nomp_free(backend->scratch);
+    return 0;
+  }
+  // FIXME: Return an error.
   return 0;
 }
 
@@ -292,16 +316,48 @@ static int parse_clauses(char **usr_file, char **usr_func, PyObject **dict_,
 }
 
 int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
-  int err;
   if (*id == -1) {
     if (progs_n == progs_max) {
       progs_max += progs_max / 2 + 1;
       progs = nomp_realloc(progs, struct prog *, progs_max);
     }
 
-    // Create loopy kernel from C source
+    struct prog *prg = progs[progs_n] = nomp_calloc(struct prog, 1);
+    prg->py_dict = PyDict_New(), prg->reduction_index = -1;
+    prg->nargs = nargs, prg->args = nomp_calloc(struct arg, nargs);
+
+    va_list args;
+    va_start(args, nargs);
+    for (unsigned i = 0; i < prg->nargs; i++) {
+      const char *name = va_arg(args, const char *);
+      strncpy(prg->args[i].name, name, MAX_ARG_NAME_SIZE);
+      prg->args[i].size = va_arg(args, size_t);
+      int type_and_attrs = va_arg(args, int);
+      prg->args[i].type = type_and_attrs & NOMP_ATTRIBUTE_MASK;
+      // Check if the argument is part of a reduction.
+      if (type_and_attrs & NOMP_ATTRIBUTE_REDUCTION) {
+        // Check if there was a reduction in the kernel already and bail
+        // out if that is the case.
+        if (prg->reduction_index >= 0) {
+          return nomp_set_log(
+              NOMP_NOT_IMPLEMENTED_ERROR, NOMP_ERROR,
+              "Multiple reductions in a kernel is not yet implemented.");
+        }
+        prg->reduction_index = i, prg->reduction_type = prg->args[i].type;
+        prg->args[i].type = NOMP_PTR;
+      }
+      // Check if we have to use pinned memory on the device.
+      if (type_and_attrs & NOMP_ATTRIBUTE_PINNED) {
+        return nomp_set_log(NOMP_NOT_IMPLEMENTED_ERROR, NOMP_ERROR,
+                            "Pinned memory support is not yet implemented.");
+      }
+    }
+    va_end(args);
+
+    // Create loopy kernel from C source.
     PyObject *knl = NULL;
-    nomp_check(py_c_to_loopy(&knl, csrc, nomp.backend));
+    nomp_check(py_c_to_loopy(&knl, &prg->reduction_op, csrc, nomp.backend,
+                             prg->reduction_index));
 
     // Parse the clauses to find transformations file, function and other
     // annotations. Annotations are returned as a Python dictionary.
@@ -309,11 +365,11 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
     PyObject *annotations = NULL;
     nomp_check(parse_clauses(&file, &func, &annotations, clauses));
 
-    // Handle annotate clauses if the exist
+    // Handle annotate clauses if they exist.
     nomp_check(py_apply_annotations(&knl, nomp.py_annotate, annotations));
     Py_XDECREF(annotations);
 
-    // Handle transform clause
+    // Handle transform clauses.
     nomp_check(py_user_transform(&knl, file, func));
     nomp_free(file), nomp_free(func);
 
@@ -322,29 +378,13 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
     nomp_check(py_get_knl_name_and_src(&name, &src, knl, nomp.backend));
 
     // Build the kernel
-    struct prog *prg = progs[progs_n] = nomp_calloc(struct prog, 1);
     nomp_check(nomp.knl_build(&nomp, prg, src, name));
     nomp_free(src), nomp_free(name);
 
-    // Get grid size of the loopy kernel as pymbolic expressions after
-    // transformations. These grid sizes will be evaluated when the kernel is
-    // run.
+    // Get grid size of the loopy kernel as pymbolic expressions.
+    // These grid sizes will be evaluated each time the kernel is run.
     nomp_check(py_get_grid_size(prg, knl));
     Py_XDECREF(knl);
-
-    prg->py_dict = PyDict_New();
-    prg->nargs = nargs;
-    prg->args = nomp_calloc(struct arg, nargs);
-
-    va_list args;
-    va_start(args, nargs);
-    for (unsigned i = 0; i < prg->nargs; i++) {
-      const char *name = va_arg(args, const char *);
-      strncpy(prg->args[i].name, name, MAX_ARG_NAME_SIZE);
-      prg->args[i].size = va_arg(args, size_t);
-      prg->args[i].type = va_arg(args, int);
-    }
-    va_end(args);
 
     *id = progs_n++;
   }
@@ -357,9 +397,8 @@ int nomp_run(int id, ...) {
     struct prog *prg = progs[id];
     struct arg *args = prg->args;
 
-    PyObject *py_key, *py_val;
+    PyObject *key, *val;
     struct mem *m;
-    long val;
 
     va_list vargs;
     va_start(vargs, id);
@@ -367,18 +406,27 @@ int nomp_run(int id, ...) {
       args[i].ptr = va_arg(vargs, void *);
       switch (args[i].type) {
       case NOMP_INT:
+        val = PyLong_FromLong(*((int *)args[i].ptr));
+        goto key;
+        break;
       case NOMP_UINT:
-        py_key =
-            PyUnicode_FromStringAndSize(args[i].name, strlen(args[i].name));
-        py_val = PyLong_FromLong(*((int *)args[i].ptr));
-        PyDict_SetItem(prg->py_dict, py_key, py_val);
-        Py_XDECREF(py_key), Py_XDECREF(py_val);
+        val = PyLong_FromLong(*((unsigned int *)args[i].ptr));
+key:
+        key = PyUnicode_FromStringAndSize(args[i].name, strlen(args[i].name));
+        PyDict_SetItem(prg->py_dict, key, val);
+        Py_XDECREF(key), Py_XDECREF(val);
         break;
       case NOMP_PTR:
         m = mem_if_mapped(args[i].ptr);
         if (m == NULL) {
-          return nomp_set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
-                              ERR_STR_USER_MAP_PTR_IS_INVALID, args[i].ptr);
+          if (prg->reduction_index == i) {
+            prg->reduction_ptr = args[i].ptr,
+            prg->reduction_size = args[i].size;
+            m = nomp.scratch;
+          } else {
+            return nomp_set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
+                                ERR_STR_USER_MAP_PTR_IS_INVALID, args[i].ptr);
+          }
         }
         args[i].size = m->bsize, args[i].ptr = m->bptr;
         break;
@@ -387,7 +435,16 @@ int nomp_run(int id, ...) {
     va_end(vargs);
 
     nomp_check(py_eval_grid_size(prg));
+
+    // FIXME: Our kernel doesn't have the local problem size for some
+    // reason.
+    if (prg->reduction_index >= 0)
+      prg->local[0] = 32;
+
     nomp_check(nomp.knl_run(&nomp, prg));
+
+    if (prg->reduction_index >= 0)
+      nomp_check(host_side_reduction(&nomp, prg, nomp.scratch));
 
     return 0;
   }
@@ -415,12 +472,14 @@ int nomp_finalize(void) {
   for (unsigned i = 0; i < progs_n; i++) {
     if (progs[i]) {
       nomp_check(nomp.knl_free(progs[i]));
+      nomp_free(progs[i]->args), nomp_free(progs[i]);
       Py_XDECREF(progs[i]->py_global), Py_XDECREF(progs[i]->py_local);
-      Py_XDECREF(progs[i]->py_dict);
-      nomp_free(progs[i]->args), nomp_free(progs[i]), progs[i] = NULL;
+      Py_XDECREF(progs[i]->py_dict), progs[i] = NULL;
     }
   }
   nomp_free(progs), progs = NULL, progs_n = progs_max = 0;
+
+  nomp_check(deallocate_scratch_memory(&nomp));
 
   nomp_free(nomp.backend), nomp_free(nomp.install_dir);
   Py_XDECREF(nomp.py_annotate);

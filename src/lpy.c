@@ -1,9 +1,12 @@
 #include "nomp-impl.h"
 
-static const char *loopy_api = "loopy_api";
+static const char *module_loopy_api = "loopy_api";
+static const char *module_reduction = "reduction";
+
 static const char *c_to_loopy = "c_to_loopy";
 static const char *get_knl_src = "get_knl_src";
 static const char *get_knl_name = "get_knl_name";
+static const char *realize_reduction = "realize_reduction";
 
 void py_print(const char *msg, PyObject *obj) {
   PyObject *repr = PyObject_Repr(obj);
@@ -33,9 +36,47 @@ int py_append_to_sys_path(const char *path) {
   return 0;
 }
 
-int py_c_to_loopy(PyObject **knl, const char *src, const char *backend) {
+static int py_realize_reduction(PyObject **knl, int *reduction_op,
+                                const char *backend) {
   int err = 1;
-  PyObject *lpy_api = PyUnicode_FromString(loopy_api);
+  PyObject *reduction = PyUnicode_FromString(module_reduction);
+  if (reduction) {
+    PyObject *module = PyImport_Import(reduction);
+    if (module) {
+      PyObject *rr = PyObject_GetAttrString(module, realize_reduction);
+      if (rr) {
+        PyObject *pbackend = PyUnicode_FromString(backend);
+        PyObject *result =
+            PyObject_CallFunctionObjArgs(rr, *knl, pbackend, NULL);
+        if (result) {
+          if (PyTuple_Size(result) == 2) {
+            Py_DECREF(*knl);
+            *knl = PyTuple_GetItem(result, 0);
+            PyObject *rop = PyTuple_GetItem(result, 1);
+            if (rop && PyLong_Check(rop)) {
+              *reduction_op = (int)PyLong_AsLong(rop);
+              err = 0, Py_DECREF(rop);
+            }
+          }
+        }
+        Py_XDECREF(pbackend), Py_DECREF(rr);
+      }
+      Py_DECREF(module);
+    }
+    Py_DECREF(reduction);
+  }
+  if (err) {
+    return nomp_set_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,
+                        "Call to realize_reduction failed.");
+  }
+
+  return 0;
+}
+
+int py_c_to_loopy(PyObject **knl, int *reduction_op, const char *src,
+                  const char *backend, int reduction_index) {
+  int err = 1;
+  PyObject *lpy_api = PyUnicode_FromString(module_loopy_api);
   if (lpy_api) {
     PyObject *module = PyImport_Import(lpy_api);
     if (module) {
@@ -57,6 +98,9 @@ int py_c_to_loopy(PyObject **knl, const char *src, const char *backend) {
     return nomp_set_log(NOMP_LOOPY_CONVERSION_FAILURE, NOMP_ERROR,
                         "C to Loopy conversion failed.\n");
   }
+
+  if (reduction_index >= 0)
+    nomp_check(py_realize_reduction(knl, reduction_op, backend));
 
   return 0;
 }
@@ -140,7 +184,7 @@ int py_user_transform(PyObject **knl, const char *file, const char *func) {
 int py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
                             const char *backend) {
   int err = 1;
-  PyObject *lpy_api = PyUnicode_FromString(loopy_api);
+  PyObject *lpy_api = PyUnicode_FromString(module_loopy_api);
   if (lpy_api) {
     PyObject *module = PyImport_Import(lpy_api);
     if (module) {

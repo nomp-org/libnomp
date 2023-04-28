@@ -23,6 +23,7 @@
 #define MAX_ARG_NAME_SIZE 128
 #define MAX_FUNC_NAME_SIZE 128
 #define MAX_KNL_ARGS 64
+#define MAX_SCRATCH_SIZE (1024 * sizeof(double))
 
 #include "nomp-aux.h"
 #include "nomp-log.h"
@@ -59,6 +60,9 @@ struct prog {
   PyObject *py_dict;
   // Pointer to keep track of backend specific data.
   void *bptr;
+  // Reduction related metadata.
+  int reduction_index, reduction_op, reduction_type, reduction_size;
+  void *reduction_ptr;
 };
 
 struct backend {
@@ -76,6 +80,9 @@ struct backend {
   int (*finalize)(struct backend *);
   // Pointer to keep track of backend specific data.
   void *bptr;
+  // Scratch memory to be used as temporary memory for kernels (like
+  // reductions).
+  struct mem *scratch;
 };
 
 #ifdef __cplusplus

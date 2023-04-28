@@ -25,7 +25,7 @@
  * @ingroup nomp_attributes
  * @brief Mask to separate the type and attributes of a kernel argument.
  */
-#define NOMP_ATTRIBUTE_MASK 2047
+#define NOMP_ATTRIBUTE_MASK 0xFFFFFF00
 
 /**
  * @defgroup nomp_types nomp data types.
@@ -128,7 +128,9 @@
 #define NOMP_FINALIZE_FAILURE -258
 /**
  * @ingroup nomp_errors
+ * @brief The feature is not implemented.
  */
+#define NOMP_NOT_IMPLEMENTED_ERROR -260
 
 /**
  * @ingroup nomp_errors
