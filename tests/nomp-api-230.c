@@ -2,8 +2,6 @@
 #include "nomp-generate-tests.h"
 #undef TEST_IMPL_H
 
-#include "nomp-aux.h"
-
 static int test_matrix_addition() {
   int err = 0;
   TEST_BUILTIN_TYPES(230_add, 32, 4)

@@ -25,11 +25,11 @@ int py_append_to_sys_path(const char *path) {
       Py_DECREF(ppath), Py_XDECREF(pstr);
     }
   }
-
   if (err) {
     return nomp_set_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,
-                        "Appending path to the sys.path failed.");
+                        "Appending path \"%s\" to the sys.path failed.");
   }
+
   return 0;
 }
 
@@ -43,19 +43,21 @@ int py_c_to_loopy(PyObject **knl, const char *src, const char *backend) {
       if (c_to_lpy) {
         PyObject *psrc = PyUnicode_FromString(src);
         PyObject *pbackend = PyUnicode_FromString(backend);
-        *knl = PyObject_CallFunctionObjArgs(c_to_lpy, psrc, pbackend, NULL);
-        err = (*knl == NULL);
-        Py_XDECREF(psrc), Py_XDECREF(pbackend), Py_DECREF(c_to_lpy);
+        PyObject *pindex = PyLong_FromLong(reduction_index);
+        *knl = PyObject_CallFunctionObjArgs(c_to_lpy, psrc, pbackend, pindex,
+                                            NULL);
+        Py_XDECREF(psrc), Py_XDECREF(pbackend), Py_XDECREF(pindex);
+        Py_DECREF(c_to_lpy), err = (*knl == NULL);
       }
       Py_DECREF(module);
     }
     Py_DECREF(lpy_api);
   }
-
   if (err) {
     return nomp_set_log(NOMP_LOOPY_CONVERSION_FAILURE, NOMP_ERROR,
                         "C to Loopy conversion failed.\n");
   }
+
   return 0;
 }
 
@@ -119,21 +121,19 @@ int py_user_transform(PyObject **knl, const char *file, const char *func) {
       Py_DECREF(module);
       if (pfunc && PyCallable_Check(pfunc)) {
         PyObject *tknl = PyObject_CallFunctionObjArgs(pfunc, *knl, NULL);
+        if (tknl)
+          Py_DECREF(*knl), *knl = tknl, err = 0;
         Py_DECREF(pfunc);
-        if (tknl) {
-          Py_DECREF(*knl), *knl = tknl;
-          err = 0;
-        }
       }
     }
   }
-
   if (err) {
     return nomp_set_log(
         NOMP_PY_CALL_FAILURE, NOMP_ERROR,
         "Failed to call user transform function: \"%s\" in file: \"%s\".", func,
         file);
   }
+
   return 0;
 }
 
@@ -157,7 +157,6 @@ int py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
         }
         Py_XDECREF(py_backend), Py_DECREF(knl_name);
       }
-
       if (err) {
         return nomp_set_log(NOMP_LOOPY_KNL_NAME_NOT_FOUND, NOMP_ERROR,
                             "Unable to get loopy kernel name.");
@@ -180,13 +179,13 @@ int py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
       Py_DECREF(module);
     }
     Py_DECREF(lpy_api);
+    if (err) {
+      return nomp_set_log(
+          NOMP_LOOPY_CODEGEN_FAILURE, NOMP_ERROR,
+          "Backend code generation from loopy kernel \"%s\" failed.", *name);
+    }
   }
 
-  if (err) {
-    return nomp_set_log(
-        NOMP_LOOPY_CODEGEN_FAILURE, NOMP_ERROR,
-        "Backend code generation from loopy kernel \"%s\" failed.", *name);
-  }
   return 0;
 }
 
@@ -199,12 +198,10 @@ int py_get_grid_size(struct prog *prg, PyObject *knl) {
       if (entry) {
         PyObject *expr = PyObject_GetAttrString(
             entry, "get_grid_size_upper_bounds_as_exprs");
-        Py_DECREF(entry);
         if (expr) {
           PyObject *grid_size =
               PyObject_CallFunctionObjArgs(expr, callables, NULL);
-          Py_DECREF(expr);
-          if (grid_size) {
+          if (grid_size && PyTuple_Check(grid_size)) {
             prg->py_global = PyTuple_GetItem(grid_size, 0);
             prg->py_local = PyTuple_GetItem(grid_size, 1);
             prg->ndim = PyTuple_Size(prg->py_global);
@@ -212,16 +209,18 @@ int py_get_grid_size(struct prog *prg, PyObject *knl) {
               prg->ndim = PyTuple_Size(prg->py_local);
             err = 0;
           }
+          Py_DECREF(expr);
         }
+        Py_DECREF(entry);
       }
       Py_DECREF(callables);
     }
   }
-
   if (err) {
     return nomp_set_log(NOMP_LOOPY_GET_GRIDSIZE_FAILURE, NOMP_ERROR,
                         "Unable to get grid sizes from loopy kernel.");
   }
+
   return 0;
 }
 
@@ -268,11 +267,11 @@ int py_eval_grid_size(struct prog *prg) {
       Py_DECREF(mapper);
     }
   }
-
   if (err) {
     return nomp_set_log(NOMP_LOOPY_EVAL_GRIDSIZE_FAILURE, NOMP_ERROR,
                         "libnomp was unable to evaluate the kernel launch "
                         "parameters using pymbolic.");
   }
+
   return 0;
 }
