@@ -55,4 +55,38 @@ static int nomp_api_241_logical_ops(int n) {
   return 0;
 }
 #undef nomp_api_241_logical_ops
+
+#define nomp_api_241_ternary_ops                                               \
+  TOKEN_PASTE(nomp_api_241_ternary_ops, TEST_SUFFIX)
+static int nomp_api_241_ternary_ops(int n) {
+  nomp_test_assert(n <= 10);
+
+  TEST_TYPE a[10];
+  for (unsigned i = 0; i < n; i++)
+    a[i] = 0;
+
+  const char *fmt =
+      "void foo(%s *a,  int N) {                                       \n"
+      "  for (int i = 0; i < N; i++) {                                 \n"
+      "    int t = 0;                                                  \n"
+      "    for (int j = 0; j < 10; j++) {                              \n"
+      "      t = ((!(j < 3) && (j < 5)) || j == 1) ? t : t + 1;        \n"
+      "      t += ((!(j < 3) && (j < 5)) || j == 1) ? 0 : 1;           \n"
+      "    }                                                           \n"
+      "    a[i] = t;                                                   \n"
+      "  }                                                             \n"
+      "}                                                               \n";
+  nomp_api_241_aux(fmt, a, n);
+
+#if defined(TEST_TOL)
+  for (unsigned i = 0; i < n; i++)
+    nomp_test_assert(fabs(a[i] - 14) < TEST_TOL);
+#else
+  for (unsigned i = 0; i < n; i++)
+    nomp_test_assert(a[i] == 14);
+#endif
+
+  return 0;
+}
+#undef nomp_api_241_ternary_ops
 #undef nomp_api_241_aux

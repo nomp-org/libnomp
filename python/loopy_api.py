@@ -229,7 +229,7 @@ class CToLoopyExpressionMapper(IdentityMapper):
 
     def map_conditional_operator(
         self, expr: cindex.CursorKind.CONDITIONAL_OPERATOR
-    ) -> prim.Expression:
+    ) -> tuple[prim.Expression]:
         """Maps an ternary operator expression."""
         cond_expr, if_true_right, if_false_right = expr.get_children()
         cond = CToLoopyExpressionMapper()(cond_expr)
@@ -270,24 +270,21 @@ class CToLoopyMapperAccumulator:
         return CToLoopyMapperAccumulator(domains, statements, kernel_data)
 
 
-def set_result_stmts(
-    true_result: CToLoopyMapperAccumulator,
-    false_result: CToLoopyMapperAccumulator,
-) -> tuple:
+def set_result_stmts(results: tuple[CToLoopyMapperAccumulator]) -> tuple:
     """Set insn ids for results."""
     true_insn_ids, false_insn_ids = frozenset(), frozenset()
-    for stmt in true_result.statements:
+    for stmt in results[0].statements:
         true_insn_ids = true_insn_ids | {(stmt.id, "any")}
-    for stmt in false_result.statements:
+    for stmt in results[1].statements:
         false_insn_ids = false_insn_ids | {(stmt.id, "any")}
 
-    for i, stmt in enumerate(true_result.statements):
+    for i, stmt in enumerate(results[0].statements):
         stmt.no_sync_with = false_insn_ids
-        true_result.statements[i] = stmt
-    for i, stmt in enumerate(false_result.statements):
+        results[0].statements[i] = stmt
+    for i, stmt in enumerate(results[1].statements):
         stmt.no_sync_with = true_insn_ids
-        false_result.statements[i] = stmt
-    return true_result, false_result
+        results[1].statements[i] = stmt
+    return results[0], results[1]
 
 
 class CToLoopyLoopBoundMapper(CToLoopyExpressionMapper):
@@ -355,6 +352,43 @@ class ForLoopInfo:
         return (cname, lbound, ubound, self.body)
 
 
+def set_tf_results(
+    lhs, rhs, context: CToLoopyMapperContext
+) -> tuple[CToLoopyMapperAccumulator]:
+    """Helper function to get true false results"""
+    true_result = CToLoopyMapperAccumulator(
+        [],
+        [
+            lp.Assignment(
+                lhs,
+                expression=rhs[1],
+                within_inames=context.inames,
+                predicates=context.copy(
+                    predicates=context.predicates | {rhs[0]}
+                ).predicates,
+                id=context.name_gen(LOOPY_INSN_PREFIX),
+            )
+        ],
+        [],
+    )
+    false_result = CToLoopyMapperAccumulator(
+        [],
+        [
+            lp.Assignment(
+                lhs,
+                expression=rhs[2],
+                within_inames=context.inames,
+                predicates=context.copy(
+                    predicates=context.predicates | {prim.LogicalNot(rhs[0])}
+                ).predicates,
+                id=context.name_gen(LOOPY_INSN_PREFIX),
+            )
+        ],
+        [],
+    )
+    return true_result, false_result
+
+
 class CToLoopyMapper(IdentityMapper):
     """Map C expressions and statemements to Loopy expressions."""
 
@@ -394,7 +428,7 @@ class CToLoopyMapper(IdentityMapper):
                 ),
             )
 
-            return self.combine(set_result_stmts(true_result, false_result))
+            return self.combine(set_result_stmts((true_result, false_result)))
         return true_result
 
     def map_for_stmt(
@@ -512,41 +546,12 @@ class CToLoopyMapper(IdentityMapper):
         lhs = CToLoopyExpressionMapper()(left)
         rhs = CToLoopyExpressionMapper()(right)
 
-        # Map assignment to an if-else if rhs is a conditional operator 
+        # Map assignment to an if-else if rhs is a conditional operator
         # statement
         if isinstance(rhs, tuple):
-            true_result = CToLoopyMapperAccumulator(
-                [],
-                [
-                    lp.Assignment(
-                        lhs,
-                        expression=rhs[1],
-                        within_inames=context.inames,
-                        predicates=context.copy(
-                            predicates=context.predicates | {rhs[0]}
-                        ).predicates,
-                        id=context.name_gen(LOOPY_INSN_PREFIX),
-                    )
-                ],
-                [],
+            return self.combine(
+                set_result_stmts(set_tf_results(lhs, rhs, context))
             )
-            false_result = CToLoopyMapperAccumulator(
-                [],
-                [
-                    lp.Assignment(
-                        lhs,
-                        expression=rhs[2],
-                        within_inames=context.inames,
-                        predicates=context.copy(
-                            predicates=context.predicates
-                            | {prim.LogicalNot(rhs[0])}
-                        ).predicates,
-                        id=context.name_gen(LOOPY_INSN_PREFIX),
-                    )
-                ],
-                [],
-            )
-            return self.combine(set_result_stmts(true_result, false_result))
         return CToLoopyMapperAccumulator(
             [],
             [
@@ -586,38 +591,9 @@ class CToLoopyMapper(IdentityMapper):
                         f"Mapping not implemented for {op_str}"
                     )
 
-            true_result = CToLoopyMapperAccumulator(
-                [],
-                [
-                    lp.Assignment(
-                        lhs,
-                        expression=rhs[1],
-                        within_inames=context.inames,
-                        predicates=context.copy(
-                            predicates=context.predicates | {rhs[0]}
-                        ).predicates,
-                        id=context.name_gen(LOOPY_INSN_PREFIX),
-                    )
-                ],
-                [],
+            return self.combine(
+                set_result_stmts(set_tf_results(lhs, rhs, context))
             )
-            false_result = CToLoopyMapperAccumulator(
-                [],
-                [
-                    lp.Assignment(
-                        lhs,
-                        expression=rhs[2],
-                        within_inames=context.inames,
-                        predicates=context.copy(
-                            predicates=context.predicates
-                            | {prim.LogicalNot(rhs[0])}
-                        ).predicates,
-                        id=context.name_gen(LOOPY_INSN_PREFIX),
-                    )
-                ],
-                [],
-            )
-            return self.combine(set_result_stmts(true_result, false_result))
 
         op_str = get_op_str(expr, left)
         if op_str == "+=":
