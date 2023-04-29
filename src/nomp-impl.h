@@ -53,7 +53,7 @@ struct nomp_prog {
   size_t global[3], local[3];
   // Map of variable names and their values use to evaluate
   // the kernel launch parameters.
-  PyObject *py_dict;
+  CMapBasicBasic *map;
   // Pointer to keep track of backend specific data.
   void *bptr;
   // Reduction related metadata.

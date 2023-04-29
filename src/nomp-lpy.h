@@ -131,6 +131,17 @@ int nomp_py_eval_grid_size(struct nomp_prog *prg);
 
 /**
  * @ingroup nomp_py_utils
+ * @brief Map the keys and values to evaluate the kernel launch parameters.
+ *
+ * @param[in] map CMapBasicBasic map.
+ * @param[in] key Key as a C-string.
+ * @param[in] val Value as a C-string.
+ * @return int
+ */
+int sym_c_map_push(CMapBasicBasic *map, const char *key, const char *val);
+
+/**
+ * @ingroup nomp_py_utils
  * @brief Get the string representation of python object.
  *
  * @param msg Debug message before printing the object.

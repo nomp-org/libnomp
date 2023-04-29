@@ -141,7 +141,13 @@
 
 /**
  * @ingroup nomp_errors
- * @brief libnomp Cuda failed.
+ * @brief Parse string and assign value failed.
+ */
+#define NOMP_SYMENGINE_PARSING_FAILURE -412
+
+/**
+ * @ingroup nomp_errors
+ * @brief libnomp Cuda operation failed.
  */
 #define NOMP_CUDA_FAILURE -512
 /**
