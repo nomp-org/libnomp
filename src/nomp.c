@@ -367,7 +367,7 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
   // Initialize the program struct.
   struct nomp_prog *prg = progs[progs_n] = nomp_calloc(struct nomp_prog, 1);
   prg->nargs = nargs, prg->args = nomp_calloc(struct nomp_arg, nargs);
-  prg->py_dict = PyDict_New(), prg->reduction_index = -1;
+  prg->map = mapbasicbasic_new(), prg->reduction_index = -1;
 
   va_list args;
   va_start(args, nargs);
@@ -426,64 +426,65 @@ int nomp_run(int id, ...) {
                         "Kernel id %d passed to nomp_run is not valid.", id);
   }
 
-  nomp_profile("nomp_run setup time", 1, 1);
+    nomp_profile("nomp_run setup time", 1, 1);
+    struct nomp_prog *prg = progs[id];
+    struct nomp_arg *args = prg->args;
 
-  struct nomp_prog *prg = progs[id];
-  struct nomp_arg *args = prg->args;
+    va_list vargs;
+    va_start(vargs, id);
 
-  va_list vargs;
-  va_start(vargs, id);
-
-  PyObject *key, *val;
-  struct nomp_mem *m;
-  for (unsigned i = 0; i < prg->nargs; i++) {
-    args[i].ptr = va_arg(vargs, void *);
-    switch (args[i].type) {
-    case NOMP_INT:
-      val = PyLong_FromLong(*((int *)args[i].ptr));
-      goto key;
-      break;
-    case NOMP_UINT:
-      val = PyLong_FromLong(*((unsigned int *)args[i].ptr));
-    key:
-      key = PyUnicode_FromStringAndSize(args[i].name, strlen(args[i].name));
-      PyDict_SetItem(prg->py_dict, key, val);
-      Py_XDECREF(key), Py_XDECREF(val);
-      break;
-    case NOMP_PTR:
-      m = mem_if_mapped(args[i].ptr);
-      if (m == NULL) {
+    struct nomp_mem *m;
+    int val, val_len;
+    char *str_val;
+    for (unsigned i = 0; i < prg->nargs; i++) {
+      args[i].ptr = va_arg(vargs, void *);
+      switch (args[i].type) {
+      case NOMP_INT:
+        val = PyLong_FromLong(*((int *)args[i].ptr));
+        goto key;
+        break;
+      case NOMP_UINT:
+        val = *((int *)args[i].ptr);
+        val_len = snprintf(NULL, 0, "%d", val) + 1;
+        str_val = (char *)malloc(val_len * sizeof(char));
+        snprintf(str_val, val_len, "%d", val);
+        sym_c_map_push(prg->map, args[i].name, str_val);
+        nomp_free(str_val);
+        break;
+      case NOMP_PTR:
         if (prg->reduction_index == i) {
           prg->reduction_ptr = args[i].ptr, prg->reduction_size = args[i].size;
-          m = &nomp.scratch;
+          m = nomp.scratch;
         } else {
-          return nomp_set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
-                              ERR_STR_USER_MAP_PTR_IS_INVALID, args[i].ptr);
+          m = mem_if_mapped(args[i].ptr);
+          if (m == NULL) {
+            return nomp_set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
+                                ERR_STR_USER_MAP_PTR_IS_INVALID, args[i].ptr);
+          }
         }
+        args[i].size = m->bsize, args[i].ptr = m->bptr;
+        break;
       }
-      args[i].size = m->bsize, args[i].ptr = m->bptr;
-      break;
     }
-  }
-  va_end(vargs);
+    va_end(vargs);
 
-  nomp_profile("nomp_run setup time", 0, 1);
+    nomp_profile("nomp_run setup time", 0, 1);
 
-  nomp_profile("nomp_run grid evaluation", 1, 1);
+    nomp_profile("nomp_run grid evaluation", 1, 1);
 
-  nomp_check(nomp_py_eval_grid_size(prg));
+    nomp_check(nomp_py_eval_grid_size(prg));
 
-  nomp_profile("nomp_run grid evaluation", 0, 1);
+    nomp_profile("nomp_run grid evaluation", 0, 1);
 
-  nomp_profile("nomp_run kernel runtime", 1, 1);
+    nomp_profile("nomp_run kernel runtime", 1, 1);
 
-  nomp_check(nomp.knl_run(&nomp, prg));
-  if (prg->reduction_index >= 0)
-    nomp_check(nomp_host_side_reduction(&nomp, prg, &nomp.scratch));
+    nomp_check(nomp.knl_run(&nomp, prg));
+    if (prg->reduction_index >= 0)
+      nomp_check(nomp_host_side_reduction(&nomp, prg, nomp.scratch));
+    
+    nomp_profile("nomp_run kernel runtime", 0, 1);
 
-  nomp_profile("nomp_run kernel runtime", 0, 1);
-
-  return 0;
+    return 0;
 }
 
 int nomp_sync() { return nomp.sync(&nomp); }
@@ -508,7 +509,7 @@ int nomp_finalize(void) {
     if (progs[i]) {
       nomp_check(nomp.knl_free(progs[i]));
       vecbasic_free(progs[i]->sym_global), vecbasic_free(progs[i]->sym_local);
-      Py_XDECREF(progs[i]->py_dict);
+      mapbasicbasic_free(progs[i]->map);
       nomp_free(progs[i]->args), nomp_free(progs[i]), progs[i] = NULL;
     }
     nomp_free(&progs[i]);
