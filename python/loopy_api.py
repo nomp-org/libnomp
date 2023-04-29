@@ -24,6 +24,7 @@ from pytools import UniqueNameGenerator
 
 LOOPY_LANG_VERSION = (2018, 2)
 LOOPY_INSN_PREFIX = "_nomp_insn"
+NOMP_VAR_PREFIX = "_nomp_var"
 
 _C_OPS_TO_PYMBOLIC_OPS = {
     "*": lambda x, y: prim.Product((x, y)),
@@ -315,8 +316,60 @@ class ForLoopInfo:
     def __init__(self, expr: cindex.CursorKind.FOR_STMT):
         (self.decl, self.cond, self.update, self.body) = expr.get_children()
 
-    def check_and_parse(self):
+    def check_and_parse(self, context: CToLoopyMapperContext):
         """Check and parse For-loop components."""
+
+        def get_bound_info(bound: prim.Expression, ctype: cindex.Type):
+            if not isinstance(bound, np.generic):
+                if isinstance(bound, prim.Variable):
+                    return bound, [str(bound)], []
+                new_var_name = context.name_gen(NOMP_VAR_PREFIX)
+                lhs = prim.Variable(new_var_name)
+                return (
+                    lhs,
+                    [new_var_name],
+                    [
+                        CToLoopyMapperAccumulator(
+                            [],
+                            [
+                                lp.Assignment(
+                                    lhs,
+                                    expression=bound,
+                                    within_inames=context.inames,
+                                    predicates=context.predicates,
+                                    id=context.name_gen(LOOPY_INSN_PREFIX),
+                                )
+                            ],
+                            [
+                                lp.TemporaryVariable(
+                                    new_var_name,
+                                    dtype=_get_dtype_from_decl_type(ctype),
+                                    shape=(),
+                                )
+                            ],
+                        )
+                    ],
+                )
+            return bound, [], []
+
+        def check_and_parse_bounds(
+            decl: cindex.CursorKind.DECL_STMT, cright: cindex.CursorKind
+        ):
+            (var,) = decl.get_children()
+            params = []
+            accumulators = []
+            lbound, param, accumulator = get_bound_info(
+                CToLoopyLoopBoundMapper()(var), var.type
+            )
+            params.extend(param)
+            accumulators.extend(accumulator)
+            ubound, param, accumulator = get_bound_info(
+                CToLoopyLoopBoundMapper()(cright), cright.type
+            )
+            params.extend(param)
+            accumulators.extend(accumulator)
+            return lbound, ubound, params, accumulators
+
         decls = list(self.decl.get_children())
         if len(decls) == 0:
             raise NotImplementedError(
@@ -351,10 +404,10 @@ class ForLoopInfo:
                 f" and increment. {uname} {cname}"
             )
 
-        (var,) = decls[0].get_children()
-        lbound = CToLoopyLoopBoundMapper()(var)
-        ubound = CToLoopyLoopBoundMapper()(cright)
-        return (cname, lbound, ubound, self.body)
+        (lbound, ubound, params, accumulators) = check_and_parse_bounds(
+            decls[0], cright
+        )
+        return (cname, lbound, ubound, self.body, params, accumulators)
 
 
 def set_tf_results(
@@ -440,10 +493,12 @@ class CToLoopyMapper(IdentityMapper):
         self, expr: cindex.CursorKind.FOR_STMT, context: CToLoopyMapperContext
     ) -> CToLoopyMapperAccumulator:
         """Maps a C For loop."""
-        (iname, lbound, ubound, body) = ForLoopInfo(expr).check_and_parse()
+        (iname, lbound, ubound, body, params, accumulators) = ForLoopInfo(
+            expr
+        ).check_and_parse(context)
 
         space = isl.Space.create_from_names(
-            isl.DEFAULT_CONTEXT, set=[iname], params=context.value_args
+            isl.DEFAULT_CONTEXT, set=[iname], params=params
         )
 
         domain = make_slab(
@@ -457,7 +512,10 @@ class CToLoopyMapper(IdentityMapper):
         new_context = context.copy(inames=new_inames)
 
         children_result = self.rec(body, new_context)
-        return children_result.copy(domains=children_result.domains + [domain])
+        accumulators.append(
+            children_result.copy(domains=children_result.domains + [domain])
+        )
+        return self.combine(accumulators)
 
     def map_decl_stmt(
         self, expr: cindex.CursorKind.DECL_STMT, context: CToLoopyMapperContext
