@@ -363,6 +363,7 @@ int nomp_run(int id, ...) {
       args[i].ptr = va_arg(vargs, void *);
       switch (args[i].type) {
       case NOMP_INT:
+      case NOMP_UINT:
         py_key =
             PyUnicode_FromStringAndSize(args[i].name, strlen(args[i].name));
         py_val = PyLong_FromLong(*((int *)args[i].ptr));
