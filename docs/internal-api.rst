@@ -36,6 +36,12 @@ Logging functions
    :project: libnomp
    :content-only:
 
+Profiler functions
+^^^^^^^^^^^^^^^^^^
+.. doxygengroup:: nomp_profiler_utils
+   :project: libnomp
+   :content-only:
+
 Other helper functions
 ^^^^^^^^^^^^^^^^^^^^^^
 .. doxygengroup:: nomp_other_utils

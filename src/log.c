@@ -89,8 +89,90 @@ nomp_log_type nomp_get_log_type(int log_id) {
   return logs[log_id - 1].type;
 }
 
-void nomp_finalize_logs() {
+void nomp_logs_finalize() {
   for (unsigned i = 0; i < logs_n; i++)
     nomp_free(&logs[i].description);
   nomp_free(&logs), logs_n = logs_max = 0;
+}
+
+struct time_log {
+  char *entry;
+  int total_calls;
+  long double total_time;
+  long double last_call;
+  clock_t last_tick;
+};
+static struct time_log *time_logs;
+static unsigned time_logs_n = 0, time_logs_max = 0;
+
+unsigned find_time_log(const char *entry) {
+  for (int i = 0; i < time_logs_n; i++)
+    if (strncmp(time_logs[i].entry, entry, NOMP_MAX_BUFSIZ) == 0)
+      return i;
+  return time_logs_n;
+}
+
+void nomp_profile(const char *name, const int toggle, const int profile_level) {
+  if (profile_level == 0)
+    return;
+
+  if (toggle == 0)
+    nomp_sync();
+  clock_t current_tick = clock();
+
+  unsigned id = find_time_log(name);
+
+  if (id == time_logs_n) { // Points to a new time log
+    if (toggle == 1) {     // Starts the timer on a new time log
+      // Dynamically increase the memory allocation
+      if (time_logs_max <= time_logs_n) {
+        time_logs_max += time_logs_max / 2 + 1;
+        time_logs = nomp_realloc(time_logs, struct time_log, time_logs_max);
+      }
+
+      // Creates a new time_log
+      time_logs[id].entry = strndup(name, NOMP_MAX_BUFSIZ);
+      time_logs[id].total_calls = 0;
+      time_logs[id].total_time = 0;
+      time_logs[id].last_tick = current_tick;
+      time_logs_n++;
+    }
+  } else if (toggle == 0) { // Turns off the timer
+    // Ignore if the user toggles off the time by accident
+    if (time_logs[id].last_tick == -1)
+      return;
+
+    // Captures the execution time.
+    long double elapsed_time =
+        (double)(current_tick - time_logs[id].last_tick) * 1000 /
+        CLOCKS_PER_SEC;
+
+    // Updates the current time log
+    time_logs[id].last_call = elapsed_time;
+    time_logs[id].total_calls++;
+    time_logs[id].total_time += elapsed_time;
+    time_logs[id].last_tick = -1;
+  } else { // Starts the timer on an exiting time log
+    time_logs[id].last_tick = current_tick;
+  }
+}
+
+void nomp_profile_finalize() {
+  for (int i = 0; i < time_logs_n; i++)
+    nomp_free(&time_logs[i].entry);
+  nomp_free(&time_logs), time_logs_n = time_logs_max = 0;
+}
+
+int nomp_profile_result() {
+  printf("| %-20s | %-12s | %-18s | %-18s | %-18s |\n", "Entry", "Total Calls",
+         "Total Time (ms)", "Last Call (ms)", "Average Time (ms)");
+  printf("|----------------------|--------------|--------------------|---------"
+         "-----------|--------------------|\n");
+  for (int i = 0; i < time_logs_n; i++) {
+    long double avg_time = time_logs[i].total_time / time_logs[i].total_calls;
+    printf("| %-20s | %12d | %18.4Lf | %18.4Lf | %18.4Lf |\n",
+           time_logs[i].entry, time_logs[i].total_calls,
+           time_logs[i].total_time, time_logs[i].last_call, avg_time);
+  }
+  return 0;
 }

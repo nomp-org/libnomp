@@ -22,6 +22,9 @@ static int check_env(struct nomp_backend *backend) {
   if ((tmp = getenv("NOMP_VERBOSE")))
     backend->verbose = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
 
+  if ((tmp = getenv("NOMP_PROFILE")))
+    backend->profile = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
+
   if ((tmp = copy_env("NOMP_BACKEND", NOMP_MAX_BUFSIZ))) {
     nomp_free(&backend->backend);
     backend->backend = strndup(tmp, NOMP_MAX_BUFSIZ), nomp_free(&tmp);
@@ -74,6 +77,8 @@ static int init_configs(int argc, const char **argv,
         backend->device_id = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
       } else if (!strncmp("--nomp-verbose", argv[i], NOMP_MAX_BUFSIZ)) {
         backend->verbose = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
+      } else if (!strncmp("--nomp-profile", argv[i], NOMP_MAX_BUFSIZ)) {
+        backend->profile = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
       } else if (!strncmp("--nomp-install-dir", argv[i], NOMP_MAX_BUFSIZ)) {
         size_t size;
         nomp_check(nomp_path_len(&size, (const char *)argv[i + 1]));
@@ -91,7 +96,7 @@ static int init_configs(int argc, const char **argv,
 
 #define check_if_initialized(param, dummy, cmd_arg, env_var)                   \
   {                                                                            \
-    if (backend->param == dummy) {                                             \
+    if (backend->param == (dummy)) {                                           \
       return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,              \
                           #param                                               \
                           " is missing or invalid. Set it with " cmd_arg       \
@@ -158,6 +163,7 @@ int nomp_init(int argc, const char **argv) {
 
   nomp_check(init_configs(argc, argv, &nomp));
 
+  nomp_profile("nomp_init", 1, nomp.profile);
   nomp_check(nomp_log_init(nomp.verbose));
 
   size_t n = strnlen(nomp.backend, NOMP_MAX_BUFSIZ);
@@ -194,6 +200,7 @@ int nomp_init(int argc, const char **argv) {
   nomp_check(allocate_scratch_memory(&nomp));
 
   initialized = 1;
+  nomp_profile("nomp_init", 0, nomp.profile);
   return 0;
 }
 
@@ -233,6 +240,7 @@ static unsigned mem_if_exist(void *p, size_t idx0, size_t idx1) {
 }
 
 int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
+  nomp_profile("nomp_update", 1, nomp.profile);
   unsigned idx = mem_if_exist(ptr, idx0, idx1);
   if (idx == mems_n) {
     // A new entry can't be created with NOMP_FREE or NOMP_FROM.
@@ -261,6 +269,7 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
   else if (idx == mems_n)
     mems_n++;
 
+  nomp_profile("nomp_update", 0, nomp.profile);
   return 0;
 }
 
@@ -340,6 +349,7 @@ static int parse_clauses(struct meta *meta, struct nomp_prog *prg,
 }
 
 int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
+  nomp_profile("nomp_jit", 1, nomp.profile);
   if (*id == -1) {
     if (progs_n == progs_max) {
       progs_max += progs_max / 2 + 1;
@@ -394,11 +404,13 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
     *id = progs_n++;
   }
 
+  nomp_profile("nomp_jit", 0, nomp.profile);
   return 0;
 }
 
 int nomp_run(int id, ...) {
   if (id >= 0) {
+    nomp_profile("nomp_run setup time", 1, nomp.profile);
     struct nomp_prog *prg = progs[id];
     struct nomp_arg *args = prg->args;
 
@@ -438,20 +450,25 @@ int nomp_run(int id, ...) {
       }
     }
     va_end(vargs);
+    nomp_profile("nomp_run setup time", 0, nomp.profile);
 
+    nomp_profile("nomp_run grid evaluation", 1, nomp.profile);
     nomp_check(nomp_py_eval_grid_size(prg));
 
     // FIXME: Our kernel doesn't have the local problem size for some
     // reason.
     if (prg->reduction_index >= 0)
       prg->local[0] = 32;
+    nomp_profile("nomp_run grid evaluation", 0, nomp.profile);
 
+    nomp_profile("nomp_run kernel runtime", 1, nomp.profile);
     nomp_check(nomp.knl_run(&nomp, prg));
 
     if (prg->reduction_index >= 0) {
       nomp_sync();
       nomp_check(nomp_host_side_reduction(&nomp, prg, nomp.scratch));
     }
+    nomp_profile("nomp_run kernel runtime", 0, nomp.profile);
 
     return 0;
   }
@@ -463,6 +480,7 @@ int nomp_run(int id, ...) {
 int nomp_sync() { return nomp.sync(&nomp); }
 
 int nomp_finalize(void) {
+  nomp_profile("nomp_finalize", 1, nomp.profile);
   if (!initialized) {
     return nomp_set_log(NOMP_FINALIZE_FAILURE, NOMP_ERROR,
                         "libnomp is not initialized.");
@@ -496,6 +514,13 @@ int nomp_finalize(void) {
     return nomp_set_log(NOMP_FINALIZE_FAILURE, NOMP_ERROR,
                         "Failed to initialize libnomp.");
   }
+  nomp_profile("nomp_finalize", 0, nomp.profile);
+  if (nomp.profile == 1)
+    nomp_profile_result();
+
+  // Free all the logs
+  nomp_logs_finalize();
+  nomp_profile_finalize();
 
   return 0;
 }
