@@ -62,7 +62,7 @@ struct nomp_prog {
 
 struct nomp_backend {
   // User configurations of the backend.
-  int platform_id, device_id, verbose;
+  int platform_id, device_id, verbose, profile;
   char *backend, *install_dir;
   // Python function object which will be called to perform annotations.
   PyObject *py_annotate;

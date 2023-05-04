@@ -56,7 +56,50 @@ int nomp_set_log_(const char *desc, int logno, nomp_log_type type,
  *
  * @return void
  */
-void nomp_finalize_logs();
+void nomp_logs_finalize();
+
+/**
+ * @defgroup nomp_profiler_utils Internal functions for profiling a
+ * Nomp program.
+ */
+
+/**
+ * @ingroup nomp_profiler_utils
+ * @brief Toggles the timer and records the execution time between the two
+ * consecutive uses of the function.
+ *
+ * @details The function either starts or ends the timer by considering the
+ * toggle value. The function will start the timer if the toggle is 0. Else,
+ * it will capture the execution time and records in a log.
+ * @code{.c}
+ * nomp_profile("Entry Name", 1);
+ * // Code to be measured
+ * nomp_profile("Entry Name", 0);
+ * @endcode
+ *
+ * @param[in] name Name of the execution time that is being profiled.
+ * @param[in] toggle Toggles the timer.
+ * @param[in] profile_level The level of APIs that needs to be measured.
+ * @return void
+ */
+void nomp_profile(const char *name, int toggle, int profile_level);
+
+/**
+ * @ingroup nomp_profiler_utils
+ * @brief Free variables used to keep track of time logs.
+ *
+ * @return void
+ */
+void nomp_profile_finalize();
+
+/**
+ * @ingroup nomp_profiler_utils
+ * @brief Prints all the execution times recorded by the program.
+ * This function is executed only when the `--nomp-profile` is provided.
+ *
+ * @return int
+ */
+int nomp_profile_result();
 
 #ifdef __cplusplus
 }
