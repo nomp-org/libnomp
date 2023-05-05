@@ -26,11 +26,18 @@ static int test_vxm() {
   return err;
 }
 
+static int test_dot_product() {
+  int err = 0;
+  TEST_BUILTIN_TYPES(500_dot_product, 10);
+  return err;
+}
+
 int main(int argc, const char *argv[]) {
   nomp_check(nomp_init(argc, argv));
 
   int err = 0;
   err |= SUBTEST(test_sum_reduction);
+  err |= SUBTEST(test_dot_product);
   /// TODO: Fix the errors of the following kernels
   //  err |= SUBTEST(test_sum_condition_reduction);
   //  err |= SUBTEST(test_mxm);
