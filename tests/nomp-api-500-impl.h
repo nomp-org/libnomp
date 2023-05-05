@@ -181,4 +181,60 @@ static int nomp_api_500_vxm(int N) {
   return 0;
 }
 #undef nomp_api_500_vxm
+#undef nomp_api_500_prod_aux
+
+#define nomp_api_500_dot_pro_aux                                               \
+  TOKEN_PASTE(nomp_api_500_dot_pro_aux, TEST_SUFFIX)
+static int nomp_api_500_dot_pro_aux(const char *fmt, const char **clauses,
+                                    TEST_TYPE *a, TEST_TYPE *b, int n,
+                                    TEST_TYPE *total) {
+  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO));
+  nomp_test_chk(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO));
+
+  int id = -1;
+  char *knl = generate_knl(fmt, 3, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE),
+                           TOSTRING(TEST_TYPE));
+  nomp_test_chk(nomp_jit(&id, knl, clauses, 4, "a", sizeof(TEST_TYPE *),
+                         NOMP_PTR, "b", sizeof(TEST_TYPE *), NOMP_PTR, "N",
+                         sizeof(int), NOMP_INT, "total", sizeof(TEST_TYPE),
+                         TEST_NOMP_TYPE | NOMP_ATTRIBUTE_REDUCTION));
+  nomp_free(knl);
+
+  nomp_test_chk(nomp_run(id, a, b, &n, total));
+
+  nomp_test_chk(nomp_sync());
+
+  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
+  nomp_test_chk(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
+
+  return 0;
+}
+
+#define nomp_api_500_dot_product                                               \
+  TOKEN_PASTE(nomp_api_500_dot_product, TEST_SUFFIX)
+static int nomp_api_500_dot_product(int N) {
+  nomp_test_assert(N <= 10);
+
+  TEST_TYPE a[10], b[10], total;
+  for (unsigned i = 0; i < N; i++)
+    a[i] = i, b[i] = i;
+
+  const char *knl_fmt =
+      "void foo(%s *a, %s *b, int N, %s *total) {                        \n"
+      "  for (int i = 0; i < N; i++) {                                   \n"
+      "    total[0] += a[i] * b[i];                                      \n"
+      "  }                                                               \n"
+      "}                                                                 \n";
+  const char *clauses[1] = {0};
+  nomp_api_500_dot_pro_aux(knl_fmt, clauses, a, b, N, &total);
+
+#if defined(TEST_TOL)
+  nomp_test_assert(fabs(total - N * (2 * N - 1) * (N - 1) / 6) < TEST_TOL);
+#else
+  nomp_test_assert(total == N * (2 * N - 1) * (N - 1) / 6);
+#endif
+
+  return 0;
+}
+#undef nomp_api_500_dot_product
 #undef nomp_api_500_dot_pro_aux
