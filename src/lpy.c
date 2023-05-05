@@ -221,43 +221,6 @@ int nomp_py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
   return 0;
 }
 
-char *str_replace(const char *orig, char *rep, char *with) {
-  char *result, *tmp;
-  int len_rep, len_with, len_front, count = 0;
-
-  if (!orig || !rep)
-    return NULL;
-  len_rep = strnlen(rep, MAX_BUFSIZ);
-  if (len_rep == 0)
-    return NULL;
-  if (!with)
-    with = "";
-  len_with = strnlen(with, MAX_BUFSIZ);
-
-  char *ins = (char *)malloc((strnlen(orig, MAX_BUFSIZ) + 1) * sizeof(char));
-  strncpy(ins, orig, strnlen(orig, MAX_BUFSIZ) + 1);
-  while ((tmp = strstr(ins, rep)) != NULL) {
-    count++;
-    ins = tmp + len_rep;
-  }
-
-  tmp = result =
-      malloc(strnlen(orig, MAX_BUFSIZ) + (len_with - len_rep) * count + 1);
-
-  if (!result)
-    return NULL;
-
-  while (count--) {
-    ins = strstr(orig, rep);
-    len_front = ins - orig;
-    tmp = strncpy(tmp, orig, len_front) + len_front;
-    tmp = strncpy(tmp, with, len_with) + len_with;
-    orig += len_front + len_rep;
-  }
-  strncpy(tmp, orig, strnlen(orig, MAX_BUFSIZ) + 1);
-  return result;
-}
-
 int sym_c_vec_push(CVecBasic *vec, const char *str) {
   CWRAPPER_OUTPUT_TYPE err;
   basic a;
@@ -282,39 +245,34 @@ int sym_c_map_push(CMapBasicBasic *map, const char *key, const char *val) {
 
 int sym_evaluate(size_t *out, unsigned i, CVecBasic *vec, CMapBasicBasic *map) {
   CWRAPPER_OUTPUT_TYPE err;
-  basic a, b, c;
+  basic a;
   basic_new_stack(a);
-  basic_new_stack(b);
-  basic_new_stack(c);
-  vecbasic_get(vec, i, b);
-  basic_subs(a, b, map);
-  err = basic_evalf(c, a, 53, 1);
-  basic_floor(c, c);
-  out[i] = integer_get_ui(c);
+  vecbasic_get(vec, i, a);
+  err = basic_subs(a, a, map);
+  out[i] = integer_get_ui(a);
   basic_free_stack(a);
-  basic_free_stack(b);
-  basic_free_stack(c);
   return err;
 }
 
 int py_get_grid_size_aux(PyObject *exp, CVecBasic *vec) {
   int err = 1;
-  PyObject *strifier = PyObject_CallMethod(exp, make_stringifier, NULL);
-  if (strifier) {
-    PyObject *str_op = PyObject_CallFunctionObjArgs(strifier, exp, NULL);
-    if (str_op) {
-      const char *str = PyUnicode_AsUTF8(str_op);
-      char *s_rep = str_replace(str, "//", "/");
-      err = sym_c_vec_push(vec, s_rep);
-      Py_DECREF(str_op);
+  PyObject *mapper = PyImport_ImportModule("pymbolic.interop.symengine");
+  if (mapper) {
+    PyObject *module_name = PyUnicode_FromString("PymbolicToSymEngineMapper");
+    PyObject *p2s_mapper = PyObject_CallMethodNoArgs(mapper, module_name);
+    if (p2s_mapper) {
+      PyObject *sym_exp = PyObject_CallFunctionObjArgs(p2s_mapper, exp, NULL);
+      if (sym_exp) {
+        PyObject *obj_rep = PyObject_Repr(sym_exp);
+        const char *str = PyUnicode_AsUTF8(obj_rep);
+        err = sym_c_vec_push(vec, str);
+        Py_XDECREF(obj_rep), Py_DECREF(sym_exp);
+      }
+      Py_DECREF(p2s_mapper);
     }
-    Py_DECREF(strifier);
-  } else {
-    PyObject *obj_rep = PyObject_Repr(exp);
-    const char *str = PyUnicode_AsUTF8(obj_rep);
-    err = sym_c_vec_push(vec, str);
-    Py_XDECREF(obj_rep);
+    Py_DECREF(mapper), Py_XDECREF(module_name);
   }
+
   if (err) {
     return nomp_set_log(
         NOMP_SYMENGINE_PARSING_FAILURE, NOMP_ERROR,
