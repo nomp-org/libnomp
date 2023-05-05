@@ -199,6 +199,11 @@ int nomp_init(int argc, const char **argv) {
   nomp.scratch = NULL;
   nomp_check(allocate_scratch_memory(&nomp));
 
+  // Populate context
+  nomp.py_context = PyDict_New();
+  PyObject *pbackend = PyUnicode_FromString(nomp.backend);
+  PyDict_SetItemString(nomp.py_context, "backend", pbackend);
+
   initialized = 1;
   nomp_profile("nomp_init", 0, nomp.profile, 1);
   return 0;
@@ -382,11 +387,13 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
         nomp_py_c_to_loopy(&knl, csrc, nomp.backend, prg->reduction_index));
 
     // Handle annotate clauses if they exist.
-    nomp_check(nomp_py_apply_annotations(&knl, nomp.py_annotate, meta.dict));
+    nomp_check(nomp_py_apply_annotations(&knl, nomp.py_annotate, meta.dict,
+                                         nomp.py_context));
     Py_XDECREF(meta.dict);
 
     // Handle transform clauses.
-    nomp_check(nomp_py_user_transform(&knl, meta.file, meta.func));
+    nomp_check(
+        nomp_py_apply_transform(&knl, meta.file, meta.func, nomp.py_context));
     nomp_free(&meta.file), nomp_free(&meta.func);
 
     // Get OpenCL, CUDA, etc. source and name from the loopy kernel and build
@@ -507,7 +514,7 @@ int nomp_finalize(void) {
   nomp_check(deallocate_scratch_memory(&nomp));
 
   nomp_free(&nomp.backend), nomp_free(&nomp.install_dir);
-  Py_XDECREF(nomp.py_annotate);
+  Py_XDECREF(nomp.py_annotate), Py_XDECREF(nomp.py_context);
 
   initialized = nomp.finalize(&nomp);
   if (initialized) {

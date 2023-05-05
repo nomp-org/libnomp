@@ -61,9 +61,12 @@ int nomp_py_set_annotate_func(PyObject **func, const char *path);
  * @param[in] func Function which performs transformations based on annotations.
  * @param[in] annts Annotations (as a PyDict) to specify which transformations
  * to apply.
+ * @param[in] context Context (as a PyDict) to pass around information such
+ * as backend, device details, etc.
  * @return int
  */
-int nomp_py_apply_annotations(PyObject **knl, PyObject *func, PyObject *annts);
+int nomp_py_apply_annotations(PyObject **knl, PyObject *func,
+                              const PyObject *annts, const PyObject *context);
 
 /**
  * @ingroup nomp_py_utils
@@ -77,9 +80,12 @@ int nomp_py_apply_annotations(PyObject **knl, PyObject *func, PyObject *annts);
  * @param[in,out] knl Pointer to loopy kernel object.
  * @param[in] file Path to the file containing transform function \p func.
  * @param[in] func Transform function.
+ * @param[in] context Context (as a PyDict) to pass around information such
+ * as backend, device details, etc.
  * @return int
  */
-int nomp_py_user_transform(PyObject **knl, const char *file, const char *func);
+int nomp_py_apply_transform(PyObject **knl, const char *file, const char *func,
+                            const PyObject *context);
 
 /**
  * @ingroup nomp_py_utils

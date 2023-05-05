@@ -128,10 +128,12 @@ int nomp_py_set_annotate_func(PyObject **annotate_func, const char *path_) {
   return err;
 }
 
-int nomp_py_apply_annotations(PyObject **knl, PyObject *func, PyObject *annts) {
+int nomp_py_apply_annotations(PyObject **knl, PyObject *func,
+                              const PyObject *annts, const PyObject *context) {
   if (knl && *knl && func) {
     if (PyCallable_Check(func)) {
-      PyObject *tknl = PyObject_CallFunctionObjArgs(func, *knl, annts, NULL);
+      PyObject *tknl =
+          PyObject_CallFunctionObjArgs(func, *knl, annts, context, NULL);
       if (tknl)
         Py_DECREF(*knl), *knl = tknl;
     }
@@ -140,7 +142,8 @@ int nomp_py_apply_annotations(PyObject **knl, PyObject *func, PyObject *annts) {
   return 0;
 }
 
-int nomp_py_user_transform(PyObject **knl, const char *file, const char *func) {
+int nomp_py_apply_transform(PyObject **knl, const char *file, const char *func,
+                            const PyObject *context) {
   // If either file, or func are NULL, we don't have to do anything:
   if (file == NULL || func == NULL)
     return 0;
@@ -154,7 +157,8 @@ int nomp_py_user_transform(PyObject **knl, const char *file, const char *func) {
       PyObject *pfunc = PyObject_GetAttrString(module, func);
       Py_DECREF(module);
       if (pfunc && PyCallable_Check(pfunc)) {
-        PyObject *tknl = PyObject_CallFunctionObjArgs(pfunc, *knl, NULL);
+        PyObject *tknl =
+            PyObject_CallFunctionObjArgs(pfunc, *knl, context, NULL);
         if (tknl)
           Py_DECREF(*knl), *knl = tknl, err = 0;
         Py_DECREF(pfunc);
