@@ -411,7 +411,7 @@ int nomp_run(int id, ...) {
         break;
       case NOMP_UINT:
         val = PyLong_FromLong(*((unsigned int *)args[i].ptr));
-key:
+      key:
         key = PyUnicode_FromStringAndSize(args[i].name, strlen(args[i].name));
         PyDict_SetItem(prg->py_dict, key, val);
         Py_XDECREF(key), Py_XDECREF(val);
@@ -443,8 +443,10 @@ key:
 
     nomp_check(nomp.knl_run(&nomp, prg));
 
-    if (prg->reduction_index >= 0)
+    if (prg->reduction_index >= 0) {
+      nomp_sync();
       nomp_check(host_side_reduction(&nomp, prg, nomp.scratch));
+    }
 
     return 0;
   }
