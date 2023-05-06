@@ -58,7 +58,12 @@ You might additionally want to specify OpenCL libray path like below if CMake
 can't find OpenCL:
 
 ```bash
-./lncfg -o /lib/x86_64-linux-gnu/libOpenCL.so.1
+./lncfg -ol /lib/x86_64-linux-gnu/libOpenCL.so
+```
+
+or if you are using `conda` to install OpenCL:
+```bash
+./lncfg -ol ${CONDA_PREFIX}/lib/libOpenCL.so -oi ${CONDA_PREFIX}/include/
 ```
 
 ### Build documentation
