@@ -24,6 +24,7 @@ NOMP_FOR_EACH_DOMAIN(NOMP_REDUCTION, PROD)
 int host_side_reduction(struct backend *backend, struct prog *prg,
                         struct mem *m) {
   nomp_check(backend->update(backend, m, NOMP_FROM));
+  backend->sync(backend);
 
   int dom = prg->reduction_type, op = prg->reduction_op;
   size_t size = prg->reduction_size;
