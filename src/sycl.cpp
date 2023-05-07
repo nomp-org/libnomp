@@ -93,12 +93,13 @@ static int sycl_knl_run(struct nomp_backend *bnd, struct nomp_prog *prg) {
     arg_list[i] = prg->args[i].ptr;
   arg_list[prg->nargs] = (void *)&sycl->queue;
 
-  size_t global[3];
-  for (unsigned i = 0; i < 3; i++)
-    global[i] = prg->global[i] * prg->local[i];
+  if (prg->is_grid_eval) {
+    for (unsigned i = 0; i < 3; i++)
+      prg->gws[i] = prg->global[i] * prg->local[i];
+  }
 
   sycl::nd_range<3> nd_range =
-      sycl::nd_range(sycl::range(global[0], global[1], global[2]),
+      sycl::nd_range(sycl::range(prg->gws[0], prg->gws[1], prg->gws[2]),
                      sycl::range(prg->local[0], prg->local[1], prg->local[2]));
   arg_list[prg->nargs + 1] = (void *)&nd_range;
   return nomp_jit_run(sycl_prg->sycl_id, arg_list);

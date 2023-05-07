@@ -231,15 +231,20 @@ int sym_c_vec_push(CVecBasic *vec, const char *str) {
   return err;
 }
 
-int sym_c_map_push(CMapBasicBasic *map, const char *key, const char *val) {
-  basic a, b;
+int sym_c_map_push(struct prog *prg, const char *key, const char *val) {
+  basic a, b, c;
   basic_new_stack(a);
   basic_new_stack(b);
+  basic_new_stack(c);
   symbol_set(a, key);
   integer_set_str(b, val);
-  mapbasicbasic_insert(map, a, b);
+  if (!mapbasicbasic_get(prg->map, a, c) || !basic_eq(c, b)) {
+    mapbasicbasic_insert(prg->map, a, b);
+    prg->is_grid_eval = 1;
+  }
   basic_free_stack(a);
   basic_free_stack(b);
+  basic_free_stack(c);
   return 0;
 }
 
@@ -293,7 +298,6 @@ int py_get_grid_size(struct prog *prg, PyObject *knl) {
         if (expr) {
           PyObject *grid_size =
               PyObject_CallFunctionObjArgs(expr, callables, NULL);
-          Py_DECREF(expr);
           if (grid_size && PyTuple_Check(grid_size)) {
             PyObject *py_global = PyTuple_GetItem(grid_size, 0);
             PyObject *py_local = PyTuple_GetItem(grid_size, 1);
