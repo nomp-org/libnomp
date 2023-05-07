@@ -30,15 +30,8 @@
   nvrtcResult result = nvrtcCompileProgram(prog, 1, opts);
 
 #define chk_cu(call)                                                           \
-  {                                                                            \
-    CUresult x = (call);                                                       \
-    if (x != CUDA_SUCCESS) {                                                   \
-      const char *msg;                                                         \
-      cuGetErrorName(x, &msg);                                                 \
-      return nomp_set_log(NOMP_CUDA_FAILURE, NOMP_ERROR, ERR_STR_GPU_FAILURE,  \
-                          "CU operation", msg);                                \
-    }                                                                          \
-  }
+  chk_err_(__FILE__, __LINE__, call, CUresult, CUDA_SUCCESS,                   \
+           cuGetErrorName(result, &msg), "operation");
 
 static const char *ERR_STR_GPU_FAILURE = "Cuda %s failed: %s.";
 
@@ -48,6 +41,7 @@ static const char *ERR_STR_GPU_FAILURE = "Cuda %s failed: %s.";
 #undef RUNTIME
 #undef GPU_CHECK
 #undef NOMP_GPU_FAILURE
+#undef chk_cu
 
 #undef gpuDeviceProp
 #undef gpuCtx

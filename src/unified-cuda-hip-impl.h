@@ -36,29 +36,24 @@
 #define gpurtcGetProgramLog TOKEN_PASTE(RUNTIME, GetProgramLog)
 #define gpurtcDestroyProgram TOKEN_PASTE(RUNTIME, DestroyProgram)
 
-#define chk_gpu_(file, line, call)                                             \
+#define chk_err_(file, line, call, err_t, success_t, retrive_err, type)        \
   do {                                                                         \
-    gpuError_t result = (call);                                                \
-    if (result != gpuSuccess) {                                                \
-      const char *msg = gpuGetErrorName(result);                               \
+    err_t result = (call);                                                     \
+    if (result != success_t) {                                                 \
+      const char *msg;                                                         \
+      retrive_err;                                                             \
       return nomp_set_log(NOMP_GPU_FAILURE, NOMP_ERROR, ERR_STR_GPU_FAILURE,   \
-                          "operation", msg);                                   \
+                          type, msg);                                          \
     }                                                                          \
   } while (0)
 
-#define chk_gpu(call) chk_gpu_(__FILE__, __LINE__, call)
+#define chk_gpu(call)                                                          \
+  chk_err_(__FILE__, __LINE__, call, gpuError_t, gpuSuccess,                   \
+           msg = gpuGetErrorName(result), "operation");
 
-#define chk_gpurtc_(file, line, call)                                          \
-  do {                                                                         \
-    gpurtcResult result = (call);                                              \
-    if (result != GPURTC_SUCCESS) {                                            \
-      const char *msg = gpurtcGetErrorString(result);                          \
-      return nomp_set_log(NOMP_GPU_FAILURE, NOMP_ERROR, ERR_STR_GPU_FAILURE,   \
-                          "runtime compilation", msg);                         \
-    }                                                                          \
-  } while (0)
-
-#define chk_gpurtc(call) chk_gpurtc_(__FILE__, __LINE__, call)
+#define chk_gpurtc(call)                                                       \
+  chk_err_(__FILE__, __LINE__, call, gpurtcResult, GPURTC_SUCCESS,             \
+           msg = gpurtcGetErrorString(result), "runtime compilation")
 
 struct gpu_backend {
   int device_id;
@@ -206,6 +201,9 @@ int gpu_init(struct backend *bnd, const int platform_id, const int device_id) {
 
 #undef TOKEN_PASTE_
 #undef TOKEN_PASTE
+#undef chk_err_
+#undef chk_gpu
+#undef chk_gpurtc
 
 #undef gpu_update
 #undef gpu_update_ptr
