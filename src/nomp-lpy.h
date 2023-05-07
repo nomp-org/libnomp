@@ -133,12 +133,12 @@ int nomp_py_eval_grid_size(struct nomp_prog *prg);
  * @ingroup nomp_py_utils
  * @brief Map the keys and values to evaluate the kernel launch parameters.
  *
- * @param[in] map CMapBasicBasic map.
+ * @param[in] prg Nomp program.
  * @param[in] key Key as a C-string.
  * @param[in] val Value as a C-string.
  * @return int
  */
-int sym_c_map_push(CMapBasicBasic *map, const char *key, const char *val);
+int sym_c_map_push(struct prog *prg, const char *key, const char *val);
 
 /**
  * @ingroup nomp_py_utils

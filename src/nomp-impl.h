@@ -50,7 +50,7 @@ struct nomp_prog {
   // expressions, and evaluated value of each dimension.
   unsigned ndim;
   CVecBasic *sym_global, *sym_local;
-  size_t global[3], local[3];
+  size_t global[3], local[3], gws[3];
   // Map of variable names and their values use to evaluate
   // the kernel launch parameters.
   CMapBasicBasic *map;
@@ -59,6 +59,7 @@ struct nomp_prog {
   // Reduction related metadata.
   int reduction_index, reduction_op, reduction_type, reduction_size;
   void *reduction_ptr;
+  int is_grid_eval;
 };
 
 struct nomp_backend {

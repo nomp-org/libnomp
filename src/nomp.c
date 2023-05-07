@@ -429,6 +429,7 @@ int nomp_run(int id, ...) {
     nomp_profile("nomp_run setup time", 1, 1);
     struct nomp_prog *prg = progs[id];
     struct nomp_arg *args = prg->args;
+    prg->is_grid_eval = 0;
 
     va_list vargs;
     va_start(vargs, id);
@@ -440,15 +441,16 @@ int nomp_run(int id, ...) {
       args[i].ptr = va_arg(vargs, void *);
       switch (args[i].type) {
       case NOMP_INT:
-        val = PyLong_FromLong(*((int *)args[i].ptr));
-        goto key;
+        val = *((int *)args[i].ptr);
+        goto val_len;
         break;
       case NOMP_UINT:
-        val = *((int *)args[i].ptr);
+        val = *((unsigned int *)args[i].ptr);
+      val_len:
         val_len = snprintf(NULL, 0, "%d", val) + 1;
         str_val = (char *)malloc(val_len * sizeof(char));
         snprintf(str_val, val_len, "%d", val);
-        sym_c_map_push(prg->map, args[i].name, str_val);
+        sym_c_map_push(prg, args[i].name, str_val);
         nomp_free(str_val);
         break;
       case NOMP_PTR:
@@ -508,9 +510,9 @@ int nomp_finalize(void) {
   for (unsigned i = 0; i < progs_n; i++) {
     if (progs[i]) {
       nomp_check(nomp.knl_free(progs[i]));
+      nomp_free(progs[i]->args), nomp_free(progs[i]);
       vecbasic_free(progs[i]->sym_global), vecbasic_free(progs[i]->sym_local);
-      mapbasicbasic_free(progs[i]->map);
-      nomp_free(progs[i]->args), nomp_free(progs[i]), progs[i] = NULL;
+      mapbasicbasic_free(progs[i]->map), progs[i] = NULL;
     }
     nomp_free(&progs[i]);
   }
