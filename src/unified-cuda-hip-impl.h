@@ -60,6 +60,17 @@
 
 #define chk_gpurtc(call) chk_gpurtc_(__FILE__, __LINE__, call)
 
+struct gpu_backend {
+  int device_id;
+  struct gpuDeviceProp prop;
+  gpuCtx ctx;
+};
+
+struct gpu_prog {
+  gpuModule module;
+  gpuFunction kernel;
+};
+
 static int gpu_update(struct backend *bnd, struct mem *m, const int op) {
   if (op & NOMP_ALLOC)
     chk_gpu(gpuMalloc(&m->bptr, (m->idx1 - m->idx0) * m->usize));
@@ -154,8 +165,9 @@ static int gpu_sync(struct backend *bnd) {
 }
 
 static int gpu_finalize(struct backend *bnd) {
-#if defined(DESTROY_CTX) && defined(__HIP_PLATFORM_NVIDIA__)
-  DESTROY_CTX
+#ifndef __HIP_PLATFORM_HCC__
+  struct gpu_backend *nbnd = (struct gpu_backend *)bnd->bptr;
+  GPU_CHECK(gpuCtxDestroy(nbnd->ctx));
 #endif
   return 0;
 }
@@ -176,8 +188,9 @@ int gpu_init(struct backend *bnd, const int platform_id, const int device_id) {
   nbnd->device_id = device_id;
   chk_gpu(gpuGetDeviceProperties(&nbnd->prop, device_id));
 
-#if defined(CREATE_CTX) && defined(__HIP_PLATFORM_NVIDIA__)
-  CREATE_CTX
+#ifndef __HIP_PLATFORM_HCC__
+  GPU_CHECK(gpuInit(0));
+  GPU_CHECK(gpuCtxCreate(&nbnd->ctx, 0, nbnd->device_id));
 #endif
   bnd->bptr = (void *)nbnd;
 
@@ -190,3 +203,39 @@ int gpu_init(struct backend *bnd, const int platform_id, const int device_id) {
 
   return 0;
 }
+
+#undef TOKEN_PASTE_
+#undef TOKEN_PASTE
+
+#undef gpu_update
+#undef gpu_update_ptr
+#undef gpu_knl_build
+#undef gpu_knl_run
+#undef gpu_knl_free
+#undef gpu_sync
+#undef gpu_finalize
+#undef gpu_init
+#undef gpu_backend
+#undef gpu_prog
+
+#undef gpuError_t
+#undef gpuSuccess
+#undef gpuGetErrorName
+#undef gpuMalloc
+#undef gpuMemcpy
+#undef gpuFree
+#undef gpuMemcpyHostToDevice
+#undef gpuMemcpyDeviceToHost
+#undef gpuDeviceSynchronize
+#undef gpuGetDeviceCount
+#undef gpuSetDevice
+#undef gpuGetDeviceProperties
+
+#undef gpurtcResult
+#undef gpurtcGetErrorString
+#undef gpurtcProgram
+#undef gpurtcCreateProgram
+#undef gpurtcCompileProgram
+#undef gpurtcGetProgramLogSize
+#undef gpurtcGetProgramLog
+#undef gpurtcDestroyProgram
