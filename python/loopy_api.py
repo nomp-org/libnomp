@@ -356,19 +356,15 @@ class ForLoopInfo:
             decl: cindex.CursorKind.DECL_STMT, cright: cindex.CursorKind
         ):
             (var,) = decl.get_children()
-            params = []
-            accumulators = []
-            lbound, param, accumulator = get_bound_info(
-                CToLoopyLoopBoundMapper()(var), var.type
-            )
-            params.extend(param)
-            accumulators.extend(accumulator)
-            ubound, param, accumulator = get_bound_info(
-                CToLoopyLoopBoundMapper()(cright), cright.type
-            )
-            params.extend(param)
-            accumulators.extend(accumulator)
-            return lbound, ubound, params, accumulators
+            params, accumulators = [], []
+            lbound, ubound = [
+                get_bound_info(CToLoopyLoopBoundMapper()(node), node.type)
+                for node in (var, cright)
+            ]
+            for bounds in (lbound, ubound):
+                params.extend(bounds[1])
+                accumulators.extend(bounds[2])
+            return lbound[0], ubound[0], params, accumulators
 
         decls = list(self.decl.get_children())
         if len(decls) == 0:
@@ -553,6 +549,13 @@ class CToLoopyMapper(IdentityMapper):
             raise NotImplementedError(f"Unable to parse: {expr.type.kind}")
 
         (name, shape, init) = check_and_parse_decl(expr)
+
+        if name.startswith(NOMP_VAR_PREFIX):
+            raise SyntaxError(
+                f"Kernel user variables should not contain '{NOMP_VAR_PREFIX}'"
+                f" as a prefix. Rename variable: {name}."
+            )
+
         if init is not None:
             lhs = prim.Variable(name)
             rhs = CToLoopyExpressionMapper()(init)
