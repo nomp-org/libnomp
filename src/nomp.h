@@ -141,12 +141,12 @@
 
 /**
  * @ingroup nomp_errors
- * @brief libnomp Cuda operation failed.
+ * @brief libnomp Cuda failed.
  */
 #define NOMP_CUDA_FAILURE -512
 /**
  * @ingroup nomp_errors
- * @brief libnomp HIP operation failed.
+ * @brief libnomp HIP failed.
  */
 #define NOMP_HIP_FAILURE -514
 /**
@@ -166,9 +166,14 @@
 #define NOMP_ISPC_FAILURE -520
 /**
  * @ingroup nomp_errors
- * @brief libnomp source compilation failure.
+ * @brief libnomp JIT failure.
  */
 #define NOMP_JIT_FAILURE -522
+/**
+ * @ingroup nomp_errors
+ * @brief libnomp memory operation failure.
+ */
+#define NOMP_MEMORY_FAILURE -524
 
 #ifdef __cplusplus
 extern "C" {

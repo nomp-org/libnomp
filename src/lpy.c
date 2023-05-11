@@ -30,7 +30,7 @@ int py_append_to_sys_path(const char *path) {
   }
   if (err) {
     return nomp_set_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,
-                        "Appending path \"%s\" to the sys.path failed.");
+                        "Appending path \"%s\" to the sys.path failed.", path);
   }
 
   return 0;
