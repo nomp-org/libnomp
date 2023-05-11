@@ -110,7 +110,6 @@ static int init_configs(int argc, const char **argv, struct backend *backend) {
 #undef check_if_initialized
 
   // Append nomp python directory to sys.path.
-  // nomp.install_dir should be set and we use it here.
   size_t len;
   nomp_check(nomp_path_len(&len, nomp.install_dir));
   len = nomp_max(2, len, MAX_BUFSIZ);
@@ -129,19 +128,18 @@ static int allocate_scratch_memory(struct backend *backend) {
     nomp_check(backend->update(backend, m, NOMP_ALLOC));
     return 0;
   }
-  // FIXME: Return an error.
-  return 0;
+  return nomp_set_log(NOMP_MEMORY_FAILURE, NOMP_ERROR,
+                      "Unable to allocate scratch memory for kernels.");
 }
 
 static int deallocate_scratch_memory(struct backend *backend) {
   if (backend->scratch) {
     nomp_check(backend->update(backend, backend->scratch, NOMP_FREE));
-    nomp_free(backend->scratch->hptr);
-    nomp_free(backend->scratch);
+    nomp_free(backend->scratch->hptr), nomp_free(backend->scratch);
     return 0;
   }
-  // FIXME: Return an error.
-  return 0;
+  return nomp_set_log(NOMP_MEMORY_FAILURE, NOMP_ERROR,
+                      "Unable to deallocate scratch memory for kernels.");
 }
 
 int nomp_init(int argc, const char **argv) {
