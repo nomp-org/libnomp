@@ -110,7 +110,7 @@ static int test_syntax_error_in_kernel() {
       "    a[i] = i                                                         \n"
       "}                                                                    \n";
   static int id = -1;
-  const char *clauses0[4] = {"transform", "invalid-file", "invalid", 0};
+  const char *clauses0[4] = {"transform", "nomp-api-100", "transform", 0};
   int err = nomp_jit(&id, invalid_knl, clauses0, 2, "a", sizeof(int *),
                      NOMP_PTR, "N", sizeof(int), NOMP_INT);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_LOOPY_CONVERSION_FAILURE);
