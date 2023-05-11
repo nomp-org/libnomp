@@ -4,30 +4,6 @@
 #include <stddef.h>
 
 /**
- * @defgroup nomp_attributes Additional attributes for kernel arguments.
- *
- * @brief Defines additional attributes for nomp kernel arguments. For example,
- * these can be used to communicate if the argument is a reduction variable
- * and/or if the pinned memory must be used for the argument on the device.
- */
-
-/**
- * @ingroup nomp_attributes
- * @brief nomp kernel argument is an accumulator of a reduction.
- */
-#define NOMP_ATTRIBUTE_REDUCTION 1
-/**
- * @ingroup nomp_attributes
- * @brief Device memory for the nomp kernel argument must be pinned.
- */
-#define NOMP_ATTRIBUTE_PINNED 2
-/**
- * @ingroup nomp_attributes
- * @brief Mask to separate the type and attributes of a kernel argument.
- */
-#define NOMP_ATTRIBUTE_MASK 0xFFFFFF00
-
-/**
  * @defgroup nomp_types nomp data types.
  *
  * @brief Defines argument types for a nomp kernel. Currently, only integer,

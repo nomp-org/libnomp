@@ -36,8 +36,7 @@ int py_append_to_sys_path(const char *path) {
   return 0;
 }
 
-static int py_realize_reduction(PyObject **knl, int *reduction_op,
-                                const char *backend) {
+static int py_realize_reduction(PyObject **knl, const char *backend) {
   int err = 1;
   PyObject *reduction = PyUnicode_FromString(module_reduction);
   if (reduction) {
@@ -48,17 +47,8 @@ static int py_realize_reduction(PyObject **knl, int *reduction_op,
         PyObject *pbackend = PyUnicode_FromString(backend);
         PyObject *result =
             PyObject_CallFunctionObjArgs(rr, *knl, pbackend, NULL);
-        if (result) {
-          if (PyTuple_Size(result) == 2) {
-            Py_DECREF(*knl);
-            *knl = PyTuple_GetItem(result, 0);
-            PyObject *rop = PyTuple_GetItem(result, 1);
-            if (rop && PyLong_Check(rop)) {
-              *reduction_op = (int)PyLong_AsLong(rop);
-              err = 0, Py_DECREF(rop);
-            }
-          }
-        }
+        if (result)
+          Py_DECREF(*knl), *knl = result, err = 0;
         Py_XDECREF(pbackend), Py_DECREF(rr);
       }
       Py_DECREF(module);
@@ -73,8 +63,8 @@ static int py_realize_reduction(PyObject **knl, int *reduction_op,
   return 0;
 }
 
-int py_c_to_loopy(PyObject **knl, int *reduction_op, const char *src,
-                  const char *backend, int reduction_index) {
+int py_c_to_loopy(PyObject **knl, const char *src, const char *backend,
+                  int reduction_index) {
   int err = 1;
   PyObject *lpy_api = PyUnicode_FromString(module_loopy_api);
   if (lpy_api) {
@@ -100,14 +90,14 @@ int py_c_to_loopy(PyObject **knl, int *reduction_op, const char *src,
   }
 
   if (reduction_index >= 0)
-    nomp_check(py_realize_reduction(knl, reduction_op, backend));
+    nomp_check(py_realize_reduction(knl, backend));
 
   return 0;
 }
 
 int py_set_annotate_func(PyObject **annotate_func, const char *path_) {
   // Find file and function from path.
-  char *path = strndup(path_, PATH_MAX + MAX_FUNC_NAME_SIZE);
+  char *path = strndup(path_, PATH_MAX + MAX_IDENT_SIZE);
   char *file = strtok(path, "::"), *func = strtok(NULL, "::");
   if (file == NULL || path == NULL) {
     nomp_free(path);

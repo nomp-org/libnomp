@@ -7,10 +7,6 @@ from loopy.transform.data import reduction_arg_to_subst_rule
 from loopy_api import LOOPY_LANG_VERSION
 
 _BACKEND_TO_BLOCK_SIZE = {"cuda": 32, "opencl": 32}
-_LOOPY_REDN_TO_C_REDN = {
-    lp.library.reduction.SumReductionOperation(): 0,
-    lp.library.reduction.ProductReductionOperation(): 1,
-}
 
 
 @dataclass
@@ -18,7 +14,6 @@ class ReductionInfo:
     """Store meta information about reductions."""
 
     var: str = ""
-    oprtr: int = -1
     arg: lp.KernelArgument = None
 
     @property
@@ -46,8 +41,7 @@ def realize_reduction(
             ):
                 if isinstance(insn.assignee.aggregate, prim.Variable):
                     redn.var = insn.assignee.aggregate.name
-                redn.oprtr = _LOOPY_REDN_TO_C_REDN[insn.expression.operation]
-    if (not redn.var) or (redn.oprtr < 0):
+    if not redn.var:
         raise SyntaxError("Reduction variable or operation not found.")
 
     if len(knl.inames.keys()) > 1:
@@ -111,4 +105,4 @@ def realize_reduction(
     knl = lp.tag_inames(knl, {i_inner: "l.0"})
     knl = lp.tag_inames(knl, {f"{i_outer}_0": "g.0"})
     knl = lp.add_dependency(knl, "writes:acc_i_outer", f"id:{redn.tmp}_barrier")
-    return (knl, redn.oprtr)
+    return knl

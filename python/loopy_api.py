@@ -833,5 +833,5 @@ if __name__ == "__main__":
           """
     BACKEND = "cuda"
     lp_knl = c_to_loopy(KNL_STR, BACKEND, 2)
-    (lp_knl, op) = realize_reduction(lp_knl, "cuda")
+    lp_knl = realize_reduction(lp_knl, "cuda")
     print(get_knl_src(lp_knl, BACKEND))

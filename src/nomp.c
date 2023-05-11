@@ -22,10 +22,10 @@ static int check_env(struct backend *backend) {
   if ((tmp = getenv("NOMP_VERBOSE")))
     backend->verbose = nomp_str_toui(tmp, MAX_BUFSIZ);
 
-  if ((tmp = copy_env("NOMP_BACKEND", MAX_BACKEND_SIZE))) {
+  if ((tmp = copy_env("NOMP_BACKEND", MAX_IDENT_SIZE))) {
     if (backend->backend)
       nomp_free(backend->backend);
-    backend->backend = strndup(tmp, MAX_BACKEND_SIZE), nomp_free(tmp);
+    backend->backend = strndup(tmp, MAX_IDENT_SIZE), nomp_free(tmp);
   }
 
   if ((tmp = copy_env("NOMP_ANNOTATE_FUNCTION", MAX_BUFSIZ))) {
@@ -68,7 +68,7 @@ static int init_configs(int argc, const char **argv, struct backend *backend) {
     if (!strncmp("--nomp", argv[i], 6)) {
       nomp_check(check_cmd_line_arg(i + 1, argc, argv));
       if (!strncmp("--nomp-backend", argv[i], MAX_BUFSIZ)) {
-        backend->backend = strndup((const char *)argv[i + 1], MAX_BACKEND_SIZE);
+        backend->backend = strndup((const char *)argv[i + 1], MAX_IDENT_SIZE);
       } else if (!strncmp("--nomp-platform", argv[i], MAX_BUFSIZ)) {
         backend->platform_id = nomp_str_toui(argv[i + 1], MAX_BUFSIZ);
       } else if (!strncmp("--nomp-device", argv[i], MAX_BUFSIZ)) {
@@ -164,27 +164,27 @@ int nomp_init(int argc, const char **argv) {
 
   nomp_check(nomp_log_init(nomp.verbose));
 
-  size_t n = strnlen(nomp.backend, MAX_BACKEND_SIZE);
+  size_t n = strnlen(nomp.backend, MAX_IDENT_SIZE);
   for (int i = 0; i < n; i++)
     nomp.backend[i] = tolower(nomp.backend[i]);
 
-  if (strncmp(nomp.backend, "opencl", MAX_BACKEND_SIZE) == 0) {
+  if (strncmp(nomp.backend, "opencl", MAX_IDENT_SIZE) == 0) {
 #if defined(OPENCL_ENABLED)
     nomp_check(opencl_init(&nomp, nomp.platform_id, nomp.device_id));
 #endif
-  } else if (strncmp(nomp.backend, "cuda", MAX_BACKEND_SIZE) == 0) {
+  } else if (strncmp(nomp.backend, "cuda", MAX_IDENT_SIZE) == 0) {
 #if defined(CUDA_ENABLED)
     nomp_check(cuda_init(&nomp, nomp.platform_id, nomp.device_id));
 #endif
-  } else if (strncmp(nomp.backend, "hip", MAX_BACKEND_SIZE) == 0) {
+  } else if (strncmp(nomp.backend, "hip", MAX_IDENT_SIZE) == 0) {
 #if defined(HIP_ENABLED)
     nomp_check(hip_init(&nomp, nomp.platform_id, nomp.device_id));
 #endif
-  } else if (strncmp(nomp.backend, "sycl", MAX_BACKEND_SIZE) == 0) {
+  } else if (strncmp(nomp.backend, "sycl", MAX_IDENT_SIZE) == 0) {
 #if defined(SYCL_ENABLED)
     nomp_check(sycl_init(&nomp, nomp.platform_id, nomp.device_id));
 #endif
-  } else if (strncmp(nomp.backend, "ispc", MAX_BACKEND_SIZE) == 0) {
+  } else if (strncmp(nomp.backend, "ispc", MAX_IDENT_SIZE) == 0) {
 #if defined(ISPC_ENABLED)
     nomp_check(ispc_init(&nomp, nomp.platform_id, nomp.device_id));
 #endif
@@ -272,10 +272,15 @@ static struct prog **progs = NULL;
 static int progs_n = 0;
 static int progs_max = 0;
 
-static int parse_clauses(char **usr_file, char **usr_func, PyObject **dict_,
+struct meta {
+  char *file, *func;
+  PyObject *dict;
+};
+
+static int parse_clauses(struct meta *meta, struct prog *prg,
                          const char **clauses) {
   // Currently, we only support `transform` and `annotate` and `jit`.
-  PyObject *dict = *dict_ = PyDict_New();
+  meta->dict = PyDict_New(), meta->file = meta->func = NULL;
   unsigned i = 0;
   while (clauses[i]) {
     if (strncmp(clauses[i], "transform", MAX_BUFSIZ) == 0) {
@@ -286,8 +291,8 @@ static int parse_clauses(char **usr_file, char **usr_func, PyObject **dict_,
             "function name. At least one of them is not provided.");
       }
       nomp_check(nomp_check_py_script_path((const char *)clauses[i + 1]));
-      *usr_file = strndup(clauses[i + 1], PATH_MAX);
-      *usr_func = strndup(clauses[i + 2], MAX_FUNC_NAME_SIZE);
+      meta->file = strndup(clauses[i + 1], PATH_MAX);
+      meta->func = strndup(clauses[i + 2], MAX_IDENT_SIZE);
       i += 3;
     } else if (strncmp(clauses[i], "annotate", MAX_BUFSIZ) == 0) {
       if (clauses[i + 1] == NULL || clauses[i + 2] == NULL) {
@@ -298,12 +303,35 @@ static int parse_clauses(char **usr_file, char **usr_func, PyObject **dict_,
       }
       const char *key = clauses[i + 1], *val = clauses[i + 2];
       PyObject *pkey =
-          PyUnicode_FromStringAndSize(key, strnlen(key, MAX_KEY_SIZE));
+          PyUnicode_FromStringAndSize(key, strnlen(key, MAX_IDENT_SIZE));
       PyObject *pval =
-          PyUnicode_FromStringAndSize(val, strnlen(val, MAX_VAL_SIZE));
-      PyDict_SetItem(dict, pkey, pval);
+          PyUnicode_FromStringAndSize(val, strnlen(val, MAX_IDENT_SIZE));
+      PyDict_SetItem(meta->dict, pkey, pval);
       Py_XDECREF(pkey), Py_XDECREF(pval);
       i += 3;
+    } else if (strncmp(clauses[i], "reduction", MAX_BUFSIZ) == 0) {
+      if (clauses[i + 1] == NULL || clauses[i + 2] == NULL) {
+        return nomp_set_log(
+            NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+            "\"reduce\" clause should be followed by a variable name and an "
+            "operation. At least one of them is not provided.");
+      }
+      for (unsigned j = 0; j < prg->nargs; j++) {
+        if (strncmp(prg->args[j].name, clauses[i + 1], MAX_IDENT_SIZE) == 0) {
+          prg->reduction_type = prg->args[j].type, prg->args[j].type = NOMP_PTR;
+          prg->reduction_index = j;
+          break;
+        }
+      }
+      if (strncmp(clauses[i + 2], "+", 2) == 0)
+        prg->reduction_op = 0;
+      if (strncmp(clauses[i + 2], "*", 2) == 0)
+        prg->reduction_op = 1;
+      i += 3;
+    } else if (strncmp(clauses[i], "pin", MAX_BUFSIZ) == 0) {
+      // Check if we have to use pinned memory on the device.
+      return nomp_set_log(NOMP_NOT_IMPLEMENTED_ERROR, NOMP_ERROR,
+                          "Pinned memory support is not yet implemented.");
     } else {
       return nomp_set_log(
           NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
@@ -322,62 +350,42 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
       progs = nomp_realloc(progs, struct prog *, progs_max);
     }
 
+    // Initialize the program struct.
     struct prog *prg = progs[progs_n] = nomp_calloc(struct prog, 1);
-    prg->py_dict = PyDict_New(), prg->reduction_index = -1;
     prg->nargs = nargs, prg->args = nomp_calloc(struct arg, nargs);
+    prg->py_dict = PyDict_New(), prg->reduction_index = -1;
 
     va_list args;
     va_start(args, nargs);
     for (unsigned i = 0; i < prg->nargs; i++) {
       const char *name = va_arg(args, const char *);
-      strncpy(prg->args[i].name, name, MAX_ARG_NAME_SIZE);
+      strncpy(prg->args[i].name, name, MAX_IDENT_SIZE);
       prg->args[i].size = va_arg(args, size_t);
-      int type_and_attrs = va_arg(args, int);
-      prg->args[i].type = type_and_attrs & NOMP_ATTRIBUTE_MASK;
-      // Check if the argument is part of a reduction.
-      if (type_and_attrs & NOMP_ATTRIBUTE_REDUCTION) {
-        // Check if there was a reduction in the kernel already and bail
-        // out if that is the case.
-        if (prg->reduction_index >= 0) {
-          return nomp_set_log(
-              NOMP_NOT_IMPLEMENTED_ERROR, NOMP_ERROR,
-              "Multiple reductions in a kernel is not yet implemented.");
-        }
-        prg->reduction_index = i, prg->reduction_type = prg->args[i].type;
-        prg->args[i].type = NOMP_PTR;
-      }
-      // Check if we have to use pinned memory on the device.
-      if (type_and_attrs & NOMP_ATTRIBUTE_PINNED) {
-        return nomp_set_log(NOMP_NOT_IMPLEMENTED_ERROR, NOMP_ERROR,
-                            "Pinned memory support is not yet implemented.");
-      }
+      prg->args[i].type = va_arg(args, int);
     }
     va_end(args);
 
-    // Create loopy kernel from C source.
-    PyObject *knl = NULL;
-    nomp_check(py_c_to_loopy(&knl, &prg->reduction_op, csrc, nomp.backend,
-                             prg->reduction_index));
-
     // Parse the clauses to find transformations file, function and other
     // annotations. Annotations are returned as a Python dictionary.
-    char *file = NULL, *func = NULL;
-    PyObject *annotations = NULL;
-    nomp_check(parse_clauses(&file, &func, &annotations, clauses));
+    struct meta meta;
+    nomp_check(parse_clauses(&meta, prg, clauses));
+
+    // Create loopy kernel from C source.
+    PyObject *knl = NULL;
+    nomp_check(py_c_to_loopy(&knl, csrc, nomp.backend, prg->reduction_index));
 
     // Handle annotate clauses if they exist.
-    nomp_check(py_apply_annotations(&knl, nomp.py_annotate, annotations));
-    Py_XDECREF(annotations);
+    nomp_check(py_apply_annotations(&knl, nomp.py_annotate, meta.dict));
+    Py_XDECREF(meta.dict);
 
     // Handle transform clauses.
-    nomp_check(py_user_transform(&knl, file, func));
-    nomp_free(file), nomp_free(func);
+    nomp_check(py_user_transform(&knl, meta.file, meta.func));
+    nomp_free(meta.file), nomp_free(meta.func);
 
-    // Get OpenCL, CUDA, etc. source and name from the loopy kernel
+    // Get OpenCL, CUDA, etc. source and name from the loopy kernel and build
+    // the program.
     char *name, *src;
     nomp_check(py_get_knl_name_and_src(&name, &src, knl, nomp.backend));
-
-    // Build the kernel
     nomp_check(nomp.knl_build(&nomp, prg, src, name));
     nomp_free(src), nomp_free(name);
 
