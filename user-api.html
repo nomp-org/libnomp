@@ -394,12 +394,6 @@ Operation <code class="docutils literal notranslate"><span class="pre">op</span>
 </dd></dl>
 
 <dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.NOMP_USER_CALLBACK_FAILURE">
-<span class="target" id="group__nomp__errors_1ga82da3fe2dfffe50c112632b5163e6a12"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_USER_CALLBACK_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_USER_CALLBACK_FAILURE" title="Permalink to this definition"></a><br /></dt>
-<dd><p>User callback function failed during execution. </p>
-</dd></dl>
-
-<dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_USER_KNL_ARG_TYPE_IS_INVALID">
 <span class="target" id="group__nomp__errors_1gae3a653c8477c8cea5db0d5292f98579b"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_USER_KNL_ARG_TYPE_IS_INVALID</span></span></span><a class="headerlink" href="#c.NOMP_USER_KNL_ARG_TYPE_IS_INVALID" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Kernel argument type provided to libnomp is not valid. </p>
@@ -418,9 +412,9 @@ Operation <code class="docutils literal notranslate"><span class="pre">op</span>
 </dd></dl>
 
 <dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.NOMP_NULL_INPUT_ENCOUNTERED">
-<span class="target" id="group__nomp__errors_1ga92f2c0ccf15b0ae955212d4f1131746e"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_NULL_INPUT_ENCOUNTERED</span></span></span><a class="headerlink" href="#c.NOMP_NULL_INPUT_ENCOUNTERED" title="Permalink to this definition"></a><br /></dt>
-<dd><p>One of the inputs to a libnomp function call are not valid. </p>
+<dt class="sig sig-object cpp" id="c.NOMP_NOT_IMPLEMENTED_ERROR">
+<span class="target" id="group__nomp__errors_1ga7b1792597780372f46ac24737805d80f"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_NOT_IMPLEMENTED_ERROR</span></span></span><a class="headerlink" href="#c.NOMP_NOT_IMPLEMENTED_ERROR" title="Permalink to this definition"></a><br /></dt>
+<dd><p>The feature is not implemented. </p>
 </dd></dl>
 
 <dl class="cpp macro">
@@ -462,13 +456,13 @@ Operation <code class="docutils literal notranslate"><span class="pre">op</span>
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_CUDA_FAILURE">
 <span class="target" id="group__nomp__errors_1ga5fec2498a76d3d5436049dca98b0dc1e"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_CUDA_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_CUDA_FAILURE" title="Permalink to this definition"></a><br /></dt>
-<dd><p>libnomp Cuda operation failed. </p>
+<dd><p>libnomp Cuda failed. </p>
 </dd></dl>
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_HIP_FAILURE">
 <span class="target" id="group__nomp__errors_1gaa10c74657396ae1be93ea0d71c0612f0"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_HIP_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_HIP_FAILURE" title="Permalink to this definition"></a><br /></dt>
-<dd><p>libnomp HIP operation failed. </p>
+<dd><p>libnomp HIP failed. </p>
 </dd></dl>
 
 <dl class="cpp macro">
@@ -492,7 +486,13 @@ Operation <code class="docutils literal notranslate"><span class="pre">op</span>
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_JIT_FAILURE">
 <span class="target" id="group__nomp__errors_1ga69a43ed070537af9e7d342699852b6c4"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_JIT_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_JIT_FAILURE" title="Permalink to this definition"></a><br /></dt>
-<dd><p>libnomp source compilation failure. </p>
+<dd><p>libnomp JIT failure. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.NOMP_MEMORY_FAILURE">
+<span class="target" id="group__nomp__errors_1ga480cbc7e1eca1729e884e8c091ce273f"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_MEMORY_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_MEMORY_FAILURE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>libnomp memory operation failure. </p>
 </dd></dl>
 
 </section>

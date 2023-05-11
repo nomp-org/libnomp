@@ -124,8 +124,8 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv413py_c_to_loopyPP8PyObjectPKcPKc">
-<span id="_CPPv313py_c_to_loopyPP8PyObjectPKcPKc"></span><span id="_CPPv213py_c_to_loopyPP8PyObjectPKcPKc"></span><span id="py_c_to_loopy__PyObjectPP.cCP.cCP"></span><span class="target" id="group__nomp__py__utils_1gafe3c9a33c1db37f13187340e5dec3d2a"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">py_c_to_loopy</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">knl</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">src</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">backend</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413py_c_to_loopyPP8PyObjectPKcPKc" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv413py_c_to_loopyPP8PyObjectPKcPKci">
+<span id="_CPPv313py_c_to_loopyPP8PyObjectPKcPKci"></span><span id="_CPPv213py_c_to_loopyPP8PyObjectPKcPKci"></span><span id="py_c_to_loopy__PyObjectPP.cCP.cCP.i"></span><span class="target" id="group__nomp__py__utils_1ga7158e30f9e8b8de0a89dfd435866dc31"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">py_c_to_loopy</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">knl</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">src</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">backend</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">reduction_index</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413py_c_to_loopyPP8PyObjectPKcPKci" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Creates loopy kernel from C source. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -133,6 +133,7 @@
 <li><p><strong>knl</strong> – <strong>[out]</strong> Loopy kernel object. </p></li>
 <li><p><strong>src</strong> – <strong>[in]</strong> C kernel source. </p></li>
 <li><p><strong>backend</strong> – <strong>[in]</strong> Backend name. </p></li>
+<li><p><strong>reduction_index</strong> – <strong>[in]</strong> Index of the reduction variable if present. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -260,26 +261,6 @@
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>void </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv419py_handle_reductionPP8PyObjectPiPKc">
-<span id="_CPPv319py_handle_reductionPP8PyObjectPiPKc"></span><span id="_CPPv219py_handle_reductionPP8PyObjectPiPKc"></span><span id="py_handle_reduction__PyObjectPP.iP.cCP"></span><span class="target" id="group__nomp__py__utils_1gaca07a9e9c57957ba6d6ce69863fcdde0"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">py_handle_reduction</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">knl</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">redn_op</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">backend</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419py_handle_reductionPP8PyObjectPiPKc" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Get kernal name and generated source for the backend. </p>
-<p>Handle reductions (if present) in a loopy kernel.</p>
-<p>Handle the reduction in the loopy kernel <code class="docutils literal notranslate"><span class="pre">knl</span></code>. <code class="docutils literal notranslate"><span class="pre">knl</span></code> will be modified in the process. Function will return a non-zero value if there was an error after registering a log.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>knl</strong> – <strong>[inout]</strong> Pointer to loopy kernel object. </p></li>
-<li><p><strong>redn_op</strong> – <strong>[out]</strong> Reduction operation. </p></li>
-<li><p><strong>backend</strong> – <strong>[in]</strong> Backend for the reduction. </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>int </p>
 </dd>
 </dl>
 </dd></dl>
