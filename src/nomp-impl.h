@@ -15,13 +15,9 @@
 #include <string.h>
 
 #define MAX_BUFSIZ 128
-#define MAX_BACKEND_SIZE 32
-#define MAX_KEY_SIZE 128
-#define MAX_VAL_SIZE 128
+#define MAX_IDENT_SIZE 128
 #define MAX_SRC_SIZE 16384
 #define MAX_CFLAGS_SIZE 16384
-#define MAX_ARG_NAME_SIZE 128
-#define MAX_FUNC_NAME_SIZE 128
 #define MAX_KNL_ARGS 64
 #define MAX_SCRATCH_SIZE (1024 * sizeof(double))
 
@@ -39,7 +35,7 @@ struct mem {
 };
 
 struct arg {
-  char name[MAX_ARG_NAME_SIZE];
+  char name[MAX_IDENT_SIZE];
   size_t size;
   unsigned type;
   void *ptr;

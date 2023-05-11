@@ -29,14 +29,13 @@ int py_append_to_sys_path(const char *path);
  * @brief Creates loopy kernel from C source.
  *
  * @param[out] knl Loopy kernel object.
- * @param[out] reduction_op Reduction operation.
  * @param[in] src C kernel source.
  * @param[in] backend Backend name.
  * @param[in] reduction_index Index of the reduction variable if present.
  * @return int
  */
-int py_c_to_loopy(PyObject **knl, int *reduction_op, const char *src,
-                  const char *backend, int reduction_index);
+int py_c_to_loopy(PyObject **knl, const char *src, const char *backend,
+                  int reduction_index);
 
 /**
  * @ingroup nomp_py_utils
