@@ -807,9 +807,11 @@ def get_wrapper(backend: str) -> BaseKernelWrapper:
     return wrapper if wrapper is not None else BaseKernelWrapper()
 
 
-def get_knl_src(knl: lp.translation_unit.TranslationUnit, backend: str) -> str:
+def get_knl_src(
+    knl: lp.translation_unit.TranslationUnit, backend: str, redn_arg: str
+) -> str:
     """Returns the kernel source for a given backend."""
-    return get_wrapper(backend).get_src(knl)
+    return get_wrapper(backend).get_src(knl, redn_arg)
 
 
 def get_knl_name(knl: lp.translation_unit.TranslationUnit, backend: str) -> str:
@@ -834,4 +836,4 @@ if __name__ == "__main__":
     BACKEND = "cuda"
     lp_knl = c_to_loopy(KNL_STR, BACKEND, 2)
     lp_knl = realize_reduction(lp_knl, "cuda")
-    print(get_knl_src(lp_knl, BACKEND))
+    print(get_knl_src(lp_knl, BACKEND, "sum"))

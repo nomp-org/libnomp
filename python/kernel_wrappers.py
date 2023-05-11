@@ -24,7 +24,9 @@ class BaseKernelWrapper:
         self.prefix = prefix
         self.includes = includes
 
-    def get_src(self, knl: lp.translation_unit.TranslationUnit) -> str:
+    def get_src(
+        self, knl: lp.translation_unit.TranslationUnit, redn_arg: str
+    ) -> str:
         """Get kernel source"""
         return lp.generate_code_v2(knl).device_code()
 
@@ -39,17 +41,23 @@ class BaseKernelWrapper:
         self,
         knl: lp.translation_unit.TranslationUnit,
         get_arg: Callable[[DTypeRegistry, int, str], c.Value],
+        redn_arg: str,
     ) -> tuple[str, str, str, list]:
         """Get device code and arguments"""
         gen_code = lp.generate_code_v2(knl)
         device_code = gen_code.device_code()
         knl_name = gen_code.device_programs[0].name
         entry = knl.default_entrypoint.name
-        args_list = [
-            get_arg(self.reg, index, value)
-            for index, value in enumerate(knl[entry].args)
-            if not None
-        ]
+        redn_args_count = 0
+        args_list = []
+        for index, value in enumerate(knl[entry].args):
+            if value.name != redn_arg:
+                args_list.append(
+                    get_arg(self.reg, index - redn_args_count, value)
+                )
+            else:
+                redn_args_count += 1
+
         wrapper_name = self.get_entry_point(knl)
         return knl_name, wrapper_name, device_code, args_list
 
@@ -61,7 +69,9 @@ class ISPCKernelWrapper(BaseKernelWrapper):
         super().__init__(prefix, includes)
         fill_registry_with_ispc_types(self.reg, True)
 
-    def get_src(self, knl: lp.translation_unit.TranslationUnit) -> str:
+    def get_src(
+        self, knl: lp.translation_unit.TranslationUnit, redn_arg: str
+    ) -> str:
         """Create ISPC kernel wrapper"""
 
         def get_arg(reg, index, value):
@@ -78,7 +88,7 @@ class ISPCKernelWrapper(BaseKernelWrapper):
             wrapper_name,
             device_code,
             knl_args,
-        ) = self.get_device_code_and_args(knl, get_arg)
+        ) = self.get_device_code_and_args(knl, get_arg, redn_arg)
         wrapper = c.FunctionBody(
             c.FunctionDeclaration(
                 c.Value("export void", wrapper_name),
@@ -113,7 +123,9 @@ class SyclKernelWrapper(BaseKernelWrapper):
         super().__init__(prefix, includes)
         fill_registry_with_c_types(self.reg, True)
 
-    def get_src(self, knl: lp.translation_unit.TranslationUnit) -> str:
+    def get_src(
+        self, knl: lp.translation_unit.TranslationUnit, redn_arg: str
+    ) -> str:
         """Create SYCL kernel wrapper"""
 
         def get_arg(reg, index, value):
@@ -130,7 +142,7 @@ class SyclKernelWrapper(BaseKernelWrapper):
             wrapper_name,
             device_code,
             args_list,
-        ) = self.get_device_code_and_args(knl, get_arg)
+        ) = self.get_device_code_and_args(knl, get_arg, redn_arg)
         knl_args = args_list + [
             c.Value("*(sycl::queue *)", f"args[{len(args_list)}]"),
             c.Value("*(sycl::nd_range<3> *)", f"args[{len(args_list) + 1}]"),

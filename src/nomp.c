@@ -381,8 +381,14 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
 
     // Get OpenCL, CUDA, etc. source and name from the loopy kernel and build
     // the program.
-    char *name, *src;
-    nomp_check(nomp_py_get_knl_name_and_src(&name, &src, knl, nomp.backend));
+    char *name, *src, *redn_name = "";
+
+    if (prg->reduction_index >= 0)
+      redn_name = prg->args[prg->reduction_index].name;
+
+    nomp_check(
+        py_get_knl_name_and_src(&name, &src, knl, nomp.backend, redn_name));
+
     nomp_check(nomp.knl_build(&nomp, prg, src, name));
     nomp_free(&src), nomp_free(&name);
 

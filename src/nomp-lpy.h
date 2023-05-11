@@ -89,10 +89,11 @@ int nomp_py_user_transform(PyObject **knl, const char *file, const char *func);
  * @param[out] src Kernel source as a C-string.
  * @param[in] knl Loopy kernel object.
  * @param[in] backend Backend name.
+ * @param[in] redn_arg Reduction variable name.
  * @return int
  */
-int nomp_py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
-                                 const char *backend);
+int py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
+                            const char *backend, char *redn_arg);
 
 /**
  * @ingroup nomp_py_utils
