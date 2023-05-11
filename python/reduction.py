@@ -99,6 +99,7 @@ def realize_reduction(
         knl.instructions,
         knl.args + list(knl.temporary_variables.values()),
         name=knl.name,
+        target=knl.target,
         lang_version=LOOPY_LANG_VERSION,
     )
 
