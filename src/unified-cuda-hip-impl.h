@@ -13,6 +13,7 @@
 #define gpu_init TOKEN_PASTE(GPU, _init)
 #define gpu_backend TOKEN_PASTE(GPU, _backend)
 #define gpu_prog TOKEN_PASTE(GPU, _prog)
+#define gpu_compile TOKEN_PASTE(GPU, _compile)
 
 #define gpuError_t TOKEN_PASTE(GPU, Error_t)
 #define gpuSuccess TOKEN_PASTE(GPU, Success)
@@ -66,6 +67,8 @@ struct gpu_prog {
   gpuFunction kernel;
 };
 
+gpurtcResult gpu_compile(gpurtcProgram prog, struct gpu_backend *nbnd);
+
 static int gpu_update(struct backend *bnd, struct mem *m, const int op) {
   if (op & NOMP_ALLOC)
     chk_gpu(gpuMalloc(&m->bptr, (m->idx1 - m->idx0) * m->usize));
@@ -98,7 +101,7 @@ static int gpu_knl_build(struct backend *bnd, struct prog *prg,
   gpurtcProgram prog;
   chk_gpurtc(gpurtcCreateProgram(&prog, source, NULL, 0, NULL, NULL));
 
-  GPU_COMPILE
+  gpurtcResult result = gpu_compile(prog, nbnd);
   if (result != GPURTC_SUCCESS) {
     size_t size;
     gpurtcGetProgramLogSize(prog, &size);
@@ -215,6 +218,7 @@ int gpu_init(struct backend *bnd, const int platform_id, const int device_id) {
 #undef gpu_init
 #undef gpu_backend
 #undef gpu_prog
+#undef gpu_compile
 
 #undef gpuError_t
 #undef gpuSuccess
