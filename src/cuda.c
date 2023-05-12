@@ -22,13 +22,6 @@
 #define gpuCtxCreate cuCtxCreate
 #define gpuCtxDestroy cuCtxDestroy
 
-#define GPU_COMPILE                                                            \
-  char arch[MAX_BUFSIZ];                                                       \
-  snprintf(arch, MAX_BUFSIZ, "-arch=compute_%d%d", nbnd->prop.major,           \
-           nbnd->prop.minor);                                                  \
-  const char *opts[1] = {arch};                                                \
-  nvrtcResult result = nvrtcCompileProgram(prog, 1, opts);
-
 #define chk_cu(call)                                                           \
   chk_err_(__FILE__, __LINE__, call, CUresult, CUDA_SUCCESS,                   \
            cuGetErrorName(result, &msg), "operation");
@@ -36,6 +29,14 @@
 static const char *ERR_STR_GPU_FAILURE = "Cuda %s failed: %s.";
 
 #include "unified-cuda-hip-impl.h"
+
+nvrtcResult cuda_compile(nvrtcProgram prog, struct cuda_backend *nbnd) {
+  char arch[MAX_BUFSIZ];
+  snprintf(arch, MAX_BUFSIZ, "-arch=compute_%d%d", nbnd->prop.major,
+           nbnd->prop.minor);
+  const char *opts[1] = {arch};
+  return nvrtcCompileProgram(prog, 1, opts);
+}
 
 #undef GPU
 #undef RUNTIME

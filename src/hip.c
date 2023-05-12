@@ -21,13 +21,14 @@
 #define gpuCtxCreate hipCtxCreate
 #define gpuCtxDestroy hipCtxDestroy
 
-#define GPU_COMPILE                                                            \
-  const char *opts[1] = {NULL};                                                \
-  hiprtcResult result = hiprtcCompileProgram(prog, 0, opts);
-
 const char *ERR_STR_GPU_FAILURE = "HIP %s failed: %s.";
 
 #include "unified-cuda-hip-impl.h"
+
+hiprtcResult hip_compile(hiprtcProgram prog, struct hip_backend *nbnd) {
+  const char *opts[1] = {NULL};
+  return hiprtcCompileProgram(prog, 0, opts);
+}
 
 #undef GPU
 #undef RUNTIME
