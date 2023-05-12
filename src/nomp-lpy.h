@@ -34,8 +34,8 @@ int nomp_py_append_to_sys_path(const char *path);
  * @param[in] reduction_index Index of the reduction variable if present.
  * @return int
  */
-int py_c_to_loopy(PyObject **knl, const char *src, const char *backend,
-                  int reduction_index);
+int nomp_py_c_to_loopy(PyObject **knl, const char *src, const char *backend,
+                       int reduction_index);
 
 /**
  * @ingroup nomp_py_utils
@@ -47,7 +47,7 @@ int py_c_to_loopy(PyObject **knl, const char *src, const char *backend,
  * and function name must be separated by "::").
  * @return int
  */
-int py_set_annotate_func(PyObject **func, const char *path);
+int nomp_py_set_annotate_func(PyObject **func, const char *path);
 
 /**
  * @ingroup nomp_py_utils
@@ -63,7 +63,7 @@ int py_set_annotate_func(PyObject **func, const char *path);
  * to apply.
  * @return int
  */
-int py_apply_annotations(PyObject **knl, PyObject *func, PyObject *annts);
+int nomp_py_apply_annotations(PyObject **knl, PyObject *func, PyObject *annts);
 
 /**
  * @ingroup nomp_py_utils

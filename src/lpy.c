@@ -63,8 +63,8 @@ static int py_realize_reduction(PyObject **knl, const char *backend) {
   return 0;
 }
 
-int py_c_to_loopy(PyObject **knl, const char *src, const char *backend,
-                  int reduction_index) {
+int nomp_py_c_to_loopy(PyObject **knl, const char *src, const char *backend,
+                       int reduction_index) {
   int err = 1;
   PyObject *lpy_api = PyUnicode_FromString(module_loopy_api);
   if (lpy_api) {
@@ -95,7 +95,7 @@ int py_c_to_loopy(PyObject **knl, const char *src, const char *backend,
   return 0;
 }
 
-int py_set_annotate_func(PyObject **annotate_func, const char *path_) {
+int nomp_py_set_annotate_func(PyObject **annotate_func, const char *path_) {
   // Find file and function from path.
   char *path = strndup(path_, PATH_MAX + NOMP_MAX_IDENT_SIZE);
   char *file = strtok(path, "::"), *func = strtok(NULL, "::");
@@ -128,7 +128,7 @@ int py_set_annotate_func(PyObject **annotate_func, const char *path_) {
   return err;
 }
 
-int py_apply_annotations(PyObject **knl, PyObject *func, PyObject *annts) {
+int nomp_py_apply_annotations(PyObject **knl, PyObject *func, PyObject *annts) {
   if (knl && *knl && func) {
     if (PyCallable_Check(func)) {
       PyObject *tknl = PyObject_CallFunctionObjArgs(func, *knl, annts, NULL);

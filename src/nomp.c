@@ -29,7 +29,7 @@ static int check_env(struct nomp_backend *backend) {
   }
 
   if ((tmp = copy_env("NOMP_ANNOTATE_FUNCTION", NOMP_MAX_BUFSIZ))) {
-    nomp_check(py_set_annotate_func(&backend->py_annotate, tmp));
+    nomp_check(nomp_py_set_annotate_func(&backend->py_annotate, tmp));
     nomp_free(tmp);
   }
 
@@ -82,8 +82,8 @@ static int init_configs(int argc, const char **argv,
         nomp_check(nomp_path_len(&size, (const char *)argv[i + 1]));
         backend->install_dir = strndup((const char *)argv[i + 1], size + 1);
       } else if (!strncmp("--nomp-function", argv[i], NOMP_MAX_BUFSIZ)) {
-        nomp_check(py_set_annotate_func(&backend->py_annotate,
-                                        (const char *)argv[i + 1]));
+        nomp_check(nomp_py_set_annotate_func(&backend->py_annotate,
+                                             (const char *)argv[i + 1]));
       }
       i++;
     }
@@ -373,10 +373,11 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
 
     // Create loopy kernel from C source.
     PyObject *knl = NULL;
-    nomp_check(py_c_to_loopy(&knl, csrc, nomp.backend, prg->reduction_index));
+    nomp_check(
+        nomp_py_c_to_loopy(&knl, csrc, nomp.backend, prg->reduction_index));
 
     // Handle annotate clauses if they exist.
-    nomp_check(py_apply_annotations(&knl, nomp.py_annotate, meta.dict));
+    nomp_check(nomp_py_apply_annotations(&knl, nomp.py_annotate, meta.dict));
     Py_XDECREF(meta.dict);
 
     // Handle transform clauses.
