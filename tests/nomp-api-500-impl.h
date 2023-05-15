@@ -1,8 +1,97 @@
 #include "nomp-test.h"
 
+#define nomp_api_500_sum_const_aux                                             \
+  TOKEN_PASTE(nomp_api_500_sum_const_aux, TEST_SUFFIX)
+static int nomp_api_500_sum_const_aux(const char *fmt, const char **clauses,
+                                      TEST_TYPE *a, int n) {
+  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO));
+
+  int id = -1;
+  char *knl = generate_knl(fmt, 1, TOSTRING(TEST_TYPE));
+  nomp_test_chk(
+      nomp_jit(&id, knl, clauses, 1, "a", sizeof(TEST_TYPE), TEST_NOMP_TYPE));
+  nomp_free(knl);
+
+  nomp_test_chk(nomp_run(id, a, &n));
+
+  nomp_test_chk(nomp_sync());
+
+  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
+
+  return 0;
+}
+
+#define nomp_api_500_sum_const TOKEN_PASTE(nomp_api_500_sum_const, TEST_SUFFIX)
+static int nomp_api_500_sum_const(void) {
+  TEST_TYPE a;
+  const int N = 10;
+  const char *knl_fmt =
+      "void foo(%s *a) {                                               \n"
+      "  for (int i = 0; i < 10; i++) {                                \n"
+      "    a[0] += i;                                                  \n"
+      "  }                                                             \n"
+      "}                                                               \n";
+  const char *clauses[4] = {"reduce", "a", "+", NULL};
+  nomp_api_500_sum_const_aux(knl_fmt, clauses, &a, N);
+
+#if defined(TEST_TOL)
+  nomp_test_assert(fabs(a - (N - 1) * N / 2) < TEST_TOL);
+#else
+  nomp_test_assert(a == (N - 1) * N / 2);
+#endif
+
+  return 0;
+}
+#undef nomp_api_500_sum_const
+#undef nomp_api_500_sum_const_aux
+
 #define nomp_api_500_sum_aux TOKEN_PASTE(nomp_api_500_sum_aux, TEST_SUFFIX)
 static int nomp_api_500_sum_aux(const char *fmt, const char **clauses,
-                                TEST_TYPE *a, int n, TEST_TYPE *sum) {
+                                TEST_TYPE *a, int n) {
+  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO));
+
+  int id = -1;
+  char *knl = generate_knl(fmt, 1, TOSTRING(TEST_TYPE));
+  nomp_test_chk(nomp_jit(&id, knl, clauses, 2, "a", sizeof(TEST_TYPE),
+                         TEST_NOMP_TYPE, "N", sizeof(int), NOMP_INT));
+  nomp_free(knl);
+
+  nomp_test_chk(nomp_run(id, a, &n));
+
+  nomp_test_chk(nomp_sync());
+
+  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
+
+  return 0;
+}
+
+#define nomp_api_500_sum TOKEN_PASTE(nomp_api_500_sum, TEST_SUFFIX)
+static int nomp_api_500_sum(int N) {
+  TEST_TYPE a;
+  const char *knl_fmt =
+      "void foo(%s *a, int N) {                                        \n"
+      "  for (int i = 0; i < N; i++) {                                 \n"
+      "    a[0] += i;                                                  \n"
+      "  }                                                             \n"
+      "}                                                               \n";
+  const char *clauses[4] = {"reduce", "a", "+", NULL};
+  nomp_api_500_sum_aux(knl_fmt, clauses, &a, N);
+
+#if defined(TEST_TOL)
+  nomp_test_assert(fabs(a - (N - 1) * N / 2) < TEST_TOL);
+#else
+  nomp_test_assert(a == (N - 1) * N / 2);
+#endif
+
+  return 0;
+}
+#undef nomp_api_500_sum
+#undef nomp_api_500_sum_aux
+
+#define nomp_api_500_sum_array_aux                                             \
+  TOKEN_PASTE(nomp_api_500_sum_array_aux, TEST_SUFFIX)
+static int nomp_api_500_sum_array_aux(const char *fmt, const char **clauses,
+                                      TEST_TYPE *a, int n, TEST_TYPE *sum) {
   nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO));
 
   int id = -1;
@@ -21,8 +110,8 @@ static int nomp_api_500_sum_aux(const char *fmt, const char **clauses,
   return 0;
 }
 
-#define nomp_api_500_sum TOKEN_PASTE(nomp_api_500_sum, TEST_SUFFIX)
-static int nomp_api_500_sum(int N) {
+#define nomp_api_500_sum_array TOKEN_PASTE(nomp_api_500_sum_array, TEST_SUFFIX)
+static int nomp_api_500_sum_array(int N) {
   nomp_test_assert(N <= 10);
 
   TEST_TYPE a[10], sum;
@@ -35,8 +124,8 @@ static int nomp_api_500_sum(int N) {
       "    sum[0] += a[i];                                             \n"
       "  }                                                             \n"
       "}                                                               \n";
-  const char *clauses[4] = {"reduction", "sum", "+", NULL};
-  nomp_api_500_sum_aux(knl_fmt, clauses, a, N, &sum);
+  const char *clauses[4] = {"reduce", "sum", "+", NULL};
+  nomp_api_500_sum_array_aux(knl_fmt, clauses, a, N, &sum);
 
 #if defined(TEST_TOL)
   nomp_test_assert(fabs(sum - (N - 1) * N / 2) < TEST_TOL);
@@ -46,7 +135,7 @@ static int nomp_api_500_sum(int N) {
 
   return 0;
 }
-#undef nomp_api_500_sum
+#undef nomp_api_500_sum_array
 
 #define nomp_api_500_condition TOKEN_PASTE(nomp_api_500_condition, TEST_SUFFIX)
 static int nomp_api_500_condition(int N) {
@@ -66,8 +155,8 @@ static int nomp_api_500_condition(int N) {
       "      sum[0] += 1;                                              \n"
       "  }                                                             \n"
       "}                                                               \n";
-  const char *clauses[4] = {"reduction", "sum", "+", NULL};
-  nomp_api_500_sum_aux(knl_fmt, clauses, a, N, &sum);
+  const char *clauses[4] = {"reduce", "sum", "+", NULL};
+  nomp_api_500_sum_array_aux(knl_fmt, clauses, a, N, &sum);
 
 #if defined(TEST_TOL)
   nomp_test_assert(fabs(sum - mid_point) < TEST_TOL);
@@ -78,7 +167,7 @@ static int nomp_api_500_condition(int N) {
   return 0;
 }
 #undef nomp_api_500_condition
-#undef nomp_api_500_sum_aux
+#undef nomp_api_500_sum_array_aux
 
 #define nomp_api_500_prod_aux TOKEN_PASTE(nomp_api_500_prod_aux, TEST_SUFFIX)
 static int nomp_api_500_prod_aux(const char *fmt, const char **clauses,
@@ -128,7 +217,7 @@ static int nomp_api_500_mxm(int N) {
       "        c[i + j * N] += a[i + k * N] * b[k + j * N];    \n"
       "}                                                       \n";
 
-  const char *clauses[4] = {"reduction", "c", "+", NULL};
+  const char *clauses[4] = {"reduce", "c", "+", NULL};
   nomp_api_500_prod_aux(knl_fmt, clauses, a, b, N, c);
 
 #if defined(TEST_TOL)
@@ -163,7 +252,7 @@ static int nomp_api_500_vxm(int N) {
       "        c[i] += a[j + i * N] * b[j];                    \n"
       "}                                                       \n";
 
-  const char *clauses[4] = {"reduction", "c", "+", NULL};
+  const char *clauses[4] = {"reduce", "c", "+", NULL};
   nomp_api_500_prod_aux(knl_fmt, clauses, a, b, N, c);
 
 #if defined(TEST_TOL)
@@ -219,7 +308,7 @@ static int nomp_api_500_dot(int N) {
       "    total[0] += a[i] * b[i];                                      \n"
       "  }                                                               \n"
       "}                                                                 \n";
-  const char *clauses[4] = {"reduction", "total", "+", NULL};
+  const char *clauses[4] = {"reduce", "total", "+", NULL};
   nomp_api_500_dot_aux(knl_fmt, clauses, a, b, N, &total);
 
 #if defined(TEST_TOL)

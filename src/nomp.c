@@ -307,7 +307,7 @@ static int parse_clauses(struct meta *meta, struct prog *prg,
       PyDict_SetItem(meta->dict, pkey, pval);
       Py_XDECREF(pkey), Py_XDECREF(pval);
       i += 3;
-    } else if (strncmp(clauses[i], "reduction", MAX_BUFSIZ) == 0) {
+    } else if (strncmp(clauses[i], "reduce", MAX_BUFSIZ) == 0) {
       if (clauses[i + 1] == NULL || clauses[i + 2] == NULL) {
         return nomp_set_log(
             NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
