@@ -285,8 +285,8 @@ int nomp_update(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
  * const char *knl = "for (unsigned i = 0; i < N; i++) a[i] += b[i];"
  * static int id = -1;
  * const char *clauses[4] = {"transform", "file", "function", 0};
- * int err = nomp_jit(&id, knl, clauses, 3, "a", sizeof(a), NOMP_PTR, "b",
- *   sizeof(b), NOMP_PTR, "N", sizeof(int), NOMP_INT);
+ * int err = nomp_jit(&id, knl, clauses, 3, "a", sizeof(a[0]), NOMP_PTR, "b",
+ *   sizeof(b[0]), NOMP_PTR, "N", sizeof(int), NOMP_INT);
  * @endcode
  *
  * @param[out] id Id of the generated kernel.
@@ -318,8 +318,8 @@ int nomp_jit(int *id, const char *src, const char **clauses, int nargs, ...);
  * static int id = -1;
  * const char *knl = "for (unsigned i = 0; i < N; i++) a[i] += b[i];"
  * const char *clauses[4] = {"transform", "file", "function", 0};
- * int err = nomp_jit(&id, knl, clauses, 3, "a", sizeof(a), NOMP_PTR, "b",
- *   sizeof(b), NOMP_PTR, "N", sizeof(int), NOMP_INT);
+ * int err = nomp_jit(&id, knl, clauses, 3, "a", sizeof(a[0]), NOMP_PTR, "b",
+ *   sizeof(b[0]), NOMP_PTR, "N", sizeof(int), NOMP_INT);
  * err = nomp_run(id, a, b, &N);
  * @endcode
  *

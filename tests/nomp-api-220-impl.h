@@ -11,9 +11,9 @@ static int nomp_api_220_aux(const char *fmt, TEST_TYPE *a, TEST_TYPE *b,
   const char *clauses[4] = {"transform", "nomp-api-220", "transform", 0};
   char *knl = generate_knl(fmt, 3, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE),
                            TOSTRING(TEST_TYPE));
-  nomp_test_chk(nomp_jit(&id, knl, clauses, 4, "a", sizeof(TEST_TYPE *),
-                         NOMP_PTR, "b", sizeof(TEST_TYPE *), NOMP_PTR, "c",
-                         sizeof(TEST_TYPE *), NOMP_PTR, "N", sizeof(int),
+  nomp_test_chk(nomp_jit(&id, knl, clauses, 4, "a", sizeof(TEST_TYPE), NOMP_PTR,
+                         "b", sizeof(TEST_TYPE), NOMP_PTR, "c",
+                         sizeof(TEST_TYPE), NOMP_PTR, "N", sizeof(int),
                          NOMP_INT));
   nomp_free(knl);
 
