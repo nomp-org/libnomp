@@ -7,8 +7,8 @@ static int nomp_api_241_aux(const char *fmt, TEST_TYPE *a, int n) {
   int id = -1;
   const char *clauses[4] = {"transform", "nomp-api-240", "transform", 0};
   char *knl = generate_knl(fmt, 1, TOSTRING(TEST_TYPE));
-  nomp_test_chk(nomp_jit(&id, knl, clauses, 2, "a", sizeof(TEST_TYPE *),
-                         NOMP_PTR, "N", sizeof(int), NOMP_INT));
+  nomp_test_chk(nomp_jit(&id, knl, clauses, 2, "a", sizeof(TEST_TYPE), NOMP_PTR,
+                         "N", sizeof(int), NOMP_INT));
   nomp_free(knl);
 
   nomp_test_chk(nomp_run(id, a, &n));
