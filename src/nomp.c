@@ -367,7 +367,8 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
   // Initialize the program struct.
   struct nomp_prog *prg = progs[progs_n] = nomp_calloc(struct nomp_prog, 1);
   prg->nargs = nargs, prg->args = nomp_calloc(struct nomp_arg, nargs);
-  prg->map = mapbasicbasic_new(), prg->reduction_index = -1;
+  prg->map = mapbasicbasic_new(), prg->sym_global = vecbasic_new(),
+  prg->sym_local = vecbasic_new(), prg->reduction_index = -1;
 
   va_list args;
   va_start(args, nargs);
@@ -426,67 +427,66 @@ int nomp_run(int id, ...) {
                         "Kernel id %d passed to nomp_run is not valid.", id);
   }
 
-    nomp_profile("nomp_run setup time", 1, 1);
-    struct nomp_prog *prg = progs[id];
-    struct nomp_arg *args = prg->args;
-    prg->is_grid_eval = 0;
+  nomp_profile("nomp_run setup time", 1, 1);
 
-    va_list vargs;
-    va_start(vargs, id);
+  struct nomp_prog *prg = progs[id];
+  struct nomp_arg *args = prg->args;
+  prg->is_grid_eval = 0;
 
-    struct nomp_mem *m;
-    int val, val_len;
-    char *str_val;
-    for (unsigned i = 0; i < prg->nargs; i++) {
-      args[i].ptr = va_arg(vargs, void *);
-      switch (args[i].type) {
-      case NOMP_INT:
-        val = *((int *)args[i].ptr);
-        goto val_len;
-        break;
-      case NOMP_UINT:
-        val = *((unsigned int *)args[i].ptr);
-      val_len:
-        val_len = snprintf(NULL, 0, "%d", val) + 1;
-        str_val = (char *)malloc(val_len * sizeof(char));
-        snprintf(str_val, val_len, "%d", val);
-        sym_c_map_push(prg, args[i].name, str_val);
-        nomp_free(str_val);
-        break;
-      case NOMP_PTR:
+  va_list vargs;
+  va_start(vargs, id);
+
+  struct nomp_mem *m;
+  int val, val_len;
+  char str_val[64];
+  for (unsigned i = 0; i < prg->nargs; i++) {
+    args[i].ptr = va_arg(vargs, void *);
+    switch (args[i].type) {
+    case NOMP_INT:
+      val = *((int *)args[i].ptr);
+      goto str_val;
+      break;
+    case NOMP_UINT:
+      val = *((unsigned int *)args[i].ptr);
+    str_val:
+      snprintf(str_val, sizeof(str_val), "%d", val);
+      nomp_symengine_map_push(prg, args[i].name, str_val);
+      break;
+    case NOMP_PTR:
+      m = mem_if_mapped(args[i].ptr);
+      if (m == NULL) {
         if (prg->reduction_index == i) {
           prg->reduction_ptr = args[i].ptr, prg->reduction_size = args[i].size;
-          m = nomp.scratch;
+          m = &nomp.scratch;
         } else {
-          m = mem_if_mapped(args[i].ptr);
-          if (m == NULL) {
-            return nomp_set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
-                                ERR_STR_USER_MAP_PTR_IS_INVALID, args[i].ptr);
-          }
+          return nomp_set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
+                              ERR_STR_USER_MAP_PTR_IS_INVALID, args[i].ptr);
         }
-        args[i].size = m->bsize, args[i].ptr = m->bptr;
-        break;
       }
+      args[i].size = m->bsize, args[i].ptr = m->bptr;
+      break;
     }
-    va_end(vargs);
+  }
+  va_end(vargs);
 
-    nomp_profile("nomp_run setup time", 0, 1);
+  nomp_profile("nomp_run setup time", 0, 1);
 
-    nomp_profile("nomp_run grid evaluation", 1, 1);
+  nomp_profile("nomp_run grid evaluation", 1, 1);
 
+  if (prg->is_grid_eval)
     nomp_check(nomp_py_eval_grid_size(prg));
 
-    nomp_profile("nomp_run grid evaluation", 0, 1);
+  nomp_profile("nomp_run grid evaluation", 0, 1);
 
-    nomp_profile("nomp_run kernel runtime", 1, 1);
+  nomp_profile("nomp_run kernel runtime", 1, 1);
 
-    nomp_check(nomp.knl_run(&nomp, prg));
-    if (prg->reduction_index >= 0)
-      nomp_check(nomp_host_side_reduction(&nomp, prg, nomp.scratch));
-    
-    nomp_profile("nomp_run kernel runtime", 0, 1);
+  nomp_check(nomp.knl_run(&nomp, prg));
+  if (prg->reduction_index >= 0)
+    nomp_check(nomp_host_side_reduction(&nomp, prg, &nomp.scratch));
 
-    return 0;
+  nomp_profile("nomp_run kernel runtime", 0, 1);
+
+  return 0;
 }
 
 int nomp_sync() { return nomp.sync(&nomp); }
@@ -510,9 +510,8 @@ int nomp_finalize(void) {
   for (unsigned i = 0; i < progs_n; i++) {
     if (progs[i]) {
       nomp_check(nomp.knl_free(progs[i]));
-      nomp_free(progs[i]->args), nomp_free(progs[i]);
       vecbasic_free(progs[i]->sym_global), vecbasic_free(progs[i]->sym_local);
-      mapbasicbasic_free(progs[i]->map), progs[i] = NULL;
+      mapbasicbasic_free(progs[i]->map), nomp_free(&progs[i]->args);
     }
     nomp_free(&progs[i]);
   }

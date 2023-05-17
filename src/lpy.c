@@ -221,17 +221,23 @@ int nomp_py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
   return 0;
 }
 
-int sym_c_vec_push(CVecBasic *vec, const char *str) {
-  CWRAPPER_OUTPUT_TYPE err;
+static int symengine_vec_push(CVecBasic *vec, const char *str) {
   basic a;
   basic_new_stack(a);
-  err = basic_parse(a, str);
+  CWRAPPER_OUTPUT_TYPE err = basic_parse(a, str);
+  if (err) {
+    return nomp_set_log(
+        NOMP_LOOPY_GRIDSIZE_FAILURE, NOMP_ERROR,
+        "Expression parsing with SymEngine failed with error %d.", err);
+  }
   vecbasic_push_back(vec, a);
   basic_free_stack(a);
-  return err;
+
+  return 0;
 }
 
-int sym_c_map_push(struct prog *prg, const char *key, const char *val) {
+int nomp_symengine_map_push(struct nomp_prog *prg, const char *key,
+                            const char *val) {
   basic a, b, c;
   basic_new_stack(a);
   basic_new_stack(b);
@@ -245,21 +251,28 @@ int sym_c_map_push(struct prog *prg, const char *key, const char *val) {
   basic_free_stack(a);
   basic_free_stack(b);
   basic_free_stack(c);
+
   return 0;
 }
 
-int sym_evaluate(size_t *out, unsigned i, CVecBasic *vec, CMapBasicBasic *map) {
-  CWRAPPER_OUTPUT_TYPE err;
+static int symengine_evaluate(size_t *out, unsigned i, CVecBasic *vec,
+                              CMapBasicBasic *map) {
   basic a;
   basic_new_stack(a);
   vecbasic_get(vec, i, a);
-  err = basic_subs(a, a, map);
+  CWRAPPER_OUTPUT_TYPE err = basic_subs(a, a, map);
+  if (err) {
+    return nomp_set_log(
+        NOMP_LOOPY_GRIDSIZE_FAILURE, NOMP_ERROR,
+        "Expression substitute with SymEngine failed with error %d.", err);
+  }
   out[i] = integer_get_ui(a);
   basic_free_stack(a);
-  return err;
+
+  return 0;
 }
 
-int py_get_grid_size_aux(PyObject *exp, CVecBasic *vec) {
+static int py_get_grid_size_aux(PyObject *exp, CVecBasic *vec) {
   int err = 1;
   PyObject *mapper = PyImport_ImportModule("pymbolic.interop.symengine");
   if (mapper) {
@@ -270,23 +283,22 @@ int py_get_grid_size_aux(PyObject *exp, CVecBasic *vec) {
       if (sym_exp) {
         PyObject *obj_rep = PyObject_Repr(sym_exp);
         const char *str = PyUnicode_AsUTF8(obj_rep);
-        err = sym_c_vec_push(vec, str);
+        err = symengine_vec_push(vec, str);
         Py_XDECREF(obj_rep), Py_DECREF(sym_exp);
       }
       Py_DECREF(p2s_mapper);
     }
     Py_DECREF(mapper), Py_XDECREF(module_name);
   }
-
   if (err) {
-    return nomp_set_log(
-        NOMP_SYMENGINE_PARSING_FAILURE, NOMP_ERROR,
-        "Unable to parse and and assign value using SymEngine.");
+    return nomp_set_log(NOMP_LOOPY_GRIDSIZE_FAILURE, NOMP_ERROR,
+                        "Unable to evaluate grid sizes from loopy kernel.");
   }
-  return err;
+
+  return 0;
 }
 
-int py_get_grid_size(struct prog *prg, PyObject *knl) {
+int nomp_py_get_grid_size(struct nomp_prog *prg, PyObject *knl) {
   int err = 1;
   if (knl) {
     PyObject *callables = PyObject_GetAttrString(knl, "callables_table");
@@ -301,23 +313,19 @@ int py_get_grid_size(struct prog *prg, PyObject *knl) {
           if (grid_size && PyTuple_Check(grid_size)) {
             PyObject *py_global = PyTuple_GetItem(grid_size, 0);
             PyObject *py_local = PyTuple_GetItem(grid_size, 1);
-            prg->sym_global = vecbasic_new();
-            prg->sym_local = vecbasic_new();
-            prg->ndim = PyTuple_Size(py_global);
+            prg->ndim = nomp_max(2, PyTuple_Size(PyTuple_GetItem(grid_size, 0)),
+                                 PyTuple_Size(PyTuple_GetItem(grid_size, 1)));
 
-            for (int i = 0; i < PyTuple_Size(py_global); i++) {
-              PyObject *ele = PyTuple_GetItem(py_global, i);
-              py_get_grid_size_aux(ele, prg->sym_global);
-            }
+            for (int i = 0; i < PyTuple_Size(py_global); i++)
+              nomp_check(py_get_grid_size_aux(PyTuple_GetItem(py_global, i),
+                                              prg->sym_global));
 
-            for (int i = 0; i < PyTuple_Size(py_local); i++) {
-              PyObject *ele = PyTuple_GetItem(py_local, i);
-              py_get_grid_size_aux(ele, prg->sym_local);
-            }
+            for (int i = 0; i < PyTuple_Size(py_local); i++)
+              nomp_check(py_get_grid_size_aux(PyTuple_GetItem(py_local, i),
+                                              prg->sym_local));
 
-            if (PyTuple_Size(py_local) > prg->ndim)
-              prg->ndim = PyTuple_Size(py_local);
             err = 0;
+            Py_DECREF(grid_size);
           }
           Py_DECREF(expr);
         }
@@ -327,14 +335,14 @@ int py_get_grid_size(struct prog *prg, PyObject *knl) {
     }
   }
   if (err) {
-    return nomp_set_log(NOMP_LOOPY_GET_GRIDSIZE_FAILURE, NOMP_ERROR,
+    return nomp_set_log(NOMP_LOOPY_GRIDSIZE_FAILURE, NOMP_ERROR,
                         "Unable to get grid sizes from loopy kernel.");
   }
 
   return 0;
 }
 
-int py_eval_grid_size(struct prog *prg) {
+int nomp_py_eval_grid_size(struct nomp_prog *prg) {
   // If the expressions are not NULL, iterate through them and evaluate with
   // pymbolic. Also, we should calculate and store a hash of the dict that
   // is passed. If the hash is the same, no need of re-evaluating the grid
@@ -342,13 +350,14 @@ int py_eval_grid_size(struct prog *prg) {
   for (unsigned i = 0; i < 3; i++)
     prg->global[i] = prg->local[i] = 1;
 
-  for (unsigned j = 0; j < vecbasic_size(prg->sym_global); j++) {
-    nomp_check(sym_evaluate(prg->global, j, prg->sym_global, prg->map));
-  }
+  for (unsigned j = 0; j < vecbasic_size(prg->sym_global); j++)
+    nomp_check(symengine_evaluate(prg->global, j, prg->sym_global, prg->map));
 
-  for (unsigned j = 0; j < vecbasic_size(prg->sym_local); j++) {
-    nomp_check(sym_evaluate(prg->local, j, prg->sym_local, prg->map));
-  }
+  for (unsigned j = 0; j < vecbasic_size(prg->sym_local); j++)
+    nomp_check(symengine_evaluate(prg->local, j, prg->sym_local, prg->map));
+
+  for (unsigned i = 0; i < 3; i++)
+    prg->gws[i] = prg->global[i] * prg->local[i];
 
   return 0;
 }

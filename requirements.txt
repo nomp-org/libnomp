@@ -1,5 +1,5 @@
 git+https://github.com/pubuduprabhathiya/loopy.git@sycl#egg=loopy
+git+https://github.com/inducer/pymbolic.git#egg=pymbolic
 libclang==14.0.6
-pymbolic==2022.2
-pytools==2022.1.12
+pytools==2022.1.14
 symengine==0.10.0

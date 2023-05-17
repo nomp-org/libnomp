@@ -93,11 +93,6 @@ static int sycl_knl_run(struct nomp_backend *bnd, struct nomp_prog *prg) {
     arg_list[i] = prg->args[i].ptr;
   arg_list[prg->nargs] = (void *)&sycl->queue;
 
-  if (prg->is_grid_eval) {
-    for (unsigned i = 0; i < 3; i++)
-      prg->gws[i] = prg->global[i] * prg->local[i];
-  }
-
   sycl::nd_range<3> nd_range =
       sycl::nd_range(sycl::range(prg->gws[0], prg->gws[1], prg->gws[2]),
                      sycl::range(prg->local[0], prg->local[1], prg->local[2]));

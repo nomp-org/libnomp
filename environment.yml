@@ -8,4 +8,4 @@ dependencies:
   - pip
   - pip:
     - -r requirements.txt
-  - symengine
+  - symengine=0.10.1

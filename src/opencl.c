@@ -101,11 +101,6 @@ static int opencl_knl_run(struct nomp_backend *bnd, struct nomp_prog *prg) {
            "clSetKernelArg");
   }
 
-  if (prg->is_grid_eval) {
-    for (unsigned i = 0; i < prg->ndim; i++)
-      prg->gws[i] = prg->global[i] * prg->local[i];
-  }
-
   struct opencl_backend *ocl = (struct opencl_backend *)bnd->bptr;
   chk_cl(clEnqueueNDRangeKernel(ocl->queue, oprg->knl, prg->ndim, NULL,
                                 prg->gws, prg->local, 0, NULL, NULL),

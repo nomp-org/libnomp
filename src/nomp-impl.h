@@ -54,12 +54,13 @@ struct nomp_prog {
   // Map of variable names and their values use to evaluate
   // the kernel launch parameters.
   CMapBasicBasic *map;
+  // Boolean flag to determine if the grid size should be evaluated or not.
+  int is_grid_eval;
   // Pointer to keep track of backend specific data.
   void *bptr;
   // Reduction related metadata.
   int reduction_index, reduction_op, reduction_type, reduction_size;
   void *reduction_ptr;
-  int is_grid_eval;
 };
 
 struct nomp_backend {
