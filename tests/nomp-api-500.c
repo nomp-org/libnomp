@@ -8,6 +8,7 @@ static int test_sum() {
   // TEST_BUILTIN_TYPES(500_sum_const);
   // TEST_BUILTIN_TYPES(500_sum, 10);
   TEST_BUILTIN_TYPES(500_sum_array, 10);
+  TEST_BUILTIN_TYPES(500_sum_array, 50);
   return err;
 }
 

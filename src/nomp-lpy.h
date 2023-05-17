@@ -31,11 +31,19 @@ int nomp_py_append_to_sys_path(const char *path);
  * @param[out] knl Loopy kernel object.
  * @param[in] src C kernel source.
  * @param[in] backend Backend name.
- * @param[in] reduction_index Index of the reduction variable if present.
  * @return int
  */
-int nomp_py_c_to_loopy(PyObject **knl, const char *src, const char *backend,
-                       int reduction_index);
+int nomp_py_c_to_loopy(PyObject **knl, const char *src, const char *backend);
+
+/**
+ * @ingroup nomp_py_utils
+ * @brief Realize reductions if present in the kernel.
+ *
+ * @param[in,out] knl Loopy kernel object.
+ * @param[in] var Name of the reduction variable.
+ * @return int
+ */
+int nomp_py_realize_reduction(PyObject **knl, const char *var);
 
 /**
  * @ingroup nomp_py_utils

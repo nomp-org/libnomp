@@ -36,7 +36,7 @@ int nomp_py_append_to_sys_path(const char *path) {
   return 0;
 }
 
-static int py_realize_reduction(PyObject **knl, const char *backend) {
+int nomp_py_realize_reduction(PyObject **knl, const char *var) {
   int err = 1;
   PyObject *reduction = PyUnicode_FromString(module_reduction);
   if (reduction) {
@@ -44,12 +44,11 @@ static int py_realize_reduction(PyObject **knl, const char *backend) {
     if (module) {
       PyObject *rr = PyObject_GetAttrString(module, realize_reduction);
       if (rr) {
-        PyObject *pbackend = PyUnicode_FromString(backend);
-        PyObject *result =
-            PyObject_CallFunctionObjArgs(rr, *knl, pbackend, NULL);
+        PyObject *pvar = PyUnicode_FromString(var);
+        PyObject *result = PyObject_CallFunctionObjArgs(rr, *knl, pvar, NULL);
         if (result)
           Py_DECREF(*knl), *knl = result, err = 0;
-        Py_XDECREF(pbackend), Py_DECREF(rr);
+        Py_XDECREF(pvar), Py_DECREF(rr);
       }
       Py_DECREF(module);
     }
@@ -57,14 +56,13 @@ static int py_realize_reduction(PyObject **knl, const char *backend) {
   }
   if (err) {
     return nomp_set_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,
-                        "Call to realize_reduction failed.");
+                        "Call to realize_reduction() failed.");
   }
 
   return 0;
 }
 
-int nomp_py_c_to_loopy(PyObject **knl, const char *src, const char *backend,
-                       int reduction_index) {
+int nomp_py_c_to_loopy(PyObject **knl, const char *src, const char *backend) {
   int err = 1;
   PyObject *lpy_api = PyUnicode_FromString(module_loopy_api);
   if (lpy_api) {
@@ -74,11 +72,9 @@ int nomp_py_c_to_loopy(PyObject **knl, const char *src, const char *backend,
       if (c_to_lpy) {
         PyObject *psrc = PyUnicode_FromString(src);
         PyObject *pbackend = PyUnicode_FromString(backend);
-        PyObject *pindex = PyLong_FromLong(reduction_index);
-        *knl = PyObject_CallFunctionObjArgs(c_to_lpy, psrc, pbackend, pindex,
-                                            NULL);
-        Py_XDECREF(psrc), Py_XDECREF(pbackend), Py_XDECREF(pindex);
-        Py_DECREF(c_to_lpy), err = (*knl == NULL);
+        *knl = PyObject_CallFunctionObjArgs(c_to_lpy, psrc, pbackend, NULL);
+        err = (*knl == NULL);
+        Py_XDECREF(psrc), Py_XDECREF(pbackend), Py_DECREF(c_to_lpy);
       }
       Py_DECREF(module);
     }
@@ -88,9 +84,6 @@ int nomp_py_c_to_loopy(PyObject **knl, const char *src, const char *backend,
     return nomp_set_log(NOMP_LOOPY_CONVERSION_FAILURE, NOMP_ERROR,
                         "C to Loopy conversion failed.\n");
   }
-
-  if (reduction_index >= 0)
-    nomp_check(py_realize_reduction(knl, backend));
 
   return 0;
 }
