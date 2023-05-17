@@ -106,9 +106,9 @@ static int nomp_api_500_sum_array_aux(const char *fmt, const char **clauses,
 
 #define nomp_api_500_sum_array TOKEN_PASTE(nomp_api_500_sum_array, TEST_SUFFIX)
 static int nomp_api_500_sum_array(int N) {
-  nomp_test_assert(N <= 10);
+  nomp_test_assert(N <= 100);
 
-  TEST_TYPE a[10], sum;
+  TEST_TYPE a[100], sum;
   for (unsigned i = 0; i < N; i++)
     a[i] = i;
 

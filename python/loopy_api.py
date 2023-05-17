@@ -15,7 +15,7 @@ from kernel_wrappers import (
 )
 from loopy.isl_helpers import make_slab
 from loopy.kernel.data import AddressSpace
-from loopy.symbolic import Reduction, aff_from_expr
+from loopy.symbolic import aff_from_expr
 from loopy.target.c.compyte.dtypes import (
     DTypeRegistry,
     fill_registry_with_c_types,
@@ -78,10 +78,6 @@ _BACKEND_TO_WRAPPER = {
 }
 _ARRAY_TYPES = [cindex.TypeKind.CONSTANTARRAY, cindex.TypeKind.INCOMPLETEARRAY]
 _ARRAY_TYPES_W_PTR = _ARRAY_TYPES + [cindex.TypeKind.POINTER]
-_C_REDN_TO_LOOPY_REDN = {
-    "+=": lp.library.reduction.SumReductionOperation(),
-    "*=": lp.library.reduction.ProductReductionOperation(),
-}
 
 
 # pylint-disable-reason: Prefer the Singleton pattern instead of a global
@@ -252,7 +248,6 @@ class CToLoopyMapperContext:
     value_args: FrozenSet[str]
     predicates: FrozenSet[Union[prim.Comparison, prim.LogicalNot]]
     name_gen: UniqueNameGenerator
-    reduction_index: int
 
     def copy(self, **kwargs) -> "CToLoopyMapperContext":
         """Return a copy of the context by replacing fields."""
@@ -602,25 +597,7 @@ class CToLoopyMapper(IdentityMapper):
 
         op_str = get_op_str(expr, left)
 
-        inames = context.inames
-        if (
-            context.reduction_index >= 0
-            and isinstance(lhs, prim.Subscript)
-            and isinstance(lhs.aggregate, prim.Variable)
-        ):
-            if len(inames) > 1:
-                raise NotImplementedError(
-                    "Reductions over multiple inames are not supported yet !"
-                )
-            try:
-                rhs = Reduction(
-                    _C_REDN_TO_LOOPY_REDN[op_str], tuple(inames), rhs
-                )
-            except Exception as ex:
-                raise NotImplementedError(f"{op_str} is not valid!") from ex
-            # FIXME: This is not correct.
-            inames = frozenset()
-        elif op_str == "+=":
+        if op_str == "+=":
             rhs = lhs + rhs
         elif op_str == "-=":
             rhs = lhs - rhs
@@ -635,7 +612,7 @@ class CToLoopyMapper(IdentityMapper):
                 lp.Assignment(
                     lhs,
                     expression=rhs,
-                    within_inames=inames,
+                    within_inames=context.inames,
                     predicates=context.predicates,
                     id=context.name_gen(LOOPY_INSN_PREFIX),
                 )
@@ -743,9 +720,7 @@ class CKernel:
         return self.knl_name
 
 
-def c_to_loopy(
-    c_str: str, backend: str, reduction_index: int = -1
-) -> lp.translation_unit.TranslationUnit:
+def c_to_loopy(c_str: str, backend: str) -> lp.translation_unit.TranslationUnit:
     """Returns a Loopy kernel for a C loop band."""
     fname = hashlib.sha256(c_str.encode("utf-8")).hexdigest() + ".c"
     tunit = cindex.Index.create().parse(fname, unsaved_files=[(fname, c_str)])
@@ -767,7 +742,6 @@ def c_to_loopy(
             c_knl.get_value_types(),
             frozenset(),
             UniqueNameGenerator(),
-            reduction_index,
         ),
     )
 
@@ -822,7 +796,6 @@ if __name__ == "__main__":
     import sys
 
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-    from reduction import realize_reduction
 
     KNL_STR = """
           void foo(double *a, int N, double *sum) {
@@ -832,6 +805,8 @@ if __name__ == "__main__":
           }
           """
     BACKEND = "cuda"
-    lp_knl = c_to_loopy(KNL_STR, BACKEND, 2)
-    lp_knl = realize_reduction(lp_knl, "cuda")
-    print(get_knl_src(lp_knl, BACKEND))
+    lp_knl = c_to_loopy(KNL_STR, BACKEND)
+
+    from reduction import realize_reduction
+
+    lp_knl = realize_reduction(lp_knl, "sum")

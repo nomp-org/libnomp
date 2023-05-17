@@ -1,49 +1,36 @@
 """Module to do reductions with using Loopy."""
-from dataclasses import dataclass
 
 import loopy as lp
 import pymbolic.primitives as prim
+from loopy.symbolic import Reduction
 from loopy.transform.data import reduction_arg_to_subst_rule
 from loopy_api import LOOPY_LANG_VERSION
 
-_BACKEND_TO_BLOCK_SIZE = {"cuda": 32, "opencl": 32}
+_TARGET_BLOCK_SIZE = {"cuda": 32, "opencl": 32}
 
 
-@dataclass
-class ReductionInfo:
-    """Store meta information about reductions."""
-
-    var: str = ""
-    arg: lp.KernelArgument = None
-
-    @property
-    def tmp(self):
-        """Return the name of the temporary variable name used for reduction"""
-        return f"{self.var}_tmp"
+def target_to_str(target: lp.target.TargetBase) -> str:
+    """Get the target name as a string"""
+    if isinstance(target, lp.target.cuda.CudaTarget):
+        return "cuda"
+    if isinstance(target, lp.target.opencl.OpenCLTarget):
+        return "opencl"
+    if isinstance(target, lp.target.ispc.ISPCTarget):
+        return "ispc"
+    raise NotImplementedError(f"Uknown target: {target}")
 
 
 def realize_reduction(
-    tunit: lp.translation_unit.TranslationUnit, backend: str
-) -> tuple[lp.translation_unit.TranslationUnit, int]:
-    """Perform transformations to realize reduction."""
+    tunit: lp.translation_unit.TranslationUnit, var: str
+) -> lp.translation_unit.TranslationUnit:
+    """Perform transformations to realize a reduction."""
 
     if len(tunit.callables_table.keys()) > 1:
         raise NotImplementedError(
             "Don't know how to handle more than 1 callable in translation unit!"
         )
-    (knl_name,) = tunit.callables_table.keys()
 
-    knl, redn = tunit.default_entrypoint, ReductionInfo()
-    for insn in knl.instructions:
-        if isinstance(insn, lp.Assignment):
-            if isinstance(insn.assignee, prim.Subscript) and isinstance(
-                insn.expression, lp.symbolic.Reduction
-            ):
-                if isinstance(insn.assignee.aggregate, prim.Variable):
-                    redn.var = insn.assignee.aggregate.name
-    if not redn.var:
-        raise SyntaxError("Reduction variable or operation not found.")
-
+    knl = tunit.default_entrypoint
     if len(knl.inames.keys()) > 1:
         raise NotImplementedError(
             "Don't know how to handle more than 1 iname in redcution !"
@@ -54,56 +41,78 @@ def realize_reduction(
     tunit = lp.split_iname(
         tunit,
         iname,
-        _BACKEND_TO_BLOCK_SIZE[backend],
+        _TARGET_BLOCK_SIZE[target_to_str(knl.target)],
         inner_iname=i_inner,
         outer_iname=i_outer,
     )
-    tunit = lp.split_reduction_outward(tunit, i_outer)
-    tunit = lp.split_reduction_inward(tunit, i_inner)
 
-    tunit = reduction_arg_to_subst_rule(
-        tunit, i_outer, subst_rule_name=redn.tmp
-    )
-    tunit = lp.precompute(
-        tunit,
-        redn.tmp,
-        i_outer,
-        temporary_address_space=lp.AddressSpace.GLOBAL,
-        default_tag="l.auto",
-    )
-    tunit = lp.realize_reduction(tunit)
+    (knl_name,) = tunit.callables_table.keys()
     knl = tunit[knl_name]
 
-    for arg in knl.args:
-        if arg.name == redn.var:
-            redn.arg = arg
-            break
+    insns = []
+    for insn in knl.instructions:
+        if (
+            isinstance(insn, lp.Assignment)
+            and isinstance(insn.assignee, prim.Subscript)
+            and isinstance(insn.assignee.aggregate, prim.Variable)
+            and insn.assignee.aggregate.name == var
+        ):
+            (lhs, rhs) = insn.expression.children
+            if isinstance(insn.expression, prim.Sum):
+                rhs = Reduction(
+                    lp.library.reduction.SumReductionOperation(),
+                    i_inner,
+                    rhs,
+                )
+            elif isinstance(insn.expression, prim.Product):
+                rhs = Reduction(
+                    lp.library.reduction.ProductReductionOperation(),
+                    i_inner,
+                    rhs,
+                )
 
-    tvar = knl.temporary_variables.pop(f"{redn.tmp}_0")
-    knl.args.append(
-        lp.GlobalArg(
-            tvar.name,
-            dtype=redn.arg.dtype,
-            shape=tvar.shape,
-            dim_tags=tvar.dim_tags,
-            offset=tvar.offset,
-            dim_names=tvar.dim_names,
-            alignment=tvar.alignment,
-            tags=tvar.tags,
-        )
-    )
-    knl.args.sort(key=lambda arg: arg.name.lower())
+            if isinstance(lhs, prim.Subscript):
+                agg = lhs.aggregate
+                lhs = prim.Subscript(agg, prim.Variable(i_outer))
+            else:
+                raise NotImplementedError(
+                    "LHS of a reduction must be a subscript !"
+                )
+            # FIXME: Missing predicates. `id` has to be random and prefixed
+            # with "nomp_insn_".
+            insn_id = "sum_reduction_"
+            insns.append(
+                lp.Assignment(
+                    lhs,
+                    expression=rhs,
+                    within_inames=frozenset({i_outer}),
+                    id=insn_id,
+                )
+            )
+        else:
+            insns.append(insn)
 
-    knl = lp.make_kernel(
+    tunit = lp.make_kernel(
         knl.domains,
-        knl.instructions,
-        knl.args + list(knl.temporary_variables.values()),
+        insns,
+        knl.args,
         name=knl.name,
         target=knl.target,
         lang_version=LOOPY_LANG_VERSION,
     )
 
-    knl = lp.tag_inames(knl, {i_inner: "l.0"})
-    knl = lp.tag_inames(knl, {f"{i_outer}_0": "g.0"})
-    knl = lp.add_dependency(knl, "writes:acc_i_outer", f"id:{redn.tmp}_barrier")
-    return knl
+    subst = "tmp_sum"
+    tunit = reduction_arg_to_subst_rule(tunit, i_inner, subst_rule_name=subst)
+    tunit = lp.precompute(
+        tunit,
+        subst,
+        i_inner,
+        temporary_address_space=lp.AddressSpace.LOCAL,
+        default_tag="l.0",
+    )
+
+    tunit = lp.tag_inames(tunit, {i_outer: "g.0"})
+    tunit = lp.tag_inames(tunit, {i_inner: "l.0"})
+    tunit = lp.remove_unused_inames(tunit)
+
+    return tunit
