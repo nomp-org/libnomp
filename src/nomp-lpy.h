@@ -138,7 +138,8 @@ int nomp_py_eval_grid_size(struct nomp_prog *prg);
  * @param[in] val Value as a C-string.
  * @return int
  */
-int sym_c_map_push(struct prog *prg, const char *key, const char *val);
+int nomp_symengine_map_push(struct nomp_prog *prg, const char *key,
+                            const char *val);
 
 /**
  * @ingroup nomp_py_utils

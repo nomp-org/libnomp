@@ -132,19 +132,7 @@
  * @ingroup nomp_errors
  * @brief Code generation from loopy kernel failed.
  */
-#define NOMP_LOOPY_GET_GRIDSIZE_FAILURE -392
-/**
- * @ingroup nomp_errors
- * @brief Grid size calculation failed.
- */
-#define NOMP_LOOPY_EVAL_GRIDSIZE_FAILURE -394
-
-/**
- * @ingroup nomp_errors
- * @brief Parse string and assign value failed.
- */
-#define NOMP_SYMENGINE_PARSING_FAILURE -412
-
+#define NOMP_LOOPY_GRIDSIZE_FAILURE -392
 /**
  * @ingroup nomp_errors
  * @brief libnomp Cuda operation failed.
