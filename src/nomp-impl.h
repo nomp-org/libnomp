@@ -15,7 +15,6 @@
 #include <string.h>
 
 #define NOMP_MAX_BUFSIZ 128
-#define NOMP_MAX_IDENT_SIZE 128
 #define NOMP_MAX_SRC_SIZE 16384
 #define NOMP_MAX_CFLAGS_SIZE 16384
 #define NOMP_MAX_KNL_ARGS 64
@@ -35,7 +34,7 @@ struct nomp_mem {
 };
 
 struct nomp_arg {
-  char name[NOMP_MAX_IDENT_SIZE];
+  char name[NOMP_MAX_BUFSIZ];
   size_t size;
   unsigned type;
   void *ptr;

@@ -97,7 +97,7 @@ int nomp_py_c_to_loopy(PyObject **knl, const char *src, const char *backend,
 
 int nomp_py_set_annotate_func(PyObject **annotate_func, const char *path_) {
   // Find file and function from path.
-  char *path = strndup(path_, PATH_MAX + NOMP_MAX_IDENT_SIZE);
+  char *path = strndup(path_, PATH_MAX + NOMP_MAX_BUFSIZ);
   char *file = strtok(path, "::"), *func = strtok(NULL, "::");
   if (file == NULL || path == NULL) {
     nomp_free(path);
