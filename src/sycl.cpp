@@ -57,10 +57,9 @@ static int sycl_update(struct nomp_backend *bnd, struct nomp_mem *m,
 static int sycl_knl_free(struct nomp_prog *prg) {
   struct sycl_prog *sycl_prg = (struct sycl_prog *)prg->bptr;
 
-  int err = nomp_jit_free(&sycl_prg->sycl_id);
-  nomp_free(&prg->bptr);
-
-  return err;
+  if (sycl)
+    return nomp_jit_free(&sycl_prg->sycl_id);
+  return nomp_free(&prg->bptr);
 }
 
 static int sycl_knl_build(struct nomp_backend *bnd, struct nomp_prog *prg,
@@ -113,7 +112,8 @@ static int sycl_sync(struct nomp_backend *bnd) {
 static int sycl_finalize(struct nomp_backend *bnd) {
   struct sycl_backend *sycl = (struct sycl_backend *)bnd->bptr;
 
-  nomp_free(&sycl->compiler), nomp_free(&sycl->compiler_flags);
+  if (sycl)
+    nomp_free(&sycl->compiler), nomp_free(&sycl->compiler_flags);
   nomp_free(&bnd->bptr);
 
   return 0;

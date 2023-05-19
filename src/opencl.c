@@ -116,11 +116,11 @@ static int opencl_knl_run(struct nomp_backend *bnd, struct nomp_prog *prg) {
 static int opencl_knl_free(struct nomp_prog *prg) {
   struct opencl_prog *ocl_prg = prg->bptr;
 
-  chk_cl(clReleaseKernel(ocl_prg->knl), "clReleaseKernel");
-  chk_cl(clReleaseProgram(ocl_prg->prg), "clReleaseProgram");
-  nomp_free(&prg->bptr);
-
-  return 0;
+  if (ocl_prg) {
+    chk_cl(clReleaseKernel(ocl_prg->knl), "clReleaseKernel");
+    chk_cl(clReleaseProgram(ocl_prg->prg), "clReleaseProgram");
+  }
+  return nomp_free(&prg->bptr);
 }
 
 static int opencl_sync(struct nomp_backend *bnd) {
@@ -134,8 +134,10 @@ static int opencl_sync(struct nomp_backend *bnd) {
 static int opencl_finalize(struct nomp_backend *bnd) {
   struct opencl_backend *ocl = bnd->bptr;
 
-  chk_cl(clReleaseCommandQueue(ocl->queue), "clReleaseCommandQueue");
-  chk_cl(clReleaseContext(ocl->ctx), "clReleaseContext");
+  if (ocl) {
+    chk_cl(clReleaseCommandQueue(ocl->queue), "clReleaseCommandQueue");
+    chk_cl(clReleaseContext(ocl->ctx), "clReleaseContext");
+  }
   nomp_free(&bnd->bptr);
 
   return 0;

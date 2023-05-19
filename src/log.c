@@ -92,6 +92,5 @@ nomp_log_type nomp_get_log_type(int log_id) {
 void nomp_finalize_logs() {
   for (unsigned i = 0; i < logs_n; i++)
     nomp_free(&logs[i].description);
-  nomp_free(&logs);
-  logs = NULL, logs_n = logs_max = 0;
+  nomp_free(&logs), logs_n = logs_max = 0;
 }

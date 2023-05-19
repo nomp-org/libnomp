@@ -115,19 +115,24 @@ static int ispc_knl_run(struct nomp_backend *bnd, struct nomp_prog *prg) {
 
 static int ispc_knl_free(struct nomp_prog *prg) {
   struct ispc_prog *iprg = (struct ispc_prog *)prg->bptr;
-  return nomp_jit_free(&iprg->ispc_id);
+
+  if (iprg)
+    return nomp_jit_free(&iprg->ispc_id);
+  return 0;
 }
 
 static int ispc_finalize(struct nomp_backend *bnd) {
   struct ispc_backend *ispc = (struct ispc_backend *)bnd->bptr;
-  ispcrtRelease(ispc->device);
-  chk_ispcrt("device release", rt_error);
-  ispcrtRelease(ispc->queue);
-  chk_ispcrt("queue release", rt_error);
-  nomp_free(&ispc->cc), nomp_free(&ispc->cc_flags);
-  nomp_free(&ispc->ispc_cc), nomp_free(&ispc->ispc_flags);
-  nomp_free(&bnd->bptr);
-  return 0;
+
+  if (ispc) {
+    ispcrtRelease(ispc->device);
+    chk_ispcrt("device release", rt_error);
+    ispcrtRelease(ispc->queue);
+    chk_ispcrt("queue release", rt_error);
+    nomp_free(&ispc->cc), nomp_free(&ispc->cc_flags);
+    nomp_free(&ispc->ispc_cc), nomp_free(&ispc->ispc_flags);
+  }
+  return nomp_free(&bnd->bptr);
 }
 
 static int nomp_to_ispc_device[2] = {ISPCRT_DEVICE_TYPE_CPU,

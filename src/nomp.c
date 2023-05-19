@@ -114,9 +114,7 @@ static int init_configs(int argc, const char **argv,
   len = nomp_max(2, len, NOMP_MAX_BUFSIZ);
   char *abs_dir = nomp_str_cat(2, len, nomp.install_dir, "/python");
   nomp_check(nomp_py_append_to_sys_path(abs_dir));
-  nomp_free(&abs_dir);
-
-  return 0;
+  return nomp_free(&abs_dir);
 }
 
 static int allocate_scratch_memory(struct nomp_backend *backend) {
@@ -480,9 +478,8 @@ int nomp_finalize(void) {
   for (unsigned i = 0; i < progs_n; i++) {
     if (progs[i]) {
       nomp_check(nomp.knl_free(progs[i]));
-      nomp_free(&progs[i]->args);
       Py_XDECREF(progs[i]->py_global), Py_XDECREF(progs[i]->py_local);
-      Py_XDECREF(progs[i]->py_dict);
+      Py_XDECREF(progs[i]->py_dict), nomp_free(&progs[i]->args);
     }
     nomp_free(&progs[i]);
   }
