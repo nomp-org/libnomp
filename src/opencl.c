@@ -120,7 +120,9 @@ static int opencl_knl_free(struct nomp_prog *prg) {
     chk_cl(clReleaseKernel(ocl_prg->knl), "clReleaseKernel");
     chk_cl(clReleaseProgram(ocl_prg->prg), "clReleaseProgram");
   }
-  return nomp_free(&prg->bptr);
+
+  nomp_free(&prg->bptr);
+  return 0;
 }
 
 static int opencl_sync(struct nomp_backend *bnd) {
