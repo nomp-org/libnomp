@@ -41,7 +41,7 @@ static int make_knl_dir(char **dir_, const char *knl_dir, const char *src) {
   nomp_check(nomp_path_len(&len, knl_dir));
   unsigned lmax = nomp_max(2, len, SHA256_DIGEST_LENGTH);
 
-  // Create the folder if it doesn't exist.
+  // Create kernel cache directory if it doesn't exist.
   char *dir = *dir_ = nomp_str_cat(3, lmax, knl_dir, "/", hash);
   if (access(dir, F_OK) == -1) {
     if (mkdir(dir, S_IRWXU) == -1) {
@@ -50,7 +50,9 @@ static int make_knl_dir(char **dir_, const char *knl_dir, const char *src) {
                           strerror(errno));
     }
   }
-  return nomp_free(&hash);
+
+  nomp_free(&hash);
+  return 0;
 }
 
 static int write_file(const char *path, const char *src) {
@@ -77,27 +79,27 @@ static int compile_aux(const char *cc, const char *cflags, const char *src,
 
   char *cmd = nomp_calloc(char, len);
   snprintf(cmd, len, "%s %s %s -o %s", cc, cflags, src, out);
-  int ret = system(cmd), failed = 0;
+  int ret = system(cmd), err = 0;
   if (ret == -1) {
-    failed =
+    err =
         nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
                      "Got error \"%s\" when trying to execute command: \"%s\".",
                      cmd, strerror(errno));
   } else if (WIFEXITED(ret)) {
     int status = WEXITSTATUS(ret);
     if (status) {
-      failed =
+      err =
           nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
                        "Command: \"%s\" exitted with non-zero status code: %d.",
                        cmd, status);
     }
   } else {
-    failed = nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
-                          "Command: \"%s\" was terminated by a signal.", cmd);
+    err = nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
+                       "Command: \"%s\" was terminated by a signal.", cmd);
   }
-  nomp_free(&cmd);
 
-  return failed;
+  nomp_free(&cmd);
+  return err;
 }
 
 struct function {

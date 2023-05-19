@@ -12,10 +12,7 @@ extern "C" {
  * @defgroup nomp_mem_utils Host memory management functions
  */
 
-static int nomp_free_(void **p) {
-  free(*p), *p = NULL;
-  return 0;
-}
+static void nomp_free_(void **p) { free(*p), *p = NULL; }
 
 /**
  * @ingroup nomp_mem_utils
@@ -23,7 +20,7 @@ static int nomp_free_(void **p) {
  * nomp_free_(). File name and line number are passed implicitly.
  *
  * @param p Address of the pointer to the memory to deallocate.
- * @return int
+ * @return void
  */
 #define nomp_free(p) nomp_free_((void **)p)
 

@@ -99,8 +99,10 @@ int nomp_py_set_annotate_func(PyObject **annotate_func, const char *path_) {
   // Find file and function from path.
   char *path = strndup(path_, PATH_MAX + NOMP_MAX_BUFSIZ);
   char *file = strtok(path, "::"), *func = strtok(NULL, "::");
-  if (file == NULL || func == NULL)
-    return nomp_free(&path);
+  if (file == NULL || func == NULL) {
+    nomp_free(&path);
+    return 0;
+  }
 
   nomp_check(nomp_check_py_script_path(file));
 
@@ -122,7 +124,8 @@ int nomp_py_set_annotate_func(PyObject **annotate_func, const char *path_) {
         "Failed to find annotate function \"%s\" in file \"%s\".", func, file);
   }
 
-  return nomp_free(&path);
+  nomp_free(&path);
+  return err;
 }
 
 int nomp_py_apply_annotations(PyObject **knl, PyObject *func, PyObject *annts) {
@@ -266,7 +269,6 @@ static int py_eval_grid_size_aux(size_t *out, PyObject *grid, unsigned dim,
       Py_DECREF(rslt), err = 0;
     }
   }
-
   return err;
 }
 

@@ -114,7 +114,8 @@ static int init_configs(int argc, const char **argv,
   len = nomp_max(2, len, NOMP_MAX_BUFSIZ);
   char *abs_dir = nomp_str_cat(2, len, nomp.install_dir, "/python");
   nomp_check(nomp_py_append_to_sys_path(abs_dir));
-  return nomp_free(&abs_dir);
+  nomp_free(&abs_dir);
+  return 0;
 }
 
 static int allocate_scratch_memory(struct nomp_backend *backend) {
