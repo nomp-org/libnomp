@@ -73,26 +73,10 @@
 <h1 id="index">Index</h1>
 
 <div class="genindex-jumpbox">
- <a href="#J"><strong>J</strong></a>
- | <a href="#N"><strong>N</strong></a>
+ <a href="#N"><strong>N</strong></a>
  | <a href="#O"><strong>O</strong></a>
- | <a href="#P"><strong>P</strong></a>
  
 </div>
-<h2 id="J">J</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="internal-api.html#_CPPv411jit_compilePiPKcPKcPKcPKcPKcPKcPKc">jit_compile (C++ function)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="internal-api.html#_CPPv48jit_freePi">jit_free (C++ function)</a>
-</li>
-      <li><a href="internal-api.html#_CPPv47jit_runiA_Pv">jit_run (C++ function)</a>
-</li>
-  </ul></td>
-</tr></table>
-
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -142,7 +126,13 @@
 </li>
       <li><a href="user-api.html#_CPPv48nomp_jitPiPKcPPKciz">nomp_jit (C++ function)</a>
 </li>
+      <li><a href="internal-api.html#_CPPv416nomp_jit_compilePiPKcPKcPKcPKcPKcPKcPKc">nomp_jit_compile (C++ function)</a>
+</li>
       <li><a href="user-api.html#c.NOMP_JIT_FAILURE">NOMP_JIT_FAILURE (C macro)</a>
+</li>
+      <li><a href="internal-api.html#_CPPv413nomp_jit_freePi">nomp_jit_free (C++ function)</a>
+</li>
+      <li><a href="internal-api.html#_CPPv412nomp_jit_runiA_Pv">nomp_jit_run (C++ function)</a>
 </li>
       <li><a href="internal-api.html#_CPPv413nomp_log_initKi">nomp_log_init (C++ function)</a>
 </li>
@@ -150,14 +140,14 @@
 </li>
       <li><a href="user-api.html#c.NOMP_LOOPY_CONVERSION_FAILURE">NOMP_LOOPY_CONVERSION_FAILURE (C macro)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="user-api.html#c.NOMP_LOOPY_EVAL_GRIDSIZE_FAILURE">NOMP_LOOPY_EVAL_GRIDSIZE_FAILURE (C macro)</a>
 </li>
       <li><a href="user-api.html#c.NOMP_LOOPY_GET_GRIDSIZE_FAILURE">NOMP_LOOPY_GET_GRIDSIZE_FAILURE (C macro)</a>
 </li>
       <li><a href="user-api.html#c.NOMP_LOOPY_KNL_NAME_NOT_FOUND">NOMP_LOOPY_KNL_NAME_NOT_FOUND (C macro)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="internal-api.html#c.nomp_malloc">nomp_malloc (C macro)</a>
 </li>
       <li><a href="internal-api.html#_CPPv412nomp_malloc_6size_tPKcj">nomp_malloc_ (C++ function)</a>
@@ -174,7 +164,25 @@
 </li>
       <li><a href="user-api.html#c.NOMP_PTR">NOMP_PTR (C macro)</a>
 </li>
+      <li><a href="internal-api.html#_CPPv426nomp_py_append_to_sys_pathPKc">nomp_py_append_to_sys_path (C++ function)</a>
+</li>
+      <li><a href="internal-api.html#_CPPv425nomp_py_apply_annotationsPP8PyObjectP8PyObjectP8PyObject">nomp_py_apply_annotations (C++ function)</a>
+</li>
+      <li><a href="internal-api.html#_CPPv418nomp_py_c_to_loopyPP8PyObjectPKcPKci">nomp_py_c_to_loopy (C++ function)</a>
+</li>
       <li><a href="user-api.html#c.NOMP_PY_CALL_FAILURE">NOMP_PY_CALL_FAILURE (C macro)</a>
+</li>
+      <li><a href="internal-api.html#_CPPv422nomp_py_eval_grid_sizeP9nomp_prog">nomp_py_eval_grid_size (C++ function)</a>
+</li>
+      <li><a href="internal-api.html#_CPPv421nomp_py_get_grid_sizeP9nomp_progP8PyObject">nomp_py_get_grid_size (C++ function)</a>
+</li>
+      <li><a href="internal-api.html#_CPPv428nomp_py_get_knl_name_and_srcPPcPPcPK8PyObjectPKc">nomp_py_get_knl_name_and_src (C++ function)</a>
+</li>
+      <li><a href="internal-api.html#_CPPv413nomp_py_printPKcP8PyObject">nomp_py_print (C++ function)</a>
+</li>
+      <li><a href="internal-api.html#_CPPv425nomp_py_set_annotate_funcPP8PyObjectPKc">nomp_py_set_annotate_func (C++ function)</a>
+</li>
+      <li><a href="internal-api.html#_CPPv422nomp_py_user_transformPP8PyObjectPKcPKc">nomp_py_user_transform (C++ function)</a>
 </li>
       <li><a href="internal-api.html#c.nomp_realloc">nomp_realloc (C macro)</a>
 </li>
@@ -214,33 +222,7 @@
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="internal-api.html#_CPPv411opencl_initP7backendKiKi">opencl_init (C++ function)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="P">P</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="internal-api.html#_CPPv421py_append_to_sys_pathPKc">py_append_to_sys_path (C++ function)</a>
-</li>
-      <li><a href="internal-api.html#_CPPv420py_apply_annotationsPP8PyObjectP8PyObjectP8PyObject">py_apply_annotations (C++ function)</a>
-</li>
-      <li><a href="internal-api.html#_CPPv413py_c_to_loopyPP8PyObjectPKcPKci">py_c_to_loopy (C++ function)</a>
-</li>
-      <li><a href="internal-api.html#_CPPv417py_eval_grid_sizeP4prog">py_eval_grid_size (C++ function)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="internal-api.html#_CPPv416py_get_grid_sizeP4progP8PyObject">py_get_grid_size (C++ function)</a>
-</li>
-      <li><a href="internal-api.html#_CPPv423py_get_knl_name_and_srcPPcPPcPK8PyObjectPKc">py_get_knl_name_and_src (C++ function)</a>
-</li>
-      <li><a href="internal-api.html#_CPPv48py_printPKcP8PyObject">py_print (C++ function)</a>
-</li>
-      <li><a href="internal-api.html#_CPPv420py_set_annotate_funcPP8PyObjectPKc">py_set_annotate_func (C++ function)</a>
-</li>
-      <li><a href="internal-api.html#_CPPv417py_user_transformPP8PyObjectPKcPKc">py_user_transform (C++ function)</a>
+      <li><a href="internal-api.html#_CPPv411opencl_initP12nomp_backendKiKi">opencl_init (C++ function)</a>
 </li>
   </ul></td>
 </tr></table>
