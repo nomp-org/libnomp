@@ -49,7 +49,7 @@ static int test_invalid_nomp_verbose(int argc, const char **argv) {
       desc, "\\[Error\\] .*libnomp\\/src\\/log.c:[0-9]* Invalid verbose level "
             "4 is provided. The value should be within the range 0-3.");
   nomp_test_assert(eq);
-  nomp_free(desc);
+  nomp_free(&desc);
 
   nomp_test_assert(nomp_get_log_no(nomp_finalize()) == NOMP_FINALIZE_FAILURE);
 
@@ -125,7 +125,7 @@ int main(int argc, const char *argv[]) {
                           max_int,          "--nomp-platform", "0"};
   err |= SUBTEST(test_valid_device_id, argsc, args3);
 
-  nomp_free(max_int);
+  nomp_free(&max_int);
 
   return err;
 }

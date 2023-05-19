@@ -12,7 +12,7 @@ static int nomp_api_210_aux(const char *fmt, TEST_TYPE *a, TEST_TYPE *b,
   nomp_test_chk(nomp_jit(&id, knl, clauses, 3, "a", sizeof(TEST_TYPE), NOMP_PTR,
                          "b", sizeof(TEST_TYPE), NOMP_PTR, "N", sizeof(int),
                          NOMP_INT));
-  nomp_free(knl);
+  nomp_free(&knl);
 
   nomp_test_chk(nomp_run(id, a, b, &n));
 

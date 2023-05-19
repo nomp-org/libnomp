@@ -65,7 +65,7 @@ int nomp_set_log_(const char *description, int logno, nomp_log_type type,
     logs[logs_n].description = strndup(desc, len);
     logs[logs_n].logno = logno, logs[logs_n].type = type, logs_n++;
   }
-  nomp_free(desc), nomp_free(file);
+  nomp_free(&desc), nomp_free(&file);
 
   return type == NOMP_ERROR ? logs_n : 0;
 }
@@ -91,7 +91,7 @@ nomp_log_type nomp_get_log_type(int log_id) {
 
 void nomp_finalize_logs() {
   for (unsigned i = 0; i < logs_n; i++)
-    nomp_free(logs[i].description);
-  nomp_free(logs);
+    nomp_free(&logs[i].description);
+  nomp_free(&logs);
   logs = NULL, logs_n = logs_max = 0;
 }

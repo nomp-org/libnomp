@@ -15,12 +15,10 @@ static int nomp_api_220_aux(const char *fmt, TEST_TYPE *a, TEST_TYPE *b,
                          "b", sizeof(TEST_TYPE), NOMP_PTR, "c",
                          sizeof(TEST_TYPE), NOMP_PTR, "N", sizeof(int),
                          NOMP_INT));
-  nomp_free(knl);
+  nomp_free(&knl);
 
   nomp_test_chk(nomp_run(id, a, b, c, &n));
-
   nomp_test_chk(nomp_sync());
-
   nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM));
   nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
   nomp_test_chk(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_FREE));

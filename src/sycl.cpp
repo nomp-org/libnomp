@@ -56,8 +56,9 @@ static int sycl_update(struct nomp_backend *bnd, struct nomp_mem *m,
 
 static int sycl_knl_free(struct nomp_prog *prg) {
   struct sycl_prog *sycl_prg = (struct sycl_prog *)prg->bptr;
+
   int err = nomp_jit_free(&sycl_prg->sycl_id);
-  nomp_free(prg->bptr), prg->bptr = NULL;
+  nomp_free(&prg->bptr);
 
   return err;
 }
@@ -79,7 +80,7 @@ static int sycl_knl_build(struct nomp_backend *bnd, struct nomp_prog *prg,
   int err = nomp_jit_compile(&sycl_prg->sycl_id, source, sycl->compiler,
                              sycl->compiler_flags, name, wkdir,
                              "nomp_sycl_src.cpp", "lib.so");
-  nomp_free(wkdir);
+  nomp_free(&wkdir);
   return err;
 }
 
@@ -111,9 +112,9 @@ static int sycl_sync(struct nomp_backend *bnd) {
 
 static int sycl_finalize(struct nomp_backend *bnd) {
   struct sycl_backend *sycl = (struct sycl_backend *)bnd->bptr;
-  nomp_free(sycl->compiler), sycl->compiler = NULL;
-  nomp_free(sycl->compiler_flags), sycl->compiler_flags = NULL;
-  nomp_free(bnd->bptr), bnd->bptr = NULL;
+
+  nomp_free(&sycl->compiler), nomp_free(&sycl->compiler_flags);
+  nomp_free(&bnd->bptr);
 
   return 0;
 }
@@ -128,13 +129,13 @@ static char *copy_env(const char *name, size_t size) {
 static int check_env(struct sycl_backend *sycl) {
   char *tmp;
   if (tmp = copy_env("NOMP_SYCL_CC", NOMP_MAX_BUFSIZ)) {
-    sycl->compiler = strndup(tmp, NOMP_MAX_BUFSIZ + 1), nomp_free(tmp);
+    sycl->compiler = strndup(tmp, NOMP_MAX_BUFSIZ + 1), nomp_free(&tmp);
   } else {
     return nomp_set_log(NOMP_SYCL_FAILURE, NOMP_ERROR,
                         "SYCL compiler NOMP_SYCL_CC must be set.");
   }
   if (tmp = copy_env("NOMP_SYCL_CFLAGS", NOMP_MAX_BUFSIZ)) {
-    sycl->compiler_flags = strndup(tmp, NOMP_MAX_BUFSIZ + 1), nomp_free(tmp);
+    sycl->compiler_flags = strndup(tmp, NOMP_MAX_BUFSIZ + 1), nomp_free(&tmp);
   } else {
     return nomp_set_log(NOMP_SYCL_FAILURE, NOMP_ERROR,
                         "SYCL compiler flags NOMP_SYCL_CFLAGS must be set.");

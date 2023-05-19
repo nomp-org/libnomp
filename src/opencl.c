@@ -55,7 +55,7 @@ static int opencl_update(struct nomp_backend *bnd, struct nomp_mem *m,
            "clEnqueueReadBuffer");
   } else if (op == NOMP_FREE) {
     chk_cl(clReleaseMemObject(*clm), "clReleaseMemObject");
-    nomp_free(m->bptr), m->bptr = NULL;
+    nomp_free(&m->bptr);
   }
 
   return 0;
@@ -83,7 +83,7 @@ static int opencl_knl_build(struct nomp_backend *bnd, struct nomp_prog *prg,
                           log_size, log, NULL);
     int err = nomp_set_log(NOMP_OPENCL_FAILURE, NOMP_ERROR,
                            "clBuildProgram failed with error:\n %s.", log);
-    nomp_free(log);
+    nomp_free(&log);
     return err;
   }
 
@@ -118,7 +118,7 @@ static int opencl_knl_free(struct nomp_prog *prg) {
 
   chk_cl(clReleaseKernel(ocl_prg->knl), "clReleaseKernel");
   chk_cl(clReleaseProgram(ocl_prg->prg), "clReleaseProgram");
-  nomp_free(prg->bptr), prg->bptr = NULL;
+  nomp_free(&prg->bptr);
 
   return 0;
 }
@@ -136,7 +136,7 @@ static int opencl_finalize(struct nomp_backend *bnd) {
 
   chk_cl(clReleaseCommandQueue(ocl->queue), "clReleaseCommandQueue");
   chk_cl(clReleaseContext(ocl->ctx), "clReleaseContext");
-  nomp_free(bnd->bptr), bnd->bptr = NULL;
+  nomp_free(&bnd->bptr);
 
   return 0;
 }
@@ -154,7 +154,7 @@ int opencl_init(struct nomp_backend *bnd, const int platform_id,
   cl_platform_id *cl_platforms = nomp_calloc(cl_platform_id, num_platforms);
   err = clGetPlatformIDs(num_platforms, cl_platforms, &num_platforms);
   cl_platform_id platform = cl_platforms[platform_id];
-  nomp_free(cl_platforms);
+  nomp_free(&cl_platforms);
 
   cl_uint num_devices;
   err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 0, NULL, &num_devices);
@@ -167,7 +167,7 @@ int opencl_init(struct nomp_backend *bnd, const int platform_id,
   err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, num_devices, cl_devices,
                        &num_devices);
   cl_device_id device = cl_devices[device_id];
-  nomp_free(cl_devices);
+  nomp_free(&cl_devices);
 
   struct opencl_backend *ocl = bnd->bptr =
       nomp_calloc(struct opencl_backend, 1);
