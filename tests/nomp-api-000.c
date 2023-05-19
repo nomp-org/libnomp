@@ -8,7 +8,7 @@ static int test_first_nomp_finalize() {
   char *desc = nomp_get_log_str(err);
   int eq = logcmp(desc, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* "
                         "libnomp is not initialized.");
-  nomp_free(desc);
+  nomp_free(&desc);
   nomp_test_assert(eq);
 
   return 0;
@@ -23,7 +23,7 @@ static int test_nomp_init_twice(int argc, const char **argv) {
   char *desc = nomp_get_log_str(err);
   int eq = logcmp(desc, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* libnomp "
                         "is already initialized.");
-  nomp_free(desc);
+  nomp_free(&desc);
   nomp_test_assert(eq);
 
   return 0;
@@ -38,7 +38,7 @@ static int test_nomp_finalize_twice() {
   char *desc = nomp_get_log_str(err);
   int eq = logcmp(desc, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* "
                         "libnomp is not initialized.");
-  nomp_free(desc);
+  nomp_free(&desc);
   nomp_test_assert(eq);
 
   return 0;

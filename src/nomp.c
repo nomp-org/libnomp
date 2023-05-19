@@ -23,22 +23,20 @@ static int check_env(struct nomp_backend *backend) {
     backend->verbose = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
 
   if ((tmp = copy_env("NOMP_BACKEND", NOMP_MAX_BUFSIZ))) {
-    if (backend->backend)
-      nomp_free(backend->backend);
-    backend->backend = strndup(tmp, NOMP_MAX_BUFSIZ), nomp_free(tmp);
+    nomp_free(&backend->backend);
+    backend->backend = strndup(tmp, NOMP_MAX_BUFSIZ), nomp_free(&tmp);
   }
 
   if ((tmp = copy_env("NOMP_ANNOTATE_FUNCTION", NOMP_MAX_BUFSIZ))) {
     nomp_check(nomp_py_set_annotate_func(&backend->py_annotate, tmp));
-    nomp_free(tmp);
+    nomp_free(&tmp);
   }
 
   if ((tmp = copy_env("NOMP_INSTALL_DIR", NOMP_MAX_BUFSIZ))) {
+    nomp_free(&backend->install_dir);
     size_t size;
     nomp_check(nomp_path_len(&size, tmp));
-    if (backend->install_dir)
-      nomp_free(backend->install_dir);
-    backend->install_dir = strndup(tmp, size + 1), nomp_free(tmp);
+    backend->install_dir = strndup(tmp, size + 1), nomp_free(&tmp);
   }
 
   return 0;
@@ -116,7 +114,7 @@ static int init_configs(int argc, const char **argv,
   len = nomp_max(2, len, NOMP_MAX_BUFSIZ);
   char *abs_dir = nomp_str_cat(2, len, nomp.install_dir, "/python");
   nomp_check(nomp_py_append_to_sys_path(abs_dir));
-  nomp_free(abs_dir);
+  nomp_free(&abs_dir);
 
   return 0;
 }
@@ -136,7 +134,7 @@ static int allocate_scratch_memory(struct nomp_backend *backend) {
 static int deallocate_scratch_memory(struct nomp_backend *backend) {
   if (backend->scratch) {
     nomp_check(backend->update(backend, backend->scratch, NOMP_FREE));
-    nomp_free(backend->scratch->hptr), nomp_free(backend->scratch);
+    nomp_free(&backend->scratch->hptr), nomp_free(&backend->scratch);
     return 0;
   }
   return nomp_set_log(NOMP_MEMORY_FAILURE, NOMP_ERROR,
@@ -259,7 +257,7 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
 
   // Device memory object was released.
   if (mems[idx]->bptr == NULL)
-    nomp_free(mems[idx]), mems[idx] = NULL;
+    nomp_free(&mems[idx]);
   // Or new memory object got created.
   else if (idx == mems_n)
     mems_n++;
@@ -380,14 +378,14 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
 
     // Handle transform clauses.
     nomp_check(nomp_py_user_transform(&knl, meta.file, meta.func));
-    nomp_free(meta.file), nomp_free(meta.func);
+    nomp_free(&meta.file), nomp_free(&meta.func);
 
     // Get OpenCL, CUDA, etc. source and name from the loopy kernel and build
     // the program.
     char *name, *src;
     nomp_check(nomp_py_get_knl_name_and_src(&name, &src, knl, nomp.backend));
     nomp_check(nomp.knl_build(&nomp, prg, src, name));
-    nomp_free(src), nomp_free(name);
+    nomp_free(&src), nomp_free(&name);
 
     // Get grid size of the loopy kernel as pymbolic expressions.
     // These grid sizes will be evaluated each time the kernel is run.
@@ -474,24 +472,25 @@ int nomp_finalize(void) {
   for (unsigned i = 0; i < mems_n; i++) {
     if (mems[i]) {
       nomp_check(nomp.update(&nomp, mems[i], NOMP_FREE));
-      nomp_free(mems[i]), mems[i] = NULL;
+      nomp_free(&mems[i]);
     }
   }
-  nomp_free(mems), mems = NULL, mems_n = mems_max = 0;
+  nomp_free(&mems), mems_n = mems_max = 0;
 
   for (unsigned i = 0; i < progs_n; i++) {
     if (progs[i]) {
       nomp_check(nomp.knl_free(progs[i]));
-      nomp_free(progs[i]->args), nomp_free(progs[i]);
+      nomp_free(&progs[i]->args);
       Py_XDECREF(progs[i]->py_global), Py_XDECREF(progs[i]->py_local);
-      Py_XDECREF(progs[i]->py_dict), progs[i] = NULL;
+      Py_XDECREF(progs[i]->py_dict);
     }
+    nomp_free(&progs[i]);
   }
-  nomp_free(progs), progs = NULL, progs_n = progs_max = 0;
+  nomp_free(&progs), progs_n = progs_max = 0;
 
   nomp_check(deallocate_scratch_memory(&nomp));
 
-  nomp_free(nomp.backend), nomp_free(nomp.install_dir);
+  nomp_free(&nomp.backend), nomp_free(&nomp.install_dir);
   Py_XDECREF(nomp.py_annotate);
 
   initialized = nomp.finalize(&nomp);

@@ -57,7 +57,7 @@ int main(int argc, const char *argv[]) {
   err |= SUBTEST(test_jit_compile_and_free, cwd, wkdir);
   err |= SUBTEST(test_jit_run, cwd, wkdir);
 
-  nomp_free(wkdir);
+  nomp_free(&wkdir);
 
   return err;
 }

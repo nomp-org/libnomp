@@ -11,7 +11,7 @@ static int nomp_api_230_aux(const char *fmt, const char **clauses, TEST_TYPE *a,
   nomp_test_chk(nomp_jit(&id, knl, clauses, 4, "a", sizeof(TEST_TYPE), NOMP_PTR,
                          "b", sizeof(TEST_TYPE), NOMP_PTR, "rows", sizeof(int),
                          NOMP_INT, "cols", sizeof(int), NOMP_INT));
-  nomp_free(knl);
+  nomp_free(&knl);
 
   nomp_test_chk(nomp_run(id, a, b, &rows, &cols));
 

@@ -32,7 +32,7 @@ static int make_knl_dir(char **dir_, const char *knl_dir, const char *src) {
                         "Unable to calculate SHA256 hash of string: \"%s\".",
                         s);
   }
-  nomp_free(s);
+  nomp_free(&s);
 
   char *hash = nomp_calloc(char, 2 * SHA256_DIGEST_LENGTH + 1);
   for (unsigned i = 0; i < SHA256_DIGEST_LENGTH; i++)
@@ -50,7 +50,7 @@ static int make_knl_dir(char **dir_, const char *knl_dir, const char *src) {
                           strerror(errno));
     }
   }
-  nomp_free(hash);
+  nomp_free(&hash);
 
   return 0;
 }
@@ -97,7 +97,7 @@ static int compile_aux(const char *cc, const char *cflags, const char *src,
     failed = nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
                           "Command: \"%s\" was terminated by a signal.", cmd);
   }
-  nomp_free(cmd);
+  nomp_free(&cmd);
 
   return failed;
 }
@@ -122,11 +122,11 @@ int nomp_jit_compile(int *id, const char *source, const char *cc,
   size_t max = nomp_max(3, ldir, strnlen(srcf, 64), strnlen(libf, 64));
   char *src = nomp_str_cat(3, max, dir, "/", srcf);
   char *lib = nomp_str_cat(3, max, dir, "/", libf);
-  nomp_free(dir);
+  nomp_free(&dir);
 
   nomp_check(write_file(src, source));
   nomp_check(compile_aux(cc, cflags, src, lib));
-  nomp_free(src);
+  nomp_free(&src);
 
   if (id == NULL)
     return 0;
@@ -140,7 +140,7 @@ int nomp_jit_compile(int *id, const char *source, const char *cc,
   void *dlh = dlopen(lib, RTLD_LAZY | RTLD_LOCAL);
   if (dlh && entry)
     dlf = dlsym(dlh, entry);
-  nomp_free(lib);
+  nomp_free(&lib);
 
   if (dlh == NULL || dlf == NULL) {
     return nomp_set_log(
@@ -167,9 +167,8 @@ int nomp_jit_run(int id, void *p[]) {
 int nomp_jit_free(int *id) {
   int fid = *id;
   if (fid >= 0 && fid < funcs_n) {
-    struct function *f = funcs[fid];
-    dlclose(f->dlh), f->dlh = NULL, f->dlf = NULL, nomp_free(f);
-    funcs[fid] = NULL, *id = -1;
+    dlclose(funcs[fid]->dlh), funcs[fid]->dlh = NULL, funcs[fid]->dlf = NULL;
+    nomp_free(&funcs[fid]), *id = -1;
     return 0;
   }
 

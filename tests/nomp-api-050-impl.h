@@ -13,7 +13,7 @@ static int free_before_mapping(unsigned s, unsigned e) {
       desc, "\\[Error\\] "
             ".*libnomp\\/src\\/nomp.c:[0-9]* NOMP_FREE or NOMP_FROM can only "
             "be called on a pointer which is already on the device.");
-  nomp_free(desc);
+  nomp_free(&desc);
   nomp_test_assert(eq);
 
   return 0;
@@ -31,7 +31,7 @@ static int d2h_before_h2d(unsigned s, unsigned e) {
       desc, "\\[Error\\] "
             ".*libnomp\\/src\\/nomp.c:[0-9]* NOMP_FREE or NOMP_FROM can only "
             "be called on a pointer which is already on the device.");
-  nomp_free(desc);
+  nomp_free(&desc);
   nomp_test_assert(eq);
 
   return 0;

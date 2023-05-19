@@ -30,7 +30,7 @@ int nomp_str_toui(const char *str, size_t size) {
   int num = (int)strtol(copy, &end_ptr, 10);
   if (copy == end_ptr || *end_ptr != '\0' || num < 0)
     num = -1;
-  nomp_free(copy);
+  nomp_free(&copy);
 
   return num;
 }
@@ -47,7 +47,7 @@ int nomp_path_len(size_t *len, const char *path) {
 
   if (len)
     *len = strnlen(abs, PATH_MAX);
-  nomp_free(abs);
+  nomp_free(&abs);
 
   return 0;
 }
@@ -71,6 +71,6 @@ int nomp_max(unsigned n, ...) {
 int nomp_check_py_script_path(const char *path) {
   char *py = nomp_str_cat(2, PATH_MAX, path, ".py");
   int err = nomp_path_len(NULL, (const char *)py);
-  nomp_free(py);
+  nomp_free(&py);
   return err;
 }

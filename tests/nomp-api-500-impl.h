@@ -10,12 +10,10 @@ static int nomp_api_500_sum_const_aux(const char *fmt, const char **clauses,
   char *knl = generate_knl(fmt, 1, TOSTRING(TEST_TYPE));
   nomp_test_chk(
       nomp_jit(&id, knl, clauses, 1, "a", sizeof(TEST_TYPE), TEST_NOMP_TYPE));
-  nomp_free(knl);
+  nomp_free(&knl);
 
   nomp_test_chk(nomp_run(id, a, &n));
-
   nomp_test_chk(nomp_sync());
-
   nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
 
   return 0;
@@ -54,12 +52,10 @@ static int nomp_api_500_sum_aux(const char *fmt, const char **clauses,
   char *knl = generate_knl(fmt, 1, TOSTRING(TEST_TYPE));
   nomp_test_chk(nomp_jit(&id, knl, clauses, 2, "a", sizeof(TEST_TYPE),
                          TEST_NOMP_TYPE, "N", sizeof(int), NOMP_INT));
-  nomp_free(knl);
+  nomp_free(&knl);
 
   nomp_test_chk(nomp_run(id, a, &n));
-
   nomp_test_chk(nomp_sync());
-
   nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
 
   return 0;
@@ -99,12 +95,10 @@ static int nomp_api_500_sum_array_aux(const char *fmt, const char **clauses,
   nomp_test_chk(nomp_jit(&id, knl, clauses, 3, "a", sizeof(TEST_TYPE), NOMP_PTR,
                          "N", sizeof(int), NOMP_INT, "sum", sizeof(TEST_TYPE),
                          TEST_NOMP_TYPE));
-  nomp_free(knl);
+  nomp_free(&knl);
 
   nomp_test_chk(nomp_run(id, a, &n, sum));
-
   nomp_test_chk(nomp_sync());
-
   nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
 
   return 0;
@@ -183,12 +177,10 @@ static int nomp_api_500_prod_aux(const char *fmt, const char **clauses,
   nomp_test_chk(nomp_jit(&id, knl, clauses, 4, "a", sizeof(TEST_TYPE), NOMP_PTR,
                          "b", sizeof(TEST_TYPE), NOMP_PTR, "N", sizeof(int),
                          NOMP_INT, "c", sizeof(TEST_TYPE), TEST_NOMP_TYPE));
-  nomp_free(knl);
+  nomp_free(&knl);
 
   nomp_test_chk(nomp_run(id, a, b, &n, c));
-
   nomp_test_chk(nomp_sync());
-
   nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
   nomp_test_chk(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
   nomp_test_chk(nomp_update(c, 0, n, sizeof(TEST_TYPE), NOMP_FROM));
@@ -281,12 +273,10 @@ static int nomp_api_500_dot_aux(const char *fmt, const char **clauses,
                          NOMP_PTR, "b", sizeof(TEST_TYPE), NOMP_PTR, "N",
                          sizeof(int), NOMP_INT, "total", sizeof(TEST_TYPE),
                          TEST_NOMP_TYPE));
-  nomp_free(knl);
+  nomp_free(&knl);
 
   nomp_test_chk(nomp_run(id, a, b, &n, total));
-
   nomp_test_chk(nomp_sync());
-
   nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
   nomp_test_chk(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
 

@@ -115,7 +115,7 @@ static int gpu_knl_build(struct nomp_backend *bnd, struct nomp_prog *prg,
     snprintf(msg, size, "%s: %s", err_str, log);
     int err_id = nomp_set_log(NOMP_GPU_FAILURE, NOMP_ERROR, ERR_STR_GPU_FAILURE,
                               "build", msg);
-    nomp_free(log), nomp_free(msg);
+    nomp_free(&log), nomp_free(&msg);
     return err_id;
   }
 
@@ -128,7 +128,7 @@ static int gpu_knl_build(struct nomp_backend *bnd, struct nomp_prog *prg,
   GPU_CHECK(gpuModuleLoadData(&nprg->module, code));
   GPU_CHECK(gpuModuleGetFunction(&nprg->kernel, nprg->module, name));
 
-  nomp_free(code);
+  nomp_free(&code);
   chk_gpurtc(gpurtcDestroyProgram(&prog));
 
   return 0;

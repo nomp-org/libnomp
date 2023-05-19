@@ -12,18 +12,9 @@ extern "C" {
  * @defgroup nomp_mem_utils Host memory management functions
  */
 
-/**
- * @ingroup nomp_mem_utils
- * @brief Deallocates or frees a memory block.
- *
- * @param p Pointer to the memory to deallocate.
- * @param file Name of the file in which the function is called.
- * @param line Line number in the file where the function is called.
- * @return int
- */
-static int nomp_free_(void *p, const char *file, unsigned line) {
-  if (p)
-    free(p);
+static int nomp_free_(void *p) {
+  free(*(void **)p);
+  *(void **)p = NULL;
   return 0;
 }
 
@@ -32,10 +23,10 @@ static int nomp_free_(void *p, const char *file, unsigned line) {
  * @brief Helper macro for deallocating or freeing a memory block using
  * nomp_free_(). File name and line number are passed implicitly.
  *
- * @param x Pointer to the memory to deallocate.
+ * @param p Address of the pointer to the memory to deallocate.
  * @return int
  */
-#define nomp_free(x) nomp_free_(x, __FILE__, __LINE__)
+#define nomp_free(p) nomp_free_(p)
 
 /**
  * @ingroup nomp_mem_utils

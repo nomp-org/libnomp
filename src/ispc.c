@@ -77,14 +77,14 @@ static int ispc_knl_build(struct nomp_backend *bnd, struct nomp_prog *prg,
   int err = nomp_jit_compile(NULL, source, ispc->ispc_cc, ispc->ispc_flags,
                              NULL, wkdir, src_f, dev_f);
   if (err) {
-    nomp_free(wkdir);
+    nomp_free(&wkdir);
     return err;
   }
 
   char *lib_so = nomp_str_cat(3, BUFSIZ, "lib", lib, ".so");
   err = nomp_jit_compile(&iprg->ispc_id, source, ispc->cc, ispc->cc_flags, name,
                          wkdir, dev_f, lib_so);
-  nomp_free(wkdir), nomp_free(lib_so);
+  nomp_free(&wkdir), nomp_free(&lib_so);
   nomp_check(err);
   prg->bptr = (void *)iprg;
   return 0;
@@ -124,9 +124,9 @@ static int ispc_finalize(struct nomp_backend *bnd) {
   chk_ispcrt("device release", rt_error);
   ispcrtRelease(ispc->queue);
   chk_ispcrt("queue release", rt_error);
-  nomp_free(ispc->cc), nomp_free(ispc->cc_flags);
-  nomp_free(ispc->ispc_cc), nomp_free(ispc->ispc_flags);
-  nomp_free(bnd->bptr), bnd->bptr = NULL;
+  nomp_free(&ispc->cc), nomp_free(&ispc->cc_flags);
+  nomp_free(&ispc->ispc_cc), nomp_free(&ispc->ispc_flags);
+  nomp_free(&bnd->bptr);
   return 0;
 }
 
