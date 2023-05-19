@@ -50,9 +50,7 @@ static int make_knl_dir(char **dir_, const char *knl_dir, const char *src) {
                           strerror(errno));
     }
   }
-  nomp_free(&hash);
-
-  return 0;
+  return nomp_free(&hash);
 }
 
 static int write_file(const char *path, const char *src) {

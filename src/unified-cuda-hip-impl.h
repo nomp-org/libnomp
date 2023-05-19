@@ -154,7 +154,10 @@ static int gpu_knl_run(struct nomp_backend *bnd, struct nomp_prog *prg) {
 
 static int gpu_knl_free(struct nomp_prog *prg) {
   struct gpu_prog *cprg = (struct gpu_prog *)prg->bptr;
-  GPU_CHECK(gpuModuleUnload(cprg->module));
+
+  if (cprg)
+    GPU_CHECK(gpuModuleUnload(cprg->module));
+
   return 0;
 }
 
@@ -166,7 +169,8 @@ static int gpu_sync(struct nomp_backend *bnd) {
 static int gpu_finalize(struct nomp_backend *bnd) {
 #ifndef __HIP_PLATFORM_HCC__
   struct gpu_backend *nbnd = (struct gpu_backend *)bnd->bptr;
-  GPU_CHECK(gpuCtxDestroy(nbnd->ctx));
+  if (nbnd)
+    GPU_CHECK(gpuCtxDestroy(nbnd->ctx));
 #endif
   return 0;
 }
