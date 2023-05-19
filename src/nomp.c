@@ -22,10 +22,10 @@ static int check_env(struct nomp_backend *backend) {
   if ((tmp = getenv("NOMP_VERBOSE")))
     backend->verbose = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
 
-  if ((tmp = copy_env("NOMP_BACKEND", NOMP_MAX_IDENT_SIZE))) {
+  if ((tmp = copy_env("NOMP_BACKEND", NOMP_MAX_BUFSIZ))) {
     if (backend->backend)
       nomp_free(backend->backend);
-    backend->backend = strndup(tmp, NOMP_MAX_IDENT_SIZE), nomp_free(tmp);
+    backend->backend = strndup(tmp, NOMP_MAX_BUFSIZ), nomp_free(tmp);
   }
 
   if ((tmp = copy_env("NOMP_ANNOTATE_FUNCTION", NOMP_MAX_BUFSIZ))) {
@@ -69,8 +69,7 @@ static int init_configs(int argc, const char **argv,
     if (!strncmp("--nomp", argv[i], 6)) {
       nomp_check(check_cmd_line_arg(i + 1, argc, argv));
       if (!strncmp("--nomp-backend", argv[i], NOMP_MAX_BUFSIZ)) {
-        backend->backend =
-            strndup((const char *)argv[i + 1], NOMP_MAX_IDENT_SIZE);
+        backend->backend = strndup((const char *)argv[i + 1], NOMP_MAX_BUFSIZ);
       } else if (!strncmp("--nomp-platform", argv[i], NOMP_MAX_BUFSIZ)) {
         backend->platform_id = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
       } else if (!strncmp("--nomp-device", argv[i], NOMP_MAX_BUFSIZ)) {
@@ -164,27 +163,27 @@ int nomp_init(int argc, const char **argv) {
 
   nomp_check(nomp_log_init(nomp.verbose));
 
-  size_t n = strnlen(nomp.backend, NOMP_MAX_IDENT_SIZE);
+  size_t n = strnlen(nomp.backend, NOMP_MAX_BUFSIZ);
   for (int i = 0; i < n; i++)
     nomp.backend[i] = tolower(nomp.backend[i]);
 
-  if (strncmp(nomp.backend, "opencl", NOMP_MAX_IDENT_SIZE) == 0) {
+  if (strncmp(nomp.backend, "opencl", NOMP_MAX_BUFSIZ) == 0) {
 #if defined(OPENCL_ENABLED)
     nomp_check(opencl_init(&nomp, nomp.platform_id, nomp.device_id));
 #endif
-  } else if (strncmp(nomp.backend, "cuda", NOMP_MAX_IDENT_SIZE) == 0) {
+  } else if (strncmp(nomp.backend, "cuda", NOMP_MAX_BUFSIZ) == 0) {
 #if defined(CUDA_ENABLED)
     nomp_check(cuda_init(&nomp, nomp.platform_id, nomp.device_id));
 #endif
-  } else if (strncmp(nomp.backend, "hip", NOMP_MAX_IDENT_SIZE) == 0) {
+  } else if (strncmp(nomp.backend, "hip", NOMP_MAX_BUFSIZ) == 0) {
 #if defined(HIP_ENABLED)
     nomp_check(hip_init(&nomp, nomp.platform_id, nomp.device_id));
 #endif
-  } else if (strncmp(nomp.backend, "sycl", NOMP_MAX_IDENT_SIZE) == 0) {
+  } else if (strncmp(nomp.backend, "sycl", NOMP_MAX_BUFSIZ) == 0) {
 #if defined(SYCL_ENABLED)
     nomp_check(sycl_init(&nomp, nomp.platform_id, nomp.device_id));
 #endif
-  } else if (strncmp(nomp.backend, "ispc", NOMP_MAX_IDENT_SIZE) == 0) {
+  } else if (strncmp(nomp.backend, "ispc", NOMP_MAX_BUFSIZ) == 0) {
 #if defined(ISPC_ENABLED)
     nomp_check(ispc_init(&nomp, nomp.platform_id, nomp.device_id));
 #endif
@@ -292,7 +291,7 @@ static int parse_clauses(struct meta *meta, struct nomp_prog *prg,
       }
       nomp_check(nomp_check_py_script_path((const char *)clauses[i + 1]));
       meta->file = strndup(clauses[i + 1], PATH_MAX);
-      meta->func = strndup(clauses[i + 2], NOMP_MAX_IDENT_SIZE);
+      meta->func = strndup(clauses[i + 2], NOMP_MAX_BUFSIZ);
       i += 3;
     } else if (strncmp(clauses[i], "annotate", NOMP_MAX_BUFSIZ) == 0) {
       if (clauses[i + 1] == NULL || clauses[i + 2] == NULL) {
@@ -303,9 +302,9 @@ static int parse_clauses(struct meta *meta, struct nomp_prog *prg,
       }
       const char *key = clauses[i + 1], *val = clauses[i + 2];
       PyObject *pkey =
-          PyUnicode_FromStringAndSize(key, strnlen(key, NOMP_MAX_IDENT_SIZE));
+          PyUnicode_FromStringAndSize(key, strnlen(key, NOMP_MAX_BUFSIZ));
       PyObject *pval =
-          PyUnicode_FromStringAndSize(val, strnlen(val, NOMP_MAX_IDENT_SIZE));
+          PyUnicode_FromStringAndSize(val, strnlen(val, NOMP_MAX_BUFSIZ));
       PyDict_SetItem(meta->dict, pkey, pval);
       Py_XDECREF(pkey), Py_XDECREF(pval);
       i += 3;
@@ -317,8 +316,7 @@ static int parse_clauses(struct meta *meta, struct nomp_prog *prg,
             "operation. At least one of them is not provided.");
       }
       for (unsigned j = 0; j < prg->nargs; j++) {
-        if (strncmp(prg->args[j].name, clauses[i + 1], NOMP_MAX_IDENT_SIZE) ==
-            0) {
+        if (strncmp(prg->args[j].name, clauses[i + 1], NOMP_MAX_BUFSIZ) == 0) {
           prg->reduction_type = prg->args[j].type, prg->args[j].type = NOMP_PTR;
           prg->reduction_index = j;
           break;
@@ -360,7 +358,7 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
     va_start(args, nargs);
     for (unsigned i = 0; i < prg->nargs; i++) {
       const char *name = va_arg(args, const char *);
-      strncpy(prg->args[i].name, name, NOMP_MAX_IDENT_SIZE);
+      strncpy(prg->args[i].name, name, NOMP_MAX_BUFSIZ);
       prg->args[i].size = va_arg(args, size_t);
       prg->args[i].type = va_arg(args, int);
     }
