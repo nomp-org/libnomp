@@ -268,88 +268,14 @@
 </section>
 <section id="memory-management-functions">
 <h2>Memory management functions<a class="headerlink" href="#memory-management-functions" title="Permalink to this heading"></a></h2>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv410nomp_free_PvPKcj">
-<span id="_CPPv310nomp_free_PvPKcj"></span><span id="_CPPv210nomp_free_PvPKcj"></span><span id="nomp_free___voidP.cCP.unsigned"></span><span class="target" id="group__nomp__mem__utils_1gaa58cc8013119e2e4e3257521f0083975"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_free_</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">p</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410nomp_free_PvPKcj" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Deallocates or frees a memory block. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>p</strong> – Pointer to the memory to deallocate. </p></li>
-<li><p><strong>file</strong> – Name of the file in which the function is called. </p></li>
-<li><p><strong>line</strong> – Line number in the file where the function is called. </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>int </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv412nomp_malloc_6size_tPKcj">
-<span id="_CPPv312nomp_malloc_6size_tPKcj"></span><span id="_CPPv212nomp_malloc_6size_tPKcj"></span><span id="nomp_malloc___s.cCP.unsigned"></span><span class="target" id="group__nomp__mem__utils_1gaf0ec327cb7f2be3fdaf8a294be91586c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_malloc_</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412nomp_malloc_6size_tPKcj" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Allocates memory blocks. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>size</strong> – Bytes to allocate. </p></li>
-<li><p><strong>file</strong> – Name of the file in which the function is called. </p></li>
-<li><p><strong>line</strong> – Line number in the file where the function is called. </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Void pointer </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv412nomp_calloc_6size_t6size_tPKcj">
-<span id="_CPPv312nomp_calloc_6size_t6size_tPKcj"></span><span id="_CPPv212nomp_calloc_6size_t6size_tPKcj"></span><span id="nomp_calloc___s.s.cCP.unsigned"></span><span class="target" id="group__nomp__mem__utils_1gad2ee779c8673821c0e35164237eb8e6b"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_calloc_</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nmemb</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412nomp_calloc_6size_t6size_tPKcj" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Allocates an array in memory with elements initialized to 0. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>nmemb</strong> – Number of elements. </p></li>
-<li><p><strong>size</strong> – Length in bytes of each element. </p></li>
-<li><p><strong>file</strong> – Name of the file in which the function is called. </p></li>
-<li><p><strong>line</strong> – Line number in the file where the function is called. </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Void pointer </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv413nomp_realloc_Pv6size_tPKcj">
-<span id="_CPPv313nomp_realloc_Pv6size_tPKcj"></span><span id="_CPPv213nomp_realloc_Pv6size_tPKcj"></span><span id="nomp_realloc___voidP.s.cCP.unsigned"></span><span class="target" id="group__nomp__mem__utils_1ga5707cc66bd5892df3cdc6bb4bc501e1e"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_realloc_</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ptr</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413nomp_realloc_Pv6size_tPKcj" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Reallocate memory blocks. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ptr</strong> – Pointer to the memory area to be reallocated. </p></li>
-<li><p><strong>size</strong> – New size in bytes. </p></li>
-<li><p><strong>file</strong> – Name of the file in which the function is called. </p></li>
-<li><p><strong>line</strong> – Line number in the file where the function is called. </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Void pointer </p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.nomp_free">
-<span class="target" id="group__nomp__mem__utils_1gaa8001c82e1b6e1395628259f6e5d0509"></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_free</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nomp_free" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Helper macro for deallocating or freeing a memory block using <a class="reference internal" href="#group__nomp__mem__utils_1gaa58cc8013119e2e4e3257521f0083975"><span class="std std-ref">nomp_free_()</span></a>. File name and line number are passed implicitly. </p>
+<span class="target" id="group__nomp__mem__utils_1ga7f94b25dae56929daada2a73b36f6934"></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_free</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nomp_free" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Helper macro for deallocating or freeing a memory block using nomp_free_(). File name and line number are passed implicitly. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> – Pointer to the memory to deallocate. </p></li>
+<li><p><strong>p</strong> – Address of the pointer to the memory to deallocate. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -361,7 +287,7 @@
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.nomp_malloc">
 <span class="target" id="group__nomp__mem__utils_1ga6121fd4a48b79c02787e2f7c3b93ed1e"></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_malloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">T</span></span>, <span class="n"><span class="pre">count</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nomp_malloc" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Helper macro for allocating memory blocks using <a class="reference internal" href="#group__nomp__mem__utils_1gaf0ec327cb7f2be3fdaf8a294be91586c"><span class="std std-ref">nomp_malloc_()</span></a>. File name and line number are passed implicitly. </p>
+<dd><p>Helper macro for allocating memory blocks using nomp_malloc_(). File name and line number are passed implicitly. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -378,7 +304,7 @@
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.nomp_calloc">
 <span class="target" id="group__nomp__mem__utils_1ga391260c7fa2d91cf34ce1ab3fd45398f"></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_calloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">T</span></span>, <span class="n"><span class="pre">count</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nomp_calloc" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Helper macro for allocating an array in memory with elements initialized to 0 using <a class="reference internal" href="#group__nomp__mem__utils_1gad2ee779c8673821c0e35164237eb8e6b"><span class="std std-ref">nomp_calloc_()</span></a>. File name and line number are passed implicitly. </p>
+<dd><p>Helper macro for allocating an array in memory with elements initialized to 0 using nomp_calloc_(). File name and line number are passed implicitly. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -395,7 +321,7 @@
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.nomp_realloc">
 <span class="target" id="group__nomp__mem__utils_1gab9ebd934f0e5b373037c5e2bbe6a28dc"></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_realloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ptr</span></span>, <span class="n"><span class="pre">T</span></span>, <span class="n"><span class="pre">count</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nomp_realloc" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Helper macro for reallocating memory blocks using <a class="reference internal" href="#group__nomp__mem__utils_1ga5707cc66bd5892df3cdc6bb4bc501e1e"><span class="std std-ref">nomp_realloc_()</span></a>. File name and line number are passed implicitly. </p>
+<dd><p>Helper macro for reallocating memory blocks using nomp_realloc_(). File name and line number are passed implicitly. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -525,7 +451,7 @@
 <dt class="sig sig-object cpp" id="_CPPv412nomp_str_catjjz">
 <span id="_CPPv312nomp_str_catjjz"></span><span id="_CPPv212nomp_str_catjjz"></span><span id="nomp_str_cat__unsigned.unsigned.z"></span><span class="target" id="group__nomp__other__utils_1gaa41545f888f512ee21adfa93171fd875"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_str_cat</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max_len</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412nomp_str_catjjz" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Concatenates <code class="docutils literal notranslate"><span class="pre">n</span></code> strings. </p>
-<p>Concatenates <code class="docutils literal notranslate"><span class="pre">n</span></code> strings and returns a pointer to the resulting string. Each string should be at most <code class="docutils literal notranslate"><span class="pre">max_len</span></code> length long. Returned pointer need to be freed using <a class="reference internal" href="#group__nomp__mem__utils_1gaa8001c82e1b6e1395628259f6e5d0509"><span class="std std-ref">nomp_free()</span></a>.</p>
+<p>Concatenates <code class="docutils literal notranslate"><span class="pre">n</span></code> strings and returns a pointer to the resulting string. Each string should be at most <code class="docutils literal notranslate"><span class="pre">max_len</span></code> length long. Returned pointer need to be freed using <a class="reference internal" href="#group__nomp__mem__utils_1ga7f94b25dae56929daada2a73b36f6934"><span class="std std-ref">nomp_free()</span></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
