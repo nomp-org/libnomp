@@ -132,7 +132,8 @@ static int ispc_finalize(struct nomp_backend *bnd) {
     nomp_free(&ispc->cc), nomp_free(&ispc->cc_flags);
     nomp_free(&ispc->ispc_cc), nomp_free(&ispc->ispc_flags);
   }
-  return nomp_free(&bnd->bptr);
+  nomp_free(&bnd->bptr);
+  return 0;
 }
 
 static int nomp_to_ispc_device[2] = {ISPCRT_DEVICE_TYPE_CPU,
