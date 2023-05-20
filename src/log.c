@@ -112,11 +112,12 @@ unsigned find_time_log(const char *entry) {
   return time_logs_n;
 }
 
-void nomp_profile(const char *name, const int toggle, const int profile_level) {
+void nomp_profile(const char *name, const int toggle, const int profile_level,
+                  const int sync) {
   if (profile_level == 0)
     return;
 
-  if (toggle == 0)
+  if (toggle == 0 && sync == 1)
     nomp_sync();
   clock_t current_tick = clock();
 
@@ -163,16 +164,15 @@ void nomp_profile_finalize() {
   nomp_free(&time_logs), time_logs_n = time_logs_max = 0;
 }
 
-int nomp_profile_result() {
-  printf("| %-20s | %-12s | %-18s | %-18s | %-18s |\n", "Entry", "Total Calls",
+void nomp_profile_result() {
+  printf("| %-24s | %12s | %18s | %18s | %18s |\n", "Entry", "Total Calls",
          "Total Time (ms)", "Last Call (ms)", "Average Time (ms)");
-  printf("|----------------------|--------------|--------------------|---------"
-         "-----------|--------------------|\n");
+  printf("|--------------------------|--------------|--------------------|-----"
+         "---------------|--------------------|\n");
   for (int i = 0; i < time_logs_n; i++) {
     long double avg_time = time_logs[i].total_time / time_logs[i].total_calls;
-    printf("| %-20s | %12d | %18.4Lf | %18.4Lf | %18.4Lf |\n",
+    printf("| %-24s | %12d | %18.4Lf | %18.4Lf | %18.4Lf |\n",
            time_logs[i].entry, time_logs[i].total_calls,
            time_logs[i].total_time, time_logs[i].last_call, avg_time);
   }
-  return 0;
 }
