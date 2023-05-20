@@ -126,7 +126,7 @@ static int init_configs(int argc, const char **argv,
 static int allocate_scratch_memory(struct nomp_backend *backend) {
   if (backend->scratch == NULL) {
     struct nomp_mem *m = backend->scratch = nomp_calloc(struct nomp_mem, 1);
-    m->idx0 = 0, m->idx1 = NOMP_MAX_SCRATCH_SIZE, m->usize = sizeof(char);
+    m->idx0 = 0, m->idx1 = NOMP_MAX_SCRATCH_SIZE, m->usize = sizeof(double);
     m->hptr = nomp_calloc(double, m->idx1 - m->idx0);
     nomp_check(backend->update(backend, m, NOMP_ALLOC));
     return 0;
@@ -384,7 +384,7 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
     // Create loopy kernel from C source.
     PyObject *knl = NULL;
     nomp_check(nomp_py_c_to_loopy(&knl, csrc, nomp.backend));
-    if (prg->reduction_index > 0)
+    if (prg->reduction_index >= 0)
       nomp_check(nomp_py_realize_reduction(
           &knl, prg->args[prg->reduction_index].name));
 
@@ -443,13 +443,12 @@ int nomp_run(int id, ...) {
         Py_XDECREF(key), Py_XDECREF(val);
         break;
       case NOMP_PTR:
-        m = mem_if_mapped(args[i].ptr);
-        if (m == NULL) {
-          if (prg->reduction_index == i) {
-            prg->reduction_ptr = args[i].ptr,
-            prg->reduction_size = args[i].size;
-            m = nomp.scratch;
-          } else {
+        if (prg->reduction_index == i) {
+          prg->reduction_ptr = args[i].ptr, prg->reduction_size = args[i].size;
+          m = nomp.scratch;
+        } else {
+          m = mem_if_mapped(args[i].ptr);
+          if (m == NULL) {
             return nomp_set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
                                 ERR_STR_USER_MAP_PTR_IS_INVALID, args[i].ptr);
           }
@@ -463,7 +462,6 @@ int nomp_run(int id, ...) {
 
     nomp_profile("nomp_run grid evaluation", 1, nomp.profile, 1);
     nomp_check(nomp_py_eval_grid_size(prg));
-
     nomp_check(nomp.knl_run(&nomp, prg));
     if (prg->reduction_index >= 0)
       nomp_check(nomp_host_side_reduction(&nomp, prg, nomp.scratch));

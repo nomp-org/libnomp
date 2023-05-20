@@ -1,12 +1,28 @@
 """Module to do reductions with using Loopy."""
 
+from typing import List
+
 import loopy as lp
+import pymbolic.mapper
 import pymbolic.primitives as prim
 from loopy.symbolic import Reduction
 from loopy.transform.data import reduction_arg_to_subst_rule
-from loopy_api import LOOPY_LANG_VERSION
+from loopy_api import LOOPY_INSN_PREFIX, LOOPY_LANG_VERSION
 
 _TARGET_BLOCK_SIZE = {"cuda": 32, "opencl": 32}
+
+
+class InameCollector(pymbolic.mapper.WalkMapper):
+    def __init__(self, expr, *args, **kwargs):
+        self.inames = []
+        self.rec(expr)
+
+    def map_variable(self, expr, *args, **kwargs):
+        self.inames.append(expr.name)
+        super().map_variable(expr, args, kwargs)
+
+    def get_inames(self) -> List[str]:
+        return self.inames
 
 
 def target_to_str(target: lp.target.TargetBase) -> str:
@@ -47,9 +63,8 @@ def realize_reduction(
     )
 
     (knl_name,) = tunit.callables_table.keys()
-    knl = tunit[knl_name]
 
-    insns = []
+    knl, insns, precompute = tunit[knl_name], [], 0
     for insn in knl.instructions:
         if (
             isinstance(insn, lp.Assignment)
@@ -57,18 +72,20 @@ def realize_reduction(
             and isinstance(insn.assignee.aggregate, prim.Variable)
             and insn.assignee.aggregate.name == var
         ):
-            (lhs, rhs) = insn.expression.children
+            (lhs, *rhs) = insn.expression.children
+            if i_inner in InameCollector(*rhs).get_inames():
+                precompute = 1
             if isinstance(insn.expression, prim.Sum):
                 rhs = Reduction(
                     lp.library.reduction.SumReductionOperation(),
                     i_inner,
-                    rhs,
+                    prim.Sum(tuple(rhs)),
                 )
             elif isinstance(insn.expression, prim.Product):
                 rhs = Reduction(
                     lp.library.reduction.ProductReductionOperation(),
                     i_inner,
-                    rhs,
+                    prim.Product(tuple(rhs)),
                 )
 
             if isinstance(lhs, prim.Subscript):
@@ -78,15 +95,14 @@ def realize_reduction(
                 raise NotImplementedError(
                     "LHS of a reduction must be a subscript !"
                 )
-            # FIXME: Missing predicates. `id` has to be random and prefixed
-            # with "nomp_insn_".
-            insn_id = "sum_reduction_"
+
             insns.append(
                 lp.Assignment(
                     lhs,
                     expression=rhs,
                     within_inames=frozenset({i_outer}),
-                    id=insn_id,
+                    id=knl.get_var_name_generator()(LOOPY_INSN_PREFIX),
+                    predicates=insn.predicates,
                 )
             )
         else:
@@ -98,21 +114,28 @@ def realize_reduction(
         knl.args,
         name=knl.name,
         target=knl.target,
+        applied_iname_rewrites=knl.applied_iname_rewrites,
+        iname_slab_increments=knl.iname_slab_increments,
         lang_version=LOOPY_LANG_VERSION,
-    )
-
-    subst = "tmp_sum"
-    tunit = reduction_arg_to_subst_rule(tunit, i_inner, subst_rule_name=subst)
-    tunit = lp.precompute(
-        tunit,
-        subst,
-        i_inner,
-        temporary_address_space=lp.AddressSpace.LOCAL,
-        default_tag="l.0",
     )
 
     tunit = lp.tag_inames(tunit, {i_outer: "g.0"})
     tunit = lp.tag_inames(tunit, {i_inner: "l.0"})
-    tunit = lp.remove_unused_inames(tunit)
+
+    if precompute == 1:
+        subst = "tmp_sum"
+        tunit = reduction_arg_to_subst_rule(
+            tunit, i_inner, subst_rule_name=subst
+        )
+        tunit = lp.precompute(
+            tunit,
+            subst,
+            i_inner,
+            temporary_address_space=lp.AddressSpace.LOCAL,
+            default_tag="l.0",
+        )
+    else:
+        tunit = lp.realize_reduction(tunit)
+        tunit = lp.add_inames_for_unused_hw_axes(tunit)
 
     return tunit
