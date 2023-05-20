@@ -69,20 +69,21 @@ void nomp_logs_finalize();
  * consecutive uses of the function.
  *
  * @details The function either starts or ends the timer by considering the
- * toggle value. The function will start the timer if the toggle is 0. Else,
+ * toggle value. The function will start the timer if the toggle is 1. Else,
  * it will capture the execution time and records in a log.
  * @code{.c}
- * nomp_profile("Entry Name", 1);
+ * nomp_profile("Entry Name", 1, nomp.profile, 1);
  * // Code to be measured
- * nomp_profile("Entry Name", 0);
+ * nomp_profile("Entry Name", 0, nomp.profile, 1);
  * @endcode
  *
  * @param[in] name Name of the execution time that is being profiled.
  * @param[in] toggle Toggles the timer.
  * @param[in] profile_level The level of APIs that needs to be measured.
+ * @param[in] sync Execute nomp_sync when toggling off the timer.
  * @return void
  */
-void nomp_profile(const char *name, int toggle, int profile_level);
+void nomp_profile(const char *name, int toggle, int profile_level, int sync);
 
 /**
  * @ingroup nomp_profiler_utils
@@ -99,7 +100,7 @@ void nomp_profile_finalize();
  *
  * @return int
  */
-int nomp_profile_result();
+void nomp_profile_result();
 
 #ifdef __cplusplus
 }

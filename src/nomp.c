@@ -163,7 +163,7 @@ int nomp_init(int argc, const char **argv) {
 
   nomp_check(init_configs(argc, argv, &nomp));
 
-  nomp_profile("nomp_init", 1, nomp.profile);
+  nomp_profile("nomp_init", 1, nomp.profile, 1);
   nomp_check(nomp_log_init(nomp.verbose));
 
   size_t n = strnlen(nomp.backend, NOMP_MAX_BUFSIZ);
@@ -200,7 +200,7 @@ int nomp_init(int argc, const char **argv) {
   nomp_check(allocate_scratch_memory(&nomp));
 
   initialized = 1;
-  nomp_profile("nomp_init", 0, nomp.profile);
+  nomp_profile("nomp_init", 0, nomp.profile, 1);
   return 0;
 }
 
@@ -240,7 +240,7 @@ static unsigned mem_if_exist(void *p, size_t idx0, size_t idx1) {
 }
 
 int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
-  nomp_profile("nomp_update", 1, nomp.profile);
+  nomp_profile("nomp_update", 1, nomp.profile, 1);
   unsigned idx = mem_if_exist(ptr, idx0, idx1);
   if (idx == mems_n) {
     // A new entry can't be created with NOMP_FREE or NOMP_FROM.
@@ -269,7 +269,7 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
   else if (idx == mems_n)
     mems_n++;
 
-  nomp_profile("nomp_update", 0, nomp.profile);
+  nomp_profile("nomp_update", 0, nomp.profile, 1);
   return 0;
 }
 
@@ -349,7 +349,7 @@ static int parse_clauses(struct meta *meta, struct nomp_prog *prg,
 }
 
 int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
-  nomp_profile("nomp_jit", 1, nomp.profile);
+  nomp_profile("nomp_jit", 1, nomp.profile, 1);
   if (*id == -1) {
     if (progs_n == progs_max) {
       progs_max += progs_max / 2 + 1;
@@ -404,13 +404,13 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
     *id = progs_n++;
   }
 
-  nomp_profile("nomp_jit", 0, nomp.profile);
+  nomp_profile("nomp_jit", 0, nomp.profile, 1);
   return 0;
 }
 
 int nomp_run(int id, ...) {
   if (id >= 0) {
-    nomp_profile("nomp_run setup time", 1, nomp.profile);
+    nomp_profile("nomp_run setup time", 1, nomp.profile, 1);
     struct nomp_prog *prg = progs[id];
     struct nomp_arg *args = prg->args;
 
@@ -450,25 +450,25 @@ int nomp_run(int id, ...) {
       }
     }
     va_end(vargs);
-    nomp_profile("nomp_run setup time", 0, nomp.profile);
+    nomp_profile("nomp_run setup time", 0, nomp.profile, 1);
 
-    nomp_profile("nomp_run grid evaluation", 1, nomp.profile);
+    nomp_profile("nomp_run grid evaluation", 1, nomp.profile, 1);
     nomp_check(nomp_py_eval_grid_size(prg));
 
     // FIXME: Our kernel doesn't have the local problem size for some
     // reason.
     if (prg->reduction_index >= 0)
       prg->local[0] = 32;
-    nomp_profile("nomp_run grid evaluation", 0, nomp.profile);
+    nomp_profile("nomp_run grid evaluation", 0, nomp.profile, 1);
 
-    nomp_profile("nomp_run kernel runtime", 1, nomp.profile);
+    nomp_profile("nomp_run kernel runtime", 1, nomp.profile, 1);
     nomp_check(nomp.knl_run(&nomp, prg));
 
     if (prg->reduction_index >= 0) {
       nomp_sync();
       nomp_check(nomp_host_side_reduction(&nomp, prg, nomp.scratch));
     }
-    nomp_profile("nomp_run kernel runtime", 0, nomp.profile);
+    nomp_profile("nomp_run kernel runtime", 0, nomp.profile, 1);
 
     return 0;
   }
@@ -480,7 +480,7 @@ int nomp_run(int id, ...) {
 int nomp_sync() { return nomp.sync(&nomp); }
 
 int nomp_finalize(void) {
-  nomp_profile("nomp_finalize", 1, nomp.profile);
+  nomp_profile("nomp_finalize", 1, nomp.profile, 1);
   if (!initialized) {
     return nomp_set_log(NOMP_FINALIZE_FAILURE, NOMP_ERROR,
                         "libnomp is not initialized.");
@@ -514,7 +514,7 @@ int nomp_finalize(void) {
     return nomp_set_log(NOMP_FINALIZE_FAILURE, NOMP_ERROR,
                         "Failed to initialize libnomp.");
   }
-  nomp_profile("nomp_finalize", 0, nomp.profile);
+  nomp_profile("nomp_finalize", 0, nomp.profile, 0);
   if (nomp.profile == 1)
     nomp_profile_result();
 
