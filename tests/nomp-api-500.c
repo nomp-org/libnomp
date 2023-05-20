@@ -4,9 +4,10 @@
 
 static int test_sum() {
   int err = 0;
-  // FIXME: Following test fails:
-  // TEST_BUILTIN_TYPES(500_sum_const);
-  // TEST_BUILTIN_TYPES(500_sum, 10);
+  TEST_BUILTIN_TYPES(500_sum_const, 10);
+  TEST_BUILTIN_TYPES(500_sum_const, 50);
+  TEST_BUILTIN_TYPES(500_sum_var, 10);
+  TEST_BUILTIN_TYPES(500_sum_var, 50);
   TEST_BUILTIN_TYPES(500_sum_array, 10);
   TEST_BUILTIN_TYPES(500_sum_array, 50);
   return err;
@@ -33,6 +34,7 @@ static int test_vxm() {
 static int test_dot() {
   int err = 0;
   TEST_BUILTIN_TYPES(500_dot, 10);
+  TEST_BUILTIN_TYPES(500_dot, 50);
   return err;
 }
 

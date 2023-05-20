@@ -6,8 +6,9 @@ LOOPY_LANG_VERSION = (2018, 2)
 
 
 def annotate(
-    knl: lp.translation_unit.TranslationUnit, annotations: Dict[str, str],
-    context: Dict[str, str]
+    knl: lp.translation_unit.TranslationUnit,
+    annotations: Dict[str, str],
+    context: Dict[str, str],
 ) -> lp.translation_unit.TranslationUnit:
     inames = knl.default_entrypoint.all_inames()
     dof_axis = 0
