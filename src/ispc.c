@@ -35,7 +35,7 @@ static void ispcrt_error(ISPCRTError err_code, const char *message) {
   }
 
 static int ispc_update(struct nomp_backend *bnd, struct nomp_mem *m,
-                       const int op) {
+                       const nomp_map_direction_t op) {
   struct ispc_backend *ispc = (struct ispc_backend *)bnd->bptr;
 
   if (op & NOMP_ALLOC) {

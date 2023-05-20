@@ -69,7 +69,8 @@ struct nomp_backend {
   int platform_id, device_id, verbose, profile;
   char backend[NOMP_MAX_BUFSIZ], install_dir[PATH_MAX];
   // Pointers to backend functions used for backend dispatch.
-  int (*update)(struct nomp_backend *, struct nomp_mem *, const int);
+  int (*update)(struct nomp_backend *, struct nomp_mem *,
+                const nomp_map_direction_t op);
   int (*knl_build)(struct nomp_backend *, struct nomp_prog *, const char *,
                    const char *);
   int (*knl_run)(struct nomp_backend *, struct nomp_prog *);

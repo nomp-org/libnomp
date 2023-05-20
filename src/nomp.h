@@ -4,61 +4,34 @@
 #include <stddef.h>
 
 /**
- * @defgroup nomp_types nomp data types.
+ * @defgroup nomp_types Data Types
+ * @brief Data types used in libnomp
+ */
+
+/**
+ * @ingroup nomp_types
  *
  * @brief Defines argument types for a nomp kernel. Currently, only integer,
  * float or pointer types are supported.
  */
+typedef enum {
+  NOMP_INT = 2048,   /*!< Signed integer argument type.*/
+  NOMP_UINT = 4096,  /*!< Unsigned integer argument type.*/
+  NOMP_FLOAT = 6144, /*!< Floating point argument type.*/
+  NOMP_PTR = 8192    /*!< Pointer argument type.*/
+} nomp_type_t;
 
 /**
  * @ingroup nomp_types
- * @brief Signed integer argument type.
+ * @brief Defines the update direction (or operation) in nomp_update().
  */
-#define NOMP_INT 2048
-/**
- * @ingroup nomp_types
- * @brief Unsigned integer argument type.
- */
-#define NOMP_UINT 4096
-/**
- * @ingroup nomp_types
- * @brief Floating point argument type.
- */
-#define NOMP_FLOAT 6144
-/**
- * @ingroup nomp_types
- * @brief Pointer argument type.
- */
-#define NOMP_PTR 8192
-
-/**
- * @defgroup nomp_update_op Memory update operations for nomp variable.
- *
- * @brief Defines update operations for a pointer type variable as passed into
- * nomp_update().
- */
-
-/**
- * @ingroup nomp_update_op
- * @brief Allocate memory on the device.
- */
-#define NOMP_ALLOC 1
-/**
- * @ingroup nomp_update_op
- * @brief Copy host data to device. Memory will be allocated if necessary.
- */
-#define NOMP_TO 2
-/**
- * @ingroup nomp_update_op
- * @brief Copy device data to host. User must make sure that there is enough
- * memory available on the host.
- */
-#define NOMP_FROM 4
-/**
- * @ingroup nomp_update_op
- * @brief Free memory allocated on the device.
- */
-#define NOMP_FREE 8
+typedef enum {
+  NOMP_ALLOC = 1, /*!< Allocate memory on the device.*/
+  NOMP_TO = 2,    /*!< Copy host data to device. Memory will be allocated if not
+                   * allocated.*/
+  NOMP_FROM = 4,  /*!< Copy device data to host.*/
+  NOMP_FREE = 8   /*!< Free memory allocated on the device.*/
+} nomp_map_direction_t;
 
 /**
  * @defgroup nomp_errors Errors
@@ -218,7 +191,7 @@ int nomp_init(int argc, const char **argv);
  * @param[in] start_idx Start index in the vector to start copying.
  * @param[in] end_idx End index in the vector to end the copying.
  * @param[in] unit_size Size of a single vector element.
- * @param[in] op Operation to perform (One of @ref nomp_update_op).
+ * @param[in] op Operation to perform (One of #nomp_map_direction_t).
  * @return int
  *
  * @details Operation \p op will be performed on the array slice [\p start_idx,
@@ -247,7 +220,7 @@ int nomp_init(int argc, const char **argv);
  * @endcode
  */
 int nomp_update(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
-                int op);
+                nomp_map_direction_t op);
 
 /**
  * @ingroup nomp_user_api

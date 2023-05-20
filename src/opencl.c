@@ -30,7 +30,7 @@ struct opencl_prog {
 };
 
 static int opencl_update(struct nomp_backend *bnd, struct nomp_mem *m,
-                         const int op) {
+                         const nomp_map_direction_t op) {
   struct opencl_backend *ocl = (struct opencl_backend *)bnd->bptr;
 
   cl_int err;

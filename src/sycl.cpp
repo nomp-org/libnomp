@@ -24,7 +24,7 @@ struct sycl_prog {
 };
 
 static int sycl_update(struct nomp_backend *bnd, struct nomp_mem *m,
-                       const int op) {
+                       const nomp_map_direction_t op) {
   struct sycl_backend *sycl = (struct sycl_backend *)bnd->bptr;
 
   if (op & NOMP_ALLOC) {
