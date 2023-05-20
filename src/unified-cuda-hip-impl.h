@@ -70,7 +70,7 @@ struct gpu_prog {
 gpurtcResult gpu_compile(gpurtcProgram prog, struct gpu_backend *nbnd);
 
 static int gpu_update(struct nomp_backend *bnd, struct nomp_mem *m,
-                      const int op) {
+                      const nomp_map_direction_t op) {
   if (op & NOMP_ALLOC)
     chk_gpu(gpuMalloc(&m->bptr, (m->idx1 - m->idx0) * m->usize));
 

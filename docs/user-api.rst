@@ -12,18 +12,6 @@ Functions
    :project: libnomp
    :content-only:
 
-.. _group__nomp__update__op:
-
-Map Direction
-^^^^^^^^^^^^^
-Defines the operation direction in `nomp_update`.
-
-.. doxygengroup:: nomp_update_op
-   :project: libnomp
-   :content-only:
-
-.. _group__nomp__types:
-
 Data Types
 ^^^^^^^^^^
 Defines argument type.

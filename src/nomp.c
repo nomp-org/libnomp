@@ -230,9 +230,9 @@ static unsigned mem_if_exist(void *p, size_t idx0, size_t idx1) {
   return mems_n;
 }
 
-int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
+int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize,
+                nomp_map_direction_t op) {
   nomp_profile("nomp_update", 1, 1);
-
   unsigned idx = mem_if_exist(ptr, idx0, idx1);
   if (idx == mems_n) {
     // A new entry can't be created with NOMP_FREE or
