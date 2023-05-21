@@ -124,25 +124,17 @@ static int init_configs(int argc, const char **argv,
 }
 
 static int allocate_scratch_memory(struct nomp_backend *backend) {
-  if (backend->scratch == NULL) {
-    struct nomp_mem *m = backend->scratch = nomp_calloc(struct nomp_mem, 1);
-    m->idx0 = 0, m->idx1 = NOMP_MAX_SCRATCH_SIZE, m->usize = sizeof(double);
-    m->hptr = nomp_calloc(double, m->idx1 - m->idx0);
-    nomp_check(backend->update(backend, m, NOMP_ALLOC));
-    return 0;
-  }
-  return nomp_set_log(NOMP_MEMORY_FAILURE, NOMP_ERROR,
-                      "Unable to allocate scratch memory for kernels.");
+  struct nomp_mem *m = &nomp.scratch;
+  m->idx0 = 0, m->idx1 = NOMP_MAX_SCRATCH_SIZE, m->usize = sizeof(char);
+  m->hptr = nomp_calloc(double, m->idx1 - m->idx0);
+  nomp_check(backend->update(backend, m, NOMP_ALLOC));
+  return 0;
 }
 
 static int deallocate_scratch_memory(struct nomp_backend *backend) {
-  if (backend->scratch) {
-    nomp_check(backend->update(backend, backend->scratch, NOMP_FREE));
-    nomp_free(&backend->scratch->hptr), nomp_free(&backend->scratch);
-    return 0;
-  }
-  return nomp_set_log(NOMP_MEMORY_FAILURE, NOMP_ERROR,
-                      "Unable to deallocate scratch memory for kernels.");
+  nomp_check(backend->update(backend, &backend->scratch, NOMP_FREE));
+  nomp_free(&backend->scratch.hptr);
+  return 0;
 }
 
 int nomp_init(int argc, const char **argv) {
@@ -196,7 +188,6 @@ int nomp_init(int argc, const char **argv) {
                         nomp.backend);
   }
 
-  nomp.scratch = NULL;
   nomp_check(allocate_scratch_memory(&nomp));
 
   // Populate context
@@ -447,8 +438,7 @@ int nomp_run(int id, ...) {
           prg->reduction_ptr = args[i].ptr, prg->reduction_size = args[i].size;
           m = nomp.scratch;
         } else {
-          m = mem_if_mapped(args[i].ptr);
-          if (m == NULL) {
+          if ((m = mem_if_mapped(args[i].ptr)) == NULL) {
             return nomp_set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
                                 ERR_STR_USER_MAP_PTR_IS_INVALID, args[i].ptr);
           }

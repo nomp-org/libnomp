@@ -169,11 +169,6 @@
  * @brief libnomp JIT failure.
  */
 #define NOMP_JIT_FAILURE -522
-/**
- * @ingroup nomp_errors
- * @brief libnomp memory operation failure.
- */
-#define NOMP_MEMORY_FAILURE -524
 
 #ifdef __cplusplus
 extern "C" {
