@@ -51,6 +51,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#memory-management-functions">Memory management functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#kernel-compilation-functions">Kernel compilation functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#logging-functions">Logging functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#profiler-functions">Profiler functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#other-helper-functions">Other helper functions</a></li>
 </ul>
 </li>
@@ -434,12 +435,62 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv418nomp_finalize_logsv">
-<span id="_CPPv318nomp_finalize_logsv"></span><span id="_CPPv218nomp_finalize_logsv"></span><span id="nomp_finalize_logs"></span><span class="target" id="group__nomp__log__utils_1ga1ac04f1cd37ab2f4aafe7ebaa8b355e5"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_finalize_logs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418nomp_finalize_logsv" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv418nomp_logs_finalizev">
+<span id="_CPPv318nomp_logs_finalizev"></span><span id="_CPPv218nomp_logs_finalizev"></span><span id="nomp_logs_finalize"></span><span class="target" id="group__nomp__log__utils_1gafa4993670a7e8f9a8b7b06dba7f25174"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_logs_finalize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418nomp_logs_finalizev" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Free variables used to keep track of logs. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>void </p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="profiler-functions">
+<h2>Profiler functions<a class="headerlink" href="#profiler-functions" title="Permalink to this heading"></a></h2>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412nomp_profilePKciii">
+<span id="_CPPv312nomp_profilePKciii"></span><span id="_CPPv212nomp_profilePKciii"></span><span id="nomp_profile__cCP.i.i.i"></span><span class="target" id="group__nomp__profiler__utils_1ga38d50295846514eaa156392b859786d7"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_profile</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">toggle</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">profile_level</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">sync</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412nomp_profilePKciii" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Toggles the timer and records the execution time between the two consecutive uses of the function. </p>
+<p>The function either starts or ends the timer by considering the toggle value. The function will start the timer if the toggle is 1. Else, it will capture the execution time and records in a log. <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nomp_profile</span><span class="p">(</span><span class="s">&quot;Entry Name&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">nomp</span><span class="p">.</span><span class="n">profile</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="c1">// Code to be measured</span>
+<span class="n">nomp_profile</span><span class="p">(</span><span class="s">&quot;Entry Name&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">nomp</span><span class="p">.</span><span class="n">profile</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+</pre></div>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – <strong>[in]</strong> Name of the execution time that is being profiled. </p></li>
+<li><p><strong>toggle</strong> – <strong>[in]</strong> Toggles the timer. </p></li>
+<li><p><strong>profile_level</strong> – <strong>[in]</strong> The level of APIs that needs to be measured. </p></li>
+<li><p><strong>sync</strong> – <strong>[in]</strong> Execute nomp_sync when toggling off the timer. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>void </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv421nomp_profile_finalizev">
+<span id="_CPPv321nomp_profile_finalizev"></span><span id="_CPPv221nomp_profile_finalizev"></span><span id="nomp_profile_finalize"></span><span class="target" id="group__nomp__profiler__utils_1gab148b6f71be8f2f1556ce61bed533b91"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_profile_finalize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421nomp_profile_finalizev" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Free variables used to keep track of time logs. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>void </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv419nomp_profile_resultv">
+<span id="_CPPv319nomp_profile_resultv"></span><span id="_CPPv219nomp_profile_resultv"></span><span id="nomp_profile_result"></span><span class="target" id="group__nomp__profiler__utils_1ga70f2ad5b1a632e77ea985170134098ed"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_profile_result</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419nomp_profile_resultv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Prints all the execution times recorded by the program. This function is executed only when the <code class="docutils literal notranslate"><span class="pre">--nomp-profile</span></code> is provided. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>int </p>
 </dd>
 </dl>
 </dd></dl>
