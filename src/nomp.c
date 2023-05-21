@@ -25,14 +25,12 @@ static int check_env(struct nomp_backend *backend) {
   if ((tmp = getenv("NOMP_PROFILE")))
     backend->profile = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
 
-  if ((tmp = copy_env("NOMP_BACKEND", NOMP_MAX_BUFSIZ))) {
-    nomp_free(&backend->backend);
-    backend->backend = strndup(tmp, NOMP_MAX_BUFSIZ), nomp_free(&tmp);
-  }
-
-  if ((tmp = copy_env("NOMP_ANNOTATE_FUNCTION", NOMP_MAX_BUFSIZ))) {
+  if ((tmp = getenv("NOMP_ANNOTATE_FUNCTION")))
     nomp_check(nomp_py_set_annotate_func(&backend->py_annotate, tmp));
-    nomp_free(&tmp);
+
+  if ((tmp = getenv("NOMP_BACKEND"))) {
+    nomp_free(&backend->backend);
+    backend->backend = strndup(tmp, NOMP_MAX_BUFSIZ);
   }
 
   if ((tmp = copy_env("NOMP_INSTALL_DIR", NOMP_MAX_BUFSIZ))) {
