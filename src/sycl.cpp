@@ -119,23 +119,17 @@ static int sycl_finalize(struct nomp_backend *bnd) {
   return 0;
 }
 
-static char *copy_env(const char *name, size_t size) {
-  const char *tmp = getenv(name);
-  if (tmp)
-    return strndup(tmp, size);
-  return NULL;
-}
-
 static int check_env(struct sycl_backend *sycl) {
-  char *tmp;
-  if (tmp = copy_env("NOMP_SYCL_CC", NOMP_MAX_BUFSIZ)) {
-    sycl->compiler = strndup(tmp, NOMP_MAX_BUFSIZ + 1), nomp_free(&tmp);
+  char *tmp = NULL;
+  if (tmp = getenv("NOMP_SYCL_CC")) {
+    // FIXME: This should be something like pathlen().
+    sycl->compiler = strndup(tmp, NOMP_MAX_BUFSIZ);
   } else {
     return nomp_set_log(NOMP_SYCL_FAILURE, NOMP_ERROR,
                         "SYCL compiler NOMP_SYCL_CC must be set.");
   }
-  if (tmp = copy_env("NOMP_SYCL_CFLAGS", NOMP_MAX_BUFSIZ)) {
-    sycl->compiler_flags = strndup(tmp, NOMP_MAX_BUFSIZ + 1), nomp_free(&tmp);
+  if (tmp = getenv("NOMP_SYCL_CFLAGS")) {
+    sycl->compiler_flags = strndup(tmp, NOMP_MAX_CFLAGS_SIZE);
   } else {
     return nomp_set_log(NOMP_SYCL_FAILURE, NOMP_ERROR,
                         "SYCL compiler flags NOMP_SYCL_CFLAGS must be set.");
