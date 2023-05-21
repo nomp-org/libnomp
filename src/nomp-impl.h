@@ -78,10 +78,10 @@ struct nomp_backend {
   void *bptr;
   // Scratch memory to be used as temporary memory for kernels (like
   // reductions).
-  struct nomp_mem *scratch;
   // Context info is used to pass necessary infomation to kernel
   // transformations and annotations.
   PyObject *py_context;
+  struct nomp_mem scratch;
 };
 
 #ifdef __cplusplus
