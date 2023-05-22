@@ -102,18 +102,23 @@ struct time_log {
   long double last_call;
   clock_t last_tick;
 };
-static struct time_log *time_logs;
+static struct time_log *time_logs = NULL;
 static unsigned time_logs_n = 0, time_logs_max = 0;
+static int profile_level = 0;
 
-unsigned find_time_log(const char *entry) {
+int nomp_profile_init(const int profile_level_in) {
+  profile_level = profile_level_in;
+  return 0;
+}
+
+static unsigned find_time_log(const char *entry) {
   for (int i = 0; i < time_logs_n; i++)
     if (strncmp(time_logs[i].entry, entry, NOMP_MAX_BUFSIZ) == 0)
       return i;
   return time_logs_n;
 }
 
-void nomp_profile(const char *name, const int toggle, const int profile_level,
-                  const int sync) {
+void nomp_profile(const char *name, const int toggle, const int sync) {
   if (profile_level == 0)
     return;
 
@@ -122,7 +127,6 @@ void nomp_profile(const char *name, const int toggle, const int profile_level,
   clock_t current_tick = clock();
 
   unsigned id = find_time_log(name);
-
   if (id == time_logs_n) { // Points to a new time log
     if (toggle == 1) {     // Starts the timer on a new time log
       // Dynamically increase the memory allocation
@@ -158,13 +162,10 @@ void nomp_profile(const char *name, const int toggle, const int profile_level,
   }
 }
 
-void nomp_profile_finalize() {
-  for (int i = 0; i < time_logs_n; i++)
-    nomp_free(&time_logs[i].entry);
-  nomp_free(&time_logs), time_logs_n = time_logs_max = 0;
-}
-
 void nomp_profile_result() {
+  if (profile_level == 0)
+    return;
+
   printf("| %-24s | %12s | %18s | %18s | %18s |\n", "Entry", "Total Calls",
          "Total Time (ms)", "Last Call (ms)", "Average Time (ms)");
   printf("|--------------------------|--------------|--------------------|-----"
@@ -175,4 +176,10 @@ void nomp_profile_result() {
            time_logs[i].entry, time_logs[i].total_calls,
            time_logs[i].total_time, time_logs[i].last_call, avg_time);
   }
+}
+
+void nomp_profile_finalize() {
+  for (int i = 0; i < time_logs_n; i++)
+    nomp_free(&time_logs[i].entry);
+  nomp_free(&time_logs), time_logs_n = time_logs_max = 0;
 }

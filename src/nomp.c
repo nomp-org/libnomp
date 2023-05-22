@@ -157,8 +157,10 @@ int nomp_init(int argc, const char **argv) {
   }
 
   nomp_check(init_configs(argc, argv, &nomp));
+  nomp_check(nomp_profile_init(nomp.profile));
 
-  nomp_profile("nomp_init", 1, nomp.profile, 1);
+  nomp_profile("nomp_init", 1, 0);
+
   nomp_check(nomp_log_init(nomp.verbose));
 
   size_t n = strnlen(nomp.backend, NOMP_MAX_BUFSIZ);
@@ -199,7 +201,9 @@ int nomp_init(int argc, const char **argv) {
   PyDict_SetItemString(nomp.py_context, "backend", pbackend);
 
   initialized = 1;
-  nomp_profile("nomp_init", 0, nomp.profile, 1);
+
+  nomp_profile("nomp_init", 0, 0);
+
   return 0;
 }
 
@@ -239,7 +243,8 @@ static unsigned mem_if_exist(void *p, size_t idx0, size_t idx1) {
 }
 
 int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
-  nomp_profile("nomp_update", 1, nomp.profile, 1);
+  nomp_profile("nomp_update", 1, 1);
+
   unsigned idx = mem_if_exist(ptr, idx0, idx1);
   if (idx == mems_n) {
     // A new entry can't be created with NOMP_FREE or NOMP_FROM.
@@ -268,7 +273,8 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
   else if (idx == mems_n)
     mems_n++;
 
-  nomp_profile("nomp_update", 0, nomp.profile, 1);
+  nomp_profile("nomp_update", 0, 1);
+
   return 0;
 }
 
@@ -348,133 +354,151 @@ static int parse_clauses(struct meta *meta, struct nomp_prog *prg,
 }
 
 int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
-  nomp_profile("nomp_jit", 1, nomp.profile, 1);
-  if (*id == -1) {
-    if (progs_n == progs_max) {
-      progs_max += progs_max / 2 + 1;
-      progs = nomp_realloc(progs, struct nomp_prog *, progs_max);
-    }
+  if (*id >= 0)
+    return 0;
 
-    // Initialize the program struct.
-    struct nomp_prog *prg = progs[progs_n] = nomp_calloc(struct nomp_prog, 1);
-    prg->nargs = nargs, prg->args = nomp_calloc(struct nomp_arg, nargs);
-    prg->py_dict = PyDict_New(), prg->reduction_index = -1;
+  nomp_profile("nomp_jit", 1, 1);
 
-    va_list args;
-    va_start(args, nargs);
-    for (unsigned i = 0; i < prg->nargs; i++) {
-      const char *name = va_arg(args, const char *);
-      strncpy(prg->args[i].name, name, NOMP_MAX_BUFSIZ);
-      prg->args[i].size = va_arg(args, size_t);
-      prg->args[i].type = va_arg(args, int);
-    }
-    va_end(args);
-
-    // Parse the clauses to find transformations file, function and other
-    // annotations. Annotations are returned as a Python dictionary.
-    struct meta meta;
-    nomp_check(parse_clauses(&meta, prg, clauses));
-
-    // Create loopy kernel from C source.
-    PyObject *knl = NULL;
-    nomp_check(nomp_py_c_to_loopy(&knl, csrc, nomp.backend));
-    if (prg->reduction_index >= 0)
-      nomp_check(nomp_py_realize_reduction(
-          &knl, prg->args[prg->reduction_index].name));
-
-    // Handle annotate clauses if they exist.
-    nomp_check(nomp_py_apply_annotations(&knl, nomp.py_annotate, meta.dict,
-                                         nomp.py_context));
-    Py_XDECREF(meta.dict);
-
-    // Handle transform clauses.
-    nomp_check(
-        nomp_py_apply_transform(&knl, meta.file, meta.func, nomp.py_context));
-    nomp_free(&meta.file), nomp_free(&meta.func);
-
-    // Get OpenCL, CUDA, etc. source and name from the loopy kernel and build
-    // the program.
-    char *name, *src;
-    nomp_check(nomp_py_get_knl_name_and_src(&name, &src, knl, nomp.backend));
-    nomp_check(nomp.knl_build(&nomp, prg, src, name));
-    nomp_free(&src), nomp_free(&name);
-
-    // Get grid size of the loopy kernel as pymbolic expressions.
-    // These grid sizes will be evaluated each time the kernel is run.
-    nomp_check(nomp_py_get_grid_size(prg, knl));
-    Py_XDECREF(knl);
-
-    *id = progs_n++;
+  if (progs_n == progs_max) {
+    progs_max += progs_max / 2 + 1;
+    progs = nomp_realloc(progs, struct nomp_prog *, progs_max);
   }
 
-  nomp_profile("nomp_jit", 0, nomp.profile, 1);
+  // Initialize the program struct.
+  struct nomp_prog *prg = progs[progs_n] = nomp_calloc(struct nomp_prog, 1);
+  prg->nargs = nargs, prg->args = nomp_calloc(struct nomp_arg, nargs);
+  prg->py_dict = PyDict_New(), prg->reduction_index = -1;
+
+  va_list args;
+  va_start(args, nargs);
+  for (unsigned i = 0; i < prg->nargs; i++) {
+    const char *name = va_arg(args, const char *);
+    strncpy(prg->args[i].name, name, NOMP_MAX_BUFSIZ);
+    prg->args[i].size = va_arg(args, size_t);
+    prg->args[i].type = va_arg(args, int);
+  }
+  va_end(args);
+
+  // Parse the clauses to find transformations file, function and other
+  // annotations. Annotations are returned as a Python dictionary.
+  struct meta meta;
+  nomp_check(parse_clauses(&meta, prg, clauses));
+
+  // Create loopy kernel from C source.
+  PyObject *knl = NULL;
+  nomp_check(
+      nomp_py_c_to_loopy(&knl, csrc, nomp.backend, prg->reduction_index));
+
+  // Handle annotate clauses if they exist.
+  nomp_check(nomp_py_apply_annotations(&knl, nomp.py_annotate, meta.dict,
+                                       nomp.py_context));
+  Py_XDECREF(meta.dict);
+
+  // Handle transform clauses.
+  nomp_check(
+      nomp_py_apply_transform(&knl, meta.file, meta.func, nomp.py_context));
+  nomp_free(&meta.file), nomp_free(&meta.func);
+
+  // Get OpenCL, CUDA, etc. source and name from the loopy kernel and build
+  // the program.
+  char *name, *src;
+  nomp_check(nomp_py_get_knl_name_and_src(&name, &src, knl, nomp.backend));
+  nomp_check(nomp.knl_build(&nomp, prg, src, name));
+  nomp_free(&src), nomp_free(&name);
+
+  // Get grid size of the loopy kernel as pymbolic expressions.
+  // These grid sizes will be evaluated each time the kernel is run.
+  nomp_check(nomp_py_get_grid_size(prg, knl));
+  Py_XDECREF(knl);
+
+  *id = progs_n++;
+
+  nomp_profile("nomp_jit", 0, 1);
+
   return 0;
 }
 
 int nomp_run(int id, ...) {
-  if (id >= 0) {
-    nomp_profile("nomp_run setup time", 1, nomp.profile, 1);
-    struct nomp_prog *prg = progs[id];
-    struct nomp_arg *args = prg->args;
-
-    PyObject *key, *val;
-    struct nomp_mem *m;
-
-    va_list vargs;
-    va_start(vargs, id);
-    for (unsigned i = 0; i < prg->nargs; i++) {
-      args[i].ptr = va_arg(vargs, void *);
-      switch (args[i].type) {
-      case NOMP_INT:
-        val = PyLong_FromLong(*((int *)args[i].ptr));
-        goto key;
-        break;
-      case NOMP_UINT:
-        val = PyLong_FromLong(*((unsigned int *)args[i].ptr));
-      key:
-        key = PyUnicode_FromStringAndSize(args[i].name, strlen(args[i].name));
-        PyDict_SetItem(prg->py_dict, key, val);
-        Py_XDECREF(key), Py_XDECREF(val);
-        break;
-      case NOMP_PTR:
-        if (prg->reduction_index == i) {
-          prg->reduction_ptr = args[i].ptr, prg->reduction_size = args[i].size;
-          m = nomp.scratch;
-        } else {
-          if ((m = mem_if_mapped(args[i].ptr)) == NULL) {
-            return nomp_set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
-                                ERR_STR_USER_MAP_PTR_IS_INVALID, args[i].ptr);
-          }
-        }
-        args[i].size = m->bsize, args[i].ptr = m->bptr;
-        break;
-      }
-    }
-    va_end(vargs);
-    nomp_profile("nomp_run setup time", 0, nomp.profile, 1);
-
-    nomp_profile("nomp_run grid evaluation", 1, nomp.profile, 1);
-    nomp_check(nomp_py_eval_grid_size(prg));
-    nomp_check(nomp.knl_run(&nomp, prg));
-    if (prg->reduction_index >= 0)
-      nomp_check(nomp_host_side_reduction(&nomp, prg, nomp.scratch));
-    nomp_profile("nomp_run kernel runtime", 0, nomp.profile, 1);
-
-    return 0;
+  if (id < 0) {
+    return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                        "Kernel id %d passed to nomp_run is not valid.", id);
   }
 
-  return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                      "Kernel id %d passed to nomp_run is not valid.", id);
+  nomp_profile("nomp_run setup time", 1, 1);
+
+  struct nomp_prog *prg = progs[id];
+  struct nomp_arg *args = prg->args;
+
+  va_list vargs;
+  va_start(vargs, id);
+
+  PyObject *key, *val;
+  struct nomp_mem *m;
+  for (unsigned i = 0; i < prg->nargs; i++) {
+    args[i].ptr = va_arg(vargs, void *);
+    switch (args[i].type) {
+    case NOMP_INT:
+      val = PyLong_FromLong(*((int *)args[i].ptr));
+      goto key;
+      break;
+    case NOMP_UINT:
+      val = PyLong_FromLong(*((unsigned int *)args[i].ptr));
+    key:
+      key = PyUnicode_FromStringAndSize(args[i].name, strlen(args[i].name));
+      PyDict_SetItem(prg->py_dict, key, val);
+      Py_XDECREF(key), Py_XDECREF(val);
+      break;
+    case NOMP_PTR:
+      m = mem_if_mapped(args[i].ptr);
+      if (m == NULL) {
+        if (prg->reduction_index == i) {
+          prg->reduction_ptr = args[i].ptr, prg->reduction_size = args[i].size;
+          m = &nomp.scratch;
+        } else {
+          return nomp_set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
+                              ERR_STR_USER_MAP_PTR_IS_INVALID, args[i].ptr);
+        }
+      }
+      args[i].size = m->bsize, args[i].ptr = m->bptr;
+      break;
+    }
+  }
+  va_end(vargs);
+
+  nomp_profile("nomp_run setup time", 0, 1);
+
+  nomp_profile("nomp_run grid evaluation", 1, 1);
+
+  nomp_check(nomp_py_eval_grid_size(prg));
+  // FIXME: Our kernel doesn't have the local problem size for some
+  // reason.
+  if (prg->reduction_index >= 0)
+    prg->local[0] = 32;
+
+  nomp_profile("nomp_run grid evaluation", 0, 1);
+
+  nomp_profile("nomp_run kernel runtime", 1, 1);
+
+  nomp_check(nomp.knl_run(&nomp, prg));
+  if (prg->reduction_index >= 0) {
+    nomp_sync();
+    nomp_check(nomp_host_side_reduction(&nomp, prg, &nomp.scratch));
+  }
+
+  nomp_profile("nomp_run kernel runtime", 0, 1);
+
+  return 0;
 }
 
 int nomp_sync() { return nomp.sync(&nomp); }
 
 int nomp_finalize(void) {
-  nomp_profile("nomp_finalize", 1, nomp.profile, 1);
   if (!initialized) {
     return nomp_set_log(NOMP_FINALIZE_FAILURE, NOMP_ERROR,
                         "libnomp is not initialized.");
   }
+
+  nomp_profile("nomp_finalize", 1, 1);
 
   for (unsigned i = 0; i < mems_n; i++) {
     if (mems[i]) {
@@ -504,11 +528,12 @@ int nomp_finalize(void) {
     return nomp_set_log(NOMP_FINALIZE_FAILURE, NOMP_ERROR,
                         "Failed to initialize libnomp.");
   }
-  nomp_profile("nomp_finalize", 0, nomp.profile, 0);
-  if (nomp.profile == 1)
-    nomp_profile_result();
 
-  // Free all the logs
+  nomp_profile("nomp_finalize", 0, 0);
+
+  nomp_profile_result();
+
+  // Free bookkeeping structures for the logger and profiler.
   nomp_logs_finalize();
   nomp_profile_finalize();
 
