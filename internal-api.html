@@ -419,11 +419,11 @@
 <h2>Logging functions<a class="headerlink" href="#logging-functions" title="Permalink to this heading"></a></h2>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv413nomp_log_initKi">
-<span id="_CPPv313nomp_log_initKi"></span><span id="_CPPv213nomp_log_initKi"></span><span id="nomp_log_init__iC"></span><span class="target" id="group__nomp__log__utils_1ga9cf2885715132519299e4f1b0b58f1aa"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_log_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">verbose_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413nomp_log_initKi" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv313nomp_log_initKi"></span><span id="_CPPv213nomp_log_initKi"></span><span id="nomp_log_init__iC"></span><span class="target" id="group__nomp__log__utils_1gaa91997a3e5dc5e90086c0eda01a5d65e"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_log_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">verbose</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413nomp_log_initKi" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Set the verbose level for the log functions. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>verbose_in</strong> – <strong>[in]</strong> Verbose level provided by the user. </p>
+<dd class="field-odd"><p><strong>verbose</strong> – <strong>[in]</strong> Verbose level provided by the user. </p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>int </p>
@@ -467,8 +467,22 @@
 <section id="profiler-functions">
 <h2>Profiler functions<a class="headerlink" href="#profiler-functions" title="Permalink to this heading"></a></h2>
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv412nomp_profilePKciii">
-<span id="_CPPv312nomp_profilePKciii"></span><span id="_CPPv212nomp_profilePKciii"></span><span id="nomp_profile__cCP.i.i.i"></span><span class="target" id="group__nomp__profiler__utils_1ga38d50295846514eaa156392b859786d7"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_profile</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">toggle</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">profile_level</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">sync</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412nomp_profilePKciii" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv417nomp_profile_initKi">
+<span id="_CPPv317nomp_profile_initKi"></span><span id="_CPPv217nomp_profile_initKi"></span><span id="nomp_profile_init__iC"></span><span class="target" id="group__nomp__profiler__utils_1ga8bcdeac928de6fd859ddf257d28a9ef0"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_profile_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">profile_level</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417nomp_profile_initKi" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Set the profile level for the nomp profiler. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>profile_level</strong> – <strong>[in]</strong> Profile level provided by the user. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412nomp_profilePKcii">
+<span id="_CPPv312nomp_profilePKcii"></span><span id="_CPPv212nomp_profilePKcii"></span><span id="nomp_profile__cCP.i.i"></span><span class="target" id="group__nomp__profiler__utils_1gaf5783347e5874e3fc876c337328ebcc5"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_profile</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">toggle</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">sync</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412nomp_profilePKcii" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Toggles the timer and records the execution time between the two consecutive uses of the function. </p>
 <p>The function either starts or ends the timer by considering the toggle value. The function will start the timer if the toggle is 1. Else, it will capture the execution time and records in a log. <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nomp_profile</span><span class="p">(</span><span class="s">&quot;Entry Name&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">nomp</span><span class="p">.</span><span class="n">profile</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
 <span class="c1">// Code to be measured</span>
@@ -480,24 +494,12 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> – <strong>[in]</strong> Name of the execution time that is being profiled. </p></li>
-<li><p><strong>toggle</strong> – <strong>[in]</strong> Toggles the timer. </p></li>
-<li><p><strong>profile_level</strong> – <strong>[in]</strong> The level of APIs that needs to be measured. </p></li>
+<li><p><strong>toggle</strong> – <strong>[in]</strong> Toggles the timer between tick (start of timing) and a tock (end of timing). </p></li>
 <li><p><strong>sync</strong> – <strong>[in]</strong> Execute nomp_sync when toggling off the timer. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>void </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv421nomp_profile_finalizev">
-<span id="_CPPv321nomp_profile_finalizev"></span><span id="_CPPv221nomp_profile_finalizev"></span><span id="nomp_profile_finalize"></span><span class="target" id="group__nomp__profiler__utils_1gab148b6f71be8f2f1556ce61bed533b91"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_profile_finalize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421nomp_profile_finalizev" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Free variables used to keep track of time logs. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>void </p>
 </dd>
 </dl>
 </dd></dl>
@@ -509,6 +511,17 @@
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>int </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv421nomp_profile_finalizev">
+<span id="_CPPv321nomp_profile_finalizev"></span><span id="_CPPv221nomp_profile_finalizev"></span><span id="nomp_profile_finalize"></span><span class="target" id="group__nomp__profiler__utils_1gab148b6f71be8f2f1556ce61bed533b91"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_profile_finalize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421nomp_profile_finalizev" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Free variables used to keep track of time logs. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>void </p>
 </dd>
 </dl>
 </dd></dl>
