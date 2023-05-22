@@ -20,7 +20,43 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set(HIP_ROOT_DIR /opt/rocm)
+if(NOT UNIX)
+  message(FATAL_ERROR "HIP is only supported on Linux !")
+endif()
+
+# Search for HIP installation
+if(NOT HIP_ROOT_DIR)
+  # Search in user specified path first
+  find_path(
+    HIP_ROOT_DIR
+    NAMES hipconfig
+    PATHS
+    ENV ROCM_PATH
+    ENV HIP_PATH
+    PATH_SUFFIXES bin
+    DOC "HIP installed location"
+    NO_DEFAULT_PATH
+    )
+
+  # Now search in default path
+  find_path(
+    HIP_ROOT_DIR
+    NAMES hipconfig
+    PATHS
+    /opt/rocm
+    PATH_SUFFIXES bin
+    DOC "HIP installed location"
+    )
+
+  # Check if we found HIP installation
+  if(HIP_ROOT_DIR)
+    # If so, fix the path
+    string(REGEX REPLACE "[/\\\\]?bin[64]*[/\\\\]?$" "" HIP_ROOT_DIR ${HIP_ROOT_DIR})
+    # And push it back to the cache
+    set(HIP_ROOT_DIR ${HIP_ROOT_DIR} CACHE PATH "HIP installed location" FORCE)
+  endif()
+endif()
+
 find_program(
   HIPCONFIG_EXECUTABLE
   NAMES hipconfig
