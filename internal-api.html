@@ -125,8 +125,8 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv418nomp_py_c_to_loopyPP8PyObjectPKcPKci">
-<span id="_CPPv318nomp_py_c_to_loopyPP8PyObjectPKcPKci"></span><span id="_CPPv218nomp_py_c_to_loopyPP8PyObjectPKcPKci"></span><span id="nomp_py_c_to_loopy__PyObjectPP.cCP.cCP.i"></span><span class="target" id="group__nomp__py__utils_1gad93022ef999d8673d55eabe6c42106b0"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_c_to_loopy</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">knl</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">src</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">backend</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">reduction_index</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418nomp_py_c_to_loopyPP8PyObjectPKcPKci" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv418nomp_py_c_to_loopyPP8PyObjectPKcPKc">
+<span id="_CPPv318nomp_py_c_to_loopyPP8PyObjectPKcPKc"></span><span id="_CPPv218nomp_py_c_to_loopyPP8PyObjectPKcPKc"></span><span id="nomp_py_c_to_loopy__PyObjectPP.cCP.cCP"></span><span class="target" id="group__nomp__py__utils_1gab6f7c2660f4077d9e82e95b5710a3fe7"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_c_to_loopy</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">knl</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">src</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">backend</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418nomp_py_c_to_loopyPP8PyObjectPKcPKc" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Creates loopy kernel from C source. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -134,7 +134,23 @@
 <li><p><strong>knl</strong> – <strong>[out]</strong> Loopy kernel object. </p></li>
 <li><p><strong>src</strong> – <strong>[in]</strong> C kernel source. </p></li>
 <li><p><strong>backend</strong> – <strong>[in]</strong> Backend name. </p></li>
-<li><p><strong>reduction_index</strong> – <strong>[in]</strong> Index of the reduction variable if present. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv425nomp_py_realize_reductionPP8PyObjectPKc">
+<span id="_CPPv325nomp_py_realize_reductionPP8PyObjectPKc"></span><span id="_CPPv225nomp_py_realize_reductionPP8PyObjectPKc"></span><span id="nomp_py_realize_reduction__PyObjectPP.cCP"></span><span class="target" id="group__nomp__py__utils_1gafec69d184ed8467facd1b6ca4f41c4fc"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_realize_reduction</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">knl</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">var</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425nomp_py_realize_reductionPP8PyObjectPKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Realize reductions if present in the kernel. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>knl</strong> – <strong>[inout]</strong> Loopy kernel object. </p></li>
+<li><p><strong>var</strong> – <strong>[in]</strong> Name of the reduction variable. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
