@@ -59,7 +59,8 @@ static int sycl_knl_free(struct nomp_prog *prg) {
 
   if (sycl)
     return nomp_jit_free(&sycl_prg->sycl_id);
-  return nomp_free(&prg->bptr);
+  nomp_free(&prg->bptr);
+  return 0;
 }
 
 static int sycl_knl_build(struct nomp_backend *bnd, struct nomp_prog *prg,

@@ -129,7 +129,7 @@ static int init_configs(int argc, const char **argv,
 
 static int allocate_scratch_memory(struct nomp_backend *backend) {
   struct nomp_mem *m = &nomp.scratch;
-  m->idx0 = 0, m->idx1 = NOMP_MAX_SCRATCH_SIZE, m->usize = sizeof(char);
+  m->idx0 = 0, m->idx1 = NOMP_MAX_SCRATCH_SIZE, m->usize = sizeof(double);
   m->hptr = nomp_calloc(double, m->idx1 - m->idx0);
   nomp_check(backend->update(backend, m, NOMP_ALLOC));
   return 0;
@@ -386,8 +386,10 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
 
   // Create loopy kernel from C source.
   PyObject *knl = NULL;
-  nomp_check(
-      nomp_py_c_to_loopy(&knl, csrc, nomp.backend, prg->reduction_index));
+  nomp_check(nomp_py_c_to_loopy(&knl, csrc, nomp.backend));
+  if (prg->reduction_index >= 0)
+    nomp_check(
+        nomp_py_realize_reduction(&knl, prg->args[prg->reduction_index].name));
 
   // Handle annotate clauses if they exist.
   nomp_check(nomp_py_apply_annotations(&knl, nomp.py_annotate, meta.dict,
@@ -470,20 +472,14 @@ int nomp_run(int id, ...) {
   nomp_profile("nomp_run grid evaluation", 1, 1);
 
   nomp_check(nomp_py_eval_grid_size(prg));
-  // FIXME: Our kernel doesn't have the local problem size for some
-  // reason.
-  if (prg->reduction_index >= 0)
-    prg->local[0] = 32;
 
   nomp_profile("nomp_run grid evaluation", 0, 1);
 
   nomp_profile("nomp_run kernel runtime", 1, 1);
 
   nomp_check(nomp.knl_run(&nomp, prg));
-  if (prg->reduction_index >= 0) {
-    nomp_sync();
+  if (prg->reduction_index >= 0)
     nomp_check(nomp_host_side_reduction(&nomp, prg, &nomp.scratch));
-  }
 
   nomp_profile("nomp_run kernel runtime", 0, 1);
 
