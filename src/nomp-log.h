@@ -20,10 +20,10 @@ extern "C" {
  * @ingroup nomp_log_utils
  * @brief Set the verbose level for the log functions.
  *
- * @param[in] verbose_in Verbose level provided by the user.
+ * @param[in] verbose Verbose level provided by the user.
  * @return int
  */
-int nomp_log_init(const int verbose_in);
+int nomp_log_init(const int verbose);
 
 /**
  * @ingroup nomp_log_utils
@@ -65,6 +65,15 @@ void nomp_logs_finalize();
 
 /**
  * @ingroup nomp_profiler_utils
+ * @brief Set the profile level for the nomp profiler.
+ *
+ * @param[in] profile_level Profile level provided by the user.
+ * @return int
+ */
+int nomp_profile_init(const int profile_level);
+
+/**
+ * @ingroup nomp_profiler_utils
  * @brief Toggles the timer and records the execution time between the two
  * consecutive uses of the function.
  *
@@ -78,20 +87,12 @@ void nomp_logs_finalize();
  * @endcode
  *
  * @param[in] name Name of the execution time that is being profiled.
- * @param[in] toggle Toggles the timer.
- * @param[in] profile_level The level of APIs that needs to be measured.
+ * @param[in] toggle Toggles the timer between tick (start of timing) and a tock
+ * (end of timing).
  * @param[in] sync Execute nomp_sync when toggling off the timer.
  * @return void
  */
-void nomp_profile(const char *name, int toggle, int profile_level, int sync);
-
-/**
- * @ingroup nomp_profiler_utils
- * @brief Free variables used to keep track of time logs.
- *
- * @return void
- */
-void nomp_profile_finalize();
+void nomp_profile(const char *name, int toggle, int sync);
 
 /**
  * @ingroup nomp_profiler_utils
@@ -101,6 +102,14 @@ void nomp_profile_finalize();
  * @return int
  */
 void nomp_profile_result();
+
+/**
+ * @ingroup nomp_profiler_utils
+ * @brief Free variables used to keep track of time logs.
+ *
+ * @return void
+ */
+void nomp_profile_finalize();
 
 #ifdef __cplusplus
 }

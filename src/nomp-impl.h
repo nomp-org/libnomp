@@ -64,8 +64,6 @@ struct nomp_backend {
   // User configurations of the backend.
   int platform_id, device_id, verbose, profile;
   char *backend, *install_dir;
-  // Python function object which will be called to perform annotations.
-  PyObject *py_annotate;
   // Pointers to backend functions used for backend dispatch.
   int (*update)(struct nomp_backend *, struct nomp_mem *, const int);
   int (*knl_build)(struct nomp_backend *, struct nomp_prog *, const char *,
@@ -74,14 +72,16 @@ struct nomp_backend {
   int (*knl_free)(struct nomp_prog *);
   int (*sync)(struct nomp_backend *);
   int (*finalize)(struct nomp_backend *);
-  // Pointer to keep track of backend specific data.
-  void *bptr;
   // Scratch memory to be used as temporary memory for kernels (like
   // reductions).
+  struct nomp_mem scratch;
+  // Python function object which will be called to perform annotations.
+  PyObject *py_annotate;
   // Context info is used to pass necessary infomation to kernel
   // transformations and annotations.
   PyObject *py_context;
-  struct nomp_mem scratch;
+  // Pointer to keep track of backend specific data.
+  void *bptr;
 };
 
 #ifdef __cplusplus
