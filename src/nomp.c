@@ -11,7 +11,7 @@ static inline char *copy_env(const char *name, size_t size) {
   return NULL;
 }
 
-static int check_env(struct nomp_backend *backend) {
+static int check_env_vars(struct nomp_backend *backend) {
   char *tmp = getenv("NOMP_PLATFORM");
   if (tmp)
     backend->platform_id = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
@@ -43,7 +43,7 @@ static int check_env(struct nomp_backend *backend) {
   return 0;
 }
 
-static inline int check_cmd_line_arg(unsigned i, unsigned argc,
+static inline int check_cmd_line_aux(unsigned i, unsigned argc,
                                      const char *argv[]) {
   if (i >= argc || argv[i] == NULL) {
     return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
@@ -52,21 +52,15 @@ static inline int check_cmd_line_arg(unsigned i, unsigned argc,
   return 0;
 }
 
-static int init_configs(int argc, const char **argv,
-                        struct nomp_backend *backend) {
-  // We only a provide default value for verbose. Everything else has to be set
-  // by user explicitly.
-  backend->verbose = 0;
-  backend->device_id = backend->platform_id = -1;
-  backend->backend = backend->install_dir = NULL;
-
+static inline int check_cmd_line(struct nomp_backend *backend, int argc,
+                                 const char **argv) {
   if (argc <= 1 || argv == NULL)
     return 0;
 
   unsigned i = 0;
   while (i < argc) {
     if (!strncmp("--nomp", argv[i], 6)) {
-      nomp_check(check_cmd_line_arg(i + 1, argc, argv));
+      nomp_check(check_cmd_line_aux(i + 1, argc, argv));
       if (!strncmp("--nomp-backend", argv[i], NOMP_MAX_BUFSIZ)) {
         backend->backend = strndup((const char *)argv[i + 1], NOMP_MAX_BUFSIZ);
       } else if (!strncmp("--nomp-platform", argv[i], NOMP_MAX_BUFSIZ)) {
@@ -90,7 +84,19 @@ static int init_configs(int argc, const char **argv,
     i++;
   }
 
-  nomp_check(check_env(&nomp));
+  return 0;
+}
+
+static int init_configs(int argc, const char **argv,
+                        struct nomp_backend *backend) {
+  // We only a provide default value for verbose. Everything else has to be set
+  // by user explicitly.
+  backend->verbose = 0;
+  backend->device_id = backend->platform_id = -1;
+  backend->backend = backend->install_dir = NULL;
+
+  nomp_check(check_cmd_line(backend, argc, argv));
+  nomp_check(check_env_vars(backend));
 
 #define check_if_initialized(param, dummy, cmd_arg, env_var)                   \
   {                                                                            \
@@ -146,7 +152,6 @@ int nomp_init(int argc, const char **argv) {
     // https://docs.python.org/3/c-api/init_config.html#init-config
     // But for now, we do the simplest thing possible.
     Py_Initialize();
-
     // Append current working directory to sys.path.
     nomp_check(nomp_py_append_to_sys_path("."));
   }
