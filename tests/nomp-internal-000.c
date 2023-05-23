@@ -14,7 +14,8 @@ static const char *add_src =
     "}                                                   \n";
 
 static int test_jit_compile_and_free(const char *cwd, const char *wkdir) {
-  const char *cc = "/usr/bin/cc", *cflags = "-shared", *entry = "add_wrapper";
+  const char *cc = "/usr/bin/cc", *cflags = "-fPIC -shared",
+             *entry = "add_wrapper";
   const char *srcf = "source.c", *libf = "mylib.so";
   int id = -1;
   nomp_test_chk(
@@ -28,7 +29,8 @@ static int test_jit_compile_and_free(const char *cwd, const char *wkdir) {
 }
 
 static int test_jit_run(const char *cwd, const char *wkdir) {
-  const char *cc = "/usr/bin/cc", *cflags = "-shared", *entry = "add_wrapper";
+  const char *cc = "/usr/bin/cc", *cflags = "-fPIC -shared",
+             *entry = "add_wrapper";
   const char *srcf = "source.c", *libf = "mylib.so";
   int id = -1;
   nomp_test_chk(
