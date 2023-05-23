@@ -57,7 +57,7 @@ static int sycl_update(struct nomp_backend *bnd, struct nomp_mem *m,
 static int sycl_knl_free(struct nomp_prog *prg) {
   struct sycl_prog *sycl_prg = (struct sycl_prog *)prg->bptr;
 
-  if (sycl)
+  if (sycl_prg)
     return nomp_jit_free(&sycl_prg->sycl_id);
   nomp_free(&prg->bptr);
   return 0;
