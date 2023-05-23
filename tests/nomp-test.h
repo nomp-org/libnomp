@@ -1,6 +1,9 @@
 #if !defined(_NOMP_TEST_H_)
 #define _NOMP_TEST_H_
 
+#define NOMP_TEST_MAX_BUFSIZ 4096
+
+#include "nomp-aux.h"
 #include "nomp-mem.h"
 #include "nomp.h"
 #include <assert.h>

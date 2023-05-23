@@ -74,3 +74,10 @@ int nomp_check_py_script_path(const char *path) {
   nomp_free(&py);
   return err;
 }
+
+char *nomp_copy_env(const char *name, size_t size) {
+  const char *tmp = getenv(name);
+  if (tmp)
+    return strndup(tmp, size);
+  return NULL;
+}

@@ -4,13 +4,6 @@
 static struct nomp_backend nomp;
 static int initialized = 0;
 
-static inline char *copy_env(const char *name, size_t size) {
-  const char *tmp = getenv(name);
-  if (tmp)
-    return strndup(tmp, size);
-  return NULL;
-}
-
 static int check_env_vars(struct nomp_backend *backend) {
   char *tmp = getenv("NOMP_PLATFORM");
   if (tmp)
@@ -33,7 +26,7 @@ static int check_env_vars(struct nomp_backend *backend) {
     backend->backend = strndup(tmp, NOMP_MAX_BUFSIZ);
   }
 
-  if ((tmp = copy_env("NOMP_INSTALL_DIR", NOMP_MAX_BUFSIZ))) {
+  if ((tmp = nomp_copy_env("NOMP_INSTALL_DIR", NOMP_MAX_BUFSIZ))) {
     nomp_free(&backend->install_dir);
     size_t size;
     nomp_check(nomp_path_len(&size, tmp));

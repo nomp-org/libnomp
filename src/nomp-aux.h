@@ -82,6 +82,18 @@ int nomp_max(unsigned n, ...);
  */
 int nomp_check_py_script_path(const char *path);
 
+/**
+ * @ingroup nomp_other_utils
+ * @brief Get a copy of the environment variable \p name if exists.
+ *
+ * Return NULL if the environment variable is not set.
+ *
+ * @param[in] name Name of the environment variable.
+ * @param[in] size Maximum lenght of the environment variable value.
+ * @return char *
+ */
+char *nomp_copy_env(const char *name, size_t size);
+
 #ifdef __cplusplus
 }
 #endif
