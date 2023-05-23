@@ -1,19 +1,20 @@
 #!/bin/bash
 
-# script variables
 NOMP_SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 NOMP_LNSTATE_PATH="${NOMP_SOURCE_DIR}/.lnstate"
 
+# Check for nomp environment variables.
 : "${NOMP_INSTALL_DIR:="${HOME}/.nomp"}"
 : "${NOMP_OPENCL_LIBRARY:=""}"
 : "${NOMP_OPENCL_INCLUDE_DIR:=""}"
 : "${NOMP_BUILD_TYPE:="RelWithDebInfo"}"
 : "${NOMP_ENABLE_DOCS:="OFF"}"
+: "${NOMP_ENABLE_HIP:="OFF"}"
 : "${NOMP_BUILD_DIR:="${NOMP_SOURCE_DIR}/build"}"
 : "${NOMP_C_COMPILER:=""}"
 : "${NOMP_CXX_COMPILER:=""}"
 
-# colors
+# Terminal output colors.
 red=$(tput setaf 1)
 green=$(tput setaf 2)
 cyan=$(tput setaf 6)
@@ -36,21 +37,24 @@ function print_help() {
     "${cyan}-B/--build-dir:${reset} Specify build directory for libnomp " \
     "(Default: ${NOMP_BUILD_DIR}).\n" \
     "${cyan}-ol/--opencl-lib:${reset} Specify OpenCL library path.\n" \
-    "${cyan}-oi/--opencl-lib:${reset} Specify OpenCL include path."
+    "${cyan}-oi/--opencl-inc:${reset} Specify OpenCL include path." \
+    "${cyan}-hip/--enable-hip:${reset} Build with HIP backend ON." \
+    "(Default: OFF).\n" \
   exit 0
 }
 
-# parse the options
+# Parse the options.
 while [ $# -gt 0 ]; do
   case $1 in
   -h | --help) print_help ;;
-  -b | --build-type) shift && NOMP_BUILD_TYPE=${1^^} ;;
+  -b | --build-type) shift && NOMP_BUILD_TYPE=${1} ;;
   -d | --enable-docs) NOMP_ENABLE_DOCS="ON" ;;
   -i | --install-dir) shift && NOMP_INSTALL_DIR=$(realpath "${1}") ;;
   -B | --build-dir) shift && NOMP_BUILD_DIR=$(realpath "${1}") ;;
   -ol | --opencl-lib) shift && NOMP_OPENCL_LIBRARY=$(realpath "${1}") ;;
   -oi | --opencl-inc) shift && NOMP_OPENCL_INCLUDE_DIR=$(realpath "${1}") ;;
-  -c | --c-compiler) shift && NOMP_C_COMPILER="${1}" ;;
+  -hip | --enable-hip) NOMP_ENABLE_HIP="ON" ;;
+  -cc | --c-compiler) shift && NOMP_C_COMPILER="${1}" ;;
   -cxx | --cxx-compiler) shift && NOMP_CXX_COMPILER="${1}" ;;
   *) echo "${red}Invalid argument: ${1}${reset}"
     echo "See ${cyan}./lncfg -h${reset} or ${cyan}./lncfg --help${reset} for " \
@@ -64,6 +68,7 @@ done
 NOMP_CMAKE_OPTS=()
 NOMP_CMAKE_OPTS+=("-DCMAKE_INSTALL_PREFIX=${NOMP_INSTALL_DIR}")
 NOMP_CMAKE_OPTS+=("-DENABLE_DOCS=${NOMP_ENABLE_DOCS}")
+NOMP_CMAKE_OPTS+=("-DENABLE_HIP=${NOMP_ENABLE_HIP}")
 NOMP_CMAKE_OPTS+=("-DCMAKE_BUILD_TYPE=${NOMP_BUILD_TYPE}")
 
 [[ -n ${NOMP_OPENCL_LIBRARY} ]] &&
