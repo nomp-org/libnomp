@@ -172,13 +172,12 @@ static int gpu_finalize(struct nomp_backend *bnd) {
   if (nbnd)
     GPU_CHECK(gpuCtxDestroy(nbnd->ctx));
 #endif
+  nomp_free(&bnd->bptr);
   return 0;
 }
 
 int gpu_init(struct nomp_backend *bnd, const int platform_id,
              const int device_id) {
-  gpuFree(0);
-
   int num_devices;
   GPU_CHECK(gpuGetDeviceCount(&num_devices));
   if (device_id < 0 || device_id >= num_devices) {
