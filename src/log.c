@@ -19,21 +19,21 @@ struct log {
 static struct log *logs = NULL;
 static unsigned logs_n = 0, logs_max = 0;
 static const char *LOG_TYPE_STRING[] = {"Error", "Warning", "Info"};
-static int verbose;
+static int verbose = 0;
 
-int nomp_log_init(const int verbose_in) {
+int nomp_log_set_verbose(const int verbose_in) {
   if (verbose_in < 0 || verbose_in > 3) {
-    return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                        "Invalid verbose level %u is provided. The value "
-                        "should be within the range 0-3.",
-                        verbose_in);
+    return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                    "Invalid verbose level %u is provided. The value "
+                    "should be within the range 0-3.",
+                    verbose_in);
   }
   verbose = verbose_in;
   return 0;
 }
 
-int nomp_set_log_(const char *description, int logno, nomp_log_type type,
-                  const char *fname, unsigned line, ...) {
+int nomp_log_(const char *description, int logno, nomp_log_type type,
+              const char *fname, unsigned line, ...) {
   char buf[BUFSIZ];
   va_list vargs;
   va_start(vargs, line);
@@ -50,7 +50,7 @@ int nomp_set_log_(const char *description, int logno, nomp_log_type type,
   char *desc = nomp_calloc(char, len);
   snprintf(desc, len, "[%s] %s:%u %s", type_str, file, line, buf);
 
-  // Print the logs based on the verbose level
+  // Print the logs based on the verbose level.
   if ((verbose > 0 && type == NOMP_ERROR) ||
       (verbose > 1 && type == NOMP_WARNING) ||
       (verbose > 2 && type == NOMP_INFORMATION))
@@ -89,7 +89,7 @@ nomp_log_type nomp_get_log_type(int log_id) {
   return logs[log_id - 1].type;
 }
 
-void nomp_logs_finalize() {
+void nomp_log_finalize() {
   for (unsigned i = 0; i < logs_n; i++)
     nomp_free(&logs[i].description);
   nomp_free(&logs), logs_n = logs_max = 0;
@@ -106,7 +106,7 @@ static struct time_log *time_logs = NULL;
 static unsigned time_logs_n = 0, time_logs_max = 0;
 static int profile_level = 0;
 
-int nomp_profile_init(const int profile_level_in) {
+int nomp_profile_set_level(const int profile_level_in) {
   profile_level = profile_level_in;
   return 0;
 }

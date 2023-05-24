@@ -8,17 +8,17 @@
 static int make_knl_dir(char **dir_, const char *knl_dir, const char *src) {
   size_t len = strnlen(src, NOMP_MAX_SRC_SIZE);
   if (len == NOMP_MAX_SRC_SIZE) {
-    return nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
-                        "Kernel source size exceeds maximum size %u.",
-                        NOMP_MAX_SRC_SIZE);
+    return nomp_log(NOMP_JIT_FAILURE, NOMP_ERROR,
+                    "Kernel source size exceeds maximum size %u.",
+                    NOMP_MAX_SRC_SIZE);
   }
 
   // Check if knl_dir exists, otherwise create it.
   if (access(knl_dir, F_OK) == -1) {
     if (mkdir(knl_dir, S_IRWXU) == -1) {
-      return nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
-                          "Unable to create directory: %s. Error: %s.", knl_dir,
-                          strerror(errno));
+      return nomp_log(NOMP_JIT_FAILURE, NOMP_ERROR,
+                      "Unable to create directory: %s. Error: %s.", knl_dir,
+                      strerror(errno));
     }
   }
 
@@ -28,9 +28,8 @@ static int make_knl_dir(char **dir_, const char *knl_dir, const char *src) {
 
   unsigned char md[SHA256_DIGEST_LENGTH], *ret = SHA256(s, len, md);
   if (ret == NULL) {
-    return nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
-                        "Unable to calculate SHA256 hash of string: \"%s\".",
-                        s);
+    return nomp_log(NOMP_JIT_FAILURE, NOMP_ERROR,
+                    "Unable to calculate SHA256 hash of string: \"%s\".", s);
   }
   nomp_free(&s);
 
@@ -45,9 +44,9 @@ static int make_knl_dir(char **dir_, const char *knl_dir, const char *src) {
   char *dir = *dir_ = nomp_str_cat(3, lmax, knl_dir, "/", hash);
   if (access(dir, F_OK) == -1) {
     if (mkdir(dir, S_IRWXU) == -1) {
-      return nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
-                          "Unable to create directory: %s. Error: %s.", dir,
-                          strerror(errno));
+      return nomp_log(NOMP_JIT_FAILURE, NOMP_ERROR,
+                      "Unable to create directory: %s. Error: %s.", dir,
+                      strerror(errno));
     }
   }
 
@@ -63,8 +62,8 @@ static int write_file(const char *path, const char *src) {
       fprintf(fp, "%s", src);
       fclose(fp);
     } else {
-      return nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
-                          "Unable to write file: %s.", path);
+      return nomp_log(NOMP_JIT_FAILURE, NOMP_ERROR, "Unable to write file: %s.",
+                      path);
     }
   }
 
@@ -81,21 +80,19 @@ static int compile_aux(const char *cc, const char *cflags, const char *src,
   snprintf(cmd, len, "%s %s %s -o %s", cc, cflags, src, out);
   int ret = system(cmd), err = 0;
   if (ret == -1) {
-    err =
-        nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
-                     "Got error \"%s\" when trying to execute command: \"%s\".",
-                     cmd, strerror(errno));
+    err = nomp_log(NOMP_JIT_FAILURE, NOMP_ERROR,
+                   "Got error \"%s\" when trying to execute command: \"%s\".",
+                   cmd, strerror(errno));
   } else if (WIFEXITED(ret)) {
     int status = WEXITSTATUS(ret);
     if (status) {
-      err =
-          nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
-                       "Command: \"%s\" exitted with non-zero status code: %d.",
-                       cmd, status);
+      err = nomp_log(NOMP_JIT_FAILURE, NOMP_ERROR,
+                     "Command: \"%s\" exitted with non-zero status code: %d.",
+                     cmd, status);
     }
   } else {
-    err = nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
-                       "Command: \"%s\" was terminated by a signal.", cmd);
+    err = nomp_log(NOMP_JIT_FAILURE, NOMP_ERROR,
+                   "Command: \"%s\" was terminated by a signal.", cmd);
   }
 
   nomp_free(&cmd);
@@ -143,9 +140,9 @@ int nomp_jit_compile(int *id, const char *source, const char *cc,
   nomp_free(&lib);
 
   if (dlh == NULL || dlf == NULL) {
-    return nomp_set_log(
-        NOMP_JIT_FAILURE, NOMP_ERROR,
-        "Failed to open object/symbol \"%s\" due to error: \"%s\".", dlerror());
+    return nomp_log(NOMP_JIT_FAILURE, NOMP_ERROR,
+                    "Failed to open object/symbol \"%s\" due to error: \"%s\".",
+                    dlerror());
   }
 
   struct function *f = funcs[funcs_n] = nomp_calloc(struct function, 1);
@@ -160,8 +157,8 @@ int nomp_jit_run(int id, void *p[]) {
     return 0;
   }
 
-  return nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
-                      "Failed to run program with handle: %d", id);
+  return nomp_log(NOMP_JIT_FAILURE, NOMP_ERROR,
+                  "Failed to run program with handle: %d", id);
 }
 
 int nomp_jit_free(int *id) {
@@ -172,6 +169,6 @@ int nomp_jit_free(int *id) {
     return 0;
   }
 
-  return nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR,
-                      "Failed to free program with handle: %d", fid);
+  return nomp_log(NOMP_JIT_FAILURE, NOMP_ERROR,
+                  "Failed to free program with handle: %d", fid);
 }

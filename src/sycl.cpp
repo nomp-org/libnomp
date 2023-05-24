@@ -8,8 +8,8 @@ static const char *ERR_STR_SYCL_FAILURE = "SYCL backend failed with error: %s.";
   try {                                                                        \
     try_body                                                                   \
   } catch (const std::exception &ex) {                                         \
-    return nomp_set_log(NOMP_SYCL_FAILURE, NOMP_ERROR, ERR_STR_SYCL_FAILURE,   \
-                        ex.what());                                            \
+    return nomp_log(NOMP_SYCL_FAILURE, NOMP_ERROR, ERR_STR_SYCL_FAILURE,       \
+                    ex.what());                                                \
   }
 
 struct sycl_backend {
@@ -72,8 +72,8 @@ static int sycl_knl_build(struct nomp_backend *bnd, struct nomp_prog *prg,
 
   char cwd[BUFSIZ];
   if (getcwd(cwd, BUFSIZ) == NULL) {
-    return nomp_set_log(NOMP_SYCL_FAILURE, NOMP_ERROR, ERR_STR_SYCL_FAILURE,
-                        "Failed to get current working directory.");
+    return nomp_log(NOMP_SYCL_FAILURE, NOMP_ERROR, ERR_STR_SYCL_FAILURE,
+                    "Failed to get current working directory.");
   }
 
   char *wkdir = nomp_str_cat(3, BUFSIZ, cwd, "/", ".nomp_jit_cache");
@@ -122,14 +122,14 @@ static int check_env(struct sycl_backend *sycl) {
     // FIXME: This should be something like pathlen().
     sycl->compiler = strndup(tmp, NOMP_MAX_BUFSIZ);
   } else {
-    return nomp_set_log(NOMP_SYCL_FAILURE, NOMP_ERROR,
-                        "SYCL compiler NOMP_SYCL_CC must be set.");
+    return nomp_log(NOMP_SYCL_FAILURE, NOMP_ERROR,
+                    "SYCL compiler NOMP_SYCL_CC must be set.");
   }
   if (tmp = getenv("NOMP_SYCL_CFLAGS")) {
     sycl->compiler_flags = strndup(tmp, NOMP_MAX_CFLAGS_SIZE);
   } else {
-    return nomp_set_log(NOMP_SYCL_FAILURE, NOMP_ERROR,
-                        "SYCL compiler flags NOMP_SYCL_CFLAGS must be set.");
+    return nomp_log(NOMP_SYCL_FAILURE, NOMP_ERROR,
+                    "SYCL compiler flags NOMP_SYCL_CFLAGS must be set.");
   }
   return 0;
 }
@@ -141,15 +141,15 @@ int sycl_init(struct nomp_backend *bnd, const int platform_id,
 
   auto sycl_platforms = sycl::platform().get_platforms();
   if (platform_id < 0 | platform_id >= sycl_platforms.size()) {
-    return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                        "Platform id %d provided to libnomp is not valid.",
-                        platform_id);
+    return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                    "Platform id %d provided to libnomp is not valid.",
+                    platform_id);
   }
 
   auto sycl_pdevices = sycl_platforms[platform_id].get_devices();
   if (device_id < 0 || device_id >= sycl_pdevices.size()) {
-    return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                        ERR_STR_USER_DEVICE_IS_INVALID, device_id);
+    return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                    ERR_STR_USER_DEVICE_IS_INVALID, device_id);
   }
 
   sycl->device_id = sycl_pdevices[device_id];
