@@ -21,17 +21,11 @@ static int check_env_vars(struct nomp_backend *backend) {
   if ((tmp = getenv("NOMP_ANNOTATE_FUNCTION")))
     nomp_check(nomp_py_set_annotate_func(&backend->py_annotate, tmp));
 
-  if ((tmp = getenv("NOMP_BACKEND"))) {
-    nomp_free(&backend->backend);
-    backend->backend = strndup(tmp, NOMP_MAX_BUFSIZ);
-  }
+  if ((tmp = getenv("NOMP_BACKEND")))
+    strncpy(backend->backend, tmp, NOMP_MAX_BUFSIZ);
 
-  if ((tmp = nomp_copy_env("NOMP_INSTALL_DIR", NOMP_MAX_BUFSIZ))) {
-    nomp_free(&backend->install_dir);
-    size_t size;
-    nomp_check(nomp_path_len(&size, tmp));
-    backend->install_dir = strndup(tmp, size + 1), nomp_free(&tmp);
-  }
+  if ((tmp = nomp_copy_env("NOMP_INSTALL_DIR", NOMP_MAX_BUFSIZ)))
+    strncpy(backend->install_dir, tmp, PATH_MAX);
 
   return 0;
 }
@@ -55,7 +49,7 @@ static inline int check_cmd_line(struct nomp_backend *backend, int argc,
     if (!strncmp("--nomp", argv[i], 6)) {
       nomp_check(check_cmd_line_aux(i + 1, argc, argv));
       if (!strncmp("--nomp-backend", argv[i], NOMP_MAX_BUFSIZ)) {
-        backend->backend = strndup((const char *)argv[i + 1], NOMP_MAX_BUFSIZ);
+        strncpy(backend->backend, argv[i + 1], NOMP_MAX_BUFSIZ);
       } else if (!strncmp("--nomp-platform", argv[i], NOMP_MAX_BUFSIZ)) {
         backend->platform_id = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
       } else if (!strncmp("--nomp-device", argv[i], NOMP_MAX_BUFSIZ)) {
@@ -65,9 +59,7 @@ static inline int check_cmd_line(struct nomp_backend *backend, int argc,
       } else if (!strncmp("--nomp-profile", argv[i], NOMP_MAX_BUFSIZ)) {
         backend->profile = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
       } else if (!strncmp("--nomp-install-dir", argv[i], NOMP_MAX_BUFSIZ)) {
-        size_t size;
-        nomp_check(nomp_path_len(&size, (const char *)argv[i + 1]));
-        backend->install_dir = strndup((const char *)argv[i + 1], size + 1);
+        strncpy(backend->install_dir, argv[i + 1], PATH_MAX);
       } else if (!strncmp("--nomp-function", argv[i], NOMP_MAX_BUFSIZ)) {
         nomp_check(nomp_py_set_annotate_func(&backend->py_annotate,
                                              (const char *)argv[i + 1]));
@@ -86,37 +78,38 @@ static int init_configs(int argc, const char **argv,
   // by user explicitly.
   backend->verbose = 0;
   backend->device_id = backend->platform_id = -1;
-  backend->backend = backend->install_dir = NULL;
+  strcpy(backend->backend, ""), strcpy(backend->install_dir, "");
 
   nomp_check(check_cmd_line(backend, argc, argv));
   nomp_check(check_env_vars(backend));
 
-#define check_if_initialized(param, dummy, cmd_arg, env_var)                   \
+#define check_if_initialized(COND, CMDARG, ENVVAR)                             \
   {                                                                            \
-    if (backend->param == (dummy)) {                                           \
+    if (COND) {                                                                \
       return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,              \
-                          #param                                               \
-                          " is missing or invalid. Set it with " cmd_arg       \
-                          " command line argument or " env_var                 \
+                          #ENVVAR                                              \
+                          " is missing or invalid. Set it with " CMDARG        \
+                          " command line argument or " ENVVAR                  \
                           " environment variable.");                           \
     }                                                                          \
   }
 
-  check_if_initialized(device_id, -1, "--nomp-device", "NOMP_DEVICE");
-  check_if_initialized(platform_id, -1, "--nomp-platform", "NOMP_PLATFORM");
-  check_if_initialized(backend, NULL, "--nomp-backend", "NOMP_BACKEND");
-  check_if_initialized(install_dir, NULL, "--nomp-install-dir",
+  check_if_initialized(backend->device_id == -1, "--nomp-device",
+                       "NOMP_DEVICE");
+  check_if_initialized(backend->platform_id == -1, "--nomp-platform",
+                       "NOMP_PLATFORM");
+  check_if_initialized(strlen(backend->backend) == 0, "--nomp-backend",
+                       "NOMP_BACKEND");
+  check_if_initialized(strlen(backend->install_dir) == 0, "--nomp-install-dir",
                        "NOMP_INSTALL_DIR");
 
 #undef check_if_initialized
 
   // Append nomp python directory to sys.path.
-  size_t len;
-  nomp_check(nomp_path_len(&len, nomp.install_dir));
-  len = nomp_max(2, len, NOMP_MAX_BUFSIZ);
-  char *abs_dir = nomp_str_cat(2, len, nomp.install_dir, "/python");
+  char abs_dir[PATH_MAX + 32];
+  strncpy(abs_dir, backend->install_dir, PATH_MAX);
+  strncat(abs_dir, "/python", 32);
   nomp_check(nomp_py_append_to_sys_path(abs_dir));
-  nomp_free(&abs_dir);
   return 0;
 }
 
@@ -141,7 +134,8 @@ int nomp_init(int argc, const char **argv) {
   }
 
   if (!Py_IsInitialized()) {
-    // May be we need the isolated configuration listed here:
+    // May be we need the isolated configuration listed
+    // here:
     // https://docs.python.org/3/c-api/init_config.html#init-config
     // But for now, we do the simplest thing possible.
     Py_Initialize();
@@ -182,7 +176,8 @@ int nomp_init(int argc, const char **argv) {
 #endif
   } else {
     return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                        "Failed to initialize libnomp. Invalid backend: %s",
+                        "Failed to initialize libnomp. "
+                        "Invalid backend: %s",
                         nomp.backend);
   }
 
@@ -240,12 +235,13 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
 
   unsigned idx = mem_if_exist(ptr, idx0, idx1);
   if (idx == mems_n) {
-    // A new entry can't be created with NOMP_FREE or NOMP_FROM.
+    // A new entry can't be created with NOMP_FREE or
+    // NOMP_FROM.
     if (op == NOMP_FROM || op == NOMP_FREE) {
-      return nomp_set_log(
-          NOMP_USER_MAP_OP_IS_INVALID, NOMP_ERROR,
-          "NOMP_FREE or NOMP_FROM can only be called on a pointer "
-          "which is already on the device.");
+      return nomp_set_log(NOMP_USER_MAP_OP_IS_INVALID, NOMP_ERROR,
+                          "NOMP_FREE or NOMP_FROM can only be called "
+                          "on a pointer "
+                          "which is already on the device.");
     }
     op |= NOMP_ALLOC;
     if (mems_n == mems_max) {
@@ -282,16 +278,18 @@ struct meta {
 
 static int parse_clauses(struct meta *meta, struct nomp_prog *prg,
                          const char **clauses) {
-  // Currently, we only support `transform` and `annotate` and `jit`.
+  // Currently, we only support `transform` and
+  // `annotate` and `jit`.
   meta->dict = PyDict_New(), meta->file = meta->func = NULL;
   unsigned i = 0;
   while (clauses[i]) {
     if (strncmp(clauses[i], "transform", NOMP_MAX_BUFSIZ) == 0) {
       if (clauses[i + 1] == NULL || clauses[i + 2] == NULL) {
-        return nomp_set_log(
-            NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-            "\"transform\" clause should be followed by a file name and a "
-            "function name. At least one of them is not provided.");
+        return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                            "\"transform\" clause should be followed "
+                            "by a file name and a "
+                            "function name. At least one of them is "
+                            "not provided.");
       }
       nomp_check(nomp_check_py_script_path((const char *)clauses[i + 1]));
       meta->file = strndup(clauses[i + 1], PATH_MAX);
@@ -299,10 +297,11 @@ static int parse_clauses(struct meta *meta, struct nomp_prog *prg,
       i += 3;
     } else if (strncmp(clauses[i], "annotate", NOMP_MAX_BUFSIZ) == 0) {
       if (clauses[i + 1] == NULL || clauses[i + 2] == NULL) {
-        return nomp_set_log(
-            NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-            "\"annotate\" clause should be followed by a key value "
-            "pair. At least one of them is not provided.");
+        return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                            "\"annotate\" clause should be followed by "
+                            "a key value "
+                            "pair. At least one of them is not "
+                            "provided.");
       }
       const char *key = clauses[i + 1], *val = clauses[i + 2];
       PyObject *pkey =
@@ -314,10 +313,11 @@ static int parse_clauses(struct meta *meta, struct nomp_prog *prg,
       i += 3;
     } else if (strncmp(clauses[i], "reduce", NOMP_MAX_BUFSIZ) == 0) {
       if (clauses[i + 1] == NULL || clauses[i + 2] == NULL) {
-        return nomp_set_log(
-            NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-            "\"reduce\" clause should be followed by a variable name and an "
-            "operation. At least one of them is not provided.");
+        return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                            "\"reduce\" clause should be followed by a "
+                            "variable name and an "
+                            "operation. At least one of them is not "
+                            "provided.");
       }
       for (unsigned j = 0; j < prg->nargs; j++) {
         if (strncmp(prg->args[j].name, clauses[i + 1], NOMP_MAX_BUFSIZ) == 0) {
@@ -332,14 +332,16 @@ static int parse_clauses(struct meta *meta, struct nomp_prog *prg,
         prg->reduction_op = 1;
       i += 3;
     } else if (strncmp(clauses[i], "pin", NOMP_MAX_BUFSIZ) == 0) {
-      // Check if we have to use pinned memory on the device.
+      // Check if we have to use pinned memory on the
+      // device.
       return nomp_set_log(NOMP_NOT_IMPLEMENTED_ERROR, NOMP_ERROR,
-                          "Pinned memory support is not yet implemented.");
+                          "Pinned memory support is "
+                          "not yet implemented.");
     } else {
-      return nomp_set_log(
-          NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-          "Clause \"%s\" passed into nomp_jit is not a valid clause.",
-          clauses[i]);
+      return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                          "Clause \"%s\" passed into nomp_jit is not a "
+                          "valid clause.",
+                          clauses[i]);
     }
   }
 
@@ -373,8 +375,9 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
   }
   va_end(args);
 
-  // Parse the clauses to find transformations file, function and other
-  // annotations. Annotations are returned as a Python dictionary.
+  // Parse the clauses to find transformations file,
+  // function and other annotations. Annotations are
+  // returned as a Python dictionary.
   struct meta meta;
   nomp_check(parse_clauses(&meta, prg, clauses));
 
@@ -395,15 +398,16 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
       nomp_py_apply_transform(&knl, meta.file, meta.func, nomp.py_context));
   nomp_free(&meta.file), nomp_free(&meta.func);
 
-  // Get OpenCL, CUDA, etc. source and name from the loopy kernel and build
-  // the program.
+  // Get OpenCL, CUDA, etc. source and name from the
+  // loopy kernel and build the program.
   char *name, *src;
   nomp_check(nomp_py_get_knl_name_and_src(&name, &src, knl, nomp.backend));
   nomp_check(nomp.knl_build(&nomp, prg, src, name));
   nomp_free(&src), nomp_free(&name);
 
-  // Get grid size of the loopy kernel as pymbolic expressions.
-  // These grid sizes will be evaluated each time the kernel is run.
+  // Get grid size of the loopy kernel as pymbolic
+  // expressions. These grid sizes will be evaluated
+  // each time the kernel is run.
   nomp_check(nomp_py_get_grid_size(prg, knl));
   Py_XDECREF(knl);
 
@@ -512,7 +516,6 @@ int nomp_finalize(void) {
 
   nomp_check(deallocate_scratch_memory(&nomp));
 
-  nomp_free(&nomp.backend), nomp_free(&nomp.install_dir);
   Py_XDECREF(nomp.py_annotate), Py_XDECREF(nomp.py_context);
 
   initialized = nomp.finalize(&nomp);
@@ -525,7 +528,8 @@ int nomp_finalize(void) {
 
   nomp_profile_result();
 
-  // Free bookkeeping structures for the logger and profiler.
+  // Free bookkeeping structures for the logger and
+  // profiler.
   nomp_logs_finalize();
   nomp_profile_finalize();
 
