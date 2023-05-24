@@ -40,9 +40,9 @@ int nomp_path_len(size_t *len, const char *path) {
     *len = 0;
   char *abs = realpath(path, NULL);
   if (!abs) {
-    return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                        "Unable to find path: \"%s\". Error: %s.", path,
-                        strerror(errno));
+    return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                    "Unable to find path: \"%s\". Error: %s.", path,
+                    strerror(errno));
   }
 
   if (len)

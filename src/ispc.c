@@ -29,8 +29,8 @@ static void ispcrt_error(ISPCRTError err_code, const char *message) {
 #define chk_ispcrt(msg, x)                                                     \
   {                                                                            \
     if (x != ISPCRT_NO_ERROR) {                                                \
-      return nomp_set_log(NOMP_ISPC_FAILURE, NOMP_ERROR, ERR_STR_ISPC_FAILURE, \
-                          msg, err_message);                                   \
+      return nomp_log(NOMP_ISPC_FAILURE, NOMP_ERROR, ERR_STR_ISPC_FAILURE,     \
+                      msg, err_message);                                       \
     }                                                                          \
   }
 
@@ -67,8 +67,8 @@ static int ispc_knl_build(struct nomp_backend *bnd, struct nomp_prog *prg,
 
   char cwd[BUFSIZ];
   if (getcwd(cwd, BUFSIZ) == NULL) {
-    return nomp_set_log(NOMP_JIT_FAILURE, NOMP_ERROR, ERR_STR_ISPC_FAILURE,
-                        "get cwd");
+    return nomp_log(NOMP_JIT_FAILURE, NOMP_ERROR, ERR_STR_ISPC_FAILURE,
+                    "get cwd");
   }
 
   const char *src_f = "nomp_ispc.ispc", *dev_f = "nomp_ispc.dev.o";
@@ -146,9 +146,9 @@ static int ispc_chk_env(struct ispc_backend *ispc) {
     nomp_check(nomp_path_len(&size, tmp));
     ispc->cc = strndup(tmp, size + 1);
   } else {
-    return nomp_set_log(NOMP_ISPC_FAILURE, NOMP_ERROR,
-                        "Environment variable NOMP_CC is not set. Please set "
-                        "it to point to host compiler.");
+    return nomp_log(NOMP_ISPC_FAILURE, NOMP_ERROR,
+                    "Environment variable NOMP_CC is not set. Please set "
+                    "it to point to host compiler.");
   }
 
   tmp = getenv("NOMP_ISPC_CC");
@@ -157,27 +157,27 @@ static int ispc_chk_env(struct ispc_backend *ispc) {
     nomp_check(nomp_path_len(&size, tmp));
     ispc->ispc_cc = strndup(tmp, size + 1);
   } else {
-    return nomp_set_log(NOMP_ISPC_FAILURE, NOMP_ERROR,
-                        "Environment variable NOMP_ISPC_CC is not set. Please "
-                        "set it to point to ISPC compiler.");
+    return nomp_log(NOMP_ISPC_FAILURE, NOMP_ERROR,
+                    "Environment variable NOMP_ISPC_CC is not set. Please "
+                    "set it to point to ISPC compiler.");
   }
 
   tmp = getenv("NOMP_CFLAGS");
   if (tmp) {
     ispc->cc_flags = strndup(tmp, NOMP_MAX_BUFSIZ + 1);
   } else {
-    return nomp_set_log(NOMP_ISPC_FAILURE, NOMP_ERROR,
-                        "Environment variable NOMP_CFLAGS is not set. Please "
-                        "set it with suitable to host compiler flags.");
+    return nomp_log(NOMP_ISPC_FAILURE, NOMP_ERROR,
+                    "Environment variable NOMP_CFLAGS is not set. Please "
+                    "set it with suitable to host compiler flags.");
   }
 
   tmp = getenv("NOMP_ISPC_CFLAGS");
   if (tmp) {
     ispc->ispc_flags = strndup(tmp, NOMP_MAX_BUFSIZ + 1);
   } else {
-    return nomp_set_log(NOMP_ISPC_FAILURE, NOMP_ERROR,
-                        "Environment variable NOMP_ISPC_CFLAGS is not set. "
-                        "Please set it with suitable ISPC compiler flags.");
+    return nomp_log(NOMP_ISPC_FAILURE, NOMP_ERROR,
+                    "Environment variable NOMP_ISPC_CFLAGS is not set. "
+                    "Please set it with suitable ISPC compiler flags.");
   }
 
   return 0;
@@ -189,16 +189,16 @@ int ispc_init(struct nomp_backend *bnd, const int platform_type,
               const int device_id) {
   ispcrtSetErrorFunc(ispcrt_error);
   if (platform_type < 0 | platform_type >= 2) {
-    return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                        "Platform type %d provided to libnomp is not valid.",
-                        platform_type);
+    return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                    "Platform type %d provided to libnomp is not valid.",
+                    platform_type);
   }
   uint32_t num_devices =
       ispcrtGetDeviceCount(nomp_to_ispc_device[platform_type]);
   chk_ispcrt("get device count", rt_error);
   if (device_id < 0 || device_id >= num_devices) {
-    return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                        ERR_STR_USER_DEVICE_IS_INVALID, device_id);
+    return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                    ERR_STR_USER_DEVICE_IS_INVALID, device_id);
   }
   ISPCRTDevice device = ispcrtGetDevice(platform_type, device_id);
   chk_ispcrt("device get", rt_error);

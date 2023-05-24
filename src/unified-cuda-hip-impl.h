@@ -43,8 +43,8 @@
     if (result != success_t) {                                                 \
       const char *msg;                                                         \
       retrive_err;                                                             \
-      return nomp_set_log(NOMP_GPU_FAILURE, NOMP_ERROR, ERR_STR_GPU_FAILURE,   \
-                          type, msg);                                          \
+      return nomp_log(NOMP_GPU_FAILURE, NOMP_ERROR, ERR_STR_GPU_FAILURE, type, \
+                      msg);                                                    \
     }                                                                          \
   } while (0)
 
@@ -113,8 +113,8 @@ static int gpu_knl_build(struct nomp_backend *bnd, struct nomp_prog *prg,
 
     char *msg = nomp_calloc(char, size);
     snprintf(msg, size, "%s: %s", err_str, log);
-    int err_id = nomp_set_log(NOMP_GPU_FAILURE, NOMP_ERROR, ERR_STR_GPU_FAILURE,
-                              "build", msg);
+    int err_id = nomp_log(NOMP_GPU_FAILURE, NOMP_ERROR, ERR_STR_GPU_FAILURE,
+                          "build", msg);
     nomp_free(&log), nomp_free(&msg);
     return err_id;
   }
@@ -181,8 +181,8 @@ int gpu_init(struct nomp_backend *bnd, const int platform_id,
   int num_devices;
   GPU_CHECK(gpuGetDeviceCount(&num_devices));
   if (device_id < 0 || device_id >= num_devices) {
-    return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                        ERR_STR_USER_DEVICE_IS_INVALID, device_id);
+    return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                    ERR_STR_USER_DEVICE_IS_INVALID, device_id);
   }
 
   chk_gpu(gpuSetDevice(device_id));

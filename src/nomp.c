@@ -33,8 +33,8 @@ static int check_env_vars(struct nomp_backend *backend) {
 static inline int check_cmd_line_aux(unsigned i, unsigned argc,
                                      const char *argv[]) {
   if (i >= argc || argv[i] == NULL) {
-    return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                        "Missing argument value after: %s.", argv[i - 1]);
+    return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                    "Missing argument value after: %s.", argv[i - 1]);
   }
   return 0;
 }
@@ -86,11 +86,10 @@ static int init_configs(int argc, const char **argv,
 #define check_if_initialized(COND, CMDARG, ENVVAR)                             \
   {                                                                            \
     if (COND) {                                                                \
-      return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,              \
-                          #ENVVAR                                              \
-                          " is missing or invalid. Set it with " CMDARG        \
-                          " command line argument or " ENVVAR                  \
-                          " environment variable.");                           \
+      return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,                  \
+                      #ENVVAR " is missing or invalid. Set it with " CMDARG    \
+                              " command line argument or " ENVVAR              \
+                              " environment variable.");                       \
     }                                                                          \
   }
 
@@ -129,8 +128,8 @@ static int deallocate_scratch_memory(struct nomp_backend *backend) {
 
 int nomp_init(int argc, const char **argv) {
   if (initialized) {
-    return nomp_set_log(NOMP_INITIALIZE_FAILURE, NOMP_ERROR,
-                        "libnomp is already initialized.");
+    return nomp_log(NOMP_INITIALIZE_FAILURE, NOMP_ERROR,
+                    "libnomp is already initialized.");
   }
 
   if (!Py_IsInitialized()) {
@@ -144,11 +143,11 @@ int nomp_init(int argc, const char **argv) {
   }
 
   nomp_check(init_configs(argc, argv, &nomp));
-  nomp_check(nomp_profile_init(nomp.profile));
+  nomp_check(nomp_profile_set_level(nomp.profile));
 
   nomp_profile("nomp_init", 1, 0);
 
-  nomp_check(nomp_log_init(nomp.verbose));
+  nomp_check(nomp_log_set_verbose(nomp.verbose));
 
   size_t n = strnlen(nomp.backend, NOMP_MAX_BUFSIZ);
   for (int i = 0; i < n; i++)
@@ -175,10 +174,10 @@ int nomp_init(int argc, const char **argv) {
     nomp_check(ispc_init(&nomp, nomp.platform_id, nomp.device_id));
 #endif
   } else {
-    return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                        "Failed to initialize libnomp. "
-                        "Invalid backend: %s",
-                        nomp.backend);
+    return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                    "Failed to initialize libnomp. "
+                    "Invalid backend: %s",
+                    nomp.backend);
   }
 
   nomp_check(allocate_scratch_memory(&nomp));
@@ -238,10 +237,10 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize, int op) {
     // A new entry can't be created with NOMP_FREE or
     // NOMP_FROM.
     if (op == NOMP_FROM || op == NOMP_FREE) {
-      return nomp_set_log(NOMP_USER_MAP_OP_IS_INVALID, NOMP_ERROR,
-                          "NOMP_FREE or NOMP_FROM can only be called "
-                          "on a pointer "
-                          "which is already on the device.");
+      return nomp_log(NOMP_USER_MAP_OP_IS_INVALID, NOMP_ERROR,
+                      "NOMP_FREE or NOMP_FROM can only be called "
+                      "on a pointer "
+                      "which is already on the device.");
     }
     op |= NOMP_ALLOC;
     if (mems_n == mems_max) {
@@ -285,11 +284,11 @@ static int parse_clauses(struct meta *meta, struct nomp_prog *prg,
   while (clauses[i]) {
     if (strncmp(clauses[i], "transform", NOMP_MAX_BUFSIZ) == 0) {
       if (clauses[i + 1] == NULL || clauses[i + 2] == NULL) {
-        return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                            "\"transform\" clause should be followed "
-                            "by a file name and a "
-                            "function name. At least one of them is "
-                            "not provided.");
+        return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                        "\"transform\" clause should be followed "
+                        "by a file name and a "
+                        "function name. At least one of them is "
+                        "not provided.");
       }
       nomp_check(nomp_check_py_script_path((const char *)clauses[i + 1]));
       meta->file = strndup(clauses[i + 1], PATH_MAX);
@@ -297,11 +296,11 @@ static int parse_clauses(struct meta *meta, struct nomp_prog *prg,
       i += 3;
     } else if (strncmp(clauses[i], "annotate", NOMP_MAX_BUFSIZ) == 0) {
       if (clauses[i + 1] == NULL || clauses[i + 2] == NULL) {
-        return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                            "\"annotate\" clause should be followed by "
-                            "a key value "
-                            "pair. At least one of them is not "
-                            "provided.");
+        return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                        "\"annotate\" clause should be followed by "
+                        "a key value "
+                        "pair. At least one of them is not "
+                        "provided.");
       }
       const char *key = clauses[i + 1], *val = clauses[i + 2];
       PyObject *pkey =
@@ -313,11 +312,11 @@ static int parse_clauses(struct meta *meta, struct nomp_prog *prg,
       i += 3;
     } else if (strncmp(clauses[i], "reduce", NOMP_MAX_BUFSIZ) == 0) {
       if (clauses[i + 1] == NULL || clauses[i + 2] == NULL) {
-        return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                            "\"reduce\" clause should be followed by a "
-                            "variable name and an "
-                            "operation. At least one of them is not "
-                            "provided.");
+        return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                        "\"reduce\" clause should be followed by a "
+                        "variable name and an "
+                        "operation. At least one of them is not "
+                        "provided.");
       }
       for (unsigned j = 0; j < prg->nargs; j++) {
         if (strncmp(prg->args[j].name, clauses[i + 1], NOMP_MAX_BUFSIZ) == 0) {
@@ -334,14 +333,14 @@ static int parse_clauses(struct meta *meta, struct nomp_prog *prg,
     } else if (strncmp(clauses[i], "pin", NOMP_MAX_BUFSIZ) == 0) {
       // Check if we have to use pinned memory on the
       // device.
-      return nomp_set_log(NOMP_NOT_IMPLEMENTED_ERROR, NOMP_ERROR,
-                          "Pinned memory support is "
-                          "not yet implemented.");
+      return nomp_log(NOMP_NOT_IMPLEMENTED_ERROR, NOMP_ERROR,
+                      "Pinned memory support is "
+                      "not yet implemented.");
     } else {
-      return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                          "Clause \"%s\" passed into nomp_jit is not a "
-                          "valid clause.",
-                          clauses[i]);
+      return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                      "Clause \"%s\" passed into nomp_jit is not a "
+                      "valid clause.",
+                      clauses[i]);
     }
   }
 
@@ -420,8 +419,8 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
 
 int nomp_run(int id, ...) {
   if (id < 0) {
-    return nomp_set_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                        "Kernel id %d passed to nomp_run is not valid.", id);
+    return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                    "Kernel id %d passed to nomp_run is not valid.", id);
   }
 
   nomp_profile("nomp_run setup time", 1, 1);
@@ -456,8 +455,8 @@ int nomp_run(int id, ...) {
           prg->reduction_ptr = args[i].ptr, prg->reduction_size = args[i].size;
           m = &nomp.scratch;
         } else {
-          return nomp_set_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
-                              ERR_STR_USER_MAP_PTR_IS_INVALID, args[i].ptr);
+          return nomp_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
+                          ERR_STR_USER_MAP_PTR_IS_INVALID, args[i].ptr);
         }
       }
       args[i].size = m->bsize, args[i].ptr = m->bptr;
@@ -490,8 +489,8 @@ int nomp_sync() { return nomp.sync(&nomp); }
 
 int nomp_finalize(void) {
   if (!initialized) {
-    return nomp_set_log(NOMP_FINALIZE_FAILURE, NOMP_ERROR,
-                        "libnomp is not initialized.");
+    return nomp_log(NOMP_FINALIZE_FAILURE, NOMP_ERROR,
+                    "libnomp is not initialized.");
   }
 
   nomp_profile("nomp_finalize", 1, 1);
@@ -520,8 +519,8 @@ int nomp_finalize(void) {
 
   initialized = nomp.finalize(&nomp);
   if (initialized) {
-    return nomp_set_log(NOMP_FINALIZE_FAILURE, NOMP_ERROR,
-                        "Failed to initialize libnomp.");
+    return nomp_log(NOMP_FINALIZE_FAILURE, NOMP_ERROR,
+                    "Failed to initialize libnomp.");
   }
 
   nomp_profile("nomp_finalize", 0, 0);
@@ -530,7 +529,7 @@ int nomp_finalize(void) {
 
   // Free bookkeeping structures for the logger and
   // profiler.
-  nomp_logs_finalize();
+  nomp_log_finalize();
   nomp_profile_finalize();
 
   return 0;

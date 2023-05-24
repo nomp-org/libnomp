@@ -30,8 +30,8 @@ int nomp_py_append_to_sys_path(const char *path) {
     }
   }
   if (err) {
-    return nomp_set_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,
-                        "Appending path \"%s\" to the sys.path failed.", path);
+    return nomp_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,
+                    "Appending path \"%s\" to the sys.path failed.", path);
   }
 
   return 0;
@@ -56,8 +56,8 @@ int nomp_py_realize_reduction(PyObject **knl, const char *var) {
     Py_DECREF(reduction);
   }
   if (err) {
-    return nomp_set_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,
-                        "Call to realize_reduction() failed.");
+    return nomp_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,
+                    "Call to realize_reduction() failed.");
   }
 
   return 0;
@@ -82,8 +82,8 @@ int nomp_py_c_to_loopy(PyObject **knl, const char *src, const char *backend) {
     Py_DECREF(lpy_api);
   }
   if (err) {
-    return nomp_set_log(NOMP_LOOPY_CONVERSION_FAILURE, NOMP_ERROR,
-                        "C to Loopy conversion failed.\n");
+    return nomp_log(NOMP_LOOPY_CONVERSION_FAILURE, NOMP_ERROR,
+                    "C to Loopy conversion failed.\n");
   }
 
   return 0;
@@ -113,9 +113,9 @@ int nomp_py_set_annotate_func(PyObject **annotate_func, const char *path_) {
     }
   }
   if (err) {
-    err = nomp_set_log(
-        NOMP_PY_CALL_FAILURE, NOMP_ERROR,
-        "Failed to find annotate function \"%s\" in file \"%s\".", func, file);
+    err = nomp_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,
+                   "Failed to find annotate function \"%s\" in file \"%s\".",
+                   func, file);
   }
 
   nomp_free(&path);
@@ -160,7 +160,7 @@ int nomp_py_apply_transform(PyObject **knl, const char *file, const char *func,
     }
   }
   if (err) {
-    return nomp_set_log(
+    return nomp_log(
         NOMP_PY_CALL_FAILURE, NOMP_ERROR,
         "Failed to call user transform function: \"%s\" in file: \"%s\".", func,
         file);
@@ -190,8 +190,8 @@ int nomp_py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
         Py_XDECREF(py_backend), Py_DECREF(knl_name);
       }
       if (err) {
-        return nomp_set_log(NOMP_LOOPY_KNL_NAME_NOT_FOUND, NOMP_ERROR,
-                            "Unable to get loopy kernel name.");
+        return nomp_log(NOMP_LOOPY_KNL_NAME_NOT_FOUND, NOMP_ERROR,
+                        "Unable to get loopy kernel name.");
       }
 
       err = 1;
@@ -212,7 +212,7 @@ int nomp_py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
     }
     Py_DECREF(lpy_api);
     if (err) {
-      return nomp_set_log(
+      return nomp_log(
           NOMP_LOOPY_CODEGEN_FAILURE, NOMP_ERROR,
           "Backend code generation from loopy kernel \"%s\" failed.", *name);
     }
@@ -226,9 +226,9 @@ static int symengine_vec_push(CVecBasic *vec, const char *str) {
   basic_new_stack(a);
   CWRAPPER_OUTPUT_TYPE err = basic_parse(a, str);
   if (err) {
-    return nomp_set_log(
-        NOMP_LOOPY_GRIDSIZE_FAILURE, NOMP_ERROR,
-        "Expression parsing with SymEngine failed with error %d.", err);
+    return nomp_log(NOMP_LOOPY_GRIDSIZE_FAILURE, NOMP_ERROR,
+                    "Expression parsing with SymEngine failed with error %d.",
+                    err);
   }
   vecbasic_push_back(vec, a);
   basic_free_stack(a);
@@ -262,7 +262,7 @@ static int symengine_evaluate(size_t *out, unsigned i, CVecBasic *vec,
   vecbasic_get(vec, i, a);
   CWRAPPER_OUTPUT_TYPE err = basic_subs(a, a, map);
   if (err) {
-    return nomp_set_log(
+    return nomp_log(
         NOMP_LOOPY_GRIDSIZE_FAILURE, NOMP_ERROR,
         "Expression substitute with SymEngine failed with error %d.", err);
   }
@@ -291,8 +291,8 @@ static int py_get_grid_size_aux(PyObject *exp, CVecBasic *vec) {
     Py_DECREF(mapper), Py_XDECREF(module_name);
   }
   if (err) {
-    return nomp_set_log(NOMP_LOOPY_GRIDSIZE_FAILURE, NOMP_ERROR,
-                        "Unable to evaluate grid sizes from loopy kernel.");
+    return nomp_log(NOMP_LOOPY_GRIDSIZE_FAILURE, NOMP_ERROR,
+                    "Unable to evaluate grid sizes from loopy kernel.");
   }
 
   return 0;
@@ -335,8 +335,8 @@ int nomp_py_get_grid_size(struct nomp_prog *prg, PyObject *knl) {
     }
   }
   if (err) {
-    return nomp_set_log(NOMP_LOOPY_GRIDSIZE_FAILURE, NOMP_ERROR,
-                        "Unable to get grid sizes from loopy kernel.");
+    return nomp_log(NOMP_LOOPY_GRIDSIZE_FAILURE, NOMP_ERROR,
+                    "Unable to get grid sizes from loopy kernel.");
   }
 
   return 0;
