@@ -9,6 +9,7 @@
 
 #include <assert.h>
 #include <ctype.h>
+#include <limits.h>
 #include <math.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -66,7 +67,7 @@ struct nomp_prog {
 struct nomp_backend {
   // User configurations of the backend.
   int platform_id, device_id, verbose, profile;
-  char *backend, *install_dir;
+  char backend[NOMP_MAX_BUFSIZ], install_dir[PATH_MAX];
   // Pointers to backend functions used for backend dispatch.
   int (*update)(struct nomp_backend *, struct nomp_mem *, const int);
   int (*knl_build)(struct nomp_backend *, struct nomp_prog *, const char *,
