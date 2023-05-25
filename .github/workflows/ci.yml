@@ -3,7 +3,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main]
+    branches: [main, test-parsing-for-2]
   workflow_dispatch:
     inputs:
       debug_enabled:
