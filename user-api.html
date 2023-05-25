@@ -46,7 +46,6 @@
 <li class="toctree-l1"><a class="reference internal" href="usage.html">How to Use Nomp</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">User API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#functions">Functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#map-direction">Map Direction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data-types">Data Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#errors">Errors</a></li>
 </ul>
@@ -119,8 +118,8 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv411nomp_updatePv6size_t6size_t6size_ti">
-<span id="_CPPv311nomp_updatePv6size_t6size_t6size_ti"></span><span id="_CPPv211nomp_updatePv6size_t6size_t6size_ti"></span><span id="nomp_update__voidP.s.s.s.i"></span><span class="target" id="group__nomp__user__api_1ga4d130be7ab4c387008b2402f149f7561"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_update</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ptr</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_idx</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">end_idx</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">unit_size</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">op</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411nomp_updatePv6size_t6size_t6size_ti" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv411nomp_updatePv6size_t6size_t6size_t20nomp_map_direction_t">
+<span id="_CPPv311nomp_updatePv6size_t6size_t6size_t20nomp_map_direction_t"></span><span id="_CPPv211nomp_updatePv6size_t6size_t6size_t20nomp_map_direction_t"></span><span id="nomp_update__voidP.s.s.s.nomp_map_direction_t"></span><span class="target" id="group__nomp__user__api_1gaa8dc9b167bf514e2f3cc4ff6f9dfb6a0"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_update</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ptr</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_idx</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">end_idx</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">unit_size</span></span>, <a class="reference internal" href="#_CPPv420nomp_map_direction_t" title="nomp_map_direction_t"><span class="n"><span class="pre">nomp_map_direction_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">op</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411nomp_updatePv6size_t6size_t6size_t20nomp_map_direction_t" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Performs device to host (D2H) and host to device (H2D) memory transfers, allocating and freeing of memory in the device. </p>
 <p>
 Operation <code class="docutils literal notranslate"><span class="pre">op</span></code> will be performed on the array slice [<code class="docutils literal notranslate"><span class="pre">start_idx</span></code>, <code class="docutils literal notranslate"><span class="pre">end_idx</span></code>), i.e., on array elements start_idx, … end_idx - 1. This method returns a non-zero value if there is an error and 0 otherwise.</p>
@@ -150,7 +149,7 @@ Operation <code class="docutils literal notranslate"><span class="pre">op</span>
 <li><p><strong>start_idx</strong> – <strong>[in]</strong> Start index in the vector to start copying. </p></li>
 <li><p><strong>end_idx</strong> – <strong>[in]</strong> End index in the vector to end the copying. </p></li>
 <li><p><strong>unit_size</strong> – <strong>[in]</strong> Size of a single vector element. </p></li>
-<li><p><strong>op</strong> – <strong>[in]</strong> Operation to perform (One of <a class="reference internal" href="#group-nomp-update-op"><span class="std std-ref">Memory update operations for nomp variable.</span></a>). </p></li>
+<li><p><strong>op</strong> – <strong>[in]</strong> Operation to perform (One of <a class="reference internal" href="#group__nomp__types_1ga9c8653d937b29cea004ff74e0ae465b1"><span class="std std-ref">nomp_map_direction_t</span></a>). </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -163,7 +162,7 @@ Operation <code class="docutils literal notranslate"><span class="pre">op</span>
 <dt class="sig sig-object cpp" id="_CPPv48nomp_jitPiPKcPPKciz">
 <span id="_CPPv38nomp_jitPiPKcPPKciz"></span><span id="_CPPv28nomp_jitPiPKcPPKciz"></span><span id="nomp_jit__iP.cCP.cCPP.i.z"></span><span class="target" id="group__nomp__user__api_1gab793ec09db7c8a89656061e6d67c4d75"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_jit</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">src</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">clauses</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nargs</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48nomp_jitPiPKcPPKciz" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Generate and compile a kernel for the targe backend (OpenCL, etc.) from C source. </p>
-<p>Target backend is the one provided during the initialization of libnomp using <a class="reference internal" href="#group__nomp__user__api_1ga9358288c50bff846af3475fdb09e2f5f"><span class="std std-ref">nomp_init()</span></a>. User defined code transformations will be applied based on the clauses specified in <code class="docutils literal notranslate"><span class="pre">clauses</span></code> argument. Additional kernel meta data can be passed using the <code class="docutils literal notranslate"><span class="pre">clauses</span></code> as well. After <code class="docutils literal notranslate"><span class="pre">clauses</span></code>, number of arguments to the kernel must be provided. Then for each argument, three values has to be passed. First is the argument name as a string. Second is is the <code class="docutils literal notranslate"><span class="pre">sizeof</span></code> argument and the third if argument type (one of <a class="reference internal" href="#group-nomp-types"><span class="std std-ref">nomp data types.</span></a>).</p>
+<p>Target backend is the one provided during the initialization of libnomp using <a class="reference internal" href="#group__nomp__user__api_1ga9358288c50bff846af3475fdb09e2f5f"><span class="std std-ref">nomp_init()</span></a>. User defined code transformations will be applied based on the clauses specified in <code class="docutils literal notranslate"><span class="pre">clauses</span></code> argument. Additional kernel meta data can be passed using the <code class="docutils literal notranslate"><span class="pre">clauses</span></code> as well. After <code class="docutils literal notranslate"><span class="pre">clauses</span></code>, number of arguments to the kernel must be provided. Then for each argument, three values has to be passed. First is the argument name as a string. Second is is the <code class="docutils literal notranslate"><span class="pre">sizeof</span></code> argument and the third if argument type (one of Data Types).</p>
 <p><strong>Example usage:</strong> <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
 <span class="kt">double</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span><span class="w"> </span><span class="n">b</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span>
 <span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
@@ -311,59 +310,69 @@ Operation <code class="docutils literal notranslate"><span class="pre">op</span>
 </dd></dl>
 
 </section>
-<section id="map-direction">
-<span id="group-nomp-update-op"></span><h2>Map Direction<a class="headerlink" href="#map-direction" title="Permalink to this heading"></a></h2>
-<p>Defines the operation direction in <cite>nomp_update</cite>.</p>
-<dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.NOMP_ALLOC">
-<span class="target" id="group__nomp__update__op_1ga6396fa3689603c84e0aeab05db3f4542"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_ALLOC</span></span></span><a class="headerlink" href="#c.NOMP_ALLOC" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Allocate memory on the device. </p>
-</dd></dl>
-
-<dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.NOMP_TO">
-<span class="target" id="group__nomp__update__op_1gafe993b1f74722f53eccc1d727db21076"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_TO</span></span></span><a class="headerlink" href="#c.NOMP_TO" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Copy host data to device. Memory will be allocated if necessary. </p>
-</dd></dl>
-
-<dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.NOMP_FROM">
-<span class="target" id="group__nomp__update__op_1ga8b9e94ecff340018b7250429aae72437"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_FROM</span></span></span><a class="headerlink" href="#c.NOMP_FROM" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Copy device data to host. User must make sure that there is enough memory available on the host. </p>
-</dd></dl>
-
-<dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.NOMP_FREE">
-<span class="target" id="group__nomp__update__op_1ga98833fef31d0f4702734e15d3fbc85ad"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_FREE</span></span></span><a class="headerlink" href="#c.NOMP_FREE" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Free memory allocated on the device. </p>
-</dd></dl>
-
-</section>
 <section id="data-types">
-<span id="group-nomp-types"></span><h2>Data Types<a class="headerlink" href="#data-types" title="Permalink to this heading"></a></h2>
+<h2>Data Types<a class="headerlink" href="#data-types" title="Permalink to this heading"></a></h2>
 <p>Defines argument type.</p>
-<dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.NOMP_INT">
-<span class="target" id="group__nomp__types_1ga538199291f717dfcf44483a139ce228a"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_INT</span></span></span><a class="headerlink" href="#c.NOMP_INT" title="Permalink to this definition"></a><br /></dt>
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv411nomp_type_t">
+<span id="_CPPv311nomp_type_t"></span><span id="_CPPv211nomp_type_t"></span><span class="target" id="group__nomp__types_1gaa080d702bfb6a51225d549bcb3c43389"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_type_t</span></span></span><a class="headerlink" href="#_CPPv411nomp_type_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Defines argument types for a nomp kernel. Currently, only integer, float or pointer types are supported. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11nomp_type_t8NOMP_INTE">
+<span id="_CPPv3N11nomp_type_t8NOMP_INTE"></span><span id="_CPPv2N11nomp_type_t8NOMP_INTE"></span><span class="target" id="group__nomp__types_1ggaa080d702bfb6a51225d549bcb3c43389ae3069e6f069e8c00142f5fe791cf8da7"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_INT</span></span></span><a class="headerlink" href="#_CPPv4N11nomp_type_t8NOMP_INTE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Signed integer argument type. </p>
 </dd></dl>
 
-<dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.NOMP_UINT">
-<span class="target" id="group__nomp__types_1ga252816846b07508286a2146bc5f955c4"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_UINT</span></span></span><a class="headerlink" href="#c.NOMP_UINT" title="Permalink to this definition"></a><br /></dt>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11nomp_type_t9NOMP_UINTE">
+<span id="_CPPv3N11nomp_type_t9NOMP_UINTE"></span><span id="_CPPv2N11nomp_type_t9NOMP_UINTE"></span><span class="target" id="group__nomp__types_1ggaa080d702bfb6a51225d549bcb3c43389afafc1afa19a95da2a95d42a021115c88"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_UINT</span></span></span><a class="headerlink" href="#_CPPv4N11nomp_type_t9NOMP_UINTE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Unsigned integer argument type. </p>
 </dd></dl>
 
-<dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.NOMP_FLOAT">
-<span class="target" id="group__nomp__types_1ga3adcd2861534aeb653712569b1e53653"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_FLOAT</span></span></span><a class="headerlink" href="#c.NOMP_FLOAT" title="Permalink to this definition"></a><br /></dt>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11nomp_type_t10NOMP_FLOATE">
+<span id="_CPPv3N11nomp_type_t10NOMP_FLOATE"></span><span id="_CPPv2N11nomp_type_t10NOMP_FLOATE"></span><span class="target" id="group__nomp__types_1ggaa080d702bfb6a51225d549bcb3c43389a82150f1b7512d525c2f57dab49ecee49"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_FLOAT</span></span></span><a class="headerlink" href="#_CPPv4N11nomp_type_t10NOMP_FLOATE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Floating point argument type. </p>
 </dd></dl>
 
-<dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.NOMP_PTR">
-<span class="target" id="group__nomp__types_1gaf1c443674b7ef95b31778d4391508715"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_PTR</span></span></span><a class="headerlink" href="#c.NOMP_PTR" title="Permalink to this definition"></a><br /></dt>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11nomp_type_t8NOMP_PTRE">
+<span id="_CPPv3N11nomp_type_t8NOMP_PTRE"></span><span id="_CPPv2N11nomp_type_t8NOMP_PTRE"></span><span class="target" id="group__nomp__types_1ggaa080d702bfb6a51225d549bcb3c43389a881d9a608e7999619b0dc20ca479782f"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_PTR</span></span></span><a class="headerlink" href="#_CPPv4N11nomp_type_t8NOMP_PTRE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Pointer argument type. </p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv420nomp_map_direction_t">
+<span id="_CPPv320nomp_map_direction_t"></span><span id="_CPPv220nomp_map_direction_t"></span><span class="target" id="group__nomp__types_1ga9c8653d937b29cea004ff74e0ae465b1"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_map_direction_t</span></span></span><a class="headerlink" href="#_CPPv420nomp_map_direction_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Defines the update direction (or operation) in <a class="reference internal" href="#group__nomp__user__api_1gaa8dc9b167bf514e2f3cc4ff6f9dfb6a0"><span class="std std-ref">nomp_update()</span></a>. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N20nomp_map_direction_t10NOMP_ALLOCE">
+<span id="_CPPv3N20nomp_map_direction_t10NOMP_ALLOCE"></span><span id="_CPPv2N20nomp_map_direction_t10NOMP_ALLOCE"></span><span class="target" id="group__nomp__types_1gga9c8653d937b29cea004ff74e0ae465b1a60da8641d193fa459abb6fccdd5fa787"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_ALLOC</span></span></span><a class="headerlink" href="#_CPPv4N20nomp_map_direction_t10NOMP_ALLOCE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Allocate memory on the device. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N20nomp_map_direction_t7NOMP_TOE">
+<span id="_CPPv3N20nomp_map_direction_t7NOMP_TOE"></span><span id="_CPPv2N20nomp_map_direction_t7NOMP_TOE"></span><span class="target" id="group__nomp__types_1gga9c8653d937b29cea004ff74e0ae465b1a9982b527c0819a015f1cebbd47f7e85d"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_TO</span></span></span><a class="headerlink" href="#_CPPv4N20nomp_map_direction_t7NOMP_TOE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Copy host data to device. Memory will be allocated if not allocated. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N20nomp_map_direction_t9NOMP_FROME">
+<span id="_CPPv3N20nomp_map_direction_t9NOMP_FROME"></span><span id="_CPPv2N20nomp_map_direction_t9NOMP_FROME"></span><span class="target" id="group__nomp__types_1gga9c8653d937b29cea004ff74e0ae465b1a34a64a0414aabd7449fef3dadc227372"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_FROM</span></span></span><a class="headerlink" href="#_CPPv4N20nomp_map_direction_t9NOMP_FROME" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Copy device data to host. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N20nomp_map_direction_t9NOMP_FREEE">
+<span id="_CPPv3N20nomp_map_direction_t9NOMP_FREEE"></span><span id="_CPPv2N20nomp_map_direction_t9NOMP_FREEE"></span><span class="target" id="group__nomp__types_1gga9c8653d937b29cea004ff74e0ae465b1adce40162fbe1d3191ea2753afca6abcc"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_FREE</span></span></span><a class="headerlink" href="#_CPPv4N20nomp_map_direction_t9NOMP_FREEE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Free memory allocated on the device. </p>
+</dd></dl>
+
 </dd></dl>
 
 </section>
