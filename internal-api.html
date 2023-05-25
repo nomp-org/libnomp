@@ -436,8 +436,8 @@
 <section id="logging-functions">
 <h2>Logging functions<a class="headerlink" href="#logging-functions" title="Permalink to this heading"></a></h2>
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv413nomp_log_initKi">
-<span id="_CPPv313nomp_log_initKi"></span><span id="_CPPv213nomp_log_initKi"></span><span id="nomp_log_init__iC"></span><span class="target" id="group__nomp__log__utils_1gaa91997a3e5dc5e90086c0eda01a5d65e"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_log_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">verbose</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413nomp_log_initKi" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv420nomp_log_set_verboseKi">
+<span id="_CPPv320nomp_log_set_verboseKi"></span><span id="_CPPv220nomp_log_set_verboseKi"></span><span id="nomp_log_set_verbose__iC"></span><span class="target" id="group__nomp__log__utils_1ga7578540f00f0e132b9e227288b6c3320"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_log_set_verbose</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">verbose</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420nomp_log_set_verboseKi" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Set the verbose level for the log functions. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -450,18 +450,18 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv413nomp_set_log_PKci13nomp_log_typePKcjz">
-<span id="_CPPv313nomp_set_log_PKci13nomp_log_typePKcjz"></span><span id="_CPPv213nomp_set_log_PKci13nomp_log_typePKcjz"></span><span id="nomp_set_log___cCP.i.nomp_log_type.cCP.unsigned.z"></span><span class="target" id="group__nomp__log__utils_1gaf32f06b90741f48a4a20cb717f6b4bae"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_set_log_</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">desc</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">logno</span></span>, <span class="n"><span class="pre">nomp_log_type</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">type</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">fname</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line_no</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413nomp_set_log_PKci13nomp_log_typePKcjz" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv49nomp_log_PKci13nomp_log_typePKcjz">
+<span id="_CPPv39nomp_log_PKci13nomp_log_typePKcjz"></span><span id="_CPPv29nomp_log_PKci13nomp_log_typePKcjz"></span><span id="nomp_log___cCP.i.nomp_log_type.cCP.unsigned.z"></span><span class="target" id="group__nomp__log__utils_1gaea9e91949c6707c93d648e6854e8ac67"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_log_</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">desc</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">logno</span></span>, <span class="n"><span class="pre">nomp_log_type</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">type</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">fname</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line_no</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49nomp_log_PKci13nomp_log_typePKcjz" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Register a log with libnomp runtime. </p>
-<p>Register a log given a description of the log, log number and log type. Returns a unique log id in case of errors which can be used to query log later on success. In case of information or warnings, nomp_set_log() returns 0 and details are printed to stdout based on the verbose level which is either set by &amp;#8212;nomp-verbose command line argument or NOMP_VERBOSE environment variable. On failure, <a class="reference internal" href="#group__nomp__log__utils_1gaf32f06b90741f48a4a20cb717f6b4bae"><span class="std std-ref">nomp_set_log_()</span></a> returns -1. Use nomp_set_log() macro to by pass the arguments <code class="docutils literal notranslate"><span class="pre">fname</span></code> and <code class="docutils literal notranslate"><span class="pre">line_no</span></code>.</p>
+<p>Register a log given a description of the log, log number and log type. Returns a unique log id in case of errors which can be used to query log later on success. In case of information or warnings, nomp_log() returns 0 and details are printed to stdout based on the verbose level which is either set by &amp;#8212;nomp-verbose command line argument or NOMP_VERBOSE environment variable. On failure, <a class="reference internal" href="#group__nomp__log__utils_1gaea9e91949c6707c93d648e6854e8ac67"><span class="std std-ref">nomp_log_()</span></a> returns -1. Use nomp_log() macro to by pass the arguments <code class="docutils literal notranslate"><span class="pre">fname</span></code> and <code class="docutils literal notranslate"><span class="pre">line_no</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>logno</strong> – <strong>[in]</strong> Log number which is defined in nomp.h </p></li>
 <li><p><strong>type</strong> – <strong>[in]</strong> Type of the log (one of nomp_log_type) </p></li>
 <li><p><strong>desc</strong> – <strong>[in]</strong> Detailed description of the log. </p></li>
-<li><p><strong>fname</strong> – <strong>[in]</strong> File name in which the <a class="reference internal" href="#group__nomp__log__utils_1gaf32f06b90741f48a4a20cb717f6b4bae"><span class="std std-ref">nomp_set_log_()</span></a> is called. </p></li>
-<li><p><strong>line_no</strong> – <strong>[in]</strong> Line number where the <a class="reference internal" href="#group__nomp__log__utils_1gaf32f06b90741f48a4a20cb717f6b4bae"><span class="std std-ref">nomp_set_log_()</span></a> is called. </p></li>
+<li><p><strong>fname</strong> – <strong>[in]</strong> File name in which the <a class="reference internal" href="#group__nomp__log__utils_1gaea9e91949c6707c93d648e6854e8ac67"><span class="std std-ref">nomp_log_()</span></a> is called. </p></li>
+<li><p><strong>line_no</strong> – <strong>[in]</strong> Line number where the <a class="reference internal" href="#group__nomp__log__utils_1gaea9e91949c6707c93d648e6854e8ac67"><span class="std std-ref">nomp_log_()</span></a> is called. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -471,8 +471,8 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv418nomp_logs_finalizev">
-<span id="_CPPv318nomp_logs_finalizev"></span><span id="_CPPv218nomp_logs_finalizev"></span><span id="nomp_logs_finalize"></span><span class="target" id="group__nomp__log__utils_1gafa4993670a7e8f9a8b7b06dba7f25174"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_logs_finalize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418nomp_logs_finalizev" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv417nomp_log_finalizev">
+<span id="_CPPv317nomp_log_finalizev"></span><span id="_CPPv217nomp_log_finalizev"></span><span id="nomp_log_finalize"></span><span class="target" id="group__nomp__log__utils_1ga30938464fbba0de47c4f260117bfd54c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_log_finalize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417nomp_log_finalizev" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Free variables used to keep track of logs. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -485,8 +485,8 @@
 <section id="profiler-functions">
 <h2>Profiler functions<a class="headerlink" href="#profiler-functions" title="Permalink to this heading"></a></h2>
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv417nomp_profile_initKi">
-<span id="_CPPv317nomp_profile_initKi"></span><span id="_CPPv217nomp_profile_initKi"></span><span id="nomp_profile_init__iC"></span><span class="target" id="group__nomp__profiler__utils_1ga8bcdeac928de6fd859ddf257d28a9ef0"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_profile_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">profile_level</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417nomp_profile_initKi" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv422nomp_profile_set_levelKi">
+<span id="_CPPv322nomp_profile_set_levelKi"></span><span id="_CPPv222nomp_profile_set_levelKi"></span><span id="nomp_profile_set_level__iC"></span><span class="target" id="group__nomp__profiler__utils_1ga9d4486cdc0b1071c8bc02300b89543e7"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_profile_set_level</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">profile_level</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422nomp_profile_set_levelKi" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Set the profile level for the nomp profiler. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -631,6 +631,24 @@
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>int </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413nomp_copy_envPKc6size_t">
+<span id="_CPPv313nomp_copy_envPKc6size_t"></span><span id="_CPPv213nomp_copy_envPKc6size_t"></span><span id="nomp_copy_env__cCP.s"></span><span class="target" id="group__nomp__other__utils_1ga0e718e8165a885874754ce1cb827275d"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_copy_env</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413nomp_copy_envPKc6size_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Get a copy of the environment variable <code class="docutils literal notranslate"><span class="pre">name</span></code> if exists. </p>
+<p>Return NULL if the environment variable is not set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – <strong>[in]</strong> Name of the environment variable. </p></li>
+<li><p><strong>size</strong> – <strong>[in]</strong> Maximum lenght of the environment variable value. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>char * </p>
 </dd>
 </dl>
 </dd></dl>
