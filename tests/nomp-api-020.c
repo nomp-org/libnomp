@@ -38,10 +38,13 @@ static int test_missing_argument() {
   const char *argv[5] = {"--nomp-backend", "opencl", "--nomp-device", "0",
                          "--nomp-platform"};
   int argc = 5;
-  nomp_test_assert(nomp_get_log_no(nomp_init(argc, argv)) ==
-                   NOMP_USER_INPUT_IS_INVALID);
+  int err = nomp_init(argc, argv);
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
-  nomp_test_assert(nomp_get_log_no(nomp_finalize()) == NOMP_FINALIZE_FAILURE);
+  err = nomp_finalize();
+  nomp_test_assert(err == NOMP_FINALIZE_FAILURE);
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_LOG_ID_IS_INVALID);
+  nomp_test_assert(nomp_get_log_type(err) == NOMP_INVALID);
 
   return 0;
 }

@@ -24,7 +24,7 @@ static int check_env_vars(struct nomp_backend *backend) {
   if ((tmp = getenv("NOMP_BACKEND")))
     strncpy(backend->backend, tmp, NOMP_MAX_BUFSIZ);
 
-  if ((tmp = nomp_copy_env("NOMP_INSTALL_DIR", NOMP_MAX_BUFSIZ)))
+  if ((tmp = getenv("NOMP_INSTALL_DIR")))
     strncpy(backend->install_dir, tmp, PATH_MAX);
 
   return 0;
@@ -133,19 +133,25 @@ int nomp_init(int argc, const char **argv) {
   }
 
   if (!Py_IsInitialized()) {
-    // May be we need the isolated configuration listed
-    // here:
+    // May be we need the isolated configuration listed here:
     // https://docs.python.org/3/c-api/init_config.html#init-config
     // But for now, we do the simplest thing possible.
-    Py_Initialize();
+    Py_InitializeEx(0);
     // Append current working directory to sys.path.
     nomp_check(nomp_py_append_to_sys_path("."));
+    // Initialize the python context.
+    nomp.py_context = PyDict_New();
   }
 
   nomp_check(init_configs(argc, argv, &nomp));
   nomp_check(nomp_profile_set_level(nomp.profile));
 
   nomp_profile("nomp_init", 1, 0);
+
+  // Populate context.
+  PyObject *pbackend = PyUnicode_FromString(nomp.backend);
+  PyDict_SetItemString(nomp.py_context, "backend", pbackend);
+  Py_XDECREF(pbackend);
 
   nomp_check(nomp_log_set_verbose(nomp.verbose));
 
@@ -181,11 +187,6 @@ int nomp_init(int argc, const char **argv) {
   }
 
   nomp_check(allocate_scratch_memory(&nomp));
-
-  // Populate context
-  nomp.py_context = PyDict_New();
-  PyObject *pbackend = PyUnicode_FromString(nomp.backend);
-  PyDict_SetItemString(nomp.py_context, "backend", pbackend);
 
   initialized = 1;
 
@@ -488,12 +489,16 @@ int nomp_run(int id, ...) {
 int nomp_sync() { return nomp.sync(&nomp); }
 
 int nomp_finalize(void) {
-  if (!initialized) {
-    return nomp_log(NOMP_FINALIZE_FAILURE, NOMP_ERROR,
-                    "libnomp is not initialized.");
-  }
+  // Free bookkeeping structures for the logger and profiler since these can be
+  // released irrespective of whether libnomp is initialized or not.
+  nomp_log_finalize();
+  nomp_profile_finalize();
 
-  nomp_profile("nomp_finalize", 1, 1);
+  if (!initialized)
+    return NOMP_FINALIZE_FAILURE;
+
+  Py_XDECREF(nomp.py_annotate), Py_XDECREF(nomp.py_context);
+  Py_Finalize();
 
   for (unsigned i = 0; i < mems_n; i++) {
     if (mems[i]) {
@@ -502,6 +507,7 @@ int nomp_finalize(void) {
     }
   }
   nomp_free(&mems), mems_n = mems_max = 0;
+  nomp_check(deallocate_scratch_memory(&nomp));
 
   for (unsigned i = 0; i < progs_n; i++) {
     if (progs[i]) {
@@ -513,24 +519,9 @@ int nomp_finalize(void) {
   }
   nomp_free(&progs), progs_n = progs_max = 0;
 
-  nomp_check(deallocate_scratch_memory(&nomp));
-
-  Py_XDECREF(nomp.py_annotate), Py_XDECREF(nomp.py_context);
-
   initialized = nomp.finalize(&nomp);
-  if (initialized) {
-    return nomp_log(NOMP_FINALIZE_FAILURE, NOMP_ERROR,
-                    "Failed to initialize libnomp.");
-  }
-
-  nomp_profile("nomp_finalize", 0, 0);
-
-  nomp_profile_result();
-
-  // Free bookkeeping structures for the logger and
-  // profiler.
-  nomp_log_finalize();
-  nomp_profile_finalize();
+  if (initialized)
+    return NOMP_FINALIZE_FAILURE;
 
   return 0;
 }

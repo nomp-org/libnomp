@@ -22,12 +22,12 @@ int nomp_py_append_to_sys_path(const char *path) {
   PyObject *sys = PyImport_ImportModule("sys");
   if (sys) {
     PyObject *ppath = PyObject_GetAttrString(sys, "path");
-    Py_DECREF(sys);
     if (ppath) {
       PyObject *pstr = PyUnicode_FromString(path);
       err = PyList_Append(ppath, pstr);
       Py_DECREF(ppath), Py_XDECREF(pstr);
     }
+    Py_DECREF(sys);
   }
   if (err) {
     return nomp_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,
@@ -104,13 +104,13 @@ int nomp_py_set_annotate_func(PyObject **annotate_func, const char *path_) {
   PyObject *pfile = PyUnicode_FromString(file);
   if (pfile) {
     PyObject *module = PyImport_Import(pfile);
-    Py_DECREF(pfile);
     if (module) {
       PyObject *pfunc = PyObject_GetAttrString(module, func);
-      Py_DECREF(module);
       if (pfunc && PyCallable_Check(pfunc))
         Py_XDECREF(*annotate_func), *annotate_func = pfunc, err = 0;
+      Py_DECREF(module);
     }
+    Py_DECREF(pfile);
   }
   if (err) {
     err = nomp_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,
@@ -146,10 +146,8 @@ int nomp_py_apply_transform(PyObject **knl, const char *file, const char *func,
   PyObject *pfile = PyUnicode_FromString(file);
   if (knl && *knl && pfile) {
     PyObject *module = PyImport_Import(pfile);
-    Py_DECREF(pfile);
     if (module) {
       PyObject *pfunc = PyObject_GetAttrString(module, func);
-      Py_DECREF(module);
       if (pfunc && PyCallable_Check(pfunc)) {
         PyObject *tknl =
             PyObject_CallFunctionObjArgs(pfunc, *knl, context, NULL);
@@ -157,7 +155,9 @@ int nomp_py_apply_transform(PyObject **knl, const char *file, const char *func,
           Py_DECREF(*knl), *knl = tknl, err = 0;
         Py_DECREF(pfunc);
       }
+      Py_DECREF(module);
     }
+    Py_DECREF(pfile);
   }
   if (err) {
     return nomp_log(
@@ -313,8 +313,8 @@ int nomp_py_get_grid_size(struct nomp_prog *prg, PyObject *knl) {
           if (grid_size && PyTuple_Check(grid_size)) {
             PyObject *py_global = PyTuple_GetItem(grid_size, 0);
             PyObject *py_local = PyTuple_GetItem(grid_size, 1);
-            prg->ndim = nomp_max(2, PyTuple_Size(PyTuple_GetItem(grid_size, 0)),
-                                 PyTuple_Size(PyTuple_GetItem(grid_size, 1)));
+            prg->ndim =
+                nomp_max(2, PyTuple_Size(py_global), PyTuple_Size(py_local));
 
             for (int i = 0; i < PyTuple_Size(py_global); i++)
               nomp_check(py_get_grid_size_aux(PyTuple_GetItem(py_global, i),

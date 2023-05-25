@@ -24,7 +24,10 @@ static int test_invalid_nomp_backend(int argc, const char **argv) {
   int err = nomp_init(argc, argv);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
-  nomp_test_assert(nomp_get_log_no(nomp_finalize()) == NOMP_FINALIZE_FAILURE);
+  err = nomp_finalize();
+  nomp_test_assert(err == NOMP_FINALIZE_FAILURE);
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_LOG_ID_IS_INVALID);
+  nomp_test_assert(nomp_get_log_type(err) == NOMP_INVALID);
 
   reset_env(backend, "NOMP_BACKEND");
 
@@ -39,7 +42,10 @@ static int test_invalid_platform_id(int argc, const char **argv) {
   int err = nomp_init(argc, argv);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
-  nomp_test_assert(nomp_get_log_no(nomp_finalize()) == NOMP_FINALIZE_FAILURE);
+  err = nomp_finalize();
+  nomp_test_assert(err == NOMP_FINALIZE_FAILURE);
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_LOG_ID_IS_INVALID);
+  nomp_test_assert(nomp_get_log_type(err) == NOMP_INVALID);
 
   reset_env(platform, "NOMP_PLATFORM");
 
@@ -54,7 +60,10 @@ static int test_invalid_device_id(int argc, const char **argv) {
   int err = nomp_init(argc, argv);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
-  nomp_test_assert(nomp_get_log_no(nomp_finalize()) == NOMP_FINALIZE_FAILURE);
+  err = nomp_finalize();
+  nomp_test_assert(err == NOMP_FINALIZE_FAILURE);
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_LOG_ID_IS_INVALID);
+  nomp_test_assert(nomp_get_log_type(err) == NOMP_INVALID);
 
   reset_env(device, "NOMP_DEVICE");
 
@@ -76,7 +85,10 @@ static int test_invalid_nomp_verbose(int argc, const char **argv) {
   nomp_test_assert(eq);
   nomp_free(&desc);
 
-  nomp_test_assert(nomp_get_log_no(nomp_finalize()) == NOMP_FINALIZE_FAILURE);
+  err = nomp_finalize();
+  nomp_test_assert(err == NOMP_FINALIZE_FAILURE);
+  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_LOG_ID_IS_INVALID);
+  nomp_test_assert(nomp_get_log_type(err) == NOMP_INVALID);
 
   reset_env(verbose, "NOMP_VERBOSE");
 
