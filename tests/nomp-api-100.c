@@ -6,6 +6,12 @@ static const char *valid_knl =
     "    a[i] = i;                                                        \n"
     "}                                                                    \n";
 
+static const char *invalid_knl =
+    "void foo(int *a, int N) {                                            \n"
+    "  for (int i = 0; i < N; i++)                                        \n"
+    "    a[i] = i                                                         \n"
+    "}                                                                    \n";
+
 // Calling nomp_jit() with invalid file should return an error.
 static int test_invalid_file() {
   const char *clauses[4] = {"transform", "invalid-file", "invalid", 0};
@@ -26,7 +32,7 @@ static int test_invalid_file() {
 
 // Calling nomp_jit() with invalid function should return an error.
 static int test_invalid_transform_function() {
-  const char *clauses[4] = {"transform", "nomp-api-100", "invalid-func", 0};
+  const char *clauses[4] = {"transform", "nomp-api-100", "invalid_func", 0};
 
   static int id = -1;
   int err = nomp_jit(&id, valid_knl, clauses, 2, "a", sizeof(int), NOMP_PTR,
@@ -36,7 +42,7 @@ static int test_invalid_transform_function() {
   char *log = nomp_get_log_str(err);
   int eq = logcmp(
       log, "\\[Error\\] .*src\\/lpy.c:[0-9]* Failed to call user transform "
-           "function: \"invalid-func\" in file: \"nomp-api-100\".");
+           "function: \"invalid_func\" in file: \"nomp-api-100\".");
   nomp_free(&log);
   nomp_test_assert(eq);
 
@@ -104,11 +110,6 @@ static int test_missing_user_callback() {
 
 // The kernel has a syntax error due to a missing a semicolon.
 static int test_syntax_error_in_kernel() {
-  const char *invalid_knl =
-      "void foo(int *a, int N) {                                            \n"
-      "  for (int i = 0; i < N; i++)                                        \n"
-      "    a[i] = i                                                         \n"
-      "}                                                                    \n";
   static int id = -1;
   const char *clauses0[4] = {"transform", "nomp-api-100", "transform", 0};
   int err = nomp_jit(&id, invalid_knl, clauses0, 2, "a", sizeof(int), NOMP_PTR,

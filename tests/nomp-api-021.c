@@ -131,7 +131,7 @@ int main(int argc, const char *argv[]) {
   nomp_test_assert(argc <= 64);
   char *argvn[64];
 
-  // Copy everything but `--nomp-platform` to new command line args.
+  // Copy everything except `--nomp-platform` to new command line args.
   int argcn = 0;
   for (unsigned i = 0; i < argc; i++) {
     if (strncmp(argv[i], "--nomp-platform", NOMP_TEST_MAX_BUFSIZ))
@@ -141,7 +141,7 @@ int main(int argc, const char *argv[]) {
   for (unsigned i = 0; i < argcn; i++)
     nomp_free(&argvn[i]);
 
-  // Copy everything but `--nomp-device` to new command line args.
+  // Copy everything except `--nomp-device` to new command line args.
   argcn = 0;
   for (unsigned i = 0; i < argc; i++) {
     if (strncmp(argv[i], "--nomp-device", NOMP_TEST_MAX_BUFSIZ))
@@ -153,3 +153,6 @@ int main(int argc, const char *argv[]) {
 
   return err;
 }
+
+#undef set_test_env
+#undef reset_env
