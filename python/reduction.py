@@ -9,7 +9,7 @@ from loopy.symbolic import Reduction
 from loopy.transform.data import reduction_arg_to_subst_rule
 from loopy_api import LOOPY_INSN_PREFIX, LOOPY_LANG_VERSION
 
-_TARGET_BLOCK_SIZE = {"cuda": 32, "opencl": 32, "sycl":32}
+_TARGET_BLOCK_SIZE = {"cuda": 32, "opencl": 32, "sycl": 32}
 
 
 class InameCollector(pymbolic.mapper.WalkMapper):

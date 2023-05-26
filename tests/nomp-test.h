@@ -20,7 +20,7 @@
 #define TOSTRING_(x) #x
 #define TOSTRING(x) TOSTRING_(x)
 
-#ifndef TEST_INT_ONLY
+#if defined(TEST_INT_ONLY)
 #define TEST_BUILTIN_TYPES(api, ...)                                           \
   {                                                                            \
     err |= TOKEN_PASTE(TOKEN_PASTE(nomp_api_, api), _int)(__VA_ARGS__);        \
@@ -28,8 +28,6 @@
     err |= TOKEN_PASTE(TOKEN_PASTE(nomp_api_, api), _unsigned)(__VA_ARGS__);   \
     err |=                                                                     \
         TOKEN_PASTE(TOKEN_PASTE(nomp_api_, api), _unsigned_long)(__VA_ARGS__); \
-    err |= TOKEN_PASTE(TOKEN_PASTE(nomp_api_, api), _double)(__VA_ARGS__);     \
-    err |= TOKEN_PASTE(TOKEN_PASTE(nomp_api_, api), _float)(__VA_ARGS__);      \
   }
 #else
 #define TEST_BUILTIN_TYPES(api, ...)                                           \
@@ -39,6 +37,8 @@
     err |= TOKEN_PASTE(TOKEN_PASTE(nomp_api_, api), _unsigned)(__VA_ARGS__);   \
     err |=                                                                     \
         TOKEN_PASTE(TOKEN_PASTE(nomp_api_, api), _unsigned_long)(__VA_ARGS__); \
+    err |= TOKEN_PASTE(TOKEN_PASTE(nomp_api_, api), _double)(__VA_ARGS__);     \
+    err |= TOKEN_PASTE(TOKEN_PASTE(nomp_api_, api), _float)(__VA_ARGS__);      \
   }
 #endif
 
