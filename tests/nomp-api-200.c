@@ -1,46 +1,48 @@
-#define TEST_IMPL_H "nomp-api-210-impl.h"
+#define TEST_MAX_SIZE 100
+#define TEST_IMPL_H "nomp-api-200-impl.h"
 #include "nomp-generate-tests.h"
 #undef TEST_IMPL_H
+#undef TEST_MAX_SIZE
 
 static int test_vector_addition() {
   int err = 0;
-  TEST_BUILTIN_TYPES(210_add, 10)
-  TEST_BUILTIN_TYPES(210_add, 20)
+  TEST_BUILTIN_TYPES(200_add, 10)
+  TEST_BUILTIN_TYPES(200_add, 50)
   return err;
 }
 
 static int test_vector_subtraction() {
   int err = 0;
-  TEST_BUILTIN_TYPES(210_sub, 10)
-  TEST_BUILTIN_TYPES(210_sub, 20)
+  TEST_BUILTIN_TYPES(200_sub, 10)
+  TEST_BUILTIN_TYPES(200_sub, 50)
   return err;
 }
 
 static int test_vector_multiplication_sum() {
   int err = 0;
-  TEST_BUILTIN_TYPES(210_mul_sum, 10)
-  TEST_BUILTIN_TYPES(210_mul_sum, 20)
+  TEST_BUILTIN_TYPES(200_mul_sum, 10)
+  TEST_BUILTIN_TYPES(200_mul_sum, 50)
   return err;
 }
 
 static int test_vector_multiplication() {
   int err = 0;
-  TEST_BUILTIN_TYPES(210_mul, 10)
-  TEST_BUILTIN_TYPES(210_mul, 20)
+  TEST_BUILTIN_TYPES(200_mul, 10)
+  TEST_BUILTIN_TYPES(200_mul, 50)
   return err;
 }
 
 static int test_vector_square_sum() {
   int err = 0;
-  TEST_BUILTIN_TYPES(210_square, 10)
-  TEST_BUILTIN_TYPES(210_square, 20)
+  TEST_BUILTIN_TYPES(200_square, 10)
+  TEST_BUILTIN_TYPES(200_square, 50)
   return err;
 }
 
 static int test_vector_linear() {
   int err = 0;
-  TEST_BUILTIN_TYPES(210_linear, 10)
-  TEST_BUILTIN_TYPES(210_linear, 20)
+  TEST_BUILTIN_TYPES(200_linear, 10)
+  TEST_BUILTIN_TYPES(200_linear, 50)
   return err;
 }
 
