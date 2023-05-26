@@ -1,14 +1,14 @@
 #include "nomp-test.h"
 
-#define nomp_api_220_aux TOKEN_PASTE(nomp_api_220_aux, TEST_SUFFIX)
-static int nomp_api_220_aux(const char *fmt, TEST_TYPE *a, TEST_TYPE *b,
+#define nomp_api_205_aux TOKEN_PASTE(nomp_api_205_aux, TEST_SUFFIX)
+static int nomp_api_205_aux(const char *fmt, TEST_TYPE *a, TEST_TYPE *b,
                             TEST_TYPE *c, int n) {
   nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO));
   nomp_test_chk(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO));
   nomp_test_chk(nomp_update(c, 0, n, sizeof(TEST_TYPE), NOMP_TO));
 
   int id = -1;
-  const char *clauses[4] = {"transform", "nomp-api-220", "transform", 0};
+  const char *clauses[4] = {"transform", "nomp-api-205", "transform", 0};
   char *knl = generate_knl(fmt, 3, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE),
                            TOSTRING(TEST_TYPE));
   nomp_test_chk(nomp_jit(&id, knl, clauses, 4, "a", sizeof(TEST_TYPE), NOMP_PTR,
@@ -27,11 +27,11 @@ static int nomp_api_220_aux(const char *fmt, TEST_TYPE *a, TEST_TYPE *b,
   return 0;
 }
 
-#define nomp_api_220_add TOKEN_PASTE(nomp_api_220_add, TEST_SUFFIX)
-static int nomp_api_220_add(int n) {
-  nomp_test_assert(n <= 20);
+#define nomp_api_205_add TOKEN_PASTE(nomp_api_205_add, TEST_SUFFIX)
+static int nomp_api_205_add(int n) {
+  nomp_test_assert(n <= TEST_MAX_SIZE);
 
-  TEST_TYPE a[20], b[20], c[20];
+  TEST_TYPE a[TEST_MAX_SIZE], b[TEST_MAX_SIZE], c[TEST_MAX_SIZE];
   for (unsigned i = 0; i < n; i++)
     a[i] = n - i, b[i] = i, c[i] = 5;
 
@@ -40,7 +40,7 @@ static int nomp_api_220_add(int n) {
       "  for (int i = 0; i < N; i++)                          \n"
       "    a[i] = a[i] + b[i] + c[i];                         \n"
       "}                                                      \n";
-  nomp_api_220_aux(knl_fmt, a, b, c, n);
+  nomp_api_205_aux(knl_fmt, a, b, c, n);
 
 #if defined(TEST_TOL)
   for (unsigned i = 0; i < n; i++)
@@ -52,13 +52,13 @@ static int nomp_api_220_add(int n) {
 
   return 0;
 }
-#undef nomp_api_220_add
+#undef nomp_api_205_add
 
-#define nomp_api_220_mul TOKEN_PASTE(nomp_api_220_mul, TEST_SUFFIX)
-static int nomp_api_220_mul(int n) {
-  nomp_test_assert(n <= 20);
+#define nomp_api_205_mul TOKEN_PASTE(nomp_api_205_mul, TEST_SUFFIX)
+static int nomp_api_205_mul(int n) {
+  nomp_test_assert(n <= TEST_MAX_SIZE);
 
-  TEST_TYPE a[20], b[20], c[20];
+  TEST_TYPE a[TEST_MAX_SIZE], b[TEST_MAX_SIZE], c[TEST_MAX_SIZE];
   for (unsigned i = 0; i < n; i++)
     a[i] = n - i, b[i] = i, c[i] = 5;
 
@@ -67,7 +67,7 @@ static int nomp_api_220_mul(int n) {
       "  for (int i = 0; i < N; i++)                          \n"
       "    a[i] = a[i] * b[i] * c[i];                         \n"
       "}                                                      \n";
-  nomp_api_220_aux(knl_fmt, a, b, c, n);
+  nomp_api_205_aux(knl_fmt, a, b, c, n);
 
 #if defined(TEST_TOL)
   for (unsigned i = 0; i < n; i++)
@@ -79,13 +79,13 @@ static int nomp_api_220_mul(int n) {
 
   return 0;
 }
-#undef nomp_api_220_mul
+#undef nomp_api_205_mul
 
-#define nomp_api_220_mul_sum TOKEN_PASTE(nomp_api_220_mul_sum, TEST_SUFFIX)
-static int nomp_api_220_mul_sum(int n) {
-  nomp_test_assert(n <= 20);
+#define nomp_api_205_mul_sum TOKEN_PASTE(nomp_api_205_mul_sum, TEST_SUFFIX)
+static int nomp_api_205_mul_sum(int n) {
+  nomp_test_assert(n <= TEST_MAX_SIZE);
 
-  TEST_TYPE a[20], b[20], c[20];
+  TEST_TYPE a[TEST_MAX_SIZE], b[TEST_MAX_SIZE], c[TEST_MAX_SIZE];
   for (unsigned i = 0; i < n; i++)
     a[i] = n - i, b[i] = i, c[i] = 5;
 
@@ -94,7 +94,7 @@ static int nomp_api_220_mul_sum(int n) {
       "  for (int i = 0; i < N; i++)                          \n"
       "    a[i] = a[i] * b[i] + c[i];                         \n"
       "}                                                      \n";
-  nomp_api_220_aux(knl_fmt, a, b, c, n);
+  nomp_api_205_aux(knl_fmt, a, b, c, n);
 
 #if defined(TEST_TOL)
   for (unsigned i = 0; i < n; i++)
@@ -106,13 +106,13 @@ static int nomp_api_220_mul_sum(int n) {
 
   return 0;
 }
-#undef nomp_api_220_mul_sum
+#undef nomp_api_205_mul_sum
 
-#define nomp_api_220_linear TOKEN_PASTE(nomp_api_220_linear, TEST_SUFFIX)
-static int nomp_api_220_linear(int n) {
-  nomp_test_assert(n <= 20);
+#define nomp_api_205_linear TOKEN_PASTE(nomp_api_205_linear, TEST_SUFFIX)
+static int nomp_api_205_linear(int n) {
+  nomp_test_assert(n <= TEST_MAX_SIZE);
 
-  TEST_TYPE a[20], b[20], c[20];
+  TEST_TYPE a[TEST_MAX_SIZE], b[TEST_MAX_SIZE], c[TEST_MAX_SIZE];
   for (unsigned i = 0; i < n; i++)
     a[i] = n - i, b[i] = i, c[i] = 5;
 
@@ -121,7 +121,7 @@ static int nomp_api_220_linear(int n) {
       "  for (int i = 0; i < N; i++)                          \n"
       "    a[i] = a[i] + 3 * b[i] + 2 * c[i];                 \n"
       "}                                                      \n";
-  nomp_api_220_aux(knl_fmt, a, b, c, n);
+  nomp_api_205_aux(knl_fmt, a, b, c, n);
 
 #if defined(TEST_TOL)
   for (unsigned i = 0; i < n; i++)
@@ -133,5 +133,5 @@ static int nomp_api_220_linear(int n) {
 
   return 0;
 }
-#undef nomp_api_220_linear
-#undef nomp_api_220_aux
+#undef nomp_api_205_linear
+#undef nomp_api_205_aux

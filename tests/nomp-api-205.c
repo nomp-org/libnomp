@@ -1,32 +1,34 @@
-#define TEST_IMPL_H "nomp-api-220-impl.h"
+#define TEST_MAX_SIZE 100
+#define TEST_IMPL_H "nomp-api-205-impl.h"
 #include "nomp-generate-tests.h"
 #undef TEST_IMPL_H
+#undef TEST_MAX_SIZE
 
 static int test_vector_addition() {
   int err = 0;
-  TEST_BUILTIN_TYPES(220_add, 10)
-  TEST_BUILTIN_TYPES(220_add, 20)
+  TEST_BUILTIN_TYPES(205_add, 10)
+  TEST_BUILTIN_TYPES(205_add, 70)
   return err;
 }
 
 static int test_vector_multiplication() {
   int err = 0;
-  TEST_BUILTIN_TYPES(220_mul, 10)
-  TEST_BUILTIN_TYPES(220_mul, 20)
+  TEST_BUILTIN_TYPES(205_mul, 10)
+  TEST_BUILTIN_TYPES(205_mul, 70)
   return err;
 }
 
 static int test_vector_multiplication_sum() {
   int err = 0;
-  TEST_BUILTIN_TYPES(220_mul_sum, 10)
-  TEST_BUILTIN_TYPES(220_mul_sum, 20)
+  TEST_BUILTIN_TYPES(205_mul_sum, 10)
+  TEST_BUILTIN_TYPES(205_mul_sum, 70)
   return err;
 }
 
 static int test_vector_linear() {
   int err = 0;
-  TEST_BUILTIN_TYPES(220_linear, 10)
-  TEST_BUILTIN_TYPES(220_linear, 20)
+  TEST_BUILTIN_TYPES(205_linear, 10)
+  TEST_BUILTIN_TYPES(205_linear, 70)
   return err;
 }
 
