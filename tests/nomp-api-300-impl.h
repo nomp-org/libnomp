@@ -1,12 +1,13 @@
 #include "nomp-test.h"
 
-#define nomp_api_230_aux TOKEN_PASTE(nomp_api_230_aux, TEST_SUFFIX)
-static int nomp_api_230_aux(const char *fmt, const char **clauses, TEST_TYPE *a,
-                            TEST_TYPE *b, int rows, int cols, int n) {
+#define nomp_api_300_aux TOKEN_PASTE(nomp_api_300_aux, TEST_SUFFIX)
+static int nomp_api_300_aux(const char *fmt, TEST_TYPE *a, TEST_TYPE *b,
+                            int rows, int cols, int n) {
   nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO));
   nomp_test_chk(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO));
 
   int id = -1;
+  const char *clauses[4] = {"transform", "nomp-api-300", "transform", 0};
   char *knl = generate_knl(fmt, 2, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE));
   nomp_test_chk(nomp_jit(&id, knl, clauses, 4, "a", sizeof(TEST_TYPE), NOMP_PTR,
                          "b", sizeof(TEST_TYPE), NOMP_PTR, "rows", sizeof(int),
@@ -24,12 +25,12 @@ static int nomp_api_230_aux(const char *fmt, const char **clauses, TEST_TYPE *a,
   return 0;
 }
 
-#define nomp_api_230_add TOKEN_PASTE(nomp_api_230_add, TEST_SUFFIX)
-static int nomp_api_230_add(int rows, int cols) {
+#define nomp_api_300_add TOKEN_PASTE(nomp_api_300_add, TEST_SUFFIX)
+static int nomp_api_300_add(int rows, int cols) {
   const int n = rows * cols;
-  nomp_test_assert(n <= 256);
+  nomp_test_assert(n <= TEST_MAX_SIZE);
 
-  TEST_TYPE a[256], b[256];
+  TEST_TYPE a[TEST_MAX_SIZE], b[TEST_MAX_SIZE];
   for (unsigned i = 0; i < n; i++)
     a[i] = 2 * n - i, b[i] = i;
 
@@ -39,9 +40,7 @@ static int nomp_api_230_add(int rows, int cols) {
       "    for (int i = 0; i < cols; i++)                              \n"
       "      a[e * cols + i] = a[e * cols + i] + b[e * cols + i];      \n"
       "}                                                               \n";
-  const char *clauses[7] = {"annotate",     "dof_loop", "i", "annotate",
-                            "element_loop", "e",        0};
-  nomp_api_230_aux(knl_fmt, clauses, a, b, rows, cols, n);
+  nomp_api_300_aux(knl_fmt, a, b, rows, cols, n);
 
 #if defined(TEST_TOL)
   for (unsigned i = 0; i < n; i++)
@@ -53,14 +52,14 @@ static int nomp_api_230_add(int rows, int cols) {
 
   return 0;
 }
-#undef nomp_api_230_add
+#undef nomp_api_300_add
 
-#define nomp_api_230_transform TOKEN_PASTE(nomp_api_230_transform, TEST_SUFFIX)
-static int nomp_api_230_transform(int rows, int cols) {
+#define nomp_api_300_transform TOKEN_PASTE(nomp_api_300_transform, TEST_SUFFIX)
+static int nomp_api_300_transform(int rows, int cols) {
   const int n = rows * cols;
-  nomp_test_assert(n <= 256);
+  nomp_test_assert(n <= TEST_MAX_SIZE);
 
-  TEST_TYPE a[256], b[256];
+  TEST_TYPE a[TEST_MAX_SIZE], b[TEST_MAX_SIZE];
   for (unsigned i = 0; i < rows; i++)
     for (unsigned j = 0; j < cols; j++)
       b[j + i * cols] = (TEST_TYPE)rand();
@@ -71,8 +70,7 @@ static int nomp_api_230_transform(int rows, int cols) {
       "    for (int i = 0; i < cols; i++)                                \n"
       "       a[j + i * rows] = b[i + j * cols];                         \n"
       "}                                                                 \n";
-  const char *clauses[4] = {"transform", "nomp-api-230", "transform", 0};
-  nomp_api_230_aux(knl_fmt, clauses, a, b, rows, cols, n);
+  nomp_api_300_aux(knl_fmt, a, b, rows, cols, n);
 
 #if defined(TEST_TOL)
   for (unsigned i = 0; i < rows; i++)
@@ -86,5 +84,5 @@ static int nomp_api_230_transform(int rows, int cols) {
 
   return 0;
 }
-#undef nomp_api_230_transform
-#undef nomp_api_230_aux
+#undef nomp_api_300_transform
+#undef nomp_api_300_aux
