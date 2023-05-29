@@ -1,16 +1,20 @@
-#define TEST_IMPL_H "nomp-api-241-impl.h"
+#define TEST_MAX_SIZE 100
+#define TEST_IMPL_H "nomp-api-215-impl.h"
 #include "nomp-generate-tests.h"
 #undef TEST_IMPL_H
+#undef TEST_MAX_SIZE
 
 static int test_logical_ops() {
   int err = 0;
-  TEST_BUILTIN_TYPES(241_logical_ops, 10)
+  TEST_BUILTIN_TYPES(215_logical_ops, 10)
+  TEST_BUILTIN_TYPES(215_logical_ops, 50)
   return err;
 }
 
 static int test_ternary_ops() {
   int err = 0;
-  TEST_BUILTIN_TYPES(241_ternary_ops, 10)
+  TEST_BUILTIN_TYPES(215_ternary_ops, 10)
+  TEST_BUILTIN_TYPES(215_ternary_ops, 50)
   return err;
 }
 
