@@ -239,18 +239,13 @@ static int symengine_vec_push(CVecBasic *vec, const char *str) {
 int nomp_symengine_map_push(struct nomp_prog *prg, const char *key,
                             const char *val) {
   basic a, b, c;
-  basic_new_stack(a);
-  basic_new_stack(b);
-  basic_new_stack(c);
-  symbol_set(a, key);
-  integer_set_str(b, val);
+  basic_new_stack(a), basic_new_stack(b), basic_new_stack(c);
+  symbol_set(a, key), integer_set_str(b, val);
   if (!mapbasicbasic_get(prg->map, a, c) || !basic_eq(c, b)) {
     mapbasicbasic_insert(prg->map, a, b);
     prg->is_grid_eval = 1;
   }
-  basic_free_stack(a);
-  basic_free_stack(b);
-  basic_free_stack(c);
+  basic_free_stack(a), basic_free_stack(b), basic_free_stack(c);
 
   return 0;
 }

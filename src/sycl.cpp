@@ -24,24 +24,27 @@ struct sycl_prog {
 };
 
 static int sycl_update(struct nomp_backend *bnd, struct nomp_mem *m,
-                       const nomp_map_direction_t op) {
+                       const nomp_map_direction_t op, size_t start,
+                       size_t end) {
   struct sycl_backend *sycl = (struct sycl_backend *)bnd->bptr;
 
   if (op & NOMP_ALLOC) {
-    chk_sycl(m->bptr = sycl::malloc_device((m->idx1 - m->idx0) * m->usize,
-                                           sycl->device_id, sycl->ctx););
+    chk_sycl(m->bptr = sycl::malloc_device(NOMP_MEM_BYTES, sycl->device_id,
+                                           sycl->ctx););
   }
 
   if (op & NOMP_TO) {
     chk_sycl({
-      sycl->queue.memcpy(m->bptr, (char *)(m->hptr) + m->usize * m->idx0,
-                         (m->idx1 - m->idx0) * m->usize);
+      sycl->queue.memcpy((char *)(m->bptr) + NOMP_MEM_BPTR_OFFSET,
+                         (char *)(m->hptr) + NOMP_MEM_HPTR_OFFSET,
+                         NOMP_MEM_BYTES);
       sycl->queue.wait();
     });
   } else if (op == NOMP_FROM) {
     chk_sycl({
-      sycl->queue.memcpy((char *)(m->hptr) + m->usize * m->idx0, m->bptr,
-                         (m->idx1 - m->idx0) * m->usize);
+      sycl->queue.memcpy((char *)(m->hptr) + NOMP_MEM_HPTR_OFFSET,
+                         (char *)(m->bptr) + NOMP_MEM_BPTR_OFFSET,
+                         NOMP_MEM_BYTES);
       sycl->queue.wait();
     });
   } else if (op == NOMP_FREE) {
