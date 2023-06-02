@@ -68,6 +68,22 @@ static int test_free_after_d2h() {
   return err;
 }
 
+static int test_in_range_d2h() {
+  int err = 0;
+  TEST_BUILTIN_TYPES(050_in_range_d2h, 0, 20, 5, 15);
+  TEST_BUILTIN_TYPES(050_in_range_d2h, 0, 20, 0, 15);
+  TEST_BUILTIN_TYPES(050_in_range_d2h, 0, 20, 5, 20);
+  return err;
+}
+
+static int test_in_range_h2d() {
+  int err = 0;
+  TEST_BUILTIN_TYPES(050_in_range_h2d, 0, 20, 5, 15);
+  TEST_BUILTIN_TYPES(050_in_range_h2d, 0, 20, 1, 15);
+  TEST_BUILTIN_TYPES(050_in_range_h2d, 0, 20, 5, 19);
+  return err;
+}
+
 int main(int argc, const char *argv[]) {
   int err = nomp_init(argc, argv);
   nomp_check(err);
@@ -79,6 +95,8 @@ int main(int argc, const char *argv[]) {
   err |= SUBTEST(test_d2h_after_h2d);
   err |= SUBTEST(test_free_after_h2d);
   err |= SUBTEST(test_free_after_d2h);
+  err |= SUBTEST(test_in_range_d2h);
+  err |= SUBTEST(test_in_range_h2d);
 
   err |= nomp_finalize();
   nomp_check(err);

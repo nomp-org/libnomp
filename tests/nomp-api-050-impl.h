@@ -76,7 +76,6 @@ static int d2h_after_h2d(unsigned s, unsigned e) {
 
   for (unsigned i = s; i < e; i++)
     a[i] = 0;
-
   nomp_test_chk(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FROM));
 
 #if defined(TEST_TOL)
@@ -123,3 +122,73 @@ static int free_after_d2h(unsigned s, unsigned e) {
   return 0;
 }
 #undef free_after_d2h
+
+#define in_range_d2h TOKEN_PASTE(nomp_api_050_in_range_d2h, TEST_SUFFIX)
+static int in_range_d2h(unsigned lb, unsigned ub, unsigned s, unsigned e) {
+  TEST_TYPE a[20] = {0};
+
+  for (unsigned i = lb; i < ub; i++)
+    a[i] = i;
+  nomp_test_chk(nomp_update(a, lb, ub, sizeof(TEST_TYPE), NOMP_TO));
+
+  for (unsigned i = lb; i < ub; i++)
+    a[i] = 0;
+  nomp_test_chk(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FROM));
+
+#if defined(TEST_TOL)
+  for (unsigned i = 0; i < s; i++)
+    nomp_test_assert(fabs(a[i]) < TEST_TOL);
+  for (unsigned i = s; i < e; i++)
+    nomp_test_assert(fabs(a[i] - i) < TEST_TOL);
+  for (unsigned i = e; i < 10; i++)
+    nomp_test_assert(fabs(a[i]) < TEST_TOL);
+#else
+  for (unsigned i = 0; i < s; i++)
+    nomp_test_assert(a[i] == 0);
+  for (unsigned i = s; i < e; i++)
+    nomp_test_assert(a[i] == i);
+  for (unsigned i = e; i < 20; i++)
+    nomp_test_assert(a[i] == 0);
+#endif
+
+  nomp_test_chk(nomp_update(a, lb, ub, sizeof(TEST_TYPE), NOMP_FREE));
+
+  return 0;
+}
+#undef in_range_d2h
+
+#define in_range_h2d TOKEN_PASTE(nomp_api_050_in_range_h2d, TEST_SUFFIX)
+static int in_range_h2d(unsigned lb, unsigned ub, unsigned s, unsigned e) {
+  TEST_TYPE a[20] = {0};
+
+  nomp_test_chk(nomp_update(a, lb, ub, sizeof(TEST_TYPE), NOMP_TO));
+  for (unsigned i = lb; i < ub; i++)
+    a[i] = i;
+  nomp_test_chk(nomp_update(a, lb, s, sizeof(TEST_TYPE), NOMP_TO));
+  nomp_test_chk(nomp_update(a, e, ub, sizeof(TEST_TYPE), NOMP_TO));
+
+  for (unsigned i = lb; i < ub; i++)
+    a[i] = 0;
+  nomp_test_chk(nomp_update(a, lb, ub, sizeof(TEST_TYPE), NOMP_FROM));
+
+#if defined(TEST_TOL)
+  for (unsigned i = lb; i < s; i++)
+    nomp_test_assert(fabs(a[i] - i) < TEST_TOL);
+  for (unsigned i = s; i < e; i++)
+    nomp_test_assert(fabs(a[i]) < TEST_TOL);
+  for (unsigned i = e; i < ub; i++)
+    nomp_test_assert(fabs(a[i] - i) < TEST_TOL);
+#else
+  for (unsigned i = lb; i < s; i++)
+    nomp_test_assert(a[i] == i);
+  for (unsigned i = s; i < e; i++)
+    nomp_test_assert(a[i] == 0);
+  for (unsigned i = e; i < ub; i++)
+    nomp_test_assert(a[i] == i);
+#endif
+
+  nomp_test_chk(nomp_update(a, lb, ub, sizeof(TEST_TYPE), NOMP_FREE));
+
+  return 0;
+}
+#undef in_range_h2d
