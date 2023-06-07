@@ -23,9 +23,9 @@ static int nomp_api_240_aux(const char *fmt, const char **clauses, TEST_TYPE *a,
 
 #define nomp_api_240_break TOKEN_PASTE(nomp_api_240_break, TEST_SUFFIX)
 static int nomp_api_240_break(int N) {
-  nomp_test_assert(N <= 10);
+  nomp_test_assert(N <= TEST_MAX_SIZE);
 
-  TEST_TYPE a[10];
+  TEST_TYPE a[TEST_MAX_SIZE];
   for (unsigned i = 0; i < N; i++)
     a[i] = 0;
 
@@ -58,9 +58,9 @@ static int nomp_api_240_break(int N) {
 
 #define nomp_api_240_continue TOKEN_PASTE(nomp_api_240_continue, TEST_SUFFIX)
 static int nomp_api_240_continue(int N) {
-  nomp_test_assert(N <= 10);
+  nomp_test_assert(N <= TEST_MAX_SIZE);
 
-  TEST_TYPE a[10];
+  TEST_TYPE a[TEST_MAX_SIZE];
   for (unsigned i = 0; i < N; i++)
     a[i] = 0;
 

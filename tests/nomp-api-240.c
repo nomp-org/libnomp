@@ -1,11 +1,14 @@
+#define TEST_MAX_SIZE 100
 #define TEST_IMPL_H "nomp-api-240-impl.h"
 #include "nomp-generate-tests.h"
 #undef TEST_IMPL_H
+#undef TEST_MAX_SIZE
 
 // Test break statement inside a serial loop.
 static int test_break() {
   int err = 0;
   TEST_BUILTIN_TYPES(240_break, 10)
+  TEST_BUILTIN_TYPES(240_break, 50)
   return err;
 }
 
@@ -13,6 +16,7 @@ static int test_break() {
 static int test_continue() {
   int err = 0;
   TEST_BUILTIN_TYPES(240_continue, 10)
+  TEST_BUILTIN_TYPES(240_continue, 50)
   return err;
 }
 

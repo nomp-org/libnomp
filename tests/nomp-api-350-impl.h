@@ -1,7 +1,7 @@
 #include "nomp-test.h"
 
-#define nomp_api_243_aux TOKEN_PASTE(nomp_api_243_aux, TEST_SUFFIX)
-static int nomp_api_243_aux(const char *fmt, const char **clauses, TEST_TYPE *a,
+#define nomp_api_350_aux TOKEN_PASTE(nomp_api_350_aux, TEST_SUFFIX)
+static int nomp_api_350_aux(const char *fmt, const char **clauses, TEST_TYPE *a,
                             int *b, int n) {
   nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO));
   nomp_test_chk(nomp_update(b, 0, n + 1, sizeof(int), NOMP_TO));
@@ -24,9 +24,9 @@ static int nomp_api_243_aux(const char *fmt, const char **clauses, TEST_TYPE *a,
   return 0;
 }
 
-#define nomp_api_243_for_loop_bounds                                           \
-  TOKEN_PASTE(nomp_api_243_for_loop_bounds, TEST_SUFFIX)
-static int nomp_api_243_for_loop_bounds(int N) {
+#define nomp_api_350_for_loop_bounds                                           \
+  TOKEN_PASTE(nomp_api_350_for_loop_bounds, TEST_SUFFIX)
+static int nomp_api_350_for_loop_bounds(int N) {
   nomp_test_assert(N <= 10);
 
   TEST_TYPE a[10];
@@ -46,8 +46,8 @@ static int nomp_api_243_for_loop_bounds(int N) {
       "    a[i] = t;                                                   \n"
       "  }                                                             \n"
       "}                                                               \n";
-  const char *clauses[4] = {"transform", "nomp-api-240", "transform", 0};
-  nomp_api_243_aux(knl_fmt, clauses, a, b, N);
+  const char *clauses[4] = {"transform", "nomp-api-350", "transform", 0};
+  nomp_api_350_aux(knl_fmt, clauses, a, b, N);
 
 #if defined(TEST_TOL)
   for (unsigned i = 0; i < N; i++)
@@ -59,5 +59,5 @@ static int nomp_api_243_for_loop_bounds(int N) {
 
   return 0;
 }
-#undef nomp_api_243_for_loop_bounds
-#undef nomp_api_243_aux
+#undef nomp_api_350_for_loop_bounds
+#undef nomp_api_350_aux
