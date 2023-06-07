@@ -19,18 +19,6 @@ static int test_sum_condition() {
   return err;
 }
 
-static int test_mxm() {
-  int err = 0;
-  TEST_BUILTIN_TYPES(500_mxm, 10);
-  return err;
-}
-
-static int test_vxm() {
-  int err = 0;
-  TEST_BUILTIN_TYPES(500_vxm, 10);
-  return err;
-}
-
 static int test_dot() {
   int err = 0;
   TEST_BUILTIN_TYPES(500_dot, 10);
@@ -46,8 +34,6 @@ int main(int argc, const char *argv[]) {
   err |= SUBTEST(test_dot);
   // FIXME: Fix the errors of the following kernels
   // err |= SUBTEST(test_sum_condition);
-  // err |= SUBTEST(test_mxm);
-  // err |= SUBTEST(test_vxm);
 
   nomp_check(nomp_finalize());
 
