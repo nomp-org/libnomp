@@ -1,4 +1,4 @@
-#define TEST_MAX_SIZE 256
+#define TEST_MAX_SIZE 40
 #define TEST_IMPL_H "nomp-api-300-impl.h"
 #include "nomp-generate-tests.h"
 #undef TEST_IMPL_H
@@ -6,14 +6,14 @@
 
 static int test_matrix_addition() {
   int err = 0;
-  TEST_BUILTIN_TYPES(300_add, 50, 5)
+  TEST_BUILTIN_TYPES(300_add, 40, 5)
   TEST_BUILTIN_TYPES(300_add, 16, 16)
   return err;
 }
 
 static int test_matrix_transpose() {
   int err = 0;
-  TEST_BUILTIN_TYPES(300_transpose, 50, 5)
+  TEST_BUILTIN_TYPES(300_transpose, 40, 5)
   TEST_BUILTIN_TYPES(300_transpose, 16, 16)
   return err;
 }
@@ -21,14 +21,14 @@ static int test_matrix_transpose() {
 static int test_matrix_matrix_multiplication() {
   int err = 0;
   TEST_BUILTIN_TYPES(300_mxm, 10)
-  TEST_BUILTIN_TYPES(300_mxm, 8)
+  TEST_BUILTIN_TYPES(300_mxm, 40)
   return err;
 }
 
 static int test_matrix_vector_multiplication() {
   int err = 0;
   TEST_BUILTIN_TYPES(300_vxm, 10)
-  TEST_BUILTIN_TYPES(300_vxm, 8)
+  TEST_BUILTIN_TYPES(300_vxm, 40)
   return err;
 }
 
