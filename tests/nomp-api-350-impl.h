@@ -27,10 +27,10 @@ static int nomp_api_350_aux(const char *fmt, const char **clauses, TEST_TYPE *a,
 #define nomp_api_350_for_loop_bounds                                           \
   TOKEN_PASTE(nomp_api_350_for_loop_bounds, TEST_SUFFIX)
 static int nomp_api_350_for_loop_bounds(int N) {
-  nomp_test_assert(N <= 10);
+  nomp_test_assert(N <= TEST_MAX_SIZE);
 
-  TEST_TYPE a[10];
-  int b[11];
+  TEST_TYPE a[TEST_MAX_SIZE];
+  int b[TEST_MAX_SIZE + 1];
   for (unsigned i = 0; i < N; i++)
     a[i] = 0;
   for (unsigned i = 0; i < N + 1; i++)
