@@ -18,12 +18,28 @@ static int test_matrix_transform() {
   return err;
 }
 
+static int test_matrix_matrix_multiplication() {
+  int err = 0;
+  TEST_BUILTIN_TYPES(300_mxm, 10)
+  TEST_BUILTIN_TYPES(300_mxm, 8)
+  return err;
+}
+
+static int test_matrix_vector_multiplication() {
+  int err = 0;
+  TEST_BUILTIN_TYPES(300_vxm, 10)
+  TEST_BUILTIN_TYPES(300_vxm, 8)
+  return err;
+}
+
 int main(int argc, const char *argv[]) {
   int err = nomp_init(argc, argv);
   nomp_check(err);
 
   err |= SUBTEST(test_matrix_addition);
   err |= SUBTEST(test_matrix_transform);
+  err |= SUBTEST(test_matrix_vector_multiplication);
+  err |= SUBTEST(test_matrix_matrix_multiplication);
 
   err |= nomp_finalize();
   nomp_check(err);
