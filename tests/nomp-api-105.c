@@ -1,20 +1,20 @@
 #include "nomp-test.h"
 
-#define TEST_IMPL_H "nomp-api-102-impl.h"
+#define TEST_IMPL_H "nomp-api-105-impl.h"
 #include "nomp-generate-tests.h"
 #undef TEST_IMPL_H
 
 // Calling nomp_jit() with valid functions should not return an error.
 static int test_valid_clauses() {
   int err = 0;
-  TEST_BUILTIN_TYPES(102_valid);
+  TEST_BUILTIN_TYPES(105_valid);
   return err;
 }
 
 // Calling nomp_jit() with invalid functions should return an error.
 static int test_invalid_clauses() {
   int err = 0;
-  TEST_BUILTIN_TYPES(102_invalid);
+  TEST_BUILTIN_TYPES(105_invalid);
   return err;
 }
 

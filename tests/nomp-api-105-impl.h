@@ -1,7 +1,7 @@
 #include "nomp-test.h"
 
-#define nomp_api_102_aux TOKEN_PASTE(nomp_api_102_aux, TEST_SUFFIX)
-static int nomp_api_102_aux(const char **clauses) {
+#define nomp_api_105_aux TOKEN_PASTE(nomp_api_105_aux, TEST_SUFFIX)
+static int nomp_api_105_aux(const char **clauses) {
   const char *fmt =
       "void foo(%s *a, int N) {                                             \n"
       "  for (int i = 0; i < N; i++)                                        \n"
@@ -16,29 +16,29 @@ static int nomp_api_102_aux(const char **clauses) {
   return err;
 }
 
-#define nomp_api_102_valid TOKEN_PASTE(nomp_api_102_valid, TEST_SUFFIX)
-static int nomp_api_102_valid() {
-  const char *clauses[4] = {"transform", "nomp-api-102", "transform", 0};
-  nomp_check(nomp_api_102_aux(clauses));
+#define nomp_api_105_valid TOKEN_PASTE(nomp_api_105_valid, TEST_SUFFIX)
+static int nomp_api_105_valid() {
+  const char *clauses[4] = {"transform", "nomp-api-105", "transform", 0};
+  nomp_check(nomp_api_105_aux(clauses));
 
   return 0;
 }
-#undef nomp_api_102_valid
+#undef nomp_api_105_valid
 
-#define nomp_api_102_invalid TOKEN_PASTE(nomp_api_102_invalid, TEST_SUFFIX)
-static int nomp_api_102_invalid() {
-  const char *clauses[4] = {"transform", "nomp-api-102", "invalid_func", 0};
-  int err = nomp_api_102_aux(clauses);
+#define nomp_api_105_invalid TOKEN_PASTE(nomp_api_105_invalid, TEST_SUFFIX)
+static int nomp_api_105_invalid() {
+  const char *clauses[4] = {"transform", "nomp-api-105", "invalid_func", 0};
+  int err = nomp_api_105_aux(clauses);
 
   nomp_test_assert(nomp_get_log_no(err) == NOMP_PY_CALL_FAILURE);
   char *log = nomp_get_log_str(err);
   int eq = logcmp(
       log, "\\[Error\\] .*src\\/lpy.c:[0-9]* Failed to call user transform "
-           "function: \"invalid_func\" in file: \"nomp-api-102\".");
+           "function: \"invalid_func\" in file: \"nomp-api-105\".");
   nomp_free(&log);
   nomp_test_assert(eq);
 
   return 0;
 }
-#undef nomp_api_102_invalid
-#undef nomp_api_102_aux
+#undef nomp_api_105_invalid
+#undef nomp_api_105_aux
