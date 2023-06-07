@@ -38,7 +38,5 @@ def mxm_transform(knl, context):
 
 def vxm_transform(knl, context):
     knl = lp.split_iname(knl, "i", 32)
-
     knl = lp.tag_inames(knl, {"i_outer": "g.0", "i_inner": "l.0", "j": "for"})
-
     return knl

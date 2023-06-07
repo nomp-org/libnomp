@@ -11,10 +11,10 @@ static int test_matrix_addition() {
   return err;
 }
 
-static int test_matrix_transform() {
+static int test_matrix_transpose() {
   int err = 0;
-  TEST_BUILTIN_TYPES(300_transform, 50, 5)
-  TEST_BUILTIN_TYPES(300_transform, 16, 16)
+  TEST_BUILTIN_TYPES(300_transpose, 50, 5)
+  TEST_BUILTIN_TYPES(300_transpose, 16, 16)
   return err;
 }
 
@@ -37,7 +37,7 @@ int main(int argc, const char *argv[]) {
   nomp_check(err);
 
   err |= SUBTEST(test_matrix_addition);
-  err |= SUBTEST(test_matrix_transform);
+  err |= SUBTEST(test_matrix_transpose);
   err |= SUBTEST(test_matrix_vector_multiplication);
   err |= SUBTEST(test_matrix_matrix_multiplication);
 

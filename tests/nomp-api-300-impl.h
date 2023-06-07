@@ -54,8 +54,8 @@ static int nomp_api_300_add(int rows, int cols) {
 }
 #undef nomp_api_300_add
 
-#define nomp_api_300_transform TOKEN_PASTE(nomp_api_300_transform, TEST_SUFFIX)
-static int nomp_api_300_transform(int rows, int cols) {
+#define nomp_api_300_transpose TOKEN_PASTE(nomp_api_300_transpose, TEST_SUFFIX)
+static int nomp_api_300_transpose(int rows, int cols) {
   const int n = rows * cols;
   nomp_test_assert(n <= TEST_MAX_SIZE);
 
@@ -84,7 +84,7 @@ static int nomp_api_300_transform(int rows, int cols) {
 
   return 0;
 }
-#undef nomp_api_300_transform
+#undef nomp_api_300_transpose
 #undef nomp_api_300_aux
 
 #define nomp_api_300_multiply_aux                                              \
