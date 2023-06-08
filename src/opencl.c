@@ -31,14 +31,14 @@ struct opencl_prog {
 
 static int opencl_update(struct nomp_backend *bnd, struct nomp_mem *m,
                          const nomp_map_direction_t op, size_t start,
-                         size_t end) {
+                         size_t end, size_t usize) {
   struct opencl_backend *ocl = (struct opencl_backend *)bnd->bptr;
 
   cl_int err;
   if (op & NOMP_ALLOC) {
     cl_mem *clm = nomp_calloc(cl_mem, 1);
     *clm = clCreateBuffer(ocl->ctx, CL_MEM_READ_WRITE,
-                          NOMP_MEM_BYTES(m, start, end), NULL, &err);
+                          NOMP_MEM_BYTES(start, end, usize), NULL, &err);
     chk_cl(err, "clCreateBuffer");
     m->bptr = (void *)clm, m->bsize = sizeof(cl_mem);
   }
@@ -46,15 +46,17 @@ static int opencl_update(struct nomp_backend *bnd, struct nomp_mem *m,
   cl_mem *clm = (cl_mem *)m->bptr;
   if (op & NOMP_TO) {
     chk_cl(clEnqueueWriteBuffer(
-               ocl->queue, *clm, CL_TRUE, NOMP_MEM_BPTR_OFFSET(m, start),
-               NOMP_MEM_BYTES(m, start, end),
-               (char *)m->hptr + NOMP_MEM_HPTR_OFFSET(m, start), 0, NULL, NULL),
+               ocl->queue, *clm, CL_TRUE, NOMP_MEM_BPTR_OFFSET(m, start, usize),
+               NOMP_MEM_BYTES(start, end, usize),
+               (char *)m->hptr + NOMP_MEM_HPTR_OFFSET(start, usize), 0, NULL,
+               NULL),
            "clEnqueueWriteBuffer");
   } else if (op == NOMP_FROM) {
     chk_cl(clEnqueueReadBuffer(
-               ocl->queue, *clm, CL_TRUE, NOMP_MEM_BPTR_OFFSET(m, start),
-               NOMP_MEM_BYTES(m, start, end),
-               (char *)m->hptr + NOMP_MEM_HPTR_OFFSET(m, start), 0, NULL, NULL),
+               ocl->queue, *clm, CL_TRUE, NOMP_MEM_BPTR_OFFSET(m, start, usize),
+               NOMP_MEM_BYTES(start, end, usize),
+               (char *)m->hptr + NOMP_MEM_HPTR_OFFSET(start, usize), 0, NULL,
+               NULL),
            "clEnqueueReadBuffer");
   } else if (op == NOMP_FREE) {
     chk_cl(clReleaseMemObject(*clm), "clReleaseMemObject");

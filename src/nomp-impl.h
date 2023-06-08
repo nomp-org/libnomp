@@ -21,9 +21,9 @@
 #define NOMP_MAX_CFLAGS_SIZE 16384
 #define NOMP_MAX_KNL_ARGS 64
 #define NOMP_MAX_SCRATCH_SIZE (1024 * sizeof(double))
-#define NOMP_MEM_BPTR_OFFSET(m, start) (((m)->usize) * ((start) - (m)->idx0))
-#define NOMP_MEM_HPTR_OFFSET(m, start) ((m)->usize * (start))
-#define NOMP_MEM_BYTES(m, start, end) (((end) - (start)) * ((m)->usize))
+#define NOMP_MEM_BPTR_OFFSET(m, start, usize) ((usize) * (start - (m)->idx0))
+#define NOMP_MEM_HPTR_OFFSET(start, usize) ((start) * (usize))
+#define NOMP_MEM_BYTES(start, end, usize) (((end) - (start)) * (usize))
 
 #include "nomp-aux.h"
 #include "nomp-log.h"
@@ -73,7 +73,8 @@ struct nomp_backend {
   char backend[NOMP_MAX_BUFSIZ], install_dir[PATH_MAX];
   // Pointers to backend functions used for backend dispatch.
   int (*update)(struct nomp_backend *, struct nomp_mem *,
-                const nomp_map_direction_t op, size_t start, size_t end);
+                const nomp_map_direction_t op, size_t start, size_t end,
+                size_t usize);
   int (*knl_build)(struct nomp_backend *, struct nomp_prog *, const char *,
                    const char *);
   int (*knl_run)(struct nomp_backend *, struct nomp_prog *);
