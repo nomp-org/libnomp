@@ -21,9 +21,9 @@
 #define NOMP_MAX_CFLAGS_SIZE 16384
 #define NOMP_MAX_KNL_ARGS 64
 #define NOMP_MAX_SCRATCH_SIZE (1024 * sizeof(double))
-#define NOMP_MEM_BPTR_OFFSET (((m)->usize) * (start - (m)->idx0))
-#define NOMP_MEM_HPTR_OFFSET ((m)->usize * start)
-#define NOMP_MEM_BYTES (((end) - (start)) * ((m)->usize))
+#define NOMP_MEM_BPTR_OFFSET(m, start) (((m)->usize) * ((start) - (m)->idx0))
+#define NOMP_MEM_HPTR_OFFSET(m, start) ((m)->usize * (start))
+#define NOMP_MEM_BYTES(m, start, end) (((end) - (start)) * ((m)->usize))
 
 #include "nomp-aux.h"
 #include "nomp-log.h"
