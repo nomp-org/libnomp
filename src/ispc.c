@@ -40,8 +40,8 @@ static int ispc_update(struct nomp_backend *bnd, struct nomp_mem *m,
   struct ispc_backend *ispc = (struct ispc_backend *)bnd->bptr;
 
   if (op & NOMP_ALLOC) {
-    ISPCRTMemoryView view = ispcrtNewMemoryView(ispc->device, m->hptr,
-                                                NOMP_MEM_BYTES, &(ispc->flags));
+    ISPCRTMemoryView view = ispcrtNewMemoryView(
+        ispc->device, m->hptr, NOMP_MEM_BYTES(m, start, end), &(ispc->flags));
     chk_ispcrt("memory allocation", rt_error);
     m->bptr = view;
   }
