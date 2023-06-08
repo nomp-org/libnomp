@@ -116,13 +116,15 @@ static int allocate_scratch_memory(struct nomp_backend *backend) {
   struct nomp_mem *m = &nomp.scratch;
   m->idx0 = 0, m->idx1 = NOMP_MAX_SCRATCH_SIZE, m->usize = sizeof(double);
   m->hptr = nomp_calloc(double, m->idx1 - m->idx0);
-  nomp_check(backend->update(backend, m, NOMP_ALLOC, 0, NOMP_MAX_SCRATCH_SIZE));
+  nomp_check(backend->update(backend, m, NOMP_ALLOC, 0, NOMP_MAX_SCRATCH_SIZE,
+                             sizeof(double)));
   return 0;
 }
 
 static int deallocate_scratch_memory(struct nomp_backend *backend) {
   nomp_check(backend->update(backend, &backend->scratch, NOMP_FREE,
-                             backend->scratch.idx0, backend->scratch.idx1));
+                             backend->scratch.idx0, backend->scratch.idx1,
+                             backend->scratch.usize));
   nomp_free(&backend->scratch.hptr);
   return 0;
 }
@@ -220,12 +222,13 @@ static inline struct nomp_mem *mem_if_mapped(void *p) {
   return NULL;
 }
 
-static unsigned mem_if_exist(void *p, size_t idx0, size_t idx1) {
+static unsigned mem_if_exist(void *p, size_t idx0, size_t idx1, size_t usize) {
   // FIXME: This is O(N) in number of allocations.
   // Needs to go. Must store a hash map.
   for (unsigned i = 0; i < mems_n; i++) {
-    if (mems[i] && mems[i]->hptr == p && mems[i]->idx0 <= idx0 &&
-        mems[i]->idx1 >= idx1)
+    if (mems[i] && mems[i]->hptr == p &&
+        (mems[i]->idx0 * mems[i]->usize <= idx0 * usize) &&
+        (mems[i]->idx1 * mems[i]->usize >= idx1 * usize))
       return i;
   }
   return mems_n;
@@ -234,7 +237,7 @@ static unsigned mem_if_exist(void *p, size_t idx0, size_t idx1) {
 int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize,
                 nomp_map_direction_t op) {
   nomp_profile("nomp_update", 1, 1);
-  unsigned idx = mem_if_exist(ptr, idx0, idx1);
+  unsigned idx = mem_if_exist(ptr, idx0, idx1, usize);
   if (idx == mems_n) {
     // A new entry can't be created with NOMP_FREE or
     // NOMP_FROM.
@@ -254,7 +257,7 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize,
     m->hptr = ptr, m->bptr = NULL;
   }
 
-  nomp_check(nomp.update(&nomp, mems[idx], op, idx0, idx1));
+  nomp_check(nomp.update(&nomp, mems[idx], op, idx0, idx1, usize));
 
   // Device memory object was released.
   if (mems[idx]->bptr == NULL)
@@ -503,8 +506,8 @@ int nomp_finalize(void) {
 
   for (unsigned i = 0; i < mems_n; i++) {
     if (mems[i]) {
-      nomp_check(
-          nomp.update(&nomp, mems[i], NOMP_FREE, mems[i]->idx0, mems[i]->idx1));
+      nomp_check(nomp.update(&nomp, mems[i], NOMP_FREE, mems[i]->idx0,
+                             mems[i]->idx1, mems[i]->usize));
       nomp_free(&mems[i]);
     }
   }

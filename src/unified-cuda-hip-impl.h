@@ -70,20 +70,23 @@ struct gpu_prog {
 gpurtcResult gpu_compile(gpurtcProgram prog, struct gpu_backend *nbnd);
 
 static int gpu_update(struct nomp_backend *bnd, struct nomp_mem *m,
-                      const nomp_map_direction_t op, size_t start, size_t end) {
+                      const nomp_map_direction_t op, size_t start, size_t end,
+                      size_t usize) {
   if (op & NOMP_ALLOC)
-    chk_gpu(gpuMalloc(&m->bptr, NOMP_MEM_BYTES(m, start, end)));
+    chk_gpu(gpuMalloc(&m->bptr, NOMP_MEM_BYTES(start, end, usize)));
 
   if (op & NOMP_TO) {
-    chk_gpu(gpuMemcpy((char *)(m->bptr) + NOMP_MEM_BPTR_OFFSET(m, start),
-                      (char *)(m->hptr) + NOMP_MEM_HPTR_OFFSET(m, start),
-                      NOMP_MEM_BYTES(m, start, end), gpuMemcpyHostToDevice));
+    chk_gpu(gpuMemcpy((char *)(m->bptr) + NOMP_MEM_BPTR_OFFSET(m, start, usize),
+                      (char *)(m->hptr) + NOMP_MEM_HPTR_OFFSET(start, usize),
+                      NOMP_MEM_BYTES(start, end, usize),
+                      gpuMemcpyHostToDevice));
   }
 
   if (op == NOMP_FROM) {
-    chk_gpu(gpuMemcpy((char *)(m->hptr) + NOMP_MEM_HPTR_OFFSET(m, start),
-                      (char *)(m->bptr) + NOMP_MEM_BPTR_OFFSET(m, start),
-                      NOMP_MEM_BYTES(m, start, end), gpuMemcpyDeviceToHost));
+    chk_gpu(gpuMemcpy((char *)(m->hptr) + NOMP_MEM_HPTR_OFFSET(start, usize),
+                      (char *)(m->bptr) + NOMP_MEM_BPTR_OFFSET(m, start, usize),
+                      NOMP_MEM_BYTES(start, end, usize),
+                      gpuMemcpyDeviceToHost));
   } else if (op == NOMP_FREE) {
     chk_gpu(gpuFree(m->bptr));
     m->bptr = NULL;

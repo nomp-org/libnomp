@@ -1,9 +1,11 @@
 #include "nomp-test.h"
 #include "nomp.h"
 
+#define TEST_MAX_SIZE 50
 #define TEST_IMPL_H "nomp-api-050-impl.h"
 #include "nomp-generate-tests.h"
 #undef TEST_IMPL_H
+#undef TEST_MAX_SIZE
 
 // Free'ing before mapping should return an error.
 static int test_free_before_mapping() {
@@ -84,6 +86,13 @@ static int test_in_range_h2d() {
   return err;
 }
 
+static int test_dynamic_data_type() {
+  int err = 0;
+  TEST_BUILTIN_TYPES(050_dynamic_data_type, 16);
+  TEST_BUILTIN_TYPES(050_dynamic_data_type, 32);
+  return err;
+}
+
 int main(int argc, const char *argv[]) {
   int err = nomp_init(argc, argv);
   nomp_check(err);
@@ -97,6 +106,7 @@ int main(int argc, const char *argv[]) {
   err |= SUBTEST(test_free_after_d2h);
   err |= SUBTEST(test_in_range_d2h);
   err |= SUBTEST(test_in_range_h2d);
+  err |= SUBTEST(test_dynamic_data_type);
 
   err |= nomp_finalize();
   nomp_check(err);

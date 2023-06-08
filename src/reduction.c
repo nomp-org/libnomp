@@ -25,7 +25,7 @@ int nomp_host_side_reduction(struct nomp_backend *backend,
                              struct nomp_prog *prg, struct nomp_mem *m) {
   nomp_check(backend->sync(backend));
   nomp_check(backend->update(backend, m, NOMP_FROM, m->idx0,
-                             m->idx0 + prg->global[0]));
+                             m->idx0 + prg->global[0], m->usize));
 
   int dom = prg->reduction_type, op = prg->reduction_op;
   size_t size = prg->reduction_size;

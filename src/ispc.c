@@ -35,13 +35,14 @@ static void ispcrt_error(ISPCRTError err_code, const char *message) {
   }
 
 static int ispc_update(struct nomp_backend *bnd, struct nomp_mem *m,
-                       const nomp_map_direction_t op, size_t start,
-                       size_t end) {
+                       const nomp_map_direction_t op, size_t start, size_t end,
+                       size_t usize) {
   struct ispc_backend *ispc = (struct ispc_backend *)bnd->bptr;
 
   if (op & NOMP_ALLOC) {
-    ISPCRTMemoryView view = ispcrtNewMemoryView(
-        ispc->device, m->hptr, NOMP_MEM_BYTES(m, start, end), &(ispc->flags));
+    ISPCRTMemoryView view =
+        ispcrtNewMemoryView(ispc->device, m->hptr,
+                            NOMP_MEM_BYTES(start, end, usize), &(ispc->flags));
     chk_ispcrt("memory allocation", rt_error);
     m->bptr = view;
   }
