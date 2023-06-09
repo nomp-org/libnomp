@@ -2,6 +2,7 @@
 #define _NOMP_MEM_H_
 
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #ifdef __cplusplus
@@ -11,6 +12,17 @@ extern "C" {
 /**
  * @defgroup nomp_mem_utils Host memory management functions
  */
+
+static inline void *check_if_null(void *temp, const char *file,
+                                  unsigned int line,
+                                  const char *function_name) {
+  if (temp == NULL) {
+    fprintf(stderr, "[Error] %s:%u: Failed to allocate memory with nomp_%s\n",
+            file, line, function_name);
+    exit(EXIT_FAILURE);
+  }
+  return temp;
+}
 
 static void nomp_free_(void **p) { free(*p), *p = NULL; }
 
@@ -24,6 +36,10 @@ static void nomp_free_(void **p) { free(*p), *p = NULL; }
  */
 #define nomp_free(p) nomp_free_((void **)p)
 
+static void *nomp_malloc_(size_t size, const char *file, unsigned line) {
+  void *temp = malloc(size);
+  return check_if_null(temp, file, line, "malloc");
+}
 /**
  * @ingroup nomp_mem_utils
  * @brief Helper macro for allocating memory blocks using nomp_malloc_().
@@ -33,7 +49,14 @@ static void nomp_free_(void **p) { free(*p), *p = NULL; }
  * @param count Number of elements.
  * @return Pointer of type T.
  */
-#define nomp_malloc(T, count) ((T *)malloc((count) * sizeof(T)))
+#define nomp_malloc(T, count)                                                  \
+  ((T *)nomp_malloc_((count) * sizeof(T), , __FILE__, __LINE__))
+
+static void *nomp_calloc_(size_t count, size_t size, const char *file,
+                          unsigned line) {
+  void *temp = calloc(count, size);
+  return check_if_null(temp, file, line, "calloc");
+}
 
 /**
  * @ingroup nomp_mem_utils
@@ -45,7 +68,14 @@ static void nomp_free_(void **p) { free(*p), *p = NULL; }
  * @param count Number of elements.
  * @return Pointer of type T.
  */
-#define nomp_calloc(T, count) ((T *)calloc((count), sizeof(T)))
+#define nomp_calloc(T, count)                                                  \
+  ((T *)nomp_calloc_((count), sizeof(T), __FILE__, __LINE__))
+
+static void *nomp_realloc_(void *ptr, size_t size, const char *file,
+                           unsigned line) {
+  void *temp = realloc(ptr, size);
+  return check_if_null(temp, file, line, "realloc");
+}
 
 /**
  * @ingroup nomp_mem_utils
@@ -57,7 +87,8 @@ static void nomp_free_(void **p) { free(*p), *p = NULL; }
  * @param count Number of elements.
  * @return Pointer of type T
  */
-#define nomp_realloc(ptr, T, count) ((T *)realloc((ptr), (count) * sizeof(T)))
+#define nomp_realloc(ptr, T, count)                                            \
+  ((T *)nomp_realloc_((ptr), (count) * sizeof(T), __FILE__, __LINE__))
 
 #ifdef __cplusplus
 }
