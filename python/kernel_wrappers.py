@@ -103,6 +103,8 @@ class ISPCKernelWrapper(BaseKernelWrapper):
                 )
             ),
         )
+        index = device_code.find("task")
+        device_code = device_code[index:]
         return combine([device_code, wrapper])
 
 

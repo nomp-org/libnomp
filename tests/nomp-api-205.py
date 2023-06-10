@@ -6,8 +6,10 @@ LOOPY_LANG_VERSION = (2018, 2)
 def transform(knl, context):
     (iname,) = knl.default_entrypoint.all_inames()
     i_inner, i_outer = f"{iname}_inner", f"{iname}_outer"
+    backend = context["backend"]
+    split_size = 8 if (backend == "ispc") else 32
     knl = lp.split_iname(
-        knl, iname, 32, inner_iname=i_inner, outer_iname=i_outer
+        knl, iname, split_size, inner_iname=i_inner, outer_iname=i_outer
     )
     knl = lp.tag_inames(knl, {i_outer: "g.0", i_inner: "l.0"})
     return knl
