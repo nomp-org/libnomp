@@ -1,8 +1,6 @@
 #include "nomp-impl.h"
-#include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 const char *ERR_STR_USER_MAP_PTR_IS_INVALID =

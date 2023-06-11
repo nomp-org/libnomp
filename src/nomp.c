@@ -114,10 +114,10 @@ static int init_configs(int argc, const char **argv,
 
 static int allocate_scratch_memory(struct nomp_backend *backend) {
   struct nomp_mem *m = &nomp.scratch;
-  m->idx0 = 0, m->idx1 = NOMP_MAX_SCRATCH_SIZE, m->usize = sizeof(double);
-  m->hptr = nomp_calloc(double, m->idx1 - m->idx0);
-  nomp_check(backend->update(backend, m, NOMP_ALLOC, 0, NOMP_MAX_SCRATCH_SIZE,
-                             sizeof(double)));
+  m->idx0 = 0, m->idx1 = NOMP_MAX_SCRATCH_SIZE, m->usize = sizeof(char);
+  m->hptr = nomp_calloc(char, m->idx1 - m->idx0);
+  nomp_check(
+      backend->update(backend, m, NOMP_ALLOC, m->idx0, m->idx1, m->usize));
   return 0;
 }
 
@@ -327,6 +327,7 @@ static int parse_clauses(struct meta *meta, struct nomp_prog *prg,
         if (strncmp(prg->args[j].name, clauses[i + 1], NOMP_MAX_BUFSIZ) == 0) {
           prg->reduction_type = prg->args[j].type, prg->args[j].type = NOMP_PTR;
           prg->reduction_index = j;
+          prg->reduction_size = prg->args[j].size;
           break;
         }
       }
@@ -457,7 +458,7 @@ int nomp_run(int id, ...) {
       m = mem_if_mapped(args[i].ptr);
       if (m == NULL) {
         if (prg->reduction_index == i) {
-          prg->reduction_ptr = args[i].ptr, prg->reduction_size = args[i].size;
+          prg->reduction_ptr = args[i].ptr;
           m = &nomp.scratch;
         } else {
           return nomp_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,

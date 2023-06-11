@@ -1,6 +1,8 @@
+#define TEST_MAX_SIZE 100
 #define TEST_IMPL_H "nomp-api-500-impl.h"
 #include "nomp-generate-tests.h"
 #undef TEST_IMPL_H
+#undef TEST_MAX_SIZE
 
 static int test_sum() {
   int err = 0;
@@ -26,12 +28,20 @@ static int test_dot() {
   return err;
 }
 
+static int test_multiple_reductions() {
+  int err = 0;
+  TEST_BUILTIN_TYPES(500_multiple_reductions, 10, 5);
+  TEST_BUILTIN_TYPES(500_multiple_reductions, 50, 3);
+  return err;
+}
+
 int main(int argc, const char *argv[]) {
   nomp_check(nomp_init(argc, argv));
 
   int err = 0;
   err |= SUBTEST(test_sum);
   err |= SUBTEST(test_dot);
+  err |= SUBTEST(test_multiple_reductions);
   // FIXME: Fix the errors of the following kernels
   // err |= SUBTEST(test_sum_condition);
 
