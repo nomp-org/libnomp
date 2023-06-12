@@ -23,7 +23,7 @@ struct sycl_prog {
   int sycl_id;
 };
 
-static int sycl_update(struct nomp_backend *bnd, struct nomp_mem *m,
+static int sycl_update(struct nomp_backend_t *bnd, struct nomp_mem_t *m,
                        const nomp_map_direction_t op, size_t start, size_t end,
                        size_t usize) {
   struct sycl_backend *sycl = (struct sycl_backend *)bnd->bptr;
@@ -59,7 +59,7 @@ static int sycl_update(struct nomp_backend *bnd, struct nomp_mem *m,
   return 0;
 }
 
-static int sycl_knl_free(struct nomp_prog *prg) {
+static int sycl_knl_free(struct nomp_prog_t *prg) {
   struct sycl_prog *sycl_prg = (struct sycl_prog *)prg->bptr;
 
   if (sycl_prg)
@@ -68,7 +68,7 @@ static int sycl_knl_free(struct nomp_prog *prg) {
   return 0;
 }
 
-static int sycl_knl_build(struct nomp_backend *bnd, struct nomp_prog *prg,
+static int sycl_knl_build(struct nomp_backend_t *bnd, struct nomp_prog_t *prg,
                           const char *source, const char *name) {
   struct sycl_backend *sycl = (struct sycl_backend *)bnd->bptr;
   struct sycl_prog *sycl_prg = nomp_calloc(struct sycl_prog, 1);
@@ -89,7 +89,7 @@ static int sycl_knl_build(struct nomp_backend *bnd, struct nomp_prog *prg,
   return err;
 }
 
-static int sycl_knl_run(struct nomp_backend *bnd, struct nomp_prog *prg) {
+static int sycl_knl_run(struct nomp_backend_t *bnd, struct nomp_prog_t *prg) {
   struct sycl_backend *sycl = (struct sycl_backend *)bnd->bptr;
   struct sycl_prog *sycl_prg = (struct sycl_prog *)prg->bptr;
 
@@ -105,13 +105,13 @@ static int sycl_knl_run(struct nomp_backend *bnd, struct nomp_prog *prg) {
   return nomp_jit_run(sycl_prg->sycl_id, arg_list);
 }
 
-static int sycl_sync(struct nomp_backend *bnd) {
+static int sycl_sync(struct nomp_backend_t *bnd) {
   struct sycl_backend *sycl = (struct sycl_backend *)bnd->bptr;
   sycl->queue.wait();
   return 0;
 }
 
-static int sycl_finalize(struct nomp_backend *bnd) {
+static int sycl_finalize(struct nomp_backend_t *bnd) {
   struct sycl_backend *sycl = (struct sycl_backend *)bnd->bptr;
 
   if (sycl)
@@ -139,7 +139,7 @@ static int check_env(struct sycl_backend *sycl) {
   return 0;
 }
 
-int sycl_init(struct nomp_backend *bnd, const int platform_id,
+int sycl_init(struct nomp_backend_t *bnd, const int platform_id,
               const int device_id) {
   struct sycl_backend *sycl = nomp_calloc(struct sycl_backend, 1);
   bnd->bptr = (void *)sycl;

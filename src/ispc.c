@@ -34,7 +34,7 @@ static void ispcrt_error(ISPCRTError err_code, const char *message) {
     }                                                                          \
   }
 
-static int ispc_update(struct nomp_backend *bnd, struct nomp_mem *m,
+static int ispc_update(struct nomp_backend_t *bnd, struct nomp_mem_t *m,
                        const nomp_map_direction_t op, size_t start, size_t end,
                        size_t usize) {
   struct ispc_backend *ispc = (struct ispc_backend *)bnd->bptr;
@@ -62,7 +62,7 @@ static int ispc_update(struct nomp_backend *bnd, struct nomp_mem *m,
   return 0;
 }
 
-static int ispc_knl_build(struct nomp_backend *bnd, struct nomp_prog *prg,
+static int ispc_knl_build(struct nomp_backend_t *bnd, struct nomp_prog_t *prg,
                           const char *source, const char *name) {
   struct ispc_backend *ispc = (struct ispc_backend *)bnd->bptr;
   struct ispc_prog *iprg = nomp_calloc(struct ispc_prog, 1);
@@ -92,9 +92,9 @@ static int ispc_knl_build(struct nomp_backend *bnd, struct nomp_prog *prg,
   return 0;
 }
 
-static int ispc_knl_run(struct nomp_backend *bnd, struct nomp_prog *prg) {
+static int ispc_knl_run(struct nomp_backend_t *bnd, struct nomp_prog_t *prg) {
   const int ndim = prg->ndim, nargs = prg->nargs;
-  struct nomp_arg *args = prg->args;
+  struct nomp_arg_t *args = prg->args;
   size_t *global = prg->global;
 
   void *vargs[NOMP_MAX_KNL_ARGS];
@@ -115,7 +115,7 @@ static int ispc_knl_run(struct nomp_backend *bnd, struct nomp_prog *prg) {
   return nomp_jit_run(iprg->ispc_id, vargs);
 }
 
-static int ispc_knl_free(struct nomp_prog *prg) {
+static int ispc_knl_free(struct nomp_prog_t *prg) {
   struct ispc_prog *iprg = (struct ispc_prog *)prg->bptr;
 
   if (iprg)
@@ -123,7 +123,7 @@ static int ispc_knl_free(struct nomp_prog *prg) {
   return 0;
 }
 
-static int ispc_finalize(struct nomp_backend *bnd) {
+static int ispc_finalize(struct nomp_backend_t *bnd) {
   struct ispc_backend *ispc = (struct ispc_backend *)bnd->bptr;
 
   if (ispc) {
@@ -185,9 +185,9 @@ static int ispc_chk_env(struct ispc_backend *ispc) {
   return 0;
 }
 
-static int ispc_sync(struct nomp_backend *bnd) { return 0; }
+static int ispc_sync(struct nomp_backend_t *bnd) { return 0; }
 
-int ispc_init(struct nomp_backend *bnd, const int platform_type,
+int ispc_init(struct nomp_backend_t *bnd, const int platform_type,
               const int device_id) {
   ispcrtSetErrorFunc(ispcrt_error);
   if (platform_type < 0 | platform_type >= 2) {
