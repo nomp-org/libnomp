@@ -1,31 +1,31 @@
 #include "nomp-impl.h"
 #include "nomp-reduction.h"
 
-static struct nomp_backend nomp;
+static struct nomp_backend_t nomp;
 static int initialized = 0;
 
-static int check_env_vars(struct nomp_backend *backend) {
+static int check_env_vars(struct nomp_backend_t *bnd) {
   char *tmp = getenv("NOMP_PLATFORM");
   if (tmp)
-    backend->platform_id = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
+    bnd->platform_id = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
 
   if ((tmp = getenv("NOMP_DEVICE")))
-    backend->device_id = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
+    bnd->device_id = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
 
   if ((tmp = getenv("NOMP_VERBOSE")))
-    backend->verbose = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
+    bnd->verbose = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
 
   if ((tmp = getenv("NOMP_PROFILE")))
-    backend->profile = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
+    bnd->profile = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
 
   if ((tmp = getenv("NOMP_ANNOTATE_FUNCTION")))
-    nomp_check(nomp_py_set_annotate_func(&backend->py_annotate, tmp));
+    nomp_check(nomp_py_set_annotate_func(&bnd->py_annotate, tmp));
 
   if ((tmp = getenv("NOMP_BACKEND")))
-    strncpy(backend->backend, tmp, NOMP_MAX_BUFSIZ);
+    strncpy(bnd->backend, tmp, NOMP_MAX_BUFSIZ);
 
   if ((tmp = getenv("NOMP_INSTALL_DIR")))
-    strncpy(backend->install_dir, tmp, PATH_MAX);
+    strncpy(bnd->install_dir, tmp, PATH_MAX);
 
   return 0;
 }
@@ -39,7 +39,7 @@ static inline int check_cmd_line_aux(unsigned i, unsigned argc,
   return 0;
 }
 
-static inline int check_cmd_line(struct nomp_backend *backend, int argc,
+static inline int check_cmd_line(struct nomp_backend_t *bnd, int argc,
                                  const char **argv) {
   if (argc <= 1 || argv == NULL)
     return 0;
@@ -49,19 +49,19 @@ static inline int check_cmd_line(struct nomp_backend *backend, int argc,
     if (!strncmp("--nomp", argv[i], 6)) {
       nomp_check(check_cmd_line_aux(i + 1, argc, argv));
       if (!strncmp("--nomp-backend", argv[i], NOMP_MAX_BUFSIZ)) {
-        strncpy(backend->backend, argv[i + 1], NOMP_MAX_BUFSIZ);
+        strncpy(bnd->backend, argv[i + 1], NOMP_MAX_BUFSIZ);
       } else if (!strncmp("--nomp-platform", argv[i], NOMP_MAX_BUFSIZ)) {
-        backend->platform_id = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
+        bnd->platform_id = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
       } else if (!strncmp("--nomp-device", argv[i], NOMP_MAX_BUFSIZ)) {
-        backend->device_id = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
+        bnd->device_id = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
       } else if (!strncmp("--nomp-verbose", argv[i], NOMP_MAX_BUFSIZ)) {
-        backend->verbose = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
+        bnd->verbose = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
       } else if (!strncmp("--nomp-profile", argv[i], NOMP_MAX_BUFSIZ)) {
-        backend->profile = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
+        bnd->profile = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
       } else if (!strncmp("--nomp-install-dir", argv[i], NOMP_MAX_BUFSIZ)) {
-        strncpy(backend->install_dir, argv[i + 1], PATH_MAX);
+        strncpy(bnd->install_dir, argv[i + 1], PATH_MAX);
       } else if (!strncmp("--nomp-function", argv[i], NOMP_MAX_BUFSIZ)) {
-        nomp_check(nomp_py_set_annotate_func(&backend->py_annotate,
+        nomp_check(nomp_py_set_annotate_func(&bnd->py_annotate,
                                              (const char *)argv[i + 1]));
       }
       i++;
@@ -73,15 +73,14 @@ static inline int check_cmd_line(struct nomp_backend *backend, int argc,
 }
 
 static int init_configs(int argc, const char **argv,
-                        struct nomp_backend *backend) {
+                        struct nomp_backend_t *bnd) {
   // We only a provide default value for verbose. Everything else has to be set
   // by user explicitly.
-  backend->verbose = 0;
-  backend->device_id = backend->platform_id = -1;
-  strcpy(backend->backend, ""), strcpy(backend->install_dir, "");
+  bnd->verbose = 0, bnd->device_id = bnd->platform_id = -1;
+  strcpy(bnd->backend, ""), strcpy(bnd->install_dir, "");
 
-  nomp_check(check_cmd_line(backend, argc, argv));
-  nomp_check(check_env_vars(backend));
+  nomp_check(check_cmd_line(bnd, argc, argv));
+  nomp_check(check_env_vars(bnd));
 
 #define check_if_initialized(COND, CMDARG, ENVVAR)                             \
   {                                                                            \
@@ -93,35 +92,33 @@ static int init_configs(int argc, const char **argv,
     }                                                                          \
   }
 
-  check_if_initialized(backend->device_id == -1, "--nomp-device",
-                       "NOMP_DEVICE");
-  check_if_initialized(backend->platform_id == -1, "--nomp-platform",
+  check_if_initialized(bnd->device_id == -1, "--nomp-device", "NOMP_DEVICE");
+  check_if_initialized(bnd->platform_id == -1, "--nomp-platform",
                        "NOMP_PLATFORM");
-  check_if_initialized(strlen(backend->backend) == 0, "--nomp-backend",
+  check_if_initialized(strlen(bnd->backend) == 0, "--nomp-backend",
                        "NOMP_BACKEND");
-  check_if_initialized(strlen(backend->install_dir) == 0, "--nomp-install-dir",
+  check_if_initialized(strlen(bnd->install_dir) == 0, "--nomp-install-dir",
                        "NOMP_INSTALL_DIR");
 
 #undef check_if_initialized
 
   // Append nomp python directory to sys.path.
   char abs_dir[PATH_MAX + 32];
-  strncpy(abs_dir, backend->install_dir, PATH_MAX);
+  strncpy(abs_dir, bnd->install_dir, PATH_MAX);
   strncat(abs_dir, "/python", 32);
   nomp_check(nomp_py_append_to_sys_path(abs_dir));
   return 0;
 }
 
-static int allocate_scratch_memory(struct nomp_backend *backend) {
-  struct nomp_mem *m = &nomp.scratch;
+static int allocate_scratch_memory(struct nomp_backend_t *bnd) {
+  struct nomp_mem_t *m = &nomp.scratch;
   m->idx0 = 0, m->idx1 = NOMP_MAX_SCRATCH_SIZE, m->usize = sizeof(char);
   m->hptr = nomp_calloc(char, m->idx1 - m->idx0);
-  nomp_check(
-      backend->update(backend, m, NOMP_ALLOC, m->idx0, m->idx1, m->usize));
+  nomp_check(bnd->update(bnd, m, NOMP_ALLOC, m->idx0, m->idx1, m->usize));
   return 0;
 }
 
-static int deallocate_scratch_memory(struct nomp_backend *backend) {
+static int deallocate_scratch_memory(struct nomp_backend_t *backend) {
   nomp_check(backend->update(backend, &backend->scratch, NOMP_FREE,
                              backend->scratch.idx0, backend->scratch.idx1,
                              backend->scratch.usize));
@@ -198,7 +195,7 @@ int nomp_init(int argc, const char **argv) {
   return 0;
 }
 
-static struct nomp_mem **mems = NULL;
+static struct nomp_mem_t **mems = NULL;
 static int mems_n = 0;
 static int mems_max = 0;
 
@@ -210,9 +207,9 @@ static int mems_max = 0;
  * has been allocated for \p p on the device, returns NULL.
  *
  * @param[in] p Host pointer
- * @return struct nomp_mem *
+ * @return struct nomp_mem_t *
  */
-static inline struct nomp_mem *mem_if_mapped(void *p) {
+static inline struct nomp_mem_t *mem_if_mapped(void *p) {
   // FIXME: This is O(N) in number of allocations.
   // Needs to go. Must store a hashmap.
   for (unsigned i = 0; i < mems_n; i++) {
@@ -250,9 +247,9 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize,
     op |= NOMP_ALLOC;
     if (mems_n == mems_max) {
       mems_max += mems_max / 2 + 1;
-      mems = nomp_realloc(mems, struct nomp_mem *, mems_max);
+      mems = nomp_realloc(mems, struct nomp_mem_t *, mems_max);
     }
-    struct nomp_mem *m = mems[mems_n] = nomp_calloc(struct nomp_mem, 1);
+    struct nomp_mem_t *m = mems[mems_n] = nomp_calloc(struct nomp_mem_t, 1);
     m->idx0 = idx0, m->idx1 = idx1, m->usize = usize;
     m->hptr = ptr, m->bptr = NULL;
   }
@@ -271,7 +268,7 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize,
   return 0;
 }
 
-static struct nomp_prog **progs = NULL;
+static struct nomp_prog_t **progs = NULL;
 static int progs_n = 0;
 static int progs_max = 0;
 
@@ -280,7 +277,7 @@ struct meta {
   PyObject *dict;
 };
 
-static int parse_clauses(struct meta *meta, struct nomp_prog *prg,
+static int parse_clauses(struct meta *meta, struct nomp_prog_t *prg,
                          const char **clauses) {
   // Currently, we only support `transform` and
   // `annotate` and `jit`.
@@ -361,12 +358,12 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
 
   if (progs_n == progs_max) {
     progs_max += progs_max / 2 + 1;
-    progs = nomp_realloc(progs, struct nomp_prog *, progs_max);
+    progs = nomp_realloc(progs, struct nomp_prog_t *, progs_max);
   }
 
   // Initialize the program struct.
-  struct nomp_prog *prg = progs[progs_n] = nomp_calloc(struct nomp_prog, 1);
-  prg->nargs = nargs, prg->args = nomp_calloc(struct nomp_arg, nargs);
+  struct nomp_prog_t *prg = progs[progs_n] = nomp_calloc(struct nomp_prog_t, 1);
+  prg->nargs = nargs, prg->args = nomp_calloc(struct nomp_arg_t, nargs);
   prg->map = mapbasicbasic_new(), prg->sym_global = vecbasic_new(),
   prg->sym_local = vecbasic_new(), prg->reduction_index = -1;
 
@@ -431,14 +428,14 @@ int nomp_run(int id, ...) {
 
   nomp_profile("nomp_run setup time", 1, 1);
 
-  struct nomp_prog *prg = progs[id];
-  struct nomp_arg *args = prg->args;
+  struct nomp_prog_t *prg = progs[id];
+  struct nomp_arg_t *args = prg->args;
   prg->is_grid_eval = 0;
 
   va_list vargs;
   va_start(vargs, id);
 
-  struct nomp_mem *m;
+  struct nomp_mem_t *m;
   int val, val_len;
   char str_val[64];
   for (unsigned i = 0; i < prg->nargs; i++) {

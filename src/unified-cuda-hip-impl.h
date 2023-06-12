@@ -69,7 +69,7 @@ struct gpu_prog {
 
 gpurtcResult gpu_compile(gpurtcProgram prog, struct gpu_backend *nbnd);
 
-static int gpu_update(struct nomp_backend *bnd, struct nomp_mem *m,
+static int gpu_update(struct nomp_backend_t *bnd, struct nomp_mem_t *m,
                       const nomp_map_direction_t op, size_t start, size_t end,
                       size_t usize) {
   if (op & NOMP_ALLOC)
@@ -95,12 +95,12 @@ static int gpu_update(struct nomp_backend *bnd, struct nomp_mem *m,
   return 0;
 }
 
-static void gpu_update_ptr(void **p, size_t *size, struct nomp_mem *m) {
+static void gpu_update_ptr(void **p, size_t *size, struct nomp_mem_t *m) {
   *p = (void *)m->bptr;
   *size = sizeof(m->bptr);
 }
 
-static int gpu_knl_build(struct nomp_backend *bnd, struct nomp_prog *prg,
+static int gpu_knl_build(struct nomp_backend_t *bnd, struct nomp_prog_t *prg,
                          const char *source, const char *name) {
   struct gpu_backend *nbnd = (struct gpu_backend *)bnd->bptr;
 
@@ -139,9 +139,9 @@ static int gpu_knl_build(struct nomp_backend *bnd, struct nomp_prog *prg,
   return 0;
 }
 
-static int gpu_knl_run(struct nomp_backend *bnd, struct nomp_prog *prg) {
+static int gpu_knl_run(struct nomp_backend_t *bnd, struct nomp_prog_t *prg) {
   void *vargs[NOMP_MAX_KNL_ARGS];
-  struct nomp_arg *args = prg->args;
+  struct nomp_arg_t *args = prg->args;
   for (int i = 0; i < prg->nargs; i++) {
     if (args[i].type == NOMP_PTR)
       vargs[i] = &args[i].ptr;
@@ -157,7 +157,7 @@ static int gpu_knl_run(struct nomp_backend *bnd, struct nomp_prog *prg) {
   return 0;
 }
 
-static int gpu_knl_free(struct nomp_prog *prg) {
+static int gpu_knl_free(struct nomp_prog_t *prg) {
   struct gpu_prog *cprg = (struct gpu_prog *)prg->bptr;
 
   if (cprg)
@@ -166,12 +166,12 @@ static int gpu_knl_free(struct nomp_prog *prg) {
   return 0;
 }
 
-static int gpu_sync(struct nomp_backend *bnd) {
+static int gpu_sync(struct nomp_backend_t *bnd) {
   chk_gpu(gpuDeviceSynchronize());
   return 0;
 }
 
-static int gpu_finalize(struct nomp_backend *bnd) {
+static int gpu_finalize(struct nomp_backend_t *bnd) {
 #ifndef __HIP_PLATFORM_HCC__
   struct gpu_backend *nbnd = (struct gpu_backend *)bnd->bptr;
   if (nbnd)
@@ -181,7 +181,7 @@ static int gpu_finalize(struct nomp_backend *bnd) {
   return 0;
 }
 
-int gpu_init(struct nomp_backend *bnd, const int platform_id,
+int gpu_init(struct nomp_backend_t *bnd, const int platform_id,
              const int device_id) {
   int num_devices;
   GPU_CHECK(gpuGetDeviceCount(&num_devices));

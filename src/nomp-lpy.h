@@ -4,8 +4,8 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
-// Forward declare the `struct nomp_prog`.
-struct nomp_prog;
+// Forward declare the `struct nomp_prog_t`.
+struct nomp_prog_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -118,7 +118,7 @@ int nomp_py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
  * @param[in] knl Python kernel object.
  * @return int
  */
-int nomp_py_get_grid_size(struct nomp_prog *prg, PyObject *knl);
+int nomp_py_get_grid_size(struct nomp_prog_t *prg, PyObject *knl);
 
 /**
  * @ingroup nomp_py_utils
@@ -127,7 +127,7 @@ int nomp_py_get_grid_size(struct nomp_prog *prg, PyObject *knl);
  * @param[in] prg Nomp program.
  * @return int
  */
-int nomp_py_eval_grid_size(struct nomp_prog *prg);
+int nomp_py_eval_grid_size(struct nomp_prog_t *prg);
 
 /**
  * @ingroup nomp_py_utils
@@ -138,7 +138,7 @@ int nomp_py_eval_grid_size(struct nomp_prog *prg);
  * @param[in] val Value as a C-string.
  * @return int
  */
-int nomp_symengine_map_push(struct nomp_prog *prg, const char *key,
+int nomp_symengine_map_push(struct nomp_prog_t *prg, const char *key,
                             const char *val);
 
 /**

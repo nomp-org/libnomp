@@ -29,7 +29,7 @@
  * @param[in] m Memory used to store device side partial reductions.
  * @return int
  */
-int nomp_host_side_reduction(struct nomp_backend *bnd, struct nomp_prog *prg,
-                             struct nomp_mem *m);
+int nomp_host_side_reduction(struct nomp_backend_t *bnd,
+                             struct nomp_prog_t *prg, struct nomp_mem_t *m);
 
 #endif

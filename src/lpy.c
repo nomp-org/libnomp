@@ -236,7 +236,7 @@ static int symengine_vec_push(CVecBasic *vec, const char *str) {
   return 0;
 }
 
-int nomp_symengine_map_push(struct nomp_prog *prg, const char *key,
+int nomp_symengine_map_push(struct nomp_prog_t *prg, const char *key,
                             const char *val) {
   basic a, b, c;
   basic_new_stack(a), basic_new_stack(b), basic_new_stack(c);
@@ -293,7 +293,7 @@ static int py_get_grid_size_aux(PyObject *exp, CVecBasic *vec) {
   return 0;
 }
 
-int nomp_py_get_grid_size(struct nomp_prog *prg, PyObject *knl) {
+int nomp_py_get_grid_size(struct nomp_prog_t *prg, PyObject *knl) {
   int err = 1;
   if (knl) {
     PyObject *callables = PyObject_GetAttrString(knl, "callables_table");
@@ -337,7 +337,7 @@ int nomp_py_get_grid_size(struct nomp_prog *prg, PyObject *knl) {
   return 0;
 }
 
-int nomp_py_eval_grid_size(struct nomp_prog *prg) {
+int nomp_py_eval_grid_size(struct nomp_prog_t *prg) {
   // If the expressions are not NULL, iterate through them and evaluate with
   // pymbolic. Also, we should calculate and store a hash of the dict that
   // is passed. If the hash is the same, no need of re-evaluating the grid

@@ -32,24 +32,24 @@
 
 #include "nomp.h"
 
-struct nomp_mem {
+struct nomp_mem_t {
   size_t idx0, idx1, usize;
   void *hptr, *bptr;
   size_t bsize;
 };
 
-struct nomp_arg {
+struct nomp_arg_t {
   char name[NOMP_MAX_BUFSIZ];
   size_t size;
   unsigned type;
   void *ptr;
 };
 
-struct nomp_prog {
+struct nomp_prog_t {
   // Number of arguments of the kernel and meta info about
   // arguments.
   unsigned nargs;
-  struct nomp_arg *args;
+  struct nomp_arg_t *args;
   // Dimension of kernel launch parameters, their pymbolic
   // expressions, and evaluated value of each dimension.
   unsigned ndim;
@@ -67,23 +67,23 @@ struct nomp_prog {
   void *reduction_ptr;
 };
 
-struct nomp_backend {
+struct nomp_backend_t {
   // User configurations of the backend.
   int platform_id, device_id, verbose, profile;
   char backend[NOMP_MAX_BUFSIZ], install_dir[PATH_MAX];
   // Pointers to backend functions used for backend dispatch.
-  int (*update)(struct nomp_backend *, struct nomp_mem *,
+  int (*update)(struct nomp_backend_t *, struct nomp_mem_t *,
                 const nomp_map_direction_t op, size_t start, size_t end,
                 size_t usize);
-  int (*knl_build)(struct nomp_backend *, struct nomp_prog *, const char *,
+  int (*knl_build)(struct nomp_backend_t *, struct nomp_prog_t *, const char *,
                    const char *);
-  int (*knl_run)(struct nomp_backend *, struct nomp_prog *);
-  int (*knl_free)(struct nomp_prog *);
-  int (*sync)(struct nomp_backend *);
-  int (*finalize)(struct nomp_backend *);
+  int (*knl_run)(struct nomp_backend_t *, struct nomp_prog_t *);
+  int (*knl_free)(struct nomp_prog_t *);
+  int (*sync)(struct nomp_backend_t *);
+  int (*finalize)(struct nomp_backend_t *);
   // Scratch memory to be used as temporary memory for kernels (like
   // reductions).
-  struct nomp_mem scratch;
+  struct nomp_mem_t scratch;
   // Python function object which will be called to perform annotations.
   PyObject *py_annotate;
   // Context info is used to pass necessary infomation to kernel
@@ -114,7 +114,7 @@ extern "C" {
  * @param[in] device_id Target device id.
  * @return int
  */
-int opencl_init(struct nomp_backend *backend, const int platform_id,
+int opencl_init(struct nomp_backend_t *backend, const int platform_id,
                 const int device_id);
 
 /**
@@ -131,7 +131,7 @@ int opencl_init(struct nomp_backend *backend, const int platform_id,
  * @param[in] device_id Target device id.
  * @return int
  */
-int sycl_init(struct nomp_backend *backend, const int platform_id,
+int sycl_init(struct nomp_backend_t *backend, const int platform_id,
               const int device_id);
 
 /**
@@ -147,7 +147,7 @@ int sycl_init(struct nomp_backend *backend, const int platform_id,
  * @param[in] device_id Target device id.
  * @return int
  */
-int cuda_init(struct nomp_backend *backend, const int platform_id,
+int cuda_init(struct nomp_backend_t *backend, const int platform_id,
               const int device_id);
 
 /**
@@ -163,7 +163,7 @@ int cuda_init(struct nomp_backend *backend, const int platform_id,
  * @param[in] device_id Target device id.
  * @return int
  */
-int hip_init(struct nomp_backend *backend, const int platform_id,
+int hip_init(struct nomp_backend_t *backend, const int platform_id,
              const int device_id);
 
 /**
@@ -179,7 +179,7 @@ int hip_init(struct nomp_backend *backend, const int platform_id,
  * @param[in] device_id Target device id.
  * @return int
  */
-int ispc_init(struct nomp_backend *backend, const int platform_type,
+int ispc_init(struct nomp_backend_t *backend, const int platform_type,
               const int device_id);
 
 #ifdef __cplusplus

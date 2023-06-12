@@ -21,8 +21,8 @@
 NOMP_FOR_EACH_DOMAIN(NOMP_REDUCTION, SUM)
 NOMP_FOR_EACH_DOMAIN(NOMP_REDUCTION, PROD)
 
-int nomp_host_side_reduction(struct nomp_backend *backend,
-                             struct nomp_prog *prg, struct nomp_mem *m) {
+int nomp_host_side_reduction(struct nomp_backend_t *backend,
+                             struct nomp_prog_t *prg, struct nomp_mem_t *m) {
   int dom = prg->reduction_type, op = prg->reduction_op;
   size_t size = prg->reduction_size;
   void *out = prg->reduction_ptr;
