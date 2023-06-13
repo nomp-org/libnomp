@@ -35,8 +35,7 @@ struct nomp_mem_t {
   size_t bsize;
 };
 
-#define NOMP_MEM_BPTR_OFFSET(m, start, usize) ((usize) * (start - (m)->idx0))
-#define NOMP_MEM_HPTR_OFFSET(start, usize) ((start) * (usize))
+#define NOMP_MEM_OFFSET(start, usize) ((start) * (usize))
 #define NOMP_MEM_BYTES(start, end, usize) (((end) - (start)) * (usize))
 
 struct nomp_arg_t {
