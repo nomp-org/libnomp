@@ -36,16 +36,16 @@ static int sycl_update(struct nomp_backend_t *bnd, struct nomp_mem_t *m,
   if (op & NOMP_TO) {
     chk_sycl({
       sycl->queue.memcpy((char *)(m->bptr) +
-                             NOMP_MEM_BPTR_OFFSET(m, start, usize),
-                         (char *)(m->hptr) + NOMP_MEM_HPTR_OFFSET(start, usize),
+                             NOMP_MEM_OFFSET(start - m->idx0, usize),
+                         (char *)(m->hptr) + NOMP_MEM_OFFSET(start, usize),
                          NOMP_MEM_BYTES(start, end, usize));
       sycl->queue.wait();
     });
   } else if (op == NOMP_FROM) {
     chk_sycl({
-      sycl->queue.memcpy((char *)(m->hptr) + NOMP_MEM_HPTR_OFFSET(start, usize),
+      sycl->queue.memcpy((char *)(m->hptr) + NOMP_MEM_OFFSET(start, usize),
                          (char *)(m->bptr) +
-                             NOMP_MEM_BPTR_OFFSET(m, start, usize),
+                             NOMP_MEM_OFFSET(start - m->idx0, usize),
                          NOMP_MEM_BYTES(start, end, usize));
       sycl->queue.wait();
     });
