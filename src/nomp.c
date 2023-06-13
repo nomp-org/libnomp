@@ -4,32 +4,6 @@
 static struct nomp_backend_t nomp;
 static int initialized = 0;
 
-static int check_env_vars(struct nomp_backend_t *bnd) {
-  char *tmp = getenv("NOMP_PLATFORM");
-  if (tmp)
-    bnd->platform_id = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
-
-  if ((tmp = getenv("NOMP_DEVICE")))
-    bnd->device_id = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
-
-  if ((tmp = getenv("NOMP_VERBOSE")))
-    bnd->verbose = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
-
-  if ((tmp = getenv("NOMP_PROFILE")))
-    bnd->profile = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
-
-  if ((tmp = getenv("NOMP_ANNOTATE_FUNCTION")))
-    nomp_check(nomp_py_set_annotate_func(&bnd->py_annotate, tmp));
-
-  if ((tmp = getenv("NOMP_BACKEND")))
-    strncpy(bnd->backend, tmp, NOMP_MAX_BUFSIZ);
-
-  if ((tmp = getenv("NOMP_INSTALL_DIR")))
-    strncpy(bnd->install_dir, tmp, PATH_MAX);
-
-  return 0;
-}
-
 static inline int check_cmd_line_aux(unsigned i, unsigned argc,
                                      const char *argv[]) {
   if (i >= argc || argv[i] == NULL) {
@@ -72,8 +46,34 @@ static inline int check_cmd_line(struct nomp_backend_t *bnd, int argc,
   return 0;
 }
 
-static int init_configs(int argc, const char **argv,
-                        struct nomp_backend_t *bnd) {
+static inline int check_env_vars(struct nomp_backend_t *bnd) {
+  char *tmp = getenv("NOMP_PLATFORM");
+  if (tmp)
+    bnd->platform_id = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
+
+  if ((tmp = getenv("NOMP_DEVICE")))
+    bnd->device_id = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
+
+  if ((tmp = getenv("NOMP_VERBOSE")))
+    bnd->verbose = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
+
+  if ((tmp = getenv("NOMP_PROFILE")))
+    bnd->profile = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
+
+  if ((tmp = getenv("NOMP_ANNOTATE_FUNCTION")))
+    nomp_check(nomp_py_set_annotate_func(&bnd->py_annotate, tmp));
+
+  if ((tmp = getenv("NOMP_BACKEND")))
+    strncpy(bnd->backend, tmp, NOMP_MAX_BUFSIZ);
+
+  if ((tmp = getenv("NOMP_INSTALL_DIR")))
+    strncpy(bnd->install_dir, tmp, PATH_MAX);
+
+  return 0;
+}
+
+static inline int init_configs(int argc, const char **argv,
+                               struct nomp_backend_t *bnd) {
   // We only a provide default value for verbose. Everything else has to be set
   // by user explicitly.
   bnd->verbose = 0, bnd->device_id = bnd->platform_id = -1;
@@ -110,19 +110,18 @@ static int init_configs(int argc, const char **argv,
   return 0;
 }
 
-static int allocate_scratch_memory(struct nomp_backend_t *bnd) {
-  struct nomp_mem_t *m = &nomp.scratch;
+static inline int allocate_scratch_memory(struct nomp_backend_t *bnd) {
+  struct nomp_mem_t *m = &bnd->scratch;
   m->idx0 = 0, m->idx1 = NOMP_MAX_SCRATCH_SIZE, m->usize = sizeof(char);
-  m->hptr = nomp_calloc(char, m->idx1 - m->idx0);
   nomp_check(bnd->update(bnd, m, NOMP_ALLOC, m->idx0, m->idx1, m->usize));
+  m->hptr = nomp_calloc(char, m->idx1 - m->idx0);
   return 0;
 }
 
-static int deallocate_scratch_memory(struct nomp_backend_t *backend) {
-  nomp_check(backend->update(backend, &backend->scratch, NOMP_FREE,
-                             backend->scratch.idx0, backend->scratch.idx1,
-                             backend->scratch.usize));
-  nomp_free(&backend->scratch.hptr);
+static inline int deallocate_scratch_memory(struct nomp_backend_t *bnd) {
+  struct nomp_mem_t *m = &bnd->scratch;
+  nomp_check(bnd->update(bnd, m, NOMP_FREE, m->idx0, m->idx1, m->usize));
+  nomp_free(&m->hptr);
   return 0;
 }
 
@@ -139,21 +138,22 @@ int nomp_init(int argc, const char **argv) {
     Py_InitializeEx(0);
     // Append current working directory to sys.path.
     nomp_check(nomp_py_append_to_sys_path("."));
-    // Initialize the python context.
-    nomp.py_context = PyDict_New();
   }
 
   nomp_check(init_configs(argc, argv, &nomp));
+
+  // Set profile level.
   nomp_check(nomp_profile_set_level(nomp.profile));
 
   nomp_profile("nomp_init", 1, 0);
-
-  // Populate context.
-  PyObject *pbackend = PyUnicode_FromString(nomp.backend);
-  PyDict_SetItemString(nomp.py_context, "backend", pbackend);
-  Py_XDECREF(pbackend);
-
+  // Set verbose level.
   nomp_check(nomp_log_set_verbose(nomp.verbose));
+
+  // Populate context with meta information.
+  nomp.py_context = PyDict_New();
+  PyObject *py_bnd = PyUnicode_FromString(nomp.backend);
+  PyDict_SetItemString(nomp.py_context, "backend", py_bnd);
+  Py_XDECREF(py_bnd);
 
   size_t n = strnlen(nomp.backend, NOMP_MAX_BUFSIZ);
   for (int i = 0; i < n; i++)
@@ -187,9 +187,7 @@ int nomp_init(int argc, const char **argv) {
   }
 
   nomp_check(allocate_scratch_memory(&nomp));
-
   initialized = 1;
-
   nomp_profile("nomp_init", 0, 0);
 
   return 0;
@@ -264,7 +262,6 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize,
     mems_n++;
 
   nomp_profile("nomp_update", 0, 1);
-
   return 0;
 }
 
@@ -272,12 +269,12 @@ static struct nomp_prog_t **progs = NULL;
 static int progs_n = 0;
 static int progs_max = 0;
 
-struct meta {
+struct nomp_meta_t {
   char *file, *func;
   PyObject *dict;
 };
 
-static int parse_clauses(struct meta *meta, struct nomp_prog_t *prg,
+static int parse_clauses(struct nomp_meta_t *meta, struct nomp_prog_t *prg,
                          const char **clauses) {
   // Currently, we only support `transform` and
   // `annotate` and `jit`.
@@ -355,7 +352,6 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
     return 0;
 
   nomp_profile("nomp_jit", 1, 1);
-
   if (progs_n == progs_max) {
     progs_max += progs_max / 2 + 1;
     progs = nomp_realloc(progs, struct nomp_prog_t *, progs_max);
@@ -380,8 +376,8 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
   // Parse the clauses to find transformations file,
   // function and other annotations. Annotations are
   // returned as a Python dictionary.
-  struct meta meta;
-  nomp_check(parse_clauses(&meta, prg, clauses));
+  struct nomp_meta_t m;
+  nomp_check(parse_clauses(&m, prg, clauses));
 
   // Create loopy kernel from C source.
   PyObject *knl = NULL;
@@ -391,14 +387,13 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
         nomp_py_realize_reduction(&knl, prg->args[prg->reduction_index].name));
 
   // Handle annotate clauses if they exist.
-  nomp_check(nomp_py_apply_annotations(&knl, nomp.py_annotate, meta.dict,
+  nomp_check(nomp_py_apply_annotations(&knl, nomp.py_annotate, m.dict,
                                        nomp.py_context));
-  Py_XDECREF(meta.dict);
+  Py_XDECREF(m.dict);
 
   // Handle transform clauses.
-  nomp_check(
-      nomp_py_apply_transform(&knl, meta.file, meta.func, nomp.py_context));
-  nomp_free(&meta.file), nomp_free(&meta.func);
+  nomp_check(nomp_py_apply_transform(&knl, m.file, m.func, nomp.py_context));
+  nomp_free(&m.file), nomp_free(&m.func);
 
   // Get OpenCL, CUDA, etc. source and name from the
   // loopy kernel and build the program.
@@ -416,7 +411,6 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
   *id = progs_n++;
 
   nomp_profile("nomp_jit", 0, 1);
-
   return 0;
 }
 
@@ -427,17 +421,16 @@ int nomp_run(int id, ...) {
   }
 
   nomp_profile("nomp_run setup time", 1, 1);
-
   struct nomp_prog_t *prg = progs[id];
-  struct nomp_arg_t *args = prg->args;
   prg->eval_grid = 0;
 
-  va_list vargs;
-  va_start(vargs, id);
-
+  struct nomp_arg_t *args = prg->args;
   struct nomp_mem_t *m;
   int val, val_len;
   char str_val[64];
+
+  va_list vargs;
+  va_start(vargs, id);
   for (unsigned i = 0; i < prg->nargs; i++) {
     args[i].ptr = va_arg(vargs, void *);
     switch (args[i].type) {
@@ -467,22 +460,17 @@ int nomp_run(int id, ...) {
     }
   }
   va_end(vargs);
-
   nomp_profile("nomp_run setup time", 0, 1);
 
   nomp_profile("nomp_run grid evaluation", 1, 1);
-
   if (prg->eval_grid)
     nomp_check(nomp_py_eval_grid_size(prg));
-
   nomp_profile("nomp_run grid evaluation", 0, 1);
 
   nomp_profile("nomp_run kernel runtime", 1, 1);
-
   nomp_check(nomp.knl_run(&nomp, prg));
   if (prg->reduction_index >= 0)
     nomp_check(nomp_host_side_reduction(&nomp, prg, &nomp.scratch));
-
   nomp_profile("nomp_run kernel runtime", 0, 1);
 
   return 0;
@@ -499,8 +487,7 @@ int nomp_finalize(void) {
   if (!initialized)
     return NOMP_FINALIZE_FAILURE;
 
-  Py_XDECREF(nomp.py_annotate), Py_XDECREF(nomp.py_context);
-  Py_Finalize();
+  Py_XDECREF(nomp.py_annotate), Py_XDECREF(nomp.py_context), Py_Finalize();
 
   for (unsigned i = 0; i < mems_n; i++) {
     if (mems[i]) {
@@ -522,9 +509,7 @@ int nomp_finalize(void) {
   }
   nomp_free(&progs), progs_n = progs_max = 0;
 
-  initialized = nomp.finalize(&nomp);
-  if (initialized)
+  if ((initialized = nomp.finalize(&nomp)))
     return NOMP_FINALIZE_FAILURE;
-
   return 0;
 }
