@@ -21,13 +21,10 @@
 #define NOMP_MAX_CFLAGS_SIZE 16384
 #define NOMP_MAX_KNL_ARGS 64
 #define NOMP_MAX_SCRATCH_SIZE (32768 * sizeof(double))
-#define NOMP_MEM_BPTR_OFFSET(m, start, usize) ((usize) * (start - (m)->idx0))
-#define NOMP_MEM_HPTR_OFFSET(start, usize) ((start) * (usize))
-#define NOMP_MEM_BYTES(start, end, usize) (((end) - (start)) * (usize))
 
 #include "nomp-aux.h"
 #include "nomp-log.h"
-#include "nomp-lpy.h"
+#include "nomp-loopy.h"
 #include "nomp-mem.h"
 
 #include "nomp.h"
@@ -37,6 +34,10 @@ struct nomp_mem_t {
   void *hptr, *bptr;
   size_t bsize;
 };
+
+#define NOMP_MEM_BPTR_OFFSET(m, start, usize) ((usize) * (start - (m)->idx0))
+#define NOMP_MEM_HPTR_OFFSET(start, usize) ((start) * (usize))
+#define NOMP_MEM_BYTES(start, end, usize) (((end) - (start)) * (usize))
 
 struct nomp_arg_t {
   char name[NOMP_MAX_BUFSIZ];
@@ -59,7 +60,7 @@ struct nomp_prog_t {
   // the kernel launch parameters.
   CMapBasicBasic *map;
   // Boolean flag to determine if the grid size should be evaluated or not.
-  int is_grid_eval;
+  int eval_grid;
   // Pointer to keep track of backend specific data.
   void *bptr;
   // Reduction related metadata.

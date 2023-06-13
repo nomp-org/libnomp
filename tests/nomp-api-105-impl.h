@@ -33,7 +33,7 @@ static int nomp_api_105_invalid() {
   nomp_test_assert(nomp_get_log_no(err) == NOMP_PY_CALL_FAILURE);
   char *log = nomp_get_log_str(err);
   int eq = logcmp(
-      log, "\\[Error\\] .*src\\/lpy.c:[0-9]* Failed to call user transform "
+      log, "\\[Error\\] .*src\\/loopy.c:[0-9]* Failed to call user transform "
            "function: \"invalid_func\" in file: \"nomp-api-105\".");
   nomp_free(&log);
   nomp_test_assert(eq);
