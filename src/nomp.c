@@ -347,6 +347,22 @@ static int parse_clauses(struct nomp_meta_t *meta, struct nomp_prog_t *prg,
   return 0;
 }
 
+static struct nomp_prog_t *init_args(int progs_n, int nargs, va_list args) {
+  struct nomp_prog_t *prg = progs[progs_n] = nomp_calloc(struct nomp_prog_t, 1);
+  prg->args = nomp_calloc(struct nomp_arg_t, nargs);
+  prg->nargs = nargs, prg->reduction_index = -1;
+  prg->map = mapbasicbasic_new();
+  prg->sym_global = vecbasic_new(), prg->sym_local = vecbasic_new();
+
+  for (unsigned i = 0; i < prg->nargs; i++) {
+    const char *name = va_arg(args, const char *);
+    strncpy(prg->args[i].name, name, NOMP_MAX_BUFSIZ);
+    prg->args[i].size = va_arg(args, size_t);
+    prg->args[i].type = va_arg(args, int);
+  }
+  return prg;
+}
+
 int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
   if (*id >= 0)
     return 0;
@@ -357,25 +373,14 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
     progs = nomp_realloc(progs, struct nomp_prog_t *, progs_max);
   }
 
-  // Initialize the program struct.
-  struct nomp_prog_t *prg = progs[progs_n] = nomp_calloc(struct nomp_prog_t, 1);
-  prg->nargs = nargs, prg->args = nomp_calloc(struct nomp_arg_t, nargs);
-  prg->map = mapbasicbasic_new(), prg->sym_global = vecbasic_new(),
-  prg->sym_local = vecbasic_new(), prg->reduction_index = -1;
-
+  // Initialize the struct nomp_prog_t with the kernel input arguments.
   va_list args;
   va_start(args, nargs);
-  for (unsigned i = 0; i < prg->nargs; i++) {
-    const char *name = va_arg(args, const char *);
-    strncpy(prg->args[i].name, name, NOMP_MAX_BUFSIZ);
-    prg->args[i].size = va_arg(args, size_t);
-    prg->args[i].type = va_arg(args, int);
-  }
+  struct nomp_prog_t *prg = init_args(progs_n, nargs, args);
   va_end(args);
 
-  // Parse the clauses to find transformations file,
-  // function and other annotations. Annotations are
-  // returned as a Python dictionary.
+  // Parse the clauses to find transformations file, function and other
+  // annotations. Annotations are returned as a Python dictionary.
   struct nomp_meta_t m;
   nomp_check(parse_clauses(&m, prg, clauses));
 
@@ -395,16 +400,15 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
   nomp_check(nomp_py_apply_transform(&knl, m.file, m.func, nomp.py_context));
   nomp_free(&m.file), nomp_free(&m.func);
 
-  // Get OpenCL, CUDA, etc. source and name from the
-  // loopy kernel and build the program.
+  // Get OpenCL, CUDA, etc. source and name from the loopy kernel and build
+  // the program.
   char *name, *src;
   nomp_check(nomp_py_get_knl_name_and_src(&name, &src, knl, nomp.backend));
   nomp_check(nomp.knl_build(&nomp, prg, src, name));
   nomp_free(&src), nomp_free(&name);
 
-  // Get grid size of the loopy kernel as pymbolic
-  // expressions. These grid sizes will be evaluated
-  // each time the kernel is run.
+  // Get grid size of the loopy kernel as pymbolic expressions. These grid
+  // sizes will be evaluated each time the kernel is run.
   nomp_check(nomp_py_get_grid_size(prg, knl));
   Py_XDECREF(knl);
 
