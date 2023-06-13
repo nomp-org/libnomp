@@ -41,7 +41,7 @@ static int test_invalid_transform_function() {
 
   char *log = nomp_get_log_str(err);
   int eq = logcmp(
-      log, "\\[Error\\] .*src\\/lpy.c:[0-9]* Failed to call user transform "
+      log, "\\[Error\\] .*src\\/loopy.c:[0-9]* Failed to call user transform "
            "function: \"invalid_func\" in file: \"nomp-api-100\".");
   nomp_free(&log);
   nomp_test_assert(eq);
@@ -117,8 +117,9 @@ static int test_syntax_error_in_kernel() {
   nomp_test_assert(nomp_get_log_no(err) == NOMP_LOOPY_CONVERSION_FAILURE);
 
   char *log = nomp_get_log_str(err);
-  int eq = logcmp(log, "\\[Error\\] .*libnomp\\/src\\/lpy.c:[0-9]* C to Loopy "
-                       "conversion failed.");
+  int eq =
+      logcmp(log, "\\[Error\\] .*libnomp\\/src\\/loopy.c:[0-9]* C to Loopy "
+                  "conversion failed.");
   nomp_free(&log);
   nomp_test_assert(eq);
 

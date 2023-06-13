@@ -1,5 +1,5 @@
-#if !defined(_NOMP_LPY_H_)
-#define _NOMP_LPY_H_
+#if !defined(_NOMP_LOOPY_H_)
+#define _NOMP_LOOPY_H_
 
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
@@ -133,13 +133,13 @@ int nomp_py_eval_grid_size(struct nomp_prog_t *prg);
  * @ingroup nomp_py_utils
  * @brief Map the keys and values to evaluate the kernel launch parameters.
  *
- * @param[in] prg Nomp program.
+ * @param[in] map SymEngine object map.
  * @param[in] key Key as a C-string.
  * @param[in] val Value as a C-string.
  * @return int
  */
-int nomp_symengine_map_push(struct nomp_prog_t *prg, const char *key,
-                            const char *val);
+int nomp_symengine_update(CMapBasicBasic *map, const char *key,
+                          const char *val);
 
 /**
  * @ingroup nomp_py_utils
@@ -155,4 +155,4 @@ void nomp_py_print(const char *msg, PyObject *obj);
 }
 #endif
 
-#endif // _NOMP_LPY_H_
+#endif // _NOMP_LOOPY_H_

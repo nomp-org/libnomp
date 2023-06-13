@@ -430,7 +430,7 @@ int nomp_run(int id, ...) {
 
   struct nomp_prog_t *prg = progs[id];
   struct nomp_arg_t *args = prg->args;
-  prg->is_grid_eval = 0;
+  prg->eval_grid = 0;
 
   va_list vargs;
   va_start(vargs, id);
@@ -449,7 +449,7 @@ int nomp_run(int id, ...) {
       val = *((unsigned int *)args[i].ptr);
     str_val:
       snprintf(str_val, sizeof(str_val), "%d", val);
-      nomp_symengine_map_push(prg, args[i].name, str_val);
+      prg->eval_grid |= nomp_symengine_update(prg->map, args[i].name, str_val);
       break;
     case NOMP_PTR:
       m = mem_if_mapped(args[i].ptr);
@@ -472,7 +472,7 @@ int nomp_run(int id, ...) {
 
   nomp_profile("nomp_run grid evaluation", 1, 1);
 
-  if (prg->is_grid_eval)
+  if (prg->eval_grid)
     nomp_check(nomp_py_eval_grid_size(prg));
 
   nomp_profile("nomp_run grid evaluation", 0, 1);
