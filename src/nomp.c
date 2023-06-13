@@ -319,16 +319,15 @@ static int parse_clauses(struct nomp_meta_t *meta, struct nomp_prog_t *prg,
       }
       for (unsigned j = 0; j < prg->nargs; j++) {
         if (strncmp(prg->args[j].name, clauses[i + 1], NOMP_MAX_BUFSIZ) == 0) {
-          prg->reduction_type = prg->args[j].type, prg->args[j].type = NOMP_PTR;
-          prg->reduction_index = j;
-          prg->reduction_size = prg->args[j].size;
+          prg->redn_type = prg->args[j].type, prg->args[j].type = NOMP_PTR;
+          prg->redn_size = prg->args[j].size, prg->redn_idx = j;
           break;
         }
       }
       if (strncmp(clauses[i + 2], "+", 2) == 0)
-        prg->reduction_op = NOMP_SUM;
+        prg->redn_op = NOMP_SUM;
       else if (strncmp(clauses[i + 2], "*", 2) == 0)
-        prg->reduction_op = NOMP_PROD;
+        prg->redn_op = NOMP_PROD;
       i += 3;
     } else if (strncmp(clauses[i], "pin", NOMP_MAX_BUFSIZ) == 0) {
       // Check if we have to use pinned memory on the
@@ -347,16 +346,16 @@ static int parse_clauses(struct nomp_meta_t *meta, struct nomp_prog_t *prg,
   return 0;
 }
 
-static struct nomp_prog_t *init_args(int progs_n, int nargs, va_list args) {
+static inline struct nomp_prog_t *init_args(int progs_n, int nargs,
+                                            va_list args) {
   struct nomp_prog_t *prg = progs[progs_n] = nomp_calloc(struct nomp_prog_t, 1);
   prg->args = nomp_calloc(struct nomp_arg_t, nargs);
-  prg->nargs = nargs, prg->reduction_index = -1;
+  prg->nargs = nargs, prg->redn_idx = -1;
   prg->map = mapbasicbasic_new();
   prg->sym_global = vecbasic_new(), prg->sym_local = vecbasic_new();
 
   for (unsigned i = 0; i < prg->nargs; i++) {
-    const char *name = va_arg(args, const char *);
-    strncpy(prg->args[i].name, name, NOMP_MAX_BUFSIZ);
+    strncpy(prg->args[i].name, va_arg(args, const char *), NOMP_MAX_BUFSIZ);
     prg->args[i].size = va_arg(args, size_t);
     prg->args[i].type = va_arg(args, int);
   }
@@ -387,9 +386,8 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
   // Create loopy kernel from C source.
   PyObject *knl = NULL;
   nomp_check(nomp_py_c_to_loopy(&knl, csrc, nomp.backend));
-  if (prg->reduction_index >= 0)
-    nomp_check(
-        nomp_py_realize_reduction(&knl, prg->args[prg->reduction_index].name));
+  if (prg->redn_idx >= 0)
+    nomp_check(nomp_py_realize_reduction(&knl, prg->args[prg->redn_idx].name));
 
   // Handle annotate clauses if they exist.
   nomp_check(nomp_py_apply_annotations(&knl, nomp.py_annotate, m.dict,
@@ -413,8 +411,8 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
   Py_XDECREF(knl);
 
   *id = progs_n++;
-
   nomp_profile("nomp_jit", 0, 1);
+
   return 0;
 }
 
@@ -451,8 +449,8 @@ int nomp_run(int id, ...) {
     case NOMP_PTR:
       m = mem_if_mapped(args[i].ptr);
       if (m == NULL) {
-        if (prg->reduction_index == i) {
-          prg->reduction_ptr = args[i].ptr;
+        if (prg->redn_idx == i) {
+          prg->redn_ptr = args[i].ptr;
           m = &nomp.scratch;
         } else {
           return nomp_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
@@ -473,7 +471,7 @@ int nomp_run(int id, ...) {
 
   nomp_profile("nomp_run kernel runtime", 1, 1);
   nomp_check(nomp.knl_run(&nomp, prg));
-  if (prg->reduction_index >= 0)
+  if (prg->redn_idx >= 0)
     nomp_check(nomp_host_side_reduction(&nomp, prg, &nomp.scratch));
   nomp_profile("nomp_run kernel runtime", 0, 1);
 

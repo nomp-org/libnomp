@@ -63,8 +63,8 @@ struct nomp_prog_t {
   // Pointer to keep track of backend specific data.
   void *bptr;
   // Reduction related metadata.
-  int reduction_index, reduction_op, reduction_type, reduction_size;
-  void *reduction_ptr;
+  int redn_idx, redn_op, redn_type, redn_size;
+  void *redn_ptr;
 };
 
 struct nomp_backend_t {
