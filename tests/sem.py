@@ -12,7 +12,7 @@ def annotate(
 ) -> lp.translation_unit.TranslationUnit:
     inames = knl.default_entrypoint.all_inames()
     dof_axis = 0
-    backend = context["backend"]
+    backend = context["backend::name"]
     for key in annotations:
         if key == "dof_loop":
             loop = annotations[key]
