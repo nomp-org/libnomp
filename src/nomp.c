@@ -125,6 +125,18 @@ static inline int deallocate_scratch_memory(struct nomp_backend_t *bnd) {
   return 0;
 }
 
+static inline void populate_context(struct nomp_backend_t *bnd) {
+  bnd->py_context = PyDict_New();
+
+  PyObject *bname = PyUnicode_FromString(bnd->backend);
+  PyDict_SetItemString(bnd->py_context, "backend::name", bname);
+  Py_XDECREF(bname);
+
+  PyObject *id = PyLong_FromLong(bnd->device_id);
+  PyDict_SetItemString(bnd->py_context, "device::id", id);
+  Py_XDECREF(id);
+}
+
 int nomp_init(int argc, const char **argv) {
   if (initialized) {
     return nomp_log(NOMP_INITIALIZE_FAILURE, NOMP_ERROR,
@@ -149,11 +161,8 @@ int nomp_init(int argc, const char **argv) {
   // Set verbose level.
   nomp_check(nomp_log_set_verbose(nomp.verbose));
 
-  // Populate context with meta information.
-  nomp.py_context = PyDict_New();
-  PyObject *py_bnd = PyUnicode_FromString(nomp.backend);
-  PyDict_SetItemString(nomp.py_context, "backend", py_bnd);
-  Py_XDECREF(py_bnd);
+  // Populate context dict with meta information of device, backend, etc.
+  populate_context(&nomp);
 
   size_t n = strnlen(nomp.backend, NOMP_MAX_BUFSIZ);
   for (int i = 0; i < n; i++)
@@ -386,8 +395,6 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
   // Create loopy kernel from C source.
   PyObject *knl = NULL;
   nomp_check(nomp_py_c_to_loopy(&knl, csrc, nomp.backend));
-  if (prg->redn_idx >= 0)
-    nomp_check(nomp_py_realize_reduction(&knl, prg->args[prg->redn_idx].name));
 
   // Handle annotate clauses if they exist.
   nomp_check(nomp_py_apply_annotations(&knl, nomp.py_annotate, m.dict,
@@ -397,6 +404,10 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
   // Handle transform clauses.
   nomp_check(nomp_py_apply_transform(&knl, m.file, m.func, nomp.py_context));
   nomp_free(&m.file), nomp_free(&m.func);
+
+  // Handle reductions if they exist.
+  if (prg->redn_idx >= 0)
+    nomp_check(nomp_py_realize_reduction(&knl, prg->args[prg->redn_idx].name));
 
   // Get OpenCL, CUDA, etc. source and name from the loopy kernel and build
   // the program.
