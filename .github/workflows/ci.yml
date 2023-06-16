@@ -65,7 +65,7 @@ jobs:
         id: build_libnomp
         run: |
           echo "NOMP_INSTALL_DIR=${PWD}/../install" >> $GITHUB_ENV
-          ./lncfg -i ../install -ol "${CONDA_PREFIX}/lib/libOpenCL.so"
+          ./lncfg -idir ../install -opencl --opencl-lib "${CONDA_PREFIX}/lib/libOpenCL.so"
           ./lninstall --no
       - name: Run libnomp tests
         id: run_libnomp
