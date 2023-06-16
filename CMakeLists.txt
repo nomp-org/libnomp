@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 
-option(ENABLE_OPENCL "Build OpenCL backend" ON)
+option(ENABLE_OPENCL "Build OpenCL backend" OFF)
 option(ENABLE_CUDA "Build Cuda backend" OFF)
 option(ENABLE_ISPC "Build ISPC backend" OFF)
 option(ENABLE_HIP "Build HIP backend" OFF)

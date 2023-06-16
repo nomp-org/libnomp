@@ -1,18 +1,19 @@
 #!/bin/bash
 
-NOMP_SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-NOMP_LNSTATE_PATH="${NOMP_SOURCE_DIR}/.lnstate"
-
 # Check for nomp environment variables.
+: "${NOMP_SOURCE_DIR:="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"}"
+: "${NOMP_BUILD_DIR:="${NOMP_SOURCE_DIR}/build"}"
 : "${NOMP_INSTALL_DIR:="${HOME}/.nomp"}"
+: "${NOMP_BUILD_TYPE:="RelWithDebInfo"}"
+: "${NOMP_ENABLE_OPENCL:="OFF"}"
 : "${NOMP_OPENCL_LIBRARY:=""}"
 : "${NOMP_OPENCL_INCLUDE_DIR:=""}"
-: "${NOMP_BUILD_TYPE:="RelWithDebInfo"}"
-: "${NOMP_ENABLE_DOCS:="OFF"}"
+: "${NOMP_ENABLE_CUDA:="OFF"}"
 : "${NOMP_ENABLE_HIP:="OFF"}"
-: "${NOMP_BUILD_DIR:="${NOMP_SOURCE_DIR}/build"}"
+: "${NOMP_ENABLE_DOCS:="OFF"}"
 : "${NOMP_C_COMPILER:=""}"
 : "${NOMP_CXX_COMPILER:=""}"
+: "${NOMP_LNSTATE_PATH:="${NOMP_SOURCE_DIR}/.lnstate"}"
 
 # Terminal output colors.
 red=$(tput setaf 1)
@@ -20,26 +21,34 @@ green=$(tput setaf 2)
 cyan=$(tput setaf 6)
 reset=$(tput sgr0)
 
+# Print the options.
 function print_help() {
-  echo -e "Usage: ${0} [-h|--help] [-v|--verbose] [-d|--debug] [-D|--docs]\n" \
-    "\t[-i|--install-dir <install directory>] " \
-    "[-B|--build-dir <build directory>\n" \
-    "\t[-ol|--opencl-lib <opencl library>] "\
-    "[-oi|--opencl-inc <opencl include path>]\n" \
-    "${cyan}-h/--help:${reset} Print help for libnomp configuration script.\n" \
-    "${cyan}-b/--build-type:${reset} Specify the build type for cmake " \
+  echo -e "Usage: ${0} [-h|--help] [-btype|--build-type <build type>] " \
+    "[-bdir|--build-dir <build directory>] " \
+    "[-idir|--install-dir <install directory>] [-docs|--enable-docs] " \
+    "[-opencl|--enable-opencl] [--opencl-lib <opencl library path>] " \
+    "[--opencl-inc <opencl include path>] [-hip|--enable-hip] " \
+    "[-cuda|--enable-cuda] [-cc|--c-compiler] [-cxx|--cxx-compiler]\n\n" \
+    "${cyan}-h/--help:${reset} Print this help and exit.\n" \
+    "${cyan}-btype/--build-type:${reset} libnomp build type. " \
     "(Default: ${NOMP_BUILD_TYPE}, Allowed: Debug, Release, RelWithDebInfo " \
     "and MinSizeRel).\n" \
-    "${cyan}-d/--enable-docs:${reset} Build with user documentation " \
-    "(Default: false).\n" \
-    "${cyan}-i/--install-dir:${reset} Specify installation directory for " \
-    "libnomp (Default: ${NOMP_INSTALL_DIR}).\n" \
-    "${cyan}-B/--build-dir:${reset} Specify build directory for libnomp " \
+    "${cyan}-bdir/--build-dir:${reset} libnomp build directory. " \
     "(Default: ${NOMP_BUILD_DIR}).\n" \
-    "${cyan}-ol/--opencl-lib:${reset} Specify OpenCL library path.\n" \
-    "${cyan}-oi/--opencl-inc:${reset} Specify OpenCL include path." \
-    "${cyan}-hip/--enable-hip:${reset} Build with HIP backend ON." \
-    "(Default: OFF).\n" \
+    "${cyan}-idir/--install-dir:${reset} libnomp install directory. "\
+    "(Default: ${NOMP_INSTALL_DIR}).\n" \
+    "${cyan}-docs/--enable-docs:${reset} Build user documentation. " \
+    "(Default: ${NOMP_ENABLE_DOCS}).\n" \
+    "${cyan}-opencl/--enable-opencl:${reset} Build with OpenCL backend. " \
+    "(Default: ${NOMP_ENABLE_OPENCL}).\n" \
+    "${cyan}--opencl-lib:${reset} Specify OpenCL library path.\n" \
+    "${cyan}--opencl-inc:${reset} Specify OpenCL include path.\n" \
+    "${cyan}-hip/--enable-hip:${reset} Build with HIP backend." \
+    "(Default: ${NOMP_ENABLE_HIP}).\n" \
+    "${cyan}-cuda/--enable-cuda:${reset} Build with Cuda backend." \
+    "(Default: ${NOMP_ENABLE_CUDA}).\n" \
+    "${cyan}-cc/--c-compiler:${reset} Specify C Compiler.\n" \
+    "${cyan}-cxx/--cxx-compiler:${reset} Specify CXX Compiler.\n"
   exit 0
 }
 
@@ -47,29 +56,33 @@ function print_help() {
 while [ $# -gt 0 ]; do
   case $1 in
   -h | --help) print_help ;;
-  -b | --build-type) shift && NOMP_BUILD_TYPE=${1} ;;
-  -d | --enable-docs) NOMP_ENABLE_DOCS="ON" ;;
-  -i | --install-dir) shift && NOMP_INSTALL_DIR=$(realpath "${1}") ;;
-  -B | --build-dir) shift && NOMP_BUILD_DIR=$(realpath "${1}") ;;
-  -ol | --opencl-lib) shift && NOMP_OPENCL_LIBRARY=$(realpath "${1}") ;;
-  -oi | --opencl-inc) shift && NOMP_OPENCL_INCLUDE_DIR=$(realpath "${1}") ;;
+  -btype | --build-type) shift && NOMP_BUILD_TYPE=${1} ;;
+  -bdir | --build-dir) shift && NOMP_BUILD_DIR=$(realpath "${1}") ;;
+  -idir | --install-dir) shift && NOMP_INSTALL_DIR=$(realpath "${1}") ;;
+  -docs | --enable-docs) NOMP_ENABLE_DOCS="ON" ;;
+  -opencl | --enable-opencl) NOMP_ENABLE_OPENCL="ON" ;;
+  --opencl-lib) shift && NOMP_OPENCL_LIBRARY=$(realpath "${1}") ;;
+  --opencl-inc) shift && NOMP_OPENCL_INCLUDE_DIR=$(realpath "${1}") ;;
   -hip | --enable-hip) NOMP_ENABLE_HIP="ON" ;;
+  -cuda | --enable-cuda) NOMP_ENABLE_CUDA="ON" ;;
   -cc | --c-compiler) shift && NOMP_C_COMPILER="${1}" ;;
   -cxx | --cxx-compiler) shift && NOMP_CXX_COMPILER="${1}" ;;
   *) echo "${red}Invalid argument: ${1}${reset}"
     echo "See ${cyan}./lncfg -h${reset} or ${cyan}./lncfg --help${reset} for " \
-      "the accepted commands."
+      "the accepted options."
     exit 1 ;;
   esac
   shift
 done
 
-# update the cmake opts
+# Update the cmake options.
 NOMP_CMAKE_OPTS=()
+NOMP_CMAKE_OPTS+=("-DCMAKE_BUILD_TYPE=${NOMP_BUILD_TYPE}")
 NOMP_CMAKE_OPTS+=("-DCMAKE_INSTALL_PREFIX=${NOMP_INSTALL_DIR}")
 NOMP_CMAKE_OPTS+=("-DENABLE_DOCS=${NOMP_ENABLE_DOCS}")
+NOMP_CMAKE_OPTS+=("-DENABLE_OPENCL=${NOMP_ENABLE_OPENCL}")
 NOMP_CMAKE_OPTS+=("-DENABLE_HIP=${NOMP_ENABLE_HIP}")
-NOMP_CMAKE_OPTS+=("-DCMAKE_BUILD_TYPE=${NOMP_BUILD_TYPE}")
+NOMP_CMAKE_OPTS+=("-DENABLE_CUDA=${NOMP_ENABLE_CUDA}")
 
 [[ -n ${NOMP_OPENCL_LIBRARY} ]] &&
   NOMP_CMAKE_OPTS+=("-DOpenCL_LIBRARY=${NOMP_OPENCL_LIBRARY}")
@@ -83,14 +96,14 @@ NOMP_CMAKE_OPTS+=("-DCMAKE_BUILD_TYPE=${NOMP_BUILD_TYPE}")
 [[ -n ${NOMP_CXX_COMPILER} ]] &&
   NOMP_CMAKE_OPTS+=("-D CMAKE_CXX_COMPILER=${NOMP_CXX_COMPILER}")
 
-# update lnstate variables
+# Update variables for lnstate scripts.
 echo -e "NOMP_INSTALL_DIR=${NOMP_INSTALL_DIR}\n" \
   "NOMP_BUILD_DIR=${NOMP_BUILD_DIR}" >"${NOMP_LNSTATE_PATH}"
 
-# create build directory if not exists
+# Create build directory if it doesn't exist.
 [[ ! -d "${NOMP_BUILD_DIR}" ]] && mkdir "${NOMP_BUILD_DIR}"
 
-# configure cmake
+# Configure cmake build.
 NOMP_CONFIGURE_SUCCESS=false
 echo "Configuring build files for libnomp..."
 cmake -B "${NOMP_BUILD_DIR}" -S "${NOMP_SOURCE_DIR}" "${NOMP_CMAKE_OPTS[@]}" &&
