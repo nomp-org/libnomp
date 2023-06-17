@@ -147,19 +147,31 @@ static int opencl_finalize(struct nomp_backend_t *bnd) {
 }
 
 static int opencl_device_query(struct nomp_backend_t *bnd, cl_device_id id) {
+  bnd->py_context = PyDict_New();
+
+#define set_string_aux(KEY, VAL)                                               \
+  {                                                                            \
+    PyObject *obj = PyUnicode_FromString(VAL);                                 \
+    PyDict_SetItemString(bnd->py_context, KEY, obj);                           \
+    Py_XDECREF(obj);                                                           \
+  }
+
+  set_string_aux("backend::name", "opencl");
+
 #define set_string_info(PARAM, KEY)                                            \
   {                                                                            \
     char string[BUFSIZ];                                                       \
     chk_cl(clGetDeviceInfo(id, PARAM, sizeof(string), string, NULL),           \
            "clGetDeviceInfo");                                                 \
-    PyObject *obj = PyUnicode_FromString(string);                              \
-    PyDict_SetItemString(bnd->py_context, KEY, obj);                           \
-    Py_XDECREF(obj);                                                           \
+    set_string_aux(KEY, string);                                               \
   }
+
   set_string_info(CL_DEVICE_NAME, "device::name");
   set_string_info(CL_DEVICE_VENDOR, "device::vendor");
   set_string_info(CL_DRIVER_VERSION, "device::driver");
+
 #undef set_string_info
+#undef set_string_aux
 
   cl_device_type type;
   chk_cl(clGetDeviceInfo(id, CL_DEVICE_TYPE, sizeof(type), &type, NULL),
@@ -185,6 +197,7 @@ static int opencl_device_query(struct nomp_backend_t *bnd, cl_device_id id) {
     PyDict_SetItemString(bnd->py_context, KEY, obj);                           \
     Py_XDECREF(obj);                                                           \
   }
+
   set_int_info(cl_uint, CL_DEVICE_MAX_COMPUTE_UNITS,
                "device::max_compute_units");
   set_int_info(size_t, CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS,
@@ -193,7 +206,8 @@ static int opencl_device_query(struct nomp_backend_t *bnd, cl_device_id id) {
                "device::max_work_group_size");
   set_int_info(cl_uint, CL_DEVICE_MAX_CLOCK_FREQUENCY,
                "device::max_clock_frequency");
-#undef set_size_t_info
+
+#undef set_int_info
 
   return 0;
 }

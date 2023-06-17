@@ -125,18 +125,6 @@ static inline int deallocate_scratch_memory(struct nomp_backend_t *bnd) {
   return 0;
 }
 
-static inline void populate_context(struct nomp_backend_t *bnd) {
-  bnd->py_context = PyDict_New();
-
-  PyObject *bname = PyUnicode_FromString(bnd->backend);
-  PyDict_SetItemString(bnd->py_context, "backend::name", bname);
-  Py_XDECREF(bname);
-
-  PyObject *id = PyLong_FromLong(bnd->device_id);
-  PyDict_SetItemString(bnd->py_context, "device::id", id);
-  Py_XDECREF(id);
-}
-
 int nomp_init(int argc, const char **argv) {
   if (initialized) {
     return nomp_log(NOMP_INITIALIZE_FAILURE, NOMP_ERROR,
@@ -160,9 +148,6 @@ int nomp_init(int argc, const char **argv) {
   nomp_profile("nomp_init", 1, 0);
   // Set verbose level.
   nomp_check(nomp_log_set_verbose(nomp.verbose));
-
-  // Populate context dict with meta information of device, backend, etc.
-  populate_context(&nomp);
 
   size_t n = strnlen(nomp.backend, NOMP_MAX_BUFSIZ);
   for (int i = 0; i < n; i++)
