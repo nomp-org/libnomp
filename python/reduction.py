@@ -1,6 +1,6 @@
 """Module to do reductions with using Loopy."""
 
-from typing import List
+from typing import Dict, List
 
 import loopy as lp
 import pymbolic.mapper
@@ -39,7 +39,9 @@ def target_to_str(target: lp.target.TargetBase) -> str:
 
 
 def realize_reduction(
-    tunit: lp.translation_unit.TranslationUnit, var: str
+    tunit: lp.translation_unit.TranslationUnit,
+    var: str,
+    context: Dict[str, str],
 ) -> lp.translation_unit.TranslationUnit:
     """Perform transformations to realize a reduction."""
 
