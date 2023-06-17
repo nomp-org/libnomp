@@ -146,6 +146,58 @@ static int opencl_finalize(struct nomp_backend_t *bnd) {
   return 0;
 }
 
+static int opencl_device_query(struct nomp_backend_t *bnd, cl_device_id id) {
+#define set_string_info(PARAM, KEY)                                            \
+  {                                                                            \
+    char string[BUFSIZ];                                                       \
+    chk_cl(clGetDeviceInfo(id, PARAM, sizeof(string), string, NULL),           \
+           "clGetDeviceInfo");                                                 \
+    PyObject *obj = PyUnicode_FromString(string);                              \
+    PyDict_SetItemString(bnd->py_context, KEY, obj);                           \
+    Py_XDECREF(obj);                                                           \
+  }
+  set_string_info(CL_DEVICE_NAME, "device::name");
+  set_string_info(CL_DEVICE_VENDOR, "device::vendor");
+  set_string_info(CL_DRIVER_VERSION, "device::driver");
+#undef set_string_info
+
+  cl_device_type type;
+  chk_cl(clGetDeviceInfo(id, CL_DEVICE_TYPE, sizeof(type), &type, NULL),
+         "clGetDeviceInfo");
+  PyObject *obj = NULL;
+  if (type & CL_DEVICE_TYPE_CPU)
+    obj = PyUnicode_FromString("cpu");
+  if (type & CL_DEVICE_TYPE_GPU)
+    obj = PyUnicode_FromString("gpu");
+  if (type & CL_DEVICE_TYPE_ACCELERATOR)
+    obj = PyUnicode_FromString("accelerator");
+  if (type & CL_DEVICE_TYPE_DEFAULT)
+    obj = PyUnicode_FromString("default");
+  PyDict_SetItemString(bnd->py_context, "device::type", obj);
+  Py_XDECREF(obj);
+
+#define set_int_info(T, PARAM, KEY)                                            \
+  {                                                                            \
+    T value;                                                                   \
+    chk_cl(clGetDeviceInfo(id, PARAM, sizeof(T), &value, NULL),                \
+           "clGetDeviceInfo");                                                 \
+    PyObject *obj = PyLong_FromSize_t(value);                                  \
+    PyDict_SetItemString(bnd->py_context, KEY, obj);                           \
+    Py_XDECREF(obj);                                                           \
+  }
+  set_int_info(cl_uint, CL_DEVICE_MAX_COMPUTE_UNITS,
+               "device::max_compute_units");
+  set_int_info(size_t, CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS,
+               "device::max_work_item_dims");
+  set_int_info(size_t, CL_DEVICE_MAX_WORK_GROUP_SIZE,
+               "device::max_work_group_size");
+  set_int_info(cl_uint, CL_DEVICE_MAX_CLOCK_FREQUENCY,
+               "device::max_clock_frequency");
+#undef set_size_t_info
+
+  return 0;
+}
+
 int opencl_init(struct nomp_backend_t *bnd, const int platform_id,
                 const int device_id) {
   cl_uint num_platforms;
@@ -174,12 +226,14 @@ int opencl_init(struct nomp_backend_t *bnd, const int platform_id,
   cl_device_id device = cl_devices[device_id];
   nomp_free(&cl_devices);
 
-  struct opencl_backend *ocl = bnd->bptr =
-      nomp_calloc(struct opencl_backend, 1);
+  nomp_check(opencl_device_query(bnd, device));
+
+  struct opencl_backend *ocl = nomp_calloc(struct opencl_backend, 1);
   ocl->device_id = device;
   ocl->ctx = clCreateContext(NULL, 1, &device, NULL, NULL, &err);
   ocl->queue = clCreateCommandQueueWithProperties(ocl->ctx, device, 0, &err);
 
+  bnd->bptr = (void *)ocl;
   bnd->update = opencl_update;
   bnd->knl_build = opencl_knl_build;
   bnd->knl_run = opencl_knl_run;
