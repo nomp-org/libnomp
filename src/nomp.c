@@ -392,7 +392,8 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
 
   // Handle reductions if they exist.
   if (prg->redn_idx >= 0)
-    nomp_check(nomp_py_realize_reduction(&knl, prg->args[prg->redn_idx].name));
+    nomp_check(nomp_py_realize_reduction(&knl, prg->args[prg->redn_idx].name,
+                                         nomp.py_context));
 
   // Get OpenCL, CUDA, etc. source and name from the loopy kernel and build
   // the program.

@@ -41,9 +41,11 @@ int nomp_py_c_to_loopy(PyObject **knl, const char *src, const char *backend);
  *
  * @param[in,out] knl Loopy kernel object.
  * @param[in] var Name of the reduction variable.
+ * @param[in] context Python dictionary with context information.
  * @return int
  */
-int nomp_py_realize_reduction(PyObject **knl, const char *var);
+int nomp_py_realize_reduction(PyObject **knl, const char *var,
+                              const PyObject *context);
 
 /**
  * @ingroup nomp_py_utils

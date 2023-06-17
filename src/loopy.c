@@ -37,7 +37,8 @@ int nomp_py_append_to_sys_path(const char *path) {
   return 0;
 }
 
-int nomp_py_realize_reduction(PyObject **knl, const char *var) {
+int nomp_py_realize_reduction(PyObject **knl, const char *var,
+                              const PyObject *context) {
   int err = 1;
   PyObject *reduction = PyUnicode_FromString(module_reduction);
   if (reduction) {
@@ -46,7 +47,8 @@ int nomp_py_realize_reduction(PyObject **knl, const char *var) {
       PyObject *rr = PyObject_GetAttrString(module, realize_reduction);
       if (rr) {
         PyObject *pvar = PyUnicode_FromString(var);
-        PyObject *result = PyObject_CallFunctionObjArgs(rr, *knl, pvar, NULL);
+        PyObject *result =
+            PyObject_CallFunctionObjArgs(rr, *knl, pvar, context, NULL);
         if (result)
           Py_DECREF(*knl), *knl = result, err = 0;
         Py_XDECREF(pvar), Py_DECREF(rr);
