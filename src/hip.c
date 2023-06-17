@@ -1,51 +1,48 @@
 #include <hip/hip_runtime.h>
 #include <hip/hiprtc.h>
 
-#define GPU hip
-#define RUNTIME hiprtc
-#define GPU_CHECK chk_gpu
-#define NOMP_GPU_FAILURE NOMP_HIP_FAILURE
+const char *ERR_STR_BACKEND_FAILURE = "HIP %s failure: %s.";
 
-#define gpuDeviceProp hipDeviceProp_t
-#define gpuCtx hipCtx_t
-#define gpuModule hipModule_t
-#define gpuFunction hipFunction_t
-#define GPURTC_SUCCESS HIPRTC_SUCCESS
-#define gpurtcGetCodeSize hiprtcGetCodeSize
-#define gpurtcGetCode hiprtcGetCode
+#define BACKEND hip
+#define RUNTIME hiprtc
+#define NOMP_BACKEND_FAILURE NOMP_HIP_FAILURE
+
+#define gpuDeviceProp_t hipDeviceProp_t
+
+#define gpuInit hipInit
+#define gpuCtxCreate hipCtxCreate
+#define gpuCtxDestroy hipCtxDestroy
 #define gpuModuleLoadData hipModuleLoadData
 #define gpuModuleGetFunction hipModuleGetFunction
 #define gpuModuleLaunchKernel hipModuleLaunchKernel
 #define gpuModuleUnload hipModuleUnload
-#define gpuInit hipInit
-#define gpuCtxCreate hipCtxCreate
-#define gpuCtxDestroy hipCtxDestroy
 
-const char *ERR_STR_GPU_FAILURE = "HIP %s failed: %s.";
+#define gpuModule hipModule_t
+#define gpuFunction hipFunction_t
+
+#define GPURTC_SUCCESS HIPRTC_SUCCESS
+#define gpurtcGetCodeSize hiprtcGetCodeSize
+#define gpurtcGetCode hiprtcGetCode
+
+#define check(call) chk_gpu(call)
 
 #include "unified-cuda-hip-impl.h"
 
-hiprtcResult hip_compile(hiprtcProgram prog, struct hip_backend *nbnd) {
-  const char *opts[1] = {NULL};
-  return hiprtcCompileProgram(prog, 0, opts);
-}
+#undef check
 
-#undef GPU
-#undef RUNTIME
-#undef GPU_CHECK
-#undef NOMP_GPU_FAILURE
+#undef gpurtcGetCode
+#undef gpurtcGetCodeSize
+#undef GPURTC_SUCCESS
+
+#undef gpuFunction
+#undef gpuModule
+#undef gpuModuleUnload
+#undef gpuModuleLaunchKernel
+#undef gpuModuleGetFunction
+#undef gpuModuleLoadData
 
 #undef gpuDeviceProp
-#undef gpuCtx
-#undef gpuModule
-#undef gpuFunction
-#undef GPURTC_SUCCESS
-#undef gpurtcGetCodeSize
-#undef gpurtcGetCode
-#undef gpuModuleLoadData
-#undef gpuModuleGetFunction
-#undef gpuModuleLaunchKernel
-#undef gpuModuleUnload
-#undef gpuInit
-#undef gpuCtxCreate
-#undef gpuCtxDestroy
+
+#undef NOMP_BACKEND_FAILURE
+#undef RUNTIME
+#undef BACKEND
