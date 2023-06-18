@@ -42,20 +42,20 @@ jobs:
           use-mamba: false
       - name: Cache conda environment
         uses: actions/cache@v3
+        id: cache
         with:
           path: ${{ env.CONDA }}/envs/libnomp
           key:  conda-${{ runner.os }}-${{ hashFiles('environment.yml') }}-${{ hashFiles('requirements.txt') }}-${{ env.CACHE_NUMBER }}
-        id: cache
       - name: Update environment
         id: update_env
         run: |
           conda env update -n libnomp -f environment.yml
         if: steps.cache.outputs.cache-hit != 'true'
       - uses: actions/cache@v3
+        id: pocl_cache
         with:
           path: ~/conda_pkgs_dir/pocl
           key:  ${{ runner.os }}-build-pocl-${{ env.POCL_CACHE_NUMBER }}
-        id: pocl_cache
       - name: Install pocl
         id: install_pocl
         run: |
@@ -70,7 +70,7 @@ jobs:
       - name: Run libnomp tests
         id: run_libnomp
         run: |
-          "${NOMP_INSTALL_DIR}/bin/lnrun" test
+          ${NOMP_INSTALL_DIR}/bin/lnrun test -b opencl
       - name: Block to allow inspecting failures
         run: sleep 30m
         if: ${{ failure() && inputs.debug_enabled }}
