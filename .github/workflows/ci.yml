@@ -102,13 +102,14 @@ jobs:
       - name: Build libnomp
         id: build_libnomp
         run: |
+          sycl-ls
           echo "NOMP_INSTALL_DIR=${PWD}/../install" >> $GITHUB_ENV
           ./lncfg -idir ../install --prefix-path ${CONDA_PREFIX} -${{ matrix.backend }}  --opencl-lib ${CONDA_PREFIX}/lib/libOpenCL.so
           ./lninstall --no
       - name: Run libnomp tests
         id: run_libnomp
         run: |
-          ${NOMP_INSTALL_DIR}/bin/lnrun test -b ${{ matrix.backend }} -p 1
+          ${NOMP_INSTALL_DIR}/bin/lnrun test -b ${{ matrix.backend }}
       - name: Block to allow inspecting failures
         run: sleep 30m
         if: ${{ failure() && inputs.debug_enabled }}
