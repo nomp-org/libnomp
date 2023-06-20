@@ -39,7 +39,7 @@ jobs:
       - name: Cache conda environment
         uses: actions/cache@v3
         with:
-          path: ${{ env.CONDA }}/envs/libnomp-dev
+          path: /usr/share/miniconda/envs/libnomp-dev
           key:  conda-${{ runner.os }}-${{ hashFiles('environment-dev.yml') }}-${{ hashFiles('requirements.txt') }}-${{ env.CACHE_NUMBER }}
         id: cache
       - name: Update environment

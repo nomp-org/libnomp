@@ -44,7 +44,7 @@ jobs:
         uses: actions/cache@v3
         id: cache
         with:
-          path: ${{ env.CONDA }}/envs/libnomp
+          path: /usr/share/miniconda/envs/libnomp
           key:  conda-${{ runner.os }}-${{ hashFiles('environment.yml') }}-${{ hashFiles('requirements.txt') }}-${{ env.CACHE_NUMBER }}
       - name: Update environment
         id: update_env
@@ -54,7 +54,7 @@ jobs:
       - uses: actions/cache@v3
         id: pocl_cache
         with:
-          path: ~/conda_pkgs_dir/pocl
+          path: /usr/share/miniconda/envs/libnomp/lib/pocl
           key:  ${{ runner.os }}-build-pocl-${{ env.POCL_CACHE_NUMBER }}
       - name: Install pocl
         id: install_pocl
