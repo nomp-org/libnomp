@@ -125,6 +125,44 @@ static inline int deallocate_scratch_memory(struct nomp_backend_t *bnd) {
   return 0;
 }
 
+static inline int init_backend(struct nomp_backend_t *bnd) {
+  size_t n = strnlen(bnd->backend, NOMP_MAX_BUFSIZ);
+  for (int i = 0; i < n; i++)
+    bnd->backend[i] = tolower(bnd->backend[i]);
+
+  bnd->py_context = PyDict_New();
+  PyObject *obj = PyUnicode_FromString(bnd->backend);
+  PyDict_SetItemString(bnd->py_context, "backend::name", obj);
+  Py_XDECREF(obj);
+
+  if (strncmp(bnd->backend, "opencl", NOMP_MAX_BUFSIZ) == 0) {
+#if defined(OPENCL_ENABLED)
+    nomp_check(opencl_init(&nomp, bnd->platform_id, bnd->device_id));
+#endif
+  } else if (strncmp(bnd->backend, "cuda", NOMP_MAX_BUFSIZ) == 0) {
+#if defined(CUDA_ENABLED)
+    nomp_check(cuda_init(&nomp, bnd->platform_id, bnd->device_id));
+#endif
+  } else if (strncmp(bnd->backend, "hip", NOMP_MAX_BUFSIZ) == 0) {
+#if defined(HIP_ENABLED)
+    nomp_check(hip_init(&nomp, bnd->platform_id, bnd->device_id));
+#endif
+  } else if (strncmp(bnd->backend, "sycl", NOMP_MAX_BUFSIZ) == 0) {
+#if defined(SYCL_ENABLED)
+    nomp_check(sycl_init(&nomp, bnd->platform_id, bnd->device_id));
+#endif
+  } else if (strncmp(bnd->backend, "ispc", NOMP_MAX_BUFSIZ) == 0) {
+#if defined(ISPC_ENABLED)
+    nomp_check(ispc_init(&nomp, bnd->platform_id, bnd->device_id));
+#endif
+  } else {
+    return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                    "Invalid backend: %s.", bnd->backend);
+  }
+
+  return 0;
+}
+
 int nomp_init(int argc, const char **argv) {
   if (initialized) {
     return nomp_log(NOMP_INITIALIZE_FAILURE, NOMP_ERROR,
@@ -144,44 +182,19 @@ int nomp_init(int argc, const char **argv) {
 
   // Set profile level.
   nomp_check(nomp_profile_set_level(nomp.profile));
-
   nomp_profile("nomp_init", 1, 0);
+
   // Set verbose level.
   nomp_check(nomp_log_set_verbose(nomp.verbose));
 
-  size_t n = strnlen(nomp.backend, NOMP_MAX_BUFSIZ);
-  for (int i = 0; i < n; i++)
-    nomp.backend[i] = tolower(nomp.backend[i]);
+  // Initialize the backend.
+  nomp_check(init_backend(&nomp));
 
-  if (strncmp(nomp.backend, "opencl", NOMP_MAX_BUFSIZ) == 0) {
-#if defined(OPENCL_ENABLED)
-    nomp_check(opencl_init(&nomp, nomp.platform_id, nomp.device_id));
-#endif
-  } else if (strncmp(nomp.backend, "cuda", NOMP_MAX_BUFSIZ) == 0) {
-#if defined(CUDA_ENABLED)
-    nomp_check(cuda_init(&nomp, nomp.platform_id, nomp.device_id));
-#endif
-  } else if (strncmp(nomp.backend, "hip", NOMP_MAX_BUFSIZ) == 0) {
-#if defined(HIP_ENABLED)
-    nomp_check(hip_init(&nomp, nomp.platform_id, nomp.device_id));
-#endif
-  } else if (strncmp(nomp.backend, "sycl", NOMP_MAX_BUFSIZ) == 0) {
-#if defined(SYCL_ENABLED)
-    nomp_check(sycl_init(&nomp, nomp.platform_id, nomp.device_id));
-#endif
-  } else if (strncmp(nomp.backend, "ispc", NOMP_MAX_BUFSIZ) == 0) {
-#if defined(ISPC_ENABLED)
-    nomp_check(ispc_init(&nomp, nomp.platform_id, nomp.device_id));
-#endif
-  } else {
-    return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                    "Failed to initialize libnomp. "
-                    "Invalid backend: %s",
-                    nomp.backend);
-  }
-
+  // Allocate scratch memory.
   nomp_check(allocate_scratch_memory(&nomp));
+
   initialized = 1;
+
   nomp_profile("nomp_init", 0, 0);
 
   return 0;

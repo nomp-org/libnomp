@@ -15,6 +15,7 @@
 #define gpuGetDeviceCount TOKEN_PASTE(BACKEND, GetDeviceCount)
 #define gpuSetDevice TOKEN_PASTE(BACKEND, SetDevice)
 #define gpuGetDeviceProperties TOKEN_PASTE(BACKEND, GetDeviceProperties)
+#define gpuDriverGetVersion TOKEN_PASTE(BACKEND, DriverGetVersion)
 
 #define gpurtcResult TOKEN_PASTE(RUNTIME, Result)
 #define gpurtcGetErrorString TOKEN_PASTE(RUNTIME, GetErrorString)
@@ -176,6 +177,45 @@ static int gpu_finalize(struct nomp_backend_t *bnd) {
   return 0;
 }
 
+#define gpu_device_query TOKEN_PASTE(BACKEND, _device_query)
+int gpu_device_query(struct nomp_backend_t *bnd, int device_id) {
+  gpuDeviceProp_t prop;
+  chk_gpu(gpuGetDeviceProperties(&prop, device_id));
+
+#define set_string_aux(KEY, VAL)                                               \
+  {                                                                            \
+    PyObject *obj = PyUnicode_FromString(VAL);                                 \
+    PyDict_SetItemString(bnd->py_context, KEY, obj);                           \
+    Py_XDECREF(obj);                                                           \
+  }
+
+  set_string_aux("device::name", prop.name);
+
+#if defined(__HIP_PLATFORM_HCC__)
+  set_string_aux("device::vendor", "AMD");
+#else
+  set_string_aux("device::vendor", "NVIDIA");
+#endif
+
+#define set_int_aux(KEY, VAL)                                                  \
+  {                                                                            \
+    PyObject *obj = PyLong_FromSize_t(VAL);                                    \
+    PyDict_SetItemString(bnd->py_context, KEY, obj);                           \
+    Py_XDECREF(obj);                                                           \
+  }
+
+  int driver_version;
+  gpuDriverGetVersion(&driver_version);
+  set_int_aux("device::driver", driver_version);
+
+  set_string_aux("device::type", "gpu");
+
+#undef set_int_aux
+#undef set_string_aux
+
+  return 0;
+}
+
 #define gpu_init TOKEN_PASTE(BACKEND, _init)
 int gpu_init(struct nomp_backend_t *bnd, const int platform_id,
              const int device_id) {
@@ -189,11 +229,13 @@ int gpu_init(struct nomp_backend_t *bnd, const int platform_id,
   chk_gpu(gpuSetDevice(device_id));
   check(gpuFree(0));
 
-  struct gpu_backend_t *gbnd = nomp_calloc(struct gpu_backend_t, 1);
-  gbnd->device_id = device_id;
-  chk_gpu(gpuGetDeviceProperties(&gbnd->prop, device_id));
+  nomp_check(gpu_device_query(bnd, device_id));
 
-  bnd->bptr = (void *)gbnd;
+  struct gpu_backend_t *gpu = nomp_calloc(struct gpu_backend_t, 1);
+  gpu->device_id = device_id;
+  chk_gpu(gpuGetDeviceProperties(&gpu->prop, device_id));
+
+  bnd->bptr = (void *)gpu;
   bnd->update = gpu_update;
   bnd->knl_build = gpu_knl_build;
   bnd->knl_run = gpu_knl_run;
@@ -233,6 +275,7 @@ int gpu_init(struct nomp_backend_t *bnd, const int platform_id,
 #undef gpuGetDeviceCount
 #undef gpuSetDevice
 #undef gpuGetDeviceProperties
+#undef gpuDriverGetVersion
 
 #undef gpurtcResult
 #undef gpurtcGetErrorString
