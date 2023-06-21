@@ -147,16 +147,12 @@ static int opencl_finalize(struct nomp_backend_t *bnd) {
 }
 
 static int opencl_device_query(struct nomp_backend_t *bnd, cl_device_id id) {
-  bnd->py_context = PyDict_New();
-
 #define set_string_aux(KEY, VAL)                                               \
   {                                                                            \
     PyObject *obj = PyUnicode_FromString(VAL);                                 \
     PyDict_SetItemString(bnd->py_context, KEY, obj);                           \
     Py_XDECREF(obj);                                                           \
   }
-
-  set_string_aux("backend::name", "opencl");
 
 #define set_string_info(PARAM, KEY)                                            \
   {                                                                            \
@@ -169,9 +165,6 @@ static int opencl_device_query(struct nomp_backend_t *bnd, cl_device_id id) {
   set_string_info(CL_DEVICE_NAME, "device::name");
   set_string_info(CL_DEVICE_VENDOR, "device::vendor");
   set_string_info(CL_DRIVER_VERSION, "device::driver");
-
-#undef set_string_info
-#undef set_string_aux
 
   cl_device_type type;
   chk_cl(clGetDeviceInfo(id, CL_DEVICE_TYPE, sizeof(type), &type, NULL),
@@ -188,26 +181,8 @@ static int opencl_device_query(struct nomp_backend_t *bnd, cl_device_id id) {
   PyDict_SetItemString(bnd->py_context, "device::type", obj);
   Py_XDECREF(obj);
 
-#define set_int_info(T, PARAM, KEY)                                            \
-  {                                                                            \
-    T value;                                                                   \
-    chk_cl(clGetDeviceInfo(id, PARAM, sizeof(T), &value, NULL),                \
-           "clGetDeviceInfo");                                                 \
-    PyObject *obj = PyLong_FromSize_t(value);                                  \
-    PyDict_SetItemString(bnd->py_context, KEY, obj);                           \
-    Py_XDECREF(obj);                                                           \
-  }
-
-  set_int_info(cl_uint, CL_DEVICE_MAX_COMPUTE_UNITS,
-               "device::max_compute_units");
-  set_int_info(size_t, CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS,
-               "device::max_work_item_dims");
-  set_int_info(size_t, CL_DEVICE_MAX_WORK_GROUP_SIZE,
-               "device::max_work_group_size");
-  set_int_info(cl_uint, CL_DEVICE_MAX_CLOCK_FREQUENCY,
-               "device::max_clock_frequency");
-
-#undef set_int_info
+#undef set_string_info
+#undef set_string_aux
 
   return 0;
 }
@@ -215,7 +190,7 @@ static int opencl_device_query(struct nomp_backend_t *bnd, cl_device_id id) {
 int opencl_init(struct nomp_backend_t *bnd, const int platform_id,
                 const int device_id) {
   cl_uint num_platforms;
-  cl_int err = clGetPlatformIDs(0, NULL, &num_platforms);
+  chk_cl(clGetPlatformIDs(0, NULL, &num_platforms), "clGetPlatformIDs");
   if (platform_id < 0 | platform_id >= num_platforms) {
     return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                     "Platform id %d provided to libnomp is not valid.",
@@ -223,20 +198,23 @@ int opencl_init(struct nomp_backend_t *bnd, const int platform_id,
   }
 
   cl_platform_id *cl_platforms = nomp_calloc(cl_platform_id, num_platforms);
-  err = clGetPlatformIDs(num_platforms, cl_platforms, &num_platforms);
+  chk_cl(clGetPlatformIDs(num_platforms, cl_platforms, &num_platforms),
+         "clGetPlatformIDs");
   cl_platform_id platform = cl_platforms[platform_id];
   nomp_free(&cl_platforms);
 
   cl_uint num_devices;
-  err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 0, NULL, &num_devices);
+  chk_cl(clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 0, NULL, &num_devices),
+         "clGetDeviceIDs");
   if (device_id < 0 || device_id >= num_devices) {
     return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                     ERR_STR_USER_DEVICE_IS_INVALID, device_id);
   }
 
   cl_device_id *cl_devices = nomp_calloc(cl_device_id, num_devices);
-  err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, num_devices, cl_devices,
-                       &num_devices);
+  chk_cl(clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, num_devices, cl_devices,
+                        &num_devices),
+         "clGetDeviceIDs");
   cl_device_id device = cl_devices[device_id];
   nomp_free(&cl_devices);
 
@@ -244,8 +222,11 @@ int opencl_init(struct nomp_backend_t *bnd, const int platform_id,
 
   struct opencl_backend *ocl = nomp_calloc(struct opencl_backend, 1);
   ocl->device_id = device;
+  cl_int err;
   ocl->ctx = clCreateContext(NULL, 1, &device, NULL, NULL, &err);
+  chk_cl(err, "clCreateContext");
   ocl->queue = clCreateCommandQueueWithProperties(ocl->ctx, device, 0, &err);
+  chk_cl(err, "clCreateCommandQueueWithProperties");
 
   bnd->bptr = (void *)ocl;
   bnd->update = opencl_update;
