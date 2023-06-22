@@ -49,7 +49,7 @@ function print_help() {
     "${cyan}-cuda/--enable-cuda:${reset} Build with Cuda backend." \
     "(Default: ${NOMP_ENABLE_CUDA}).\n" \
     "${cyan}-cc/--c-compiler:${reset} Specify C Compiler.\n" \
-    "${cyan}-cxx/--cxx-compiler:${reset} Specify CXX Compiler.\n"
+    "${cyan}-cxx/--cxx-compiler:${reset} Specify CXX Compiler.\n" \
     "${cyan}--prefix-path:${reset} Semicolon separated list of prefix paths " \
     "for cmake.\n"
   exit 0
