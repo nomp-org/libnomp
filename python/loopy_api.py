@@ -850,24 +850,3 @@ def get_knl_src(knl: lp.translation_unit.TranslationUnit, backend: str) -> str:
 def get_knl_name(knl: lp.translation_unit.TranslationUnit, backend: str) -> str:
     """Returns the kernel name for a given backend."""
     return get_wrapper(backend).get_entry_point(knl)
-
-
-if __name__ == "__main__":
-    import os
-    import sys
-
-    sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-    KNL_STR = """
-          void foo(double *a, int N, double *sum) {
-            for (int i = 0; i < N; i++) {
-              sum[0] += a[i];
-            }
-          }
-          """
-    BACKEND = "cuda"
-    lp_knl = c_to_loopy(KNL_STR, BACKEND)
-
-    from reduction import realize_reduction
-
-    lp_knl = realize_reduction(lp_knl, "sum", {})
