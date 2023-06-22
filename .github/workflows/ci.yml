@@ -13,8 +13,9 @@ on:
         default: false
 env:
   # Increase to reset cache manually
-  CACHE_NUMBER: 1
-  POCL_CACHE_NUMBER: 1
+  CACHE_NUMBER: 0
+  POCL_CACHE_NUMBER: 0
+  LIBNOMP_ENV: /usr/share/miniconda/envs/libnomp
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -44,7 +45,7 @@ jobs:
         uses: actions/cache@v3
         id: cache
         with:
-          path: ${{ env.CONDA }}/envs/libnomp
+          path: ${{ env.LIBNOMP_ENV }}
           key:  conda-${{ runner.os }}-${{ hashFiles('environment.yml') }}-${{ hashFiles('requirements.txt') }}-${{ env.CACHE_NUMBER }}
       - name: Update environment
         id: update_env
@@ -54,7 +55,7 @@ jobs:
       - uses: actions/cache@v3
         id: pocl_cache
         with:
-          path: ~/conda_pkgs_dir/pocl
+          path: ${{ env.LIBNOMP_ENV }}/lib/pocl
           key:  ${{ runner.os }}-build-pocl-${{ env.POCL_CACHE_NUMBER }}
       - name: Install pocl
         id: install_pocl
