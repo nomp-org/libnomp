@@ -13,7 +13,9 @@ _TARGET_BLOCK_SIZE = {"cuda": 32, "opencl": 32, "sycl": 32}
 
 
 class InameCollector(pymbolic.mapper.WalkMapper):
-    def __init__(self, expr, *args, **kwargs):
+    """Get all the inames in a pymbolic expression."""
+
+    def __init__(self, expr):
         self.inames = []
         self.rec(expr)
 
@@ -22,20 +24,11 @@ class InameCollector(pymbolic.mapper.WalkMapper):
         super().map_variable(expr, args, kwargs)
 
     def get_inames(self) -> List[str]:
+        """Returns the inames which were found."""
         return self.inames
 
-
-def target_to_str(target: lp.target.TargetBase) -> str:
-    """Get the target name as a string"""
-    if isinstance(target, lp.target.cuda.CudaTarget):
-        return "cuda"
-    if isinstance(target, lp.target.opencl.OpenCLTarget):
-        return "opencl"
-    if isinstance(target, lp.target.ispc.ISPCTarget):
-        return "ispc"
-    if isinstance(target, lp.target.sycl.SYCLTarget):
-        return "sycl"
-    raise NotImplementedError(f"Uknown target: {target}")
+    def map_algebraic_leaf(self, expr, *args, **kwargs):
+        raise NotImplementedError
 
 
 def realize_reduction(
@@ -61,7 +54,7 @@ def realize_reduction(
     tunit = lp.split_iname(
         tunit,
         iname,
-        _TARGET_BLOCK_SIZE[target_to_str(knl.target)],
+        _TARGET_BLOCK_SIZE[context["backend::name"]],
         inner_iname=i_inner,
         outer_iname=i_outer,
     )

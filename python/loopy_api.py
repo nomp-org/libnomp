@@ -870,4 +870,4 @@ if __name__ == "__main__":
 
     from reduction import realize_reduction
 
-    lp_knl = realize_reduction(lp_knl, "sum")
+    lp_knl = realize_reduction(lp_knl, "sum", {})
