@@ -143,14 +143,15 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv425nomp_py_realize_reductionPP8PyObjectPKc">
-<span id="_CPPv325nomp_py_realize_reductionPP8PyObjectPKc"></span><span id="_CPPv225nomp_py_realize_reductionPP8PyObjectPKc"></span><span id="nomp_py_realize_reduction__PyObjectPP.cCP"></span><span class="target" id="group__nomp__py__utils_1gafec69d184ed8467facd1b6ca4f41c4fc"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_realize_reduction</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">knl</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">var</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425nomp_py_realize_reductionPP8PyObjectPKc" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv425nomp_py_realize_reductionPP8PyObjectPKcPK8PyObject">
+<span id="_CPPv325nomp_py_realize_reductionPP8PyObjectPKcPK8PyObject"></span><span id="_CPPv225nomp_py_realize_reductionPP8PyObjectPKcPK8PyObject"></span><span id="nomp_py_realize_reduction__PyObjectPP.cCP.PyObjectCP"></span><span class="target" id="group__nomp__py__utils_1ga1299017b3e5a66333d3944e4d95e3aee"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_realize_reduction</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">knl</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">var</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">context</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425nomp_py_realize_reductionPP8PyObjectPKcPK8PyObject" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Realize reductions if present in the kernel. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>knl</strong> – <strong>[inout]</strong> Loopy kernel object. </p></li>
 <li><p><strong>var</strong> – <strong>[in]</strong> Name of the reduction variable. </p></li>
+<li><p><strong>context</strong> – <strong>[in]</strong> Python dictionary with context information. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
