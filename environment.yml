@@ -4,8 +4,8 @@ channels:
   - anaconda
 dependencies:
   - python=3.10
-  - cmake=3.24
   - pip
+  - cmake=3.24
+  - symengine=0.10.1
   - pip:
     - -r requirements.txt
-  - symengine=0.10.1

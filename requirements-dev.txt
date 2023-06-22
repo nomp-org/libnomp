@@ -1,0 +1,7 @@
+isort==5.10.1
+black==22.8.0
+flake8==4.0.1
+breathe==4.34.0
+Sphinx==5.1.1
+sphinx-rtd-theme==1.0.0
+pylint==2.15.5
