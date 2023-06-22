@@ -13,7 +13,8 @@ on:
         default: false
 env:
   # Increase to reset cache manually
-  CACHE_NUMBER: 1
+  CACHE_NUMBER: 0
+  LIBNOMP_ENV: /usr/share/miniconda/envs/libnomp-dev
 jobs:
   docs:
     runs-on: ubuntu-latest
@@ -39,7 +40,7 @@ jobs:
       - name: Cache conda environment
         uses: actions/cache@v3
         with:
-          path: ${{ env.CONDA }}/envs/libnomp-dev
+          path: ${{ env.LIBNOMP_ENV }}
           key:  conda-${{ runner.os }}-${{ hashFiles('environment-dev.yml') }}-${{ hashFiles('requirements.txt') }}-${{ env.CACHE_NUMBER }}
         id: cache
       - name: Update environment
