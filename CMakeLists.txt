@@ -60,10 +60,14 @@ add_library(nomp SHARED ${SOURCES})
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 target_link_libraries(nomp PRIVATE Python3::Python)
+
 find_package(OpenSSL REQUIRED)
 target_link_libraries(nomp PRIVATE OpenSSL::SSL)
-find_package(SymEngine REQUIRED)
-target_link_libraries(nomp PRIVATE nomp::SymEngine)
+
+find_package(SymEngine REQUIRED HINTS $ENV{CONDA_PREFIX})
+include_directories(${SYMENGINE_INCLUDE_DIRS})
+target_link_libraries(nomp PRIVATE ${SYMENGINE_LIBRARIES})
+
 if (ENABLE_OPENCL)
   target_link_libraries(nomp PRIVATE OpenCL::OpenCL)
   target_compile_definitions(nomp PRIVATE OPENCL_ENABLED)
