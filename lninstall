@@ -18,10 +18,19 @@ else
   echo "${red}You should run ./lncfg before running ./${0}${reset}."
   exit 1
 fi
-if [[ ! -v NOMP_INSTALL_DIR ]]; then
+if [[ -z "${NOMP_INSTALL_DIR}" ]]; then
   echo "${red}NOMP_INSTALL_DIR is not set in .lnstate file${reset}."
   exit 1
 fi
+
+# Create commands which goes in shell configuration.
+NOMP_ENVIRONMENT=$(cat <<-END
+# Setup nomp environment variables.
+export NOMP_INSTALL_DIR=${NOMP_INSTALL_DIR}
+# Add lnrun script to path.
+export PATH=${NOMP_INSTALL_DIR}/bin:\${PATH}
+END
+)
 
 # Check if the specified shell configuration file exists. If not, look for
 # common config files.
@@ -35,16 +44,6 @@ if [[ ! -f "${NOMP_SHELL_CONFIG_FILE}" ]]; then
   fi
 fi
 
-function update_bashrc() {
-  [[ -n ${NOMP_SHELL_CONFIG_FILE} ]] &&
-    echo -e "${NOMP_ENVIRONMENT}" >>"${NOMP_SHELL_CONFIG_FILE}" &&
-    echo "${green}Successfully exported variables to" \
-    "${NOMP_SHELL_CONFIG_FILE}${reset}."
-  exit 0
-}
-
-# Check if the user asked us to update the shell configuration.
-NOMP_DEFAULT_PROMPT=""
 function print_help() {
   echo -e "Usage: ${0} [-h|--help] [-n|--no] [-y|--yes]\n" \
     "${cyan}-h/--help:${reset} Print help for libnomp install.\n" \
@@ -53,6 +52,8 @@ function print_help() {
   exit 0
 }
 
+# Check if the user asked us to update the shell configuration file.
+NOMP_DEFAULT_PROMPT=""
 if [[ $# -gt 0 ]]; then
   case $1 in
     -h | --help) print_help ;;
@@ -65,16 +66,28 @@ if [[ $# -gt 0 ]]; then
   esac
 fi
 
-# Create the commands which goes in shell configuration.
-NOMP_ENVIRONMENT=$(cat <<-END
-# Setup nomp environment variables.
-export NOMP_INSTALL_DIR=${NOMP_INSTALL_DIR}
-# Add lnrun script to path.
-export PATH=${NOMP_INSTALL_DIR}/bin:\${PATH}
-END
-)
+# Update the shell configuration file.
+function update_shellrc() {
+  if [[ -z "${NOMP_DEFAULT_PROMPT}" ]]; then
+    read -p "Do you wish to add libnomp env. variables to ${NOMP_SHELL_CONFIG_FILE}? [Y|n]: " -n 1
+    echo
+    NOMP_DEFAULT_PROMPT=$REPLY
+  fi
 
-# Installing libnomp.
+  [[ "${NOMP_DEFAULT_PROMPT}" = "n" ]] && exit 0
+
+  if [[ -n ${NOMP_SHELL_CONFIG_FILE} ]]; then
+    echo -e "${NOMP_ENVIRONMENT}" >> "${NOMP_SHELL_CONFIG_FILE}"
+    echo "${green}Successfully exported variables to" \
+    "${NOMP_SHELL_CONFIG_FILE}${reset}."
+    exit 0
+  else
+    echo "${red}Shell configration file ${NOMP_SHELL_CONFIG_FILE} doesn't exist{reset}."
+    exit 1
+  fi
+}
+
+# Install libnomp.
 NOMP_INSTALL_SUCCESS=false
 cmake --build "${NOMP_BUILD_DIR}" --target install &&
   NOMP_INSTALL_SUCCESS=true
@@ -83,17 +96,8 @@ if [[ ${NOMP_INSTALL_SUCCESS} = true ]]; then
   echo "${green}Successfully installed libnomp${reset}."
   echo "See ${cyan}lnrun -h${reset} or ${cyan}lnrun --help${reset} for " \
     "available commands."
-
-  [[ ${NOMP_DEFAULT_PROMPT} = "n" ]] && exit 0
-  [[ -z "${NOMP_SHELL_CONFIG_FILE}" ]] && exit 0
-
-  # set the libnomp env variables if not
-  [[ ${NOMP_DEFAULT_PROMPT} = "y" ]] && update_bashrc
-  read -p "Do you wish to add libnomp variables to .bashrc? [Y|n]: " -n 1
-  echo
-  [[ $REPLY =~ ^[Yy]$ ]] && update_bashrc
-  exit 0
+  update_shellrc
 else
-  echo "${red}Failed to install libnomp${reset}"
+  echo "${red}Failed to install libnomp${reset}."
   exit 1
 fi
