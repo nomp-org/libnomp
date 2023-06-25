@@ -1,56 +1,68 @@
-How to Use Nomp
-===============
+Nomp Examples
+=============
 
-Make sure both `NOMP_INSTALL_DIR` and `NOMP_CLANG_DIR` are set and follow
-the :doc:`Build Instructions <build>` correctly.
+Make sure both `libnomp` and `nompcc` is built and `NOMP_INSTALL_DIR` and
+`NOMP_CLANG_DIR` are set before trying this section. Follow the instructions
+in :doc:`Build Instructions <build>` to build and set these variables correctly.
 
-Create the following files in your working directory.
+This example requires creating three files in your working directory. First,
+let's create `foo.c` file which contains the C program annotated with `nomp`
+pragmas.
 
-The `foo.c` file contains the example with nomp pragmas. 
-
-..  code-block:: c
+.. code-block:: c
     :caption: foo.c
 
     #include <stdio.h>
 
     void foo(double *a) {
     #pragma nomp for transform("transforms", "foo")
-        for(int i = 0; i<10; i++)
-            a[i] = i;
+      for(int i = 0; i < 100; i++)
+        a[i] = i;
     }
 
     int main(int argc, const char *argv[]) {
     #pragma nomp init(argc, argv)
-        double a[10] = {0};
-        for (int i=0; i<10; i++)
-            printf("a[%d] = %f \n", i, a[i]);
-    #pragma nomp update(to : a[0, 10])
-        foo(a);
-    #pragma nomp update(from : a[0, 10])
-    #pragma nomp update(free : a[0, 10])
-        for (int i=0; i<10; i++)
-            printf("a[%d] = %f \n", i, a[i]);
+      double a[100] = {0};
+      for (int i = 0; i < 100; i++)
+        printf("a[%d] = %f \n", i, a[i]);
+
+    #pragma nomp update(to : a[0, 100])
+      foo(a);
+    #pragma nomp update(from : a[0, 100])
+
+      for (int i=0; i<100; i++)
+        printf("a[%d] = %f \n", i, a[i]);
+
+    #pragma nomp update(free : a[0, 100])
     #pragma nomp finalize
+
         return 0;
     }
 
-The `transforms.py` file contains the `foo` function that creates the loopy kernel. 
+Then let's create the `transforms.py` file which contains the `foo` Python
+function that is called by `libnomp` during the creation of accelerator kernel.
+This file has the loopy transformations that are applied to the kernel.
 
-..  code-block:: python
+.. code-block:: python
     :caption: transforms.py
 
     import loopy as lp
 
     LOOPY_LANG_VERSION = (2018, 2)
 
-    def foo(knl):
-        (g,) = knl.default_entrypoint.all_inames()
-        knl = lp.tag_inames(knl, [(g, "g.0")])
+    def foo(knl, context):
+        (iname,) = knl.default_entrypoint.all_inames()
+        i_inner, i_outer = f"{iname}_inner", f"{iname}_outer"
+        knl = lp.split_iname(
+            knl, iname, 32, inner_iname=i_inner, outer_iname=i_outer
+        )
+        knl = lp.tag_inames(knl, {i_outer: "g.0", i_inner: "l.0"})
         return knl
 
-`nompcc` contains the script that link libnomp installation to the clang compiler. 
+Finally, let's create `nompcc` which is a helper script that links libnomp
+installation to the clang compiler during compilation.
 
-..  code-block:: bash
+.. code-block:: bash
     :caption: nompcc
 
     #!/bin/bash
@@ -69,17 +81,19 @@ The `transforms.py` file contains the `foo` function that creates the loopy kern
 
     ${NOMP_CLANG_DIR}/clang -fnomp -include nomp.h -I${NOMP_INC_DIR} "$@" -Wl,-rpath,${NOMP_LIB_DIR} -L${NOMP_LIB_DIR} -lnomp
 
-To compile any file containing `nomp` pragmas, use `nompcc` as follows:
+Now, compile `foo.c` containing `nomp` pragmas using `nompcc` script as follows:
 
-..  code-block:: bash
+.. code-block:: bash
 
+    chmod +x nompcc
     ./nompcc foo.c -o foo
 
-You can now run the compiled executable by simply providing arguments to
-initialize and use backends, devices, etc.
+You can now run the compiled executable by simply providing commnad line
+arguments to initialize and use backends, devices, etc.
 
-..  code-block:: bash
+.. code-block:: bash
 
-    ./foo -b opencl -d 0
+    ./foo --nomp-backend opencl --nomp-device 0
 
-Read more about arguments accepted by nomp_init() under :doc:`User API <user-api>`.
+Read more about arguments accepted by nomp_init() under
+:doc:`User API <user-api>`.
