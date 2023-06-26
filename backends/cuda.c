@@ -2,7 +2,7 @@
 #include <cuda_runtime.h>
 #include <nvrtc.h>
 
-#define chk_cu(file, line, call)                                               \
+#define check_cu(file, line, call)                                             \
   {                                                                            \
     CUresult result = (call);                                                  \
     if (result != CUDA_SUCCESS) {                                              \
@@ -14,50 +14,44 @@
   }
 
 static const char *ERR_STR_BACKEND_FAILURE = "CUDA %s failure: %s.";
-
-#define BACKEND cuda
-#define RUNTIME nvrtc
 #define NOMP_BACKEND_FAILURE NOMP_CUDA_FAILURE
 
-#define gpuDeviceProp_t cudaDeviceProp
+#define BACKEND cuda
+#define RUNTIME_COMPILATION nvrtc
+#define RUNTIME cu
 
-#define gpuInit cuInit
-#define gpuCtxCreate cuCtxCreate
-#define gpuCtxDestroy cuCtxDestroy
-#define gpuModuleLoadData cuModuleLoadData
-#define gpuModuleGetFunction cuModuleGetFunction
-#define gpuModuleLaunchKernel cuLaunchKernel
-#define gpuModuleUnload cuModuleUnload
+#define backendDeviceProp_t cudaDeviceProp
 
-#define gpuModule CUmodule
-#define gpuFunction CUfunction
+#define backendModuleLaunchKernel cuLaunchKernel
 
-#define GPURTC_SUCCESS NVRTC_SUCCESS
-#define gpurtcGetCodeSize nvrtcGetPTXSize
-#define gpurtcGetCode nvrtcGetPTX
+#define backendModule CUmodule
+#define backendFunction CUfunction
 
-#define check(call) chk_cu(__FILE__, __LINE__, call)
+#define BACKENDRTC_SUCCESS NVRTC_SUCCESS
+#define backendrtcGetCodeSize nvrtcGetPTXSize
+#define backendrtcGetCode nvrtcGetPTX
+
+#define check(call) check_cu(__FILE__, __LINE__, call)
 
 #include "unified-cuda-hip-impl.h"
 
 #undef check
 
-#undef gpurtcGetCode
-#undef gpurtcGetCodeSize
-#undef GPURTC_SUCCESS
+#undef backendrtcGetCode
+#undef backendrtcGetCodeSize
+#undef BACKENDRTC_SUCCESS
 
-#undef gpuFunction
-#undef gpuModule
+#undef backendFunction
+#undef backendModule
 
-#undef gpuModuleUnload
-#undef gpuModuleLaunchKernel
-#undef gpuModuleGetFunction
-#undef gpuModuleLoadData
+#undef backendModuleLaunchKernel
 
-#undef gpuDeviceProp
+#undef backendDeviceProp
 
-#undef NOMP_BACKEND_FAILURE
 #undef RUNTIME
+#undef RUNTIME_COMPILATION
 #undef BACKEND
 
-#undef chk_cu
+#undef NOMP_BACKEND_FAILURE
+
+#undef check_cu
