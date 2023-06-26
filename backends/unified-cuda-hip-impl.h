@@ -193,8 +193,13 @@ int gpu_device_query(struct nomp_backend_t *bnd, int device_id) {
 
 #if defined(__HIP_PLATFORM_HCC__)
   set_string_aux("device::vendor", "AMD");
-#else
+  set_string_aux("device::type", "gpu");
+#elif defined(__HIP_PLATFORM_NVCC__) || defined(chk_cu)
   set_string_aux("device::vendor", "NVIDIA");
+  set_string_aux("device::type", "gpu");
+#else
+  set_string_aux("device::vendor", "unknown");
+  set_string_aux("device::type", "unknown");
 #endif
 
 #define set_int_aux(KEY, VAL)                                                  \
@@ -207,8 +212,6 @@ int gpu_device_query(struct nomp_backend_t *bnd, int device_id) {
   int driver_version;
   gpuDriverGetVersion(&driver_version);
   set_int_aux("device::driver", driver_version);
-
-  set_string_aux("device::type", "gpu");
 
 #undef set_int_aux
 #undef set_string_aux
