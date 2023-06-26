@@ -4,6 +4,7 @@
 
 static const char *ERR_STR_BACKEND_FAILURE = "CUDA %s failure: %s.";
 #define NOMP_BACKEND_FAILURE NOMP_CUDA_FAILURE
+#define NOMP_CUDA 1
 
 #define DRIVER cuda
 #define RUNTIME_COMPILATION nvrtc
@@ -50,4 +51,5 @@ static const char *ERR_STR_BACKEND_FAILURE = "CUDA %s failure: %s.";
 #undef RUNTIME_COMPILATION
 #undef DRIVER
 
+#undef NOMP_CUDA
 #undef NOMP_BACKEND_FAILURE

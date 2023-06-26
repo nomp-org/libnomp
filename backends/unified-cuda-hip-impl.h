@@ -206,15 +206,10 @@ static int backend_device_query(struct nomp_backend_t *bnd, int device_id) {
 
   set_string_aux("device::name", prop.name);
 
-#if defined(__HIP_PLATFORM_HCC__)
+#if defined(NOMP_HIP)
   set_string_aux("device::vendor", "AMD");
-  set_string_aux("device::type", "gpu");
-#elif defined(__HIP_PLATFORM_NVCC__) || defined(checkk_cu)
+#elif defined(NOMP_CUDA)
   set_string_aux("device::vendor", "NVIDIA");
-  set_string_aux("device::type", "gpu");
-#else
-  set_string_aux("device::vendor", "unknown");
-  set_string_aux("device::type", "unknown");
 #endif
 
 #define set_int_aux(KEY, VAL)                                                  \
@@ -227,6 +222,8 @@ static int backend_device_query(struct nomp_backend_t *bnd, int device_id) {
   int driver_version;
   backendDriverGetVersion(&driver_version);
   set_int_aux("device::driver", driver_version);
+
+  set_string_aux("device::type", "gpu");
 
 #undef set_int_aux
 #undef set_string_aux

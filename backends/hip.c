@@ -3,6 +3,7 @@
 
 static const char *ERR_STR_BACKEND_FAILURE = "HIP %s failure: %s.";
 #define NOMP_BACKEND_FAILURE NOMP_HIP_FAILURE
+#define NOMP_HIP 1
 
 #define DRIVER hip
 #define RUNTIME_COMPILATION hiprtc
@@ -40,4 +41,5 @@ static const char *ERR_STR_BACKEND_FAILURE = "HIP %s failure: %s.";
 #undef RUNTIME_COMPILATION
 #undef DRIVER
 
+#undef NOMP_HIP
 #undef NOMP_BACKEND_FAILURE
