@@ -1,7 +1,7 @@
 #include "nomp-test.h"
 
-static int test_valid_arguments() {
-  const char *argv[7] = {"foo.c", "--nomp-backend",  "opencl", "--nomp-device",
+static int test_valid_arguments(const char *backend) {
+  const char *argv[7] = {"foo.c", "--nomp-backend",  backend, "--nomp-device",
                          "0",     "--nomp-platform", "0"};
   int argc = 7;
 
@@ -11,9 +11,9 @@ static int test_valid_arguments() {
   return 0;
 }
 
-static int test_ignore_non_argument_string() {
-  const char *argv[8] = {"--nomp-backend",  "opencl", "cuda",
-                         "--nomp-device",   "0",      "1",
+static int test_ignore_non_argument_string(const char *backend) {
+  const char *argv[8] = {"--nomp-backend",  backend, "cuda",
+                         "--nomp-device",   "0",     "1",
                          "--nomp-platform", "0"};
   int argc = 8;
 
@@ -23,9 +23,9 @@ static int test_ignore_non_argument_string() {
   return 0;
 }
 
-static int test_invalid_argument_flag() {
-  const char *argv[8] = {"--nomp-backend",  "opencl", "--nomp-device", "0",
-                         "--nomp-platform", "0",      "--unknown-arg", "value"};
+static int test_invalid_argument_flag(const char *backend) {
+  const char *argv[8] = {"--nomp-backend",  backend, "--nomp-device", "0",
+                         "--nomp-platform", "0",     "--unknown-arg", "value"};
   int argc = 8;
 
   nomp_test_chk(nomp_init(argc, argv));
@@ -34,8 +34,8 @@ static int test_invalid_argument_flag() {
   return 0;
 }
 
-static int test_missing_argument() {
-  const char *argv[5] = {"--nomp-backend", "opencl", "--nomp-device", "0",
+static int test_missing_argument(const char *backend) {
+  const char *argv[5] = {"--nomp-backend", backend, "--nomp-device", "0",
                          "--nomp-platform"};
   int argc = 5;
   int err = nomp_init(argc, argv);
@@ -50,11 +50,20 @@ static int test_missing_argument() {
 }
 
 int main(int argc, const char *argv[]) {
+  char backend[NOMP_TEST_MAX_BUFSIZ];
+  for (unsigned i = 0; i < argc; i++) {
+    if (strncmp(argv[i], "--nomp-backend", NOMP_TEST_MAX_BUFSIZ) == 0) {
+      assert(i + 1 < argc);
+      strncpy(backend, argv[i + 1], NOMP_TEST_MAX_BUFSIZ);
+      break;
+    }
+  }
+
   int err = 0;
-  err |= SUBTEST(test_valid_arguments);
-  err |= SUBTEST(test_ignore_non_argument_string);
-  err |= SUBTEST(test_invalid_argument_flag);
-  err |= SUBTEST(test_missing_argument);
+  err |= SUBTEST(test_valid_arguments, backend);
+  err |= SUBTEST(test_ignore_non_argument_string, backend);
+  err |= SUBTEST(test_invalid_argument_flag, backend);
+  err |= SUBTEST(test_missing_argument, backend);
 
   return err;
 }
