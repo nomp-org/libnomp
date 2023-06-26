@@ -53,7 +53,7 @@ jobs:
         run: |
           mkdir -p ${BUILDDIR}
           cd ${BUILDDIR}
-          (cat ../${DOCSDIR}/Doxyfile.in; echo 'OUTPUT_DIRECTORY = "."'; echo 'INPUT = "../src"';) | doxygen -
+          (cat ../${DOCSDIR}/Doxyfile.in; echo 'OUTPUT_DIRECTORY = "."'; echo 'INPUT = "../include"';) | doxygen -
       - name: Run sphinx
         id: run_sphinx
         run: |

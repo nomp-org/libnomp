@@ -73,7 +73,7 @@ find_package(OpenSSL REQUIRED)
 target_link_libraries(nomp PRIVATE OpenSSL::SSL)
 
 find_package(SymEngine REQUIRED HINTS $ENV{CONDA_PREFIX})
-include_directories(${SYMENGINE_INCLUDE_DIRS})
+target_include_directories(nomp PRIVATE ${SYMENGINE_INCLUDE_DIRS})
 target_link_libraries(nomp PRIVATE ${SYMENGINE_LIBRARIES})
 
 if (ENABLE_OPENCL)
@@ -100,8 +100,8 @@ endif()
 set_target_properties(nomp PROPERTIES
   VERSION ${PROJECT_VERSION}
   SOVERSION 1
-  PUBLIC_HEADER src/nomp.h)
-target_include_directories(nomp PRIVATE src)
+  PUBLIC_HEADER include/nomp.h)
+target_include_directories(nomp PRIVATE include)
 
 option(ENABLE_DOCS "Enable Documentation" OFF)
 if (ENABLE_DOCS)
@@ -121,7 +121,7 @@ foreach(test ${TESTS})
   string(REPLACE ".c" "" test_exe ${temp})
   add_executable(${test_exe} ${test})
   target_link_libraries(${test_exe} nomp)
-  target_include_directories(${test_exe} PUBLIC src tests)
+  target_include_directories(${test_exe} PRIVATE include tests)
   install (TARGETS ${test_exe} RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/tests)
 endforeach(test ${TESTS})
 install(DIRECTORY tests/ DESTINATION ${CMAKE_INSTALL_PREFIX}/tests
