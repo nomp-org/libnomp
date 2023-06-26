@@ -18,13 +18,13 @@ static const char *ERR_STR_OPENCL_FAILURE = "%s failed with error code: %d.";
     }                                                                          \
   }
 
-struct opencl_backend {
+struct opencl_backend_t {
   cl_device_id device_id;
   cl_command_queue queue;
   cl_context ctx;
 };
 
-struct opencl_prog {
+struct opencl_prog_t {
   cl_program prg;
   cl_kernel knl;
 };
@@ -32,7 +32,7 @@ struct opencl_prog {
 static int opencl_update(struct nomp_backend_t *bnd, struct nomp_mem_t *m,
                          const nomp_map_direction_t op, size_t start,
                          size_t end, size_t usize) {
-  struct opencl_backend *ocl = (struct opencl_backend *)bnd->bptr;
+  struct opencl_backend_t *ocl = (struct opencl_backend_t *)bnd->bptr;
 
   cl_int err;
   if (op & NOMP_ALLOC) {
@@ -68,9 +68,9 @@ static int opencl_update(struct nomp_backend_t *bnd, struct nomp_mem_t *m,
 
 static int opencl_knl_build(struct nomp_backend_t *bnd, struct nomp_prog_t *prg,
                             const char *source, const char *name) {
-  struct opencl_backend *ocl = bnd->bptr;
-  struct opencl_prog *ocl_prg = prg->bptr = nomp_calloc(struct opencl_prog, 1);
+  struct opencl_prog_t *ocl_prg = nomp_calloc(struct opencl_prog_t, 1);
 
+  struct opencl_backend_t *ocl = (struct opencl_backend_t *)bnd->bptr;
   cl_int err;
   ocl_prg->prg = clCreateProgramWithSource(
       ocl->ctx, 1, (const char **)(&source), NULL, &err);
@@ -94,20 +94,21 @@ static int opencl_knl_build(struct nomp_backend_t *bnd, struct nomp_prog_t *prg,
 
   ocl_prg->knl = clCreateKernel(ocl_prg->prg, name, &err);
   chk_cl(err, "clCreateKernel");
+  prg->bptr = (void *)ocl_prg;
 
   return 0;
 }
 
 static int opencl_knl_run(struct nomp_backend_t *bnd, struct nomp_prog_t *prg) {
-  struct opencl_prog *oprg = (struct opencl_prog *)prg->bptr;
+  struct opencl_prog_t *ocl_prg = (struct opencl_prog_t *)prg->bptr;
 
   for (int i = 0; i < prg->nargs; i++) {
-    chk_cl(clSetKernelArg(oprg->knl, i, prg->args[i].size, prg->args[i].ptr),
+    chk_cl(clSetKernelArg(ocl_prg->knl, i, prg->args[i].size, prg->args[i].ptr),
            "clSetKernelArg");
   }
 
-  struct opencl_backend *ocl = (struct opencl_backend *)bnd->bptr;
-  chk_cl(clEnqueueNDRangeKernel(ocl->queue, oprg->knl, prg->ndim, NULL,
+  struct opencl_backend_t *ocl = (struct opencl_backend_t *)bnd->bptr;
+  chk_cl(clEnqueueNDRangeKernel(ocl->queue, ocl_prg->knl, prg->ndim, NULL,
                                 prg->gws, prg->local, 0, NULL, NULL),
          "clEnqueueNDRangeKernel");
 
@@ -115,7 +116,7 @@ static int opencl_knl_run(struct nomp_backend_t *bnd, struct nomp_prog_t *prg) {
 }
 
 static int opencl_knl_free(struct nomp_prog_t *prg) {
-  struct opencl_prog *ocl_prg = prg->bptr;
+  struct opencl_prog_t *ocl_prg = (struct opencl_prog_t *)prg->bptr;
 
   if (ocl_prg) {
     chk_cl(clReleaseKernel(ocl_prg->knl), "clReleaseKernel");
@@ -127,15 +128,13 @@ static int opencl_knl_free(struct nomp_prog_t *prg) {
 }
 
 static int opencl_sync(struct nomp_backend_t *bnd) {
-  struct opencl_backend *ocl = (struct opencl_backend *)bnd->bptr;
-
+  struct opencl_backend_t *ocl = (struct opencl_backend_t *)bnd->bptr;
   chk_cl(clFinish(ocl->queue), "clFinish");
-
   return 0;
 }
 
 static int opencl_finalize(struct nomp_backend_t *bnd) {
-  struct opencl_backend *ocl = bnd->bptr;
+  struct opencl_backend_t *ocl = (struct opencl_backend_t *)bnd->bptr;
 
   if (ocl) {
     chk_cl(clReleaseCommandQueue(ocl->queue), "clReleaseCommandQueue");
@@ -220,7 +219,7 @@ int opencl_init(struct nomp_backend_t *bnd, const int platform_id,
 
   nomp_check(opencl_device_query(bnd, device));
 
-  struct opencl_backend *ocl = nomp_calloc(struct opencl_backend, 1);
+  struct opencl_backend_t *ocl = nomp_calloc(struct opencl_backend_t, 1);
   ocl->device_id = device;
   cl_int err;
   ocl->ctx = clCreateContext(NULL, 1, &device, NULL, NULL, &err);
