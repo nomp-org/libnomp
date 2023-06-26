@@ -4,7 +4,7 @@
 static const char *ERR_STR_BACKEND_FAILURE = "HIP %s failure: %s.";
 #define NOMP_BACKEND_FAILURE NOMP_HIP_FAILURE
 
-#define BACKEND hip
+#define DRIVER hip
 #define RUNTIME_COMPILATION hiprtc
 #define RUNTIME hip
 
@@ -15,7 +15,7 @@ static const char *ERR_STR_BACKEND_FAILURE = "HIP %s failure: %s.";
 #define backendModule hipModule_t
 #define backendFunction hipFunction_t
 
-#define BACKENDRTC_SUCCESS HIPRTC_SUCCESS
+#define RTC_SUCCESS HIPRTC_SUCCESS
 #define backendrtcGetCodeSize hiprtcGetCodeSize
 #define backendrtcGetCode hiprtcGetCode
 
@@ -27,7 +27,7 @@ static const char *ERR_STR_BACKEND_FAILURE = "HIP %s failure: %s.";
 
 #undef backendrtcGetCode
 #undef backendrtcGetCodeSize
-#undef BACKENDRTC_SUCCESS
+#undef RTC_SUCCESS
 
 #undef backendFunction
 #undef backendModule
@@ -38,6 +38,6 @@ static const char *ERR_STR_BACKEND_FAILURE = "HIP %s failure: %s.";
 
 #undef RUNTIME
 #undef RUNTIME_COMPILATION
-#undef BACKEND
+#undef DRIVER
 
 #undef NOMP_BACKEND_FAILURE

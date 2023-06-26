@@ -16,7 +16,7 @@
 static const char *ERR_STR_BACKEND_FAILURE = "CUDA %s failure: %s.";
 #define NOMP_BACKEND_FAILURE NOMP_CUDA_FAILURE
 
-#define BACKEND cuda
+#define DRIVER cuda
 #define RUNTIME_COMPILATION nvrtc
 #define RUNTIME cu
 
@@ -27,7 +27,7 @@ static const char *ERR_STR_BACKEND_FAILURE = "CUDA %s failure: %s.";
 #define backendModule CUmodule
 #define backendFunction CUfunction
 
-#define BACKENDRTC_SUCCESS NVRTC_SUCCESS
+#define RTC_SUCCESS NVRTC_SUCCESS
 #define backendrtcGetCodeSize nvrtcGetPTXSize
 #define backendrtcGetCode nvrtcGetPTX
 
@@ -39,7 +39,7 @@ static const char *ERR_STR_BACKEND_FAILURE = "CUDA %s failure: %s.";
 
 #undef backendrtcGetCode
 #undef backendrtcGetCodeSize
-#undef BACKENDRTC_SUCCESS
+#undef RTC_SUCCESS
 
 #undef backendFunction
 #undef backendModule
@@ -50,7 +50,7 @@ static const char *ERR_STR_BACKEND_FAILURE = "CUDA %s failure: %s.";
 
 #undef RUNTIME
 #undef RUNTIME_COMPILATION
-#undef BACKEND
+#undef DRIVER
 
 #undef NOMP_BACKEND_FAILURE
 
