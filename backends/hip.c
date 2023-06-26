@@ -1,48 +1,43 @@
 #include <hip/hip_runtime.h>
 #include <hip/hiprtc.h>
 
-const char *ERR_STR_BACKEND_FAILURE = "HIP %s failure: %s.";
-
-#define BACKEND hip
-#define RUNTIME hiprtc
+static const char *ERR_STR_BACKEND_FAILURE = "HIP %s failure: %s.";
 #define NOMP_BACKEND_FAILURE NOMP_HIP_FAILURE
 
-#define gpuDeviceProp_t hipDeviceProp_t
+#define BACKEND hip
+#define RUNTIME_COMPILATION hiprtc
+#define RUNTIME hip
 
-#define gpuInit hipInit
-#define gpuCtxCreate hipCtxCreate
-#define gpuCtxDestroy hipCtxDestroy
-#define gpuModuleLoadData hipModuleLoadData
-#define gpuModuleGetFunction hipModuleGetFunction
-#define gpuModuleLaunchKernel hipModuleLaunchKernel
-#define gpuModuleUnload hipModuleUnload
+#define backendDeviceProp_t hipDeviceProp_t
 
-#define gpuModule hipModule_t
-#define gpuFunction hipFunction_t
+#define backendModuleLaunchKernel hipModuleLaunchKernel
 
-#define GPURTC_SUCCESS HIPRTC_SUCCESS
-#define gpurtcGetCodeSize hiprtcGetCodeSize
-#define gpurtcGetCode hiprtcGetCode
+#define backendModule hipModule_t
+#define backendFunction hipFunction_t
 
-#define check(call) chk_gpu(call)
+#define BACKENDRTC_SUCCESS HIPRTC_SUCCESS
+#define backendrtcGetCodeSize hiprtcGetCodeSize
+#define backendrtcGetCode hiprtcGetCode
+
+#define check(call) check_backend(call)
 
 #include "unified-cuda-hip-impl.h"
 
 #undef check
 
-#undef gpurtcGetCode
-#undef gpurtcGetCodeSize
-#undef GPURTC_SUCCESS
+#undef backendrtcGetCode
+#undef backendrtcGetCodeSize
+#undef BACKENDRTC_SUCCESS
 
-#undef gpuFunction
-#undef gpuModule
-#undef gpuModuleUnload
-#undef gpuModuleLaunchKernel
-#undef gpuModuleGetFunction
-#undef gpuModuleLoadData
+#undef backendFunction
+#undef backendModule
 
-#undef gpuDeviceProp
+#undef backendModuleLaunchKernel
+
+#undef backendDeviceProp
+
+#undef RUNTIME
+#undef RUNTIME_COMPILATION
+#undef BACKEND
 
 #undef NOMP_BACKEND_FAILURE
-#undef RUNTIME
-#undef BACKEND
