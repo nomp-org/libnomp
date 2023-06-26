@@ -2,17 +2,6 @@
 #include <cuda_runtime.h>
 #include <nvrtc.h>
 
-#define check_cu(file, line, call)                                             \
-  {                                                                            \
-    CUresult result = (call);                                                  \
-    if (result != CUDA_SUCCESS) {                                              \
-      const char *msg;                                                         \
-      cuGetErrorName(result, &msg);                                            \
-      return nomp_log(NOMP_BACKEND_FAILURE, NOMP_ERROR,                        \
-                      ERR_STR_BACKEND_FAILURE, "operation", msg);              \
-    }                                                                          \
-  }
-
 static const char *ERR_STR_BACKEND_FAILURE = "CUDA %s failure: %s.";
 #define NOMP_BACKEND_FAILURE NOMP_CUDA_FAILURE
 
@@ -31,11 +20,20 @@ static const char *ERR_STR_BACKEND_FAILURE = "CUDA %s failure: %s.";
 #define backendrtcGetCodeSize nvrtcGetPTXSize
 #define backendrtcGetCode nvrtcGetPTX
 
-#define check(call) check_cu(__FILE__, __LINE__, call)
+#define check_runtime(call)                                                    \
+  {                                                                            \
+    CUresult result = (call);                                                  \
+    if (result != CUDA_SUCCESS) {                                              \
+      const char *msg;                                                         \
+      cuGetErrorName(result, &msg);                                            \
+      return nomp_log(NOMP_BACKEND_FAILURE, NOMP_ERROR,                        \
+                      ERR_STR_BACKEND_FAILURE, "operation", msg);              \
+    }                                                                          \
+  }
 
 #include "unified-cuda-hip-impl.h"
 
-#undef check
+#undef check_runtime
 
 #undef backendrtcGetCode
 #undef backendrtcGetCodeSize
@@ -53,5 +51,3 @@ static const char *ERR_STR_BACKEND_FAILURE = "CUDA %s failure: %s.";
 #undef DRIVER
 
 #undef NOMP_BACKEND_FAILURE
-
-#undef check_cu
