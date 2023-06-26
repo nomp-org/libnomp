@@ -47,11 +47,11 @@
     }                                                                          \
   }
 
-#define check_backend(call)                                                    \
+#define check_driver(call)                                                     \
   check_error(call, backendError_t, backendSuccess, backendGetErrorName,       \
               "operation");
 
-#define check_backend_rt(call)                                                 \
+#define check_rtc(call)                                                        \
   check_error(call, backendrtcResult, RTC_SUCCESS, backendrtcGetErrorString,   \
               "runtime")
 
@@ -82,22 +82,22 @@ static int backend_update(struct nomp_backend_t *bnd, struct nomp_mem_t *m,
                           const nomp_map_direction_t op, size_t start,
                           size_t end, size_t usize) {
   if (op & NOMP_ALLOC)
-    check_backend(backendMalloc(&m->bptr, NOMP_MEM_BYTES(start, end, usize)));
+    check_driver(backendMalloc(&m->bptr, NOMP_MEM_BYTES(start, end, usize)));
 
   if (op & NOMP_TO) {
-    check_backend(backendMemcpy(
+    check_driver(backendMemcpy(
         (char *)(m->bptr) + NOMP_MEM_OFFSET(start - m->idx0, usize),
         (char *)(m->hptr) + NOMP_MEM_OFFSET(start, usize),
         NOMP_MEM_BYTES(start, end, usize), backendMemcpyHostToDevice));
   }
 
   if (op == NOMP_FROM) {
-    check_backend(backendMemcpy(
+    check_driver(backendMemcpy(
         (char *)(m->hptr) + NOMP_MEM_OFFSET(start, usize),
         (char *)(m->bptr) + NOMP_MEM_OFFSET(start - m->idx0, usize),
         NOMP_MEM_BYTES(start, end, usize), backendMemcpyDeviceToHost));
   } else if (op == NOMP_FREE) {
-    check_backend(backendFree(m->bptr));
+    check_driver(backendFree(m->bptr));
     m->bptr = NULL;
   }
 
@@ -113,12 +113,12 @@ static void backend_update_ptr(void **p, size_t *size, struct nomp_mem_t *m) {
 static int backend_knl_build(struct nomp_backend_t *bnd,
                              struct nomp_prog_t *prg, const char *source,
                              const char *name) {
-  struct backend_t *gbnd = (struct backend_t *)bnd->bptr;
+  struct backend_t *backend = (struct backend_t *)bnd->bptr;
 
   backendrtcProgram prog;
-  check_backend_rt(backendrtcCreateProgram(&prog, source, NULL, 0, NULL, NULL));
+  check_rtc(backendrtcCreateProgram(&prog, source, NULL, 0, NULL, NULL));
 
-  backendrtcResult result = backend_compile(prog, gbnd);
+  backendrtcResult result = backend_compile(prog, backend);
   if (result != RTC_SUCCESS) {
     const char *err = backendrtcGetErrorString(result);
 
@@ -137,15 +137,15 @@ static int backend_knl_build(struct nomp_backend_t *bnd,
   }
 
   size_t size;
-  check_backend_rt(backendrtcGetCodeSize(prog, &size));
+  check_rtc(backendrtcGetCodeSize(prog, &size));
   char *code = nomp_calloc(char, size + 1);
-  check_backend_rt(backendrtcGetCode(prog, code));
-  check_backend_rt(backendrtcDestroyProgram(&prog));
+  check_rtc(backendrtcGetCode(prog, code));
+  check_rtc(backendrtcDestroyProgram(&prog));
 
   struct backend_prog_t *gprg = nomp_calloc(struct backend_prog_t, 1);
-  check(backendModuleLoadData(&gprg->module, code));
+  check_runtime(backendModuleLoadData(&gprg->module, code));
   nomp_free(&code);
-  check(backendModuleGetFunction(&gprg->kernel, gprg->module, name));
+  check_runtime(backendModuleGetFunction(&gprg->kernel, gprg->module, name));
   prg->bptr = (void *)gprg;
 
   return 0;
@@ -164,26 +164,25 @@ static int backend_knl_run(struct nomp_backend_t *bnd,
   }
 
   const size_t *global = prg->global, *local = prg->local;
-  struct backend_prog_t *gprg = (struct backend_prog_t *)prg->bptr;
-  check(backendModuleLaunchKernel(gprg->kernel, global[0], global[1], global[2],
-                                  local[0], local[1], local[2], 0, NULL, vargs,
-                                  NULL));
+  struct backend_prog_t *bprg = (struct backend_prog_t *)prg->bptr;
+  check_runtime(backendModuleLaunchKernel(bprg->kernel, global[0], global[1],
+                                          global[2], local[0], local[1],
+                                          local[2], 0, NULL, vargs, NULL));
 
   return 0;
 }
 
 #define backend_knl_free TOKEN_PASTE(DRIVER, _knl_free)
 static int backend_knl_free(struct nomp_prog_t *prg) {
-  struct backend_prog_t *gprg = (struct backend_prog_t *)prg->bptr;
-  if (gprg)
-    check(backendModuleUnload(gprg->module));
-
+  struct backend_prog_t *bprg = (struct backend_prog_t *)prg->bptr;
+  if (bprg)
+    check_runtime(backendModuleUnload(bprg->module));
   return 0;
 }
 
 #define backend_sync TOKEN_PASTE(DRIVER, _sync)
 static int backend_sync(struct nomp_backend_t *bnd) {
-  check_backend(backendDeviceSynchronize());
+  check_driver(backendDeviceSynchronize());
   return 0;
 }
 
@@ -194,9 +193,9 @@ static int backend_finalize(struct nomp_backend_t *bnd) {
 }
 
 #define backend_device_query TOKEN_PASTE(DRIVER, _device_query)
-int backend_device_query(struct nomp_backend_t *bnd, int device_id) {
+static int backend_device_query(struct nomp_backend_t *bnd, int device_id) {
   backendDeviceProp_t prop;
-  check_backend(backendGetDeviceProperties(&prop, device_id));
+  check_driver(backendGetDeviceProperties(&prop, device_id));
 
 #define set_string_aux(KEY, VAL)                                               \
   {                                                                            \
@@ -210,7 +209,7 @@ int backend_device_query(struct nomp_backend_t *bnd, int device_id) {
 #if defined(__HIP_PLATFORM_HCC__)
   set_string_aux("device::vendor", "AMD");
   set_string_aux("device::type", "gpu");
-#elif defined(__HIP_PLATFORM_NVCC__) || defined(chk_cu)
+#elif defined(__HIP_PLATFORM_NVCC__) || defined(checkk_cu)
   set_string_aux("device::vendor", "NVIDIA");
   set_string_aux("device::type", "gpu");
 #else
@@ -239,20 +238,20 @@ int backend_device_query(struct nomp_backend_t *bnd, int device_id) {
 int backend_init(struct nomp_backend_t *bnd, const int platform_id,
                  const int device_id) {
   int num_devices;
-  check(backendGetDeviceCount(&num_devices));
+  check_runtime(backendGetDeviceCount(&num_devices));
   if (device_id < 0 || device_id >= num_devices) {
     return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                     ERR_STR_USER_DEVICE_IS_INVALID, device_id);
   }
 
-  check_backend(backendSetDevice(device_id));
-  check(backendFree(0));
+  check_driver(backendSetDevice(device_id));
+  check_runtime(backendFree(0));
 
   nomp_check(backend_device_query(bnd, device_id));
 
   struct backend_t *backend = nomp_calloc(struct backend_t, 1);
   backend->device_id = device_id;
-  check_backend(backendGetDeviceProperties(&backend->prop, device_id));
+  check_driver(backendGetDeviceProperties(&backend->prop, device_id));
 
   bnd->bptr = (void *)backend;
   bnd->update = backend_update;
@@ -278,8 +277,8 @@ int backend_init(struct nomp_backend_t *bnd, const int platform_id,
 #undef backend_prog_t
 #undef backend_t
 
-#undef check_backend_rt
-#undef check_backend
+#undef check_rtc
+#undef check_driver
 #undef check_error
 
 #undef backendModuleUnload

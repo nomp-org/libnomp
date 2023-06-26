@@ -19,11 +19,11 @@ static const char *ERR_STR_BACKEND_FAILURE = "HIP %s failure: %s.";
 #define backendrtcGetCodeSize hiprtcGetCodeSize
 #define backendrtcGetCode hiprtcGetCode
 
-#define check(call) check_backend(call)
+#define check_runtime(call) check_driver(call)
 
 #include "unified-cuda-hip-impl.h"
 
-#undef check
+#undef check_runtime
 
 #undef backendrtcGetCode
 #undef backendrtcGetCodeSize
