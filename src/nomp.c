@@ -74,9 +74,9 @@ static inline int check_env_vars(struct nomp_backend_t *bnd) {
 
 static inline int init_configs(int argc, const char **argv,
                                struct nomp_backend_t *bnd) {
-  // We only a provide default value for verbose. Everything else has to be set
-  // by user explicitly.
-  bnd->verbose = 0, bnd->device_id = bnd->platform_id = -1;
+  // verbose, profile, device and platform id are all initialized to zero.
+  // Everything else has to be set by user explicitly.
+  bnd->verbose = bnd->profile = bnd->device_id = bnd->platform_id = 0;
   strcpy(bnd->backend, ""), strcpy(bnd->install_dir, "");
 
   nomp_check(check_cmd_line(bnd, argc, argv));
@@ -92,9 +92,6 @@ static inline int init_configs(int argc, const char **argv,
     }                                                                          \
   }
 
-  check_if_initialized(bnd->device_id == -1, "--nomp-device", "NOMP_DEVICE");
-  check_if_initialized(bnd->platform_id == -1, "--nomp-platform",
-                       "NOMP_PLATFORM");
   check_if_initialized(strlen(bnd->backend) == 0, "--nomp-backend",
                        "NOMP_BACKEND");
   check_if_initialized(strlen(bnd->install_dir) == 0, "--nomp-install-dir",
@@ -182,10 +179,12 @@ int nomp_init(int argc, const char **argv) {
 
   // Set profile level.
   nomp_check(nomp_profile_set_level(nomp.profile));
-  nomp_profile("nomp_init", 1, 0);
 
   // Set verbose level.
   nomp_check(nomp_log_set_verbose(nomp.verbose));
+
+  // Maybe we shouldn't profile nomp_init(). But for now, we do.
+  nomp_profile("nomp_init", 1, 0);
 
   // Initialize the backend.
   nomp_check(init_backend(&nomp));
