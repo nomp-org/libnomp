@@ -11,10 +11,10 @@ static const char *ERR_STR_OPENCL_FAILURE = "%s failed with error code: %d.";
 
 #define chk_cl(call, msg)                                                      \
   {                                                                            \
-    cl_int err = (call);                                                       \
-    if (err != CL_SUCCESS) {                                                   \
+    cl_int err_ = (call);                                                      \
+    if (err_ != CL_SUCCESS) {                                                  \
       return nomp_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE, \
-                      msg, err);                                               \
+                      msg, err_);                                              \
     }                                                                          \
   }
 
