@@ -13,7 +13,7 @@ static const char *add_src =
     "  *((int *)p[2]) = add(a, b);                       \n"
     "}                                                   \n";
 
-static int test_jit_compile_and_free(const char *cwd, const char *wkdir) {
+static int test_jit_compile_and_free(const char *wkdir) {
   const char *cc = "/usr/bin/cc", *cflags = "-fPIC -shared",
              *entry = "add_wrapper";
   const char *srcf = "source.c", *libf = "mylib.so";
@@ -28,7 +28,7 @@ static int test_jit_compile_and_free(const char *cwd, const char *wkdir) {
   return 0;
 }
 
-static int test_jit_run(const char *cwd, const char *wkdir) {
+static int test_jit_run(const char *wkdir) {
   const char *cc = "/usr/bin/cc", *cflags = "-fPIC -shared",
              *entry = "add_wrapper";
   const char *srcf = "source.c", *libf = "mylib.so";
@@ -46,7 +46,7 @@ static int test_jit_run(const char *cwd, const char *wkdir) {
   return 0;
 }
 
-int main(int argc, const char *argv[]) {
+int main(void) {
   char cwd[BUFSIZ];
   if (getcwd(cwd, BUFSIZ) == NULL) {
     perror("getcwd() error");
@@ -56,8 +56,8 @@ int main(int argc, const char *argv[]) {
   char *wkdir = nomp_str_cat(3, BUFSIZ, cwd, "/", ".nomp_jit_cache");
 
   int err = 0;
-  err |= SUBTEST(test_jit_compile_and_free, cwd, wkdir);
-  err |= SUBTEST(test_jit_run, cwd, wkdir);
+  err |= SUBTEST(test_jit_compile_and_free, wkdir);
+  err |= SUBTEST(test_jit_run, wkdir);
 
   nomp_free(&wkdir);
 

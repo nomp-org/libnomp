@@ -4,7 +4,7 @@
 #undef TEST_IMPL_H
 #undef TEST_MAX_SIZE
 
-static int test_sum() {
+static int test_sum(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(500_sum_const, 10);
   TEST_BUILTIN_TYPES(500_sum_const, 50);
@@ -15,20 +15,20 @@ static int test_sum() {
   return err;
 }
 
-static int test_sum_condition() {
+static int test_sum_condition(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(500_condition, 10);
   return err;
 }
 
-static int test_dot() {
+static int test_dot(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(500_dot, 10);
   TEST_BUILTIN_TYPES(500_dot, 50);
   return err;
 }
 
-static int test_multiple_reductions() {
+static int test_multiple_reductions(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(500_multiple_reductions, 10, 5);
   TEST_BUILTIN_TYPES(500_multiple_reductions, 50, 3);
