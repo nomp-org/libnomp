@@ -25,7 +25,8 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 # outside the build tree to the install RPATH
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-set(SOURCES src/nomp.c src/loopy.c src/aux.c src/log.c src/jit.c src/reduction.c)
+set(SOURCES src/nomp.c src/loopy.c src/symengine.c src/aux.c src/log.c src/jit.c
+  src/reduction.c)
 if (ENABLE_OPENCL)
   find_package(OpenCL REQUIRED)
   if (OpenCL_FOUND)

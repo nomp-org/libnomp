@@ -440,8 +440,7 @@ int nomp_run(int id, ...) {
 
   struct nomp_arg_t *args = prg->args;
   struct nomp_mem_t *m;
-  int val;
-  char str_val[64];
+  long val;
 
   va_list vargs;
   va_start(vargs, id);
@@ -450,13 +449,11 @@ int nomp_run(int id, ...) {
     switch (args[i].type) {
     case NOMP_INT:
       val = *((int *)args[i].ptr);
-      goto str_val;
+      prg->eval_grid |= nomp_symengine_update(prg->map, args[i].name, val);
       break;
     case NOMP_UINT:
-      val = *((unsigned int *)args[i].ptr);
-    str_val:
-      snprintf(str_val, sizeof(str_val), "%d", val);
-      prg->eval_grid |= nomp_symengine_update(prg->map, args[i].name, str_val);
+      val = *((unsigned *)args[i].ptr);
+      prg->eval_grid |= nomp_symengine_update(prg->map, args[i].name, val);
       break;
     case NOMP_PTR:
       m = mem_if_mapped(args[i].ptr);
@@ -478,7 +475,7 @@ int nomp_run(int id, ...) {
 
   nomp_profile("nomp_run grid evaluation", 1, 1);
   if (prg->eval_grid)
-    nomp_check(nomp_py_eval_grid_size(prg));
+    nomp_check(nomp_symengine_eval_grid_size(prg));
   nomp_profile("nomp_run grid evaluation", 0, 1);
 
   nomp_profile("nomp_run kernel runtime", 1, 1);

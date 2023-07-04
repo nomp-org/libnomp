@@ -129,7 +129,7 @@ int nomp_py_get_grid_size(struct nomp_prog_t *prg, PyObject *knl);
  * @param[in] prg Nomp program.
  * @return int
  */
-int nomp_py_eval_grid_size(struct nomp_prog_t *prg);
+int nomp_symengine_eval_grid_size(struct nomp_prog_t *prg);
 
 /**
  * @ingroup nomp_py_utils
@@ -140,8 +140,7 @@ int nomp_py_eval_grid_size(struct nomp_prog_t *prg);
  * @param[in] val Value as a C-string.
  * @return int
  */
-int nomp_symengine_update(CMapBasicBasic *map, const char *key,
-                          const char *val);
+int nomp_symengine_update(CMapBasicBasic *map, const char *key, const long val);
 
 /**
  * @ingroup nomp_py_utils
