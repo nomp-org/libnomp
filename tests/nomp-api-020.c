@@ -51,9 +51,9 @@ static int test_missing_argument(const char *backend) {
 
 int main(int argc, const char *argv[]) {
   char backend[NOMP_TEST_MAX_BUFSIZ];
-  for (unsigned i = 0; i < argc; i++) {
+  for (unsigned i = 0; i < (unsigned)argc; i++) {
     if (strncmp(argv[i], "--nomp-backend", NOMP_TEST_MAX_BUFSIZ) == 0) {
-      assert(i + 1 < argc);
+      assert(i + 1 < (unsigned)argc);
       strncpy(backend, argv[i + 1], NOMP_TEST_MAX_BUFSIZ);
       break;
     }

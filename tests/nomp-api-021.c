@@ -132,8 +132,8 @@ int main(int argc, const char *argv[]) {
   char *argvn[64];
 
   // Copy everything except `--nomp-platform` to new command line args.
-  int argcn = 0;
-  for (unsigned i = 0; i < argc; i++) {
+  unsigned argcn = 0;
+  for (unsigned i = 0; i < (unsigned)argc; i++) {
     if (strncmp(argv[i], "--nomp-platform", NOMP_TEST_MAX_BUFSIZ))
       argvn[argcn] = strndup(argv[i], NOMP_TEST_MAX_BUFSIZ), argcn++;
   }
@@ -143,7 +143,7 @@ int main(int argc, const char *argv[]) {
 
   // Copy everything except `--nomp-device` to new command line args.
   argcn = 0;
-  for (unsigned i = 0; i < argc; i++) {
+  for (unsigned i = 0; i < (unsigned)argc; i++) {
     if (strncmp(argv[i], "--nomp-device", NOMP_TEST_MAX_BUFSIZ))
       argvn[argcn] = strndup(argv[i], NOMP_TEST_MAX_BUFSIZ), argcn++;
   }

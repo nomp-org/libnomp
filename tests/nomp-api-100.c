@@ -13,7 +13,7 @@ static const char *invalid_knl =
     "}                                                                    \n";
 
 // Calling nomp_jit() with invalid file should return an error.
-static int test_invalid_file() {
+static int test_invalid_file(void) {
   const char *clauses[4] = {"transform", "invalid-file", "invalid", 0};
 
   static int id = -1;
@@ -31,7 +31,7 @@ static int test_invalid_file() {
 }
 
 // Calling nomp_jit() with invalid function should return an error.
-static int test_invalid_transform_function() {
+static int test_invalid_transform_function(void) {
   const char *clauses[4] = {"transform", "nomp-api-100", "invalid_func", 0};
 
   static int id = -1;
@@ -50,7 +50,7 @@ static int test_invalid_transform_function() {
 }
 
 // Calling nomp_jit() with invalid clauses should return an error.
-static int test_invalid_clause() {
+static int test_invalid_clause(void) {
   const char *clauses[4] = {"invalid-clause", "nomp-api-100", "transform", 0};
 
   static int id = -1;
@@ -69,7 +69,7 @@ static int test_invalid_clause() {
 }
 
 // Missing file name in nomp_jit() should return an error.
-static int test_missing_filename() {
+static int test_missing_filename(void) {
   const char *clauses[4] = {"transform", NULL, "transform", 0};
 
   static int id = -1;
@@ -89,7 +89,7 @@ static int test_missing_filename() {
 }
 
 // Missing user callback should return an error.
-static int test_missing_user_callback() {
+static int test_missing_user_callback(void) {
   const char *clauses[4] = {"transform", "nomp-api-100", NULL, 0};
 
   static int id = -1;
@@ -109,7 +109,7 @@ static int test_missing_user_callback() {
 }
 
 // The kernel has a syntax error due to a missing a semicolon.
-static int test_syntax_error_in_kernel() {
+static int test_syntax_error_in_kernel(void) {
   static int id = -1;
   const char *clauses0[4] = {"transform", "nomp-api-100", "transform", 0};
   int err = nomp_jit(&id, invalid_knl, clauses0, 2, "a", sizeof(int), NOMP_PTR,

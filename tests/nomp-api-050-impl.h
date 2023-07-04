@@ -99,7 +99,7 @@ static int d2h_after_h2d(unsigned s, unsigned e) {
   for (unsigned i = 0; i < s; i++)
     nomp_test_assert(a[i] == 0);
   for (unsigned i = s; i < e; i++)
-    nomp_test_assert(a[i] == i);
+    nomp_test_assert(a[i] == (TEST_TYPE)i);
   for (unsigned i = e; i < TEST_MAX_SIZE; i++)
     nomp_test_assert(a[i] == 0);
 #endif
@@ -162,7 +162,7 @@ static int in_range_d2h(unsigned lb, unsigned ub, unsigned s, unsigned e) {
   for (unsigned i = 0; i < s; i++)
     nomp_test_assert(a[i] == 0);
   for (unsigned i = s; i < e; i++)
-    nomp_test_assert(a[i] == i);
+    nomp_test_assert(a[i] == (TEST_TYPE)i);
   for (unsigned i = e; i < TEST_MAX_SIZE; i++)
     nomp_test_assert(a[i] == 0);
 #endif
@@ -198,11 +198,11 @@ static int in_range_h2d(unsigned lb, unsigned ub, unsigned s, unsigned e) {
     nomp_test_assert(fabs(a[i] - i) < TEST_TOL);
 #else
   for (unsigned i = lb; i < s; i++)
-    nomp_test_assert(a[i] == i);
+    nomp_test_assert(a[i] == (TEST_TYPE)i);
   for (unsigned i = s; i < e; i++)
     nomp_test_assert(a[i] == 0);
   for (unsigned i = e; i < ub; i++)
-    nomp_test_assert(a[i] == i);
+    nomp_test_assert(a[i] == (TEST_TYPE)i);
 #endif
 
   nomp_test_chk(nomp_update(a, lb, ub, sizeof(TEST_TYPE), NOMP_FREE));
@@ -220,7 +220,7 @@ static int dynamic_data_type(unsigned n) {
   nomp_test_chk(nomp_update(a, 0, n, sizeof(char), NOMP_ALLOC));
 
   TEST_TYPE *b = (TEST_TYPE *)a;
-  const int new_size = n / sizeof(TEST_TYPE);
+  const unsigned new_size = n / sizeof(TEST_TYPE);
   for (unsigned i = 0; i < new_size; i++)
     b[i] = i;
   nomp_update(b, 0, new_size, sizeof(TEST_TYPE), NOMP_TO);
@@ -234,7 +234,7 @@ static int dynamic_data_type(unsigned n) {
     nomp_test_assert(fabs(b[i] - i) < TEST_TOL);
 #else
   for (unsigned i = 0; i < new_size; i++)
-    nomp_test_assert(b[i] == i);
+    nomp_test_assert(b[i] == (TEST_TYPE)i);
 #endif
 
   nomp_test_chk(nomp_update(a, 0, n, sizeof(char), NOMP_FREE));
