@@ -13,7 +13,7 @@ extern "C" {
  * @defgroup nomp_mem_utils Host memory management functions
  */
 
-static inline void *check_if_null(void *temp, const char *file,
+inline static void *check_if_null(void *temp, const char *file,
                                   unsigned int line,
                                   const char *function_name) {
   if (temp == NULL) {
@@ -24,7 +24,7 @@ static inline void *check_if_null(void *temp, const char *file,
   return temp;
 }
 
-static void nomp_free_(void **p) { free(*p), *p = NULL; }
+inline static void nomp_free_(void **p) { free(*p), *p = NULL; }
 
 /**
  * @ingroup nomp_mem_utils
@@ -36,8 +36,8 @@ static void nomp_free_(void **p) { free(*p), *p = NULL; }
  */
 #define nomp_free(p) nomp_free_((void **)p)
 
-static void *nomp_calloc_(size_t count, size_t size, const char *file,
-                          unsigned line) {
+inline static void *nomp_calloc_(size_t count, size_t size, const char *file,
+                                 unsigned line) {
   void *temp = calloc(count, size);
   return check_if_null(temp, file, line, "calloc");
 }
@@ -55,8 +55,8 @@ static void *nomp_calloc_(size_t count, size_t size, const char *file,
 #define nomp_calloc(T, count)                                                  \
   ((T *)nomp_calloc_((count), sizeof(T), __FILE__, __LINE__))
 
-static void *nomp_realloc_(void *ptr, size_t size, const char *file,
-                           unsigned line) {
+inline static void *nomp_realloc_(void *ptr, size_t size, const char *file,
+                                  unsigned line) {
   void *temp = realloc(ptr, size);
   return check_if_null(temp, file, line, "realloc");
 }
