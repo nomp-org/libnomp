@@ -133,10 +133,10 @@ int nomp_jit_compile(int *id, const char *source, const char *cc,
     funcs = nomp_realloc(funcs, struct function *, funcs_max);
   }
 
-  void (*dlf)() = NULL;
+  void (*dlf)(void **) = NULL;
   void *dlh = dlopen(lib, RTLD_LAZY | RTLD_LOCAL);
   if (dlh && entry)
-    dlf = dlsym(dlh, entry);
+    dlf = (void (*)(void **))dlsym(dlh, entry);
   nomp_free(&lib);
 
   if (dlh == NULL || dlf == NULL) {
@@ -152,7 +152,7 @@ int nomp_jit_compile(int *id, const char *source, const char *cc,
 }
 
 int nomp_jit_run(int id, void *p[]) {
-  if (id >= 0 && id < funcs_n && funcs[id] && funcs[id]->dlf) {
+  if (id >= 0 && id < (int)funcs_n && funcs[id] && funcs[id]->dlf) {
     funcs[id]->dlf(p);
     return 0;
   }
@@ -163,7 +163,7 @@ int nomp_jit_run(int id, void *p[]) {
 
 int nomp_jit_free(int *id) {
   int fid = *id;
-  if (fid >= 0 && fid < funcs_n) {
+  if (fid >= 0 && fid < (int)funcs_n) {
     dlclose(funcs[fid]->dlh), funcs[fid]->dlh = NULL, funcs[fid]->dlf = NULL;
     nomp_free(&funcs[fid]), *id = -1;
     return 0;
