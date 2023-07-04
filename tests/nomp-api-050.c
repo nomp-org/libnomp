@@ -8,7 +8,7 @@
 #undef TEST_MAX_SIZE
 
 // Free'ing before mapping should return an error.
-static int test_free_before_mapping() {
+static int test_free_before_mapping(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(050_free_before_mapping, 0, 10);
   TEST_BUILTIN_TYPES(050_free_before_mapping, 5, 10);
@@ -17,7 +17,7 @@ static int test_free_before_mapping() {
 }
 
 // D2H before H2D should return an error.
-static int test_d2h_before_h2d() {
+static int test_d2h_before_h2d(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(050_d2h_before_h2d, 0, 10);
   TEST_BUILTIN_TYPES(050_d2h_before_h2d, 5, 10);
@@ -26,7 +26,7 @@ static int test_d2h_before_h2d() {
 }
 
 // Mapping H2D multiple times is not an error.
-static int test_multiple_h2d_calls() {
+static int test_multiple_h2d_calls(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(050_multiple_h2d_calls, 0, 10);
   TEST_BUILTIN_TYPES(050_multiple_h2d_calls, 5, 10);
@@ -35,7 +35,7 @@ static int test_multiple_h2d_calls() {
 }
 
 // Mapping D2H multiple times is not an error.
-static int test_multiple_d2h_calls() {
+static int test_multiple_d2h_calls(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(050_multiple_d2h_calls, 0, 10);
   TEST_BUILTIN_TYPES(050_multiple_d2h_calls, 5, 10);
@@ -44,7 +44,7 @@ static int test_multiple_d2h_calls() {
 }
 
 // Check D2H followed by H2D.
-static int test_d2h_after_h2d() {
+static int test_d2h_after_h2d(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(050_d2h_after_h2d, 0, 10);
   TEST_BUILTIN_TYPES(050_d2h_after_h2d, 5, 10);
@@ -53,7 +53,7 @@ static int test_d2h_after_h2d() {
 }
 
 // Free'ing after H2D is not an error.
-static int test_free_after_h2d() {
+static int test_free_after_h2d(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(050_free_after_h2d, 0, 10);
   TEST_BUILTIN_TYPES(050_free_after_h2d, 5, 10);
@@ -62,7 +62,7 @@ static int test_free_after_h2d() {
 }
 
 // Free'ing after D2H is not an error.
-static int test_free_after_d2h() {
+static int test_free_after_d2h(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(050_free_after_d2h, 0, 10);
   TEST_BUILTIN_TYPES(050_free_after_d2h, 5, 10);
@@ -70,7 +70,7 @@ static int test_free_after_d2h() {
   return err;
 }
 
-static int test_in_range_d2h() {
+static int test_in_range_d2h(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(050_in_range_d2h, 0, 20, 5, 15);
   TEST_BUILTIN_TYPES(050_in_range_d2h, 0, 20, 0, 15);
@@ -78,7 +78,7 @@ static int test_in_range_d2h() {
   return err;
 }
 
-static int test_in_range_h2d() {
+static int test_in_range_h2d(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(050_in_range_h2d, 0, 20, 5, 15);
   TEST_BUILTIN_TYPES(050_in_range_h2d, 0, 20, 1, 15);
@@ -86,7 +86,7 @@ static int test_in_range_h2d() {
   return err;
 }
 
-static int test_dynamic_data_type() {
+static int test_dynamic_data_type(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(050_dynamic_data_type, 16);
   TEST_BUILTIN_TYPES(050_dynamic_data_type, 32);

@@ -42,7 +42,7 @@
   }
 #endif
 
-static int subtest_(int err, const char *test_name) {
+inline static int subtest_(int err, const char *test_name) {
   char *result = err ? "\033[31mFailed" : "\033[32mPassed";
   printf("\t%s: %s\033[0m\n", test_name, result);
   return err;
@@ -61,7 +61,7 @@ static int subtest_(int err, const char *test_name) {
       return err;                                                              \
   }
 
-static char *generate_knl(const char *fmt, int nargs, ...) {
+inline static char *generate_knl(const char *fmt, unsigned nargs, ...) {
   size_t len = strlen(fmt) + 1;
 
   va_list vargs;
@@ -79,7 +79,7 @@ static char *generate_knl(const char *fmt, int nargs, ...) {
   return knl;
 }
 
-static int logcmp(const char *log, const char *pattern) {
+inline static int logcmp(const char *log, const char *pattern) {
   regex_t regex;
   int result = regcomp(&regex, pattern, 0);
   if (!result)

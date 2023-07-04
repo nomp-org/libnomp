@@ -1,7 +1,7 @@
 #include "nomp-test.h"
 
 // Calling nomp_finalize() before nomp_init() should return an error.
-static int test_first_nomp_finalize() {
+static int test_first_nomp_finalize(void) {
   int err = nomp_finalize();
   nomp_test_assert(err == NOMP_FINALIZE_FAILURE);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_LOG_ID_IS_INVALID);
