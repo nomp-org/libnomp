@@ -36,22 +36,6 @@ static void nomp_free_(void **p) { free(*p), *p = NULL; }
  */
 #define nomp_free(p) nomp_free_((void **)p)
 
-static void *nomp_malloc_(size_t size, const char *file, unsigned line) {
-  void *temp = malloc(size);
-  return check_if_null(temp, file, line, "malloc");
-}
-/**
- * @ingroup nomp_mem_utils
- * @brief Helper macro for allocating memory blocks using nomp_malloc_().
- * File name and line number are passed implicitly.
- *
- * @param T Type of element.
- * @param count Number of elements.
- * @return Pointer of type T.
- */
-#define nomp_malloc(T, count)                                                  \
-  ((T *)nomp_malloc_((count) * sizeof(T), , __FILE__, __LINE__))
-
 static void *nomp_calloc_(size_t count, size_t size, const char *file,
                           unsigned line) {
   void *temp = calloc(count, size);

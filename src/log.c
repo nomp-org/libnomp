@@ -15,7 +15,8 @@ struct log {
 };
 
 static struct log *logs = NULL;
-static unsigned logs_n = 0, logs_max = 0;
+static unsigned logs_n = 0;
+static unsigned logs_max = 0;
 static const char *LOG_TYPE_STRING[] = {"Error", "Warning", "Info"};
 static int verbose = 0;
 
@@ -69,25 +70,25 @@ int nomp_log_(const char *description, int logno, nomp_log_type type,
 }
 
 char *nomp_get_log_str(int id) {
-  if (id <= 0 || id > logs_n)
+  if (id <= 0 || id > (int)logs_n)
     return NULL;
 
   return strndup(logs[id - 1].description, BUFSIZ);
 }
 
 int nomp_get_log_no(int log_id) {
-  if (log_id <= 0 || log_id > logs_n)
+  if (log_id <= 0 || log_id > (int)logs_n)
     return NOMP_USER_LOG_ID_IS_INVALID;
   return logs[log_id - 1].logno;
 }
 
 nomp_log_type nomp_get_log_type(int log_id) {
-  if (log_id <= 0 || log_id > logs_n)
+  if (log_id <= 0 || log_id > (int)logs_n)
     return NOMP_INVALID;
   return logs[log_id - 1].type;
 }
 
-void nomp_log_finalize() {
+void nomp_log_finalize(void) {
   for (unsigned i = 0; i < logs_n; i++)
     nomp_free(&logs[i].description);
   nomp_free(&logs), logs_n = logs_max = 0;
@@ -95,13 +96,15 @@ void nomp_log_finalize() {
 
 struct time_log {
   char *entry;
-  int total_calls;
-  long double total_time;
-  long double last_call;
+  unsigned total_calls;
+  double total_time;
+  double last_call;
   clock_t last_tick;
 };
+
 static struct time_log *time_logs = NULL;
-static unsigned time_logs_n = 0, time_logs_max = 0;
+static unsigned time_logs_n = 0;
+static unsigned time_logs_max = 0;
 static int profile_level = 0;
 
 int nomp_profile_set_level(const int profile_level_in) {
@@ -110,9 +113,10 @@ int nomp_profile_set_level(const int profile_level_in) {
 }
 
 static unsigned find_time_log(const char *entry) {
-  for (int i = 0; i < time_logs_n; i++)
+  for (unsigned i = 0; i < time_logs_n; i++) {
     if (strncmp(time_logs[i].entry, entry, NOMP_MAX_BUFSIZ) == 0)
       return i;
+  }
   return time_logs_n;
 }
 
@@ -125,9 +129,11 @@ void nomp_profile(const char *name, const int toggle, const int sync) {
   clock_t current_tick = clock();
 
   unsigned id = find_time_log(name);
-  if (id == time_logs_n) { // Points to a new time log
-    if (toggle == 1) {     // Starts the timer on a new time log
-      // Dynamically increase the memory allocation
+  // If the timer is not found, create a new one.
+  if (id == time_logs_n) {
+    // Starts the timer if toggle is on.
+    if (toggle == 1) {
+      // Dynamically increase the memory if needed.
       if (time_logs_max <= time_logs_n) {
         time_logs_max += time_logs_max / 2 + 1;
         time_logs = nomp_realloc(time_logs, struct time_log, time_logs_max);
@@ -140,27 +146,28 @@ void nomp_profile(const char *name, const int toggle, const int sync) {
       time_logs[id].last_tick = current_tick;
       time_logs_n++;
     }
-  } else if (toggle == 0) { // Turns off the timer
-    // Ignore if the user toggles off the time by accident
-    if (time_logs[id].last_tick == -1)
+  } else if (toggle == 0) {
+    // Ignore if the user toggles off the timer by accident.
+    if (time_logs[id].last_tick == 0)
       return;
 
     // Captures the execution time.
-    long double elapsed_time =
-        (double)(current_tick - time_logs[id].last_tick) * 1000 /
-        CLOCKS_PER_SEC;
+    double elapsed =
+        (double)(current_tick - time_logs[id].last_tick) / CLOCKS_PER_SEC;
+    elapsed *= 1000.0;
 
-    // Updates the current time log
-    time_logs[id].last_call = elapsed_time;
+    // Updates the current timing information.
+    time_logs[id].last_call = elapsed;
+    time_logs[id].total_time += elapsed;
+    time_logs[id].last_tick = 0;
     time_logs[id].total_calls++;
-    time_logs[id].total_time += elapsed_time;
-    time_logs[id].last_tick = -1;
-  } else { // Starts the timer on an exiting time log
+  } else {
+    // Toggle is on. So, we start the timer on an exiting time log.
     time_logs[id].last_tick = current_tick;
   }
 }
 
-void nomp_profile_result() {
+void nomp_profile_result(void) {
   if (profile_level == 0)
     return;
 
@@ -168,16 +175,16 @@ void nomp_profile_result() {
          "Total Time (ms)", "Last Call (ms)", "Average Time (ms)");
   printf("|--------------------------|--------------|--------------------|-----"
          "---------------|--------------------|\n");
-  for (int i = 0; i < time_logs_n; i++) {
-    long double avg_time = time_logs[i].total_time / time_logs[i].total_calls;
-    printf("| %-24s | %12d | %18.4Lf | %18.4Lf | %18.4Lf |\n",
+  for (unsigned i = 0; i < time_logs_n; i++) {
+    double avg_time = time_logs[i].total_time / time_logs[i].total_calls;
+    printf("| %-24s | %12d | %18.4lf | %18.4lf | %18.4lf |\n",
            time_logs[i].entry, time_logs[i].total_calls,
            time_logs[i].total_time, time_logs[i].last_call, avg_time);
   }
 }
 
-void nomp_profile_finalize() {
-  for (int i = 0; i < time_logs_n; i++)
+void nomp_profile_finalize(void) {
+  for (unsigned i = 0; i < time_logs_n; i++)
     nomp_free(&time_logs[i].entry);
   nomp_free(&time_logs), time_logs_n = time_logs_max = 0;
 }

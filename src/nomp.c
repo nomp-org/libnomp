@@ -19,7 +19,7 @@ static inline int check_cmd_line(struct nomp_backend_t *bnd, int argc,
     return 0;
 
   unsigned i = 0;
-  while (i < (unsigned)argc) {
+  while ((int)i < argc) {
     if (!strncmp("--nomp", argv[i], 6)) {
       nomp_check(check_cmd_line_aux(i + 1, argc, argv));
       if (!strncmp("--nomp-backend", argv[i], NOMP_MAX_BUFSIZ)) {
