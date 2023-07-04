@@ -82,7 +82,7 @@ static inline int init_configs(int argc, const char **argv,
   nomp_check(check_cmd_line(bnd, argc, argv));
   nomp_check(check_env_vars(bnd));
 
-#define check_if_initialized(COND, CMDARG, ENVVAR)                             \
+#define check_if_valid(COND, CMDARG, ENVVAR)                                   \
   {                                                                            \
     if (COND) {                                                                \
       return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,                  \
@@ -92,12 +92,15 @@ static inline int init_configs(int argc, const char **argv,
     }                                                                          \
   }
 
-  check_if_initialized(strlen(bnd->backend) == 0, "--nomp-backend",
-                       "NOMP_BACKEND");
-  check_if_initialized(strlen(bnd->install_dir) == 0, "--nomp-install-dir",
-                       "NOMP_INSTALL_DIR");
+  check_if_valid(bnd->verbose < 0, "--nomp-verbose", "NOMP_VERBOSE");
+  check_if_valid(bnd->profile < 0, "--nomp-profile", "NOMP_PROFILE");
+  check_if_valid(bnd->platform_id < 0, "--nomp-platform", "NOMP_PLATFORM");
+  check_if_valid(bnd->device_id < 0, "--nomp-device", "NOMP_DEVICE");
+  check_if_valid(strlen(bnd->backend) == 0, "--nomp-backend", "NOMP_BACKEND");
+  check_if_valid(strlen(bnd->install_dir) == 0, "--nomp-install-dir",
+                 "NOMP_INSTALL_DIR");
 
-#undef check_if_initialized
+#undef check_if_valid
 
   // Append nomp python directory to sys.path.
   char abs_dir[PATH_MAX + 32];
