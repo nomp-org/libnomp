@@ -255,8 +255,8 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv422nomp_py_eval_grid_sizeP11nomp_prog_t">
-<span id="_CPPv322nomp_py_eval_grid_sizeP11nomp_prog_t"></span><span id="_CPPv222nomp_py_eval_grid_sizeP11nomp_prog_t"></span><span id="nomp_py_eval_grid_size__nomp_prog_tP"></span><span class="target" id="group__nomp__py__utils_1gaadb47e76554e330d4299f624e53c1b93"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_eval_grid_size</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">nomp_prog_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">prg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422nomp_py_eval_grid_sizeP11nomp_prog_t" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv429nomp_symengine_eval_grid_sizeP11nomp_prog_t">
+<span id="_CPPv329nomp_symengine_eval_grid_sizeP11nomp_prog_t"></span><span id="_CPPv229nomp_symengine_eval_grid_sizeP11nomp_prog_t"></span><span id="nomp_symengine_eval_grid_size__nomp_prog_tP"></span><span class="target" id="group__nomp__py__utils_1gabecc810d31f97f69ad9bc05bc6c37037"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_symengine_eval_grid_size</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">nomp_prog_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">prg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv429nomp_symengine_eval_grid_sizeP11nomp_prog_t" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Evaluate global and local grid sizes based on the dictionary <code class="docutils literal notranslate"><span class="pre">dict</span></code>. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -269,8 +269,8 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv421nomp_symengine_updateP14CMapBasicBasicPKcPKc">
-<span id="_CPPv321nomp_symengine_updateP14CMapBasicBasicPKcPKc"></span><span id="_CPPv221nomp_symengine_updateP14CMapBasicBasicPKcPKc"></span><span id="nomp_symengine_update__CMapBasicBasicP.cCP.cCP"></span><span class="target" id="group__nomp__py__utils_1ga5d7628fe72af35862006d7a6271794b7"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_symengine_update</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">CMapBasicBasic</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">map</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">key</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421nomp_symengine_updateP14CMapBasicBasicPKcPKc" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv421nomp_symengine_updateP14CMapBasicBasicPKcKl">
+<span id="_CPPv321nomp_symengine_updateP14CMapBasicBasicPKcKl"></span><span id="_CPPv221nomp_symengine_updateP14CMapBasicBasicPKcKl"></span><span id="nomp_symengine_update__CMapBasicBasicP.cCP.lC"></span><span class="target" id="group__nomp__py__utils_1ga07db966dfa26b166ed4ef03b88769bb4"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_symengine_update</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">CMapBasicBasic</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">map</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">key</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421nomp_symengine_updateP14CMapBasicBasicPKcKl" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Map the keys and values to evaluate the kernel launch parameters. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -318,23 +318,6 @@
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>void </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.nomp_malloc">
-<span class="target" id="group__nomp__mem__utils_1ga6121fd4a48b79c02787e2f7c3b93ed1e"></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_malloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">T</span></span>, <span class="n"><span class="pre">count</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nomp_malloc" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Helper macro for allocating memory blocks using nomp_malloc_(). File name and line number are passed implicitly. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>T</strong> – Type of element. </p></li>
-<li><p><strong>count</strong> – Number of elements. </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Pointer of type T. </p>
 </dd>
 </dl>
 </dd></dl>
@@ -473,7 +456,7 @@
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv417nomp_log_finalizev">
-<span id="_CPPv317nomp_log_finalizev"></span><span id="_CPPv217nomp_log_finalizev"></span><span id="nomp_log_finalize"></span><span class="target" id="group__nomp__log__utils_1ga30938464fbba0de47c4f260117bfd54c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_log_finalize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417nomp_log_finalizev" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv317nomp_log_finalizev"></span><span id="_CPPv217nomp_log_finalizev"></span><span id="nomp_log_finalize__void"></span><span class="target" id="group__nomp__log__utils_1ga26943238b328935d1b051f42c4475abb"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_log_finalize</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417nomp_log_finalizev" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Free variables used to keep track of logs. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -525,7 +508,7 @@
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv419nomp_profile_resultv">
-<span id="_CPPv319nomp_profile_resultv"></span><span id="_CPPv219nomp_profile_resultv"></span><span id="nomp_profile_result"></span><span class="target" id="group__nomp__profiler__utils_1ga70f2ad5b1a632e77ea985170134098ed"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_profile_result</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419nomp_profile_resultv" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv319nomp_profile_resultv"></span><span id="_CPPv219nomp_profile_resultv"></span><span id="nomp_profile_result__void"></span><span class="target" id="group__nomp__profiler__utils_1ga3e4823e7f77812677d07a6945b58f6c3"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_profile_result</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419nomp_profile_resultv" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Prints all the execution times recorded by the program. This function is executed only when the <code class="docutils literal notranslate"><span class="pre">--nomp-profile</span></code> is provided. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -536,7 +519,7 @@
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv421nomp_profile_finalizev">
-<span id="_CPPv321nomp_profile_finalizev"></span><span id="_CPPv221nomp_profile_finalizev"></span><span id="nomp_profile_finalize"></span><span class="target" id="group__nomp__profiler__utils_1gab148b6f71be8f2f1556ce61bed533b91"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_profile_finalize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421nomp_profile_finalizev" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv321nomp_profile_finalizev"></span><span id="_CPPv221nomp_profile_finalizev"></span><span id="nomp_profile_finalize__void"></span><span class="target" id="group__nomp__profiler__utils_1gaa72982b6c77a157735a243f3d43096a8"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_profile_finalize</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421nomp_profile_finalizev" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Free variables used to keep track of time logs. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
