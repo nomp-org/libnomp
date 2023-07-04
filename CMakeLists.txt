@@ -1,19 +1,18 @@
 cmake_minimum_required(VERSION 3.22)
 project(libnomp VERSION 0.0.1 DESCRIPTION "nomp runtime library" LANGUAGES C CXX)
 
-# Treat compiler warnings as errors
-set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
-set(CMAKE_C_STANDARD 99)
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_C_STANDARD_REQUIRED ON)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
-
 option(ENABLE_OPENCL "Build OpenCL backend" OFF)
 option(ENABLE_CUDA "Build Cuda backend" OFF)
 option(ENABLE_ISPC "Build ISPC backend" OFF)
 option(ENABLE_HIP "Build HIP backend" OFF)
 option(ENABLE_SYCL "Build SYCL backend" OFF)
+option(ENABLE_DOCS "Enable Documentation" OFF)
+
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 
 # https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling
 # Use, i.e. don't skip the full RPATH for the build tree
@@ -75,6 +74,8 @@ target_link_libraries(nomp PRIVATE OpenSSL::SSL)
 find_package(SymEngine REQUIRED HINTS $ENV{CONDA_PREFIX})
 target_include_directories(nomp PRIVATE ${SYMENGINE_INCLUDE_DIRS})
 target_link_libraries(nomp PRIVATE ${SYMENGINE_LIBRARIES})
+target_compile_options(nomp PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+  $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic>)
 
 if (ENABLE_OPENCL)
   target_link_libraries(nomp PRIVATE OpenCL::OpenCL)
@@ -103,17 +104,9 @@ set_target_properties(nomp PROPERTIES
   PUBLIC_HEADER include/nomp.h)
 target_include_directories(nomp PRIVATE include)
 
-option(ENABLE_DOCS "Enable Documentation" OFF)
 if (ENABLE_DOCS)
   add_subdirectory ("docs")
 endif()
-
-install(TARGETS nomp LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib PUBLIC_HEADER
-  DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/python DESTINATION ${CMAKE_INSTALL_PREFIX})
-
-configure_file(nomp.pc.in nomp.pc @ONLY)
-install(FILES ${CMAKE_BINARY_DIR}/nomp.pc DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
 
 file(GLOB TESTS tests/nomp-*.c)
 foreach(test ${TESTS})
@@ -122,10 +115,22 @@ foreach(test ${TESTS})
   add_executable(${test_exe} ${test})
   target_link_libraries(${test_exe} nomp)
   target_include_directories(${test_exe} PRIVATE include tests)
+  target_compile_options(${test_exe} PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+    $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic>)
   install (TARGETS ${test_exe} RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/tests)
 endforeach(test ${TESTS})
+
+install(TARGETS nomp LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/python DESTINATION ${CMAKE_INSTALL_PREFIX})
+
 install(DIRECTORY tests/ DESTINATION ${CMAKE_INSTALL_PREFIX}/tests
   FILES_MATCHING PATTERN "*.py")
+
 install(DIRECTORY scripts/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
   FILE_PERMISSIONS OWNER_READ OWNER_EXECUTE OWNER_WRITE GROUP_READ GROUP_EXECUTE
   WORLD_READ WORLD_EXECUTE)
+
+configure_file(nomp.pc.in nomp.pc @ONLY)
+install(FILES ${CMAKE_BINARY_DIR}/nomp.pc
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
