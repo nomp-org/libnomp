@@ -5,7 +5,7 @@
 #undef TEST_MAX_SIZE
 
 // Test break statement inside a serial loop.
-static int test_break() {
+static int test_break(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(240_break, 10)
   TEST_BUILTIN_TYPES(240_break, 50)
@@ -13,7 +13,7 @@ static int test_break() {
 }
 
 // Test continue statement inside a serial loop.
-static int test_continue() {
+static int test_continue(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(240_continue, 10)
   TEST_BUILTIN_TYPES(240_continue, 50)

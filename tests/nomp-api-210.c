@@ -6,7 +6,7 @@
 #undef TEST_IMPL_H
 #undef TEST_MAX_SIZE
 
-static int test_bitwise_and() {
+static int test_bitwise_and(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(210_bitwise_and, 10)
   TEST_BUILTIN_TYPES(210_bitwise_and, 50)
@@ -14,7 +14,7 @@ static int test_bitwise_and() {
   return err;
 }
 
-static int test_bitwise_or() {
+static int test_bitwise_or(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(210_bitwise_or, 10)
   TEST_BUILTIN_TYPES(210_bitwise_or, 50)
@@ -22,7 +22,7 @@ static int test_bitwise_or() {
   return err;
 }
 
-static int test_bitwise_xor() {
+static int test_bitwise_xor(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(210_bitwise_xor, 10)
   TEST_BUILTIN_TYPES(210_bitwise_xor, 50)
@@ -30,7 +30,7 @@ static int test_bitwise_xor() {
   return err;
 }
 
-static int test_bitwise_left_shift() {
+static int test_bitwise_left_shift(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(210_bitwise_left_shift, 10)
   TEST_BUILTIN_TYPES(210_bitwise_left_shift, 50)
@@ -38,7 +38,7 @@ static int test_bitwise_left_shift() {
   return err;
 }
 
-static int test_bitwise_right_shift() {
+static int test_bitwise_right_shift(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(210_bitwise_right_shift, 10)
   TEST_BUILTIN_TYPES(210_bitwise_right_shift, 50)
@@ -46,7 +46,7 @@ static int test_bitwise_right_shift() {
   return err;
 }
 
-static int test_bitwise_complement() {
+static int test_bitwise_complement(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(210_bitwise_complement, 10)
   TEST_BUILTIN_TYPES(210_bitwise_complement, 50)
