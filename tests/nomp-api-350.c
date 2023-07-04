@@ -5,7 +5,7 @@
 #undef TEST_MAX_SIZE
 
 // Test non-constant/ non-single-variable for loop bounds inside a serial loop.
-static int test_for_loop_bounds() {
+static int test_for_loop_bounds(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(350_for_loop_bounds, 10)
   TEST_BUILTIN_TYPES(350_for_loop_bounds, 50)

@@ -15,7 +15,9 @@ static int nomp_api_500_sum_aux(const char *fmt, const char **clauses,
 }
 
 #define nomp_api_500_sum_const TOKEN_PASTE(nomp_api_500_sum_const, TEST_SUFFIX)
-static int nomp_api_500_sum_const(int N) {
+static int nomp_api_500_sum_const(unsigned N) {
+  nomp_test_assert(N <= TEST_MAX_SIZE);
+
   TEST_TYPE a[TEST_MAX_SIZE] = {0};
   const char *knl_fmt =
       "void foo(%s *a, int N) {                                        \n"
@@ -29,7 +31,7 @@ static int nomp_api_500_sum_const(int N) {
 #if defined(TEST_TOL)
   nomp_test_assert(fabs(a[0] - N) < TEST_TOL);
 #else
-  nomp_test_assert(a[0] == N);
+  nomp_test_assert(a[0] == (TEST_TYPE)N);
 #endif
 
   return 0;
@@ -37,7 +39,9 @@ static int nomp_api_500_sum_const(int N) {
 #undef nomp_api_500_sum_const
 
 #define nomp_api_500_sum_var TOKEN_PASTE(nomp_api_500_sum_var, TEST_SUFFIX)
-static int nomp_api_500_sum_var(int N) {
+static int nomp_api_500_sum_var(unsigned N) {
+  nomp_test_assert(N <= TEST_MAX_SIZE && N > 0);
+
   TEST_TYPE a[TEST_MAX_SIZE] = {0};
   const char *knl_fmt =
       "void foo(%s *a, int N) {                                        \n"
@@ -51,7 +55,7 @@ static int nomp_api_500_sum_var(int N) {
 #if defined(TEST_TOL)
   nomp_test_assert(fabs(a[0] - (N - 1) * N / 2) < TEST_TOL);
 #else
-  nomp_test_assert(a[0] == (N - 1) * N / 2);
+  nomp_test_assert(a[0] == (TEST_TYPE)((N - 1) * N / 2));
 #endif
 
   return 0;
@@ -80,8 +84,8 @@ static int nomp_api_500_sum_array_aux(const char *fmt, const char **clauses,
 }
 
 #define nomp_api_500_sum_array TOKEN_PASTE(nomp_api_500_sum_array, TEST_SUFFIX)
-static int nomp_api_500_sum_array(int N) {
-  nomp_test_assert(N <= TEST_MAX_SIZE);
+static int nomp_api_500_sum_array(unsigned N) {
+  nomp_test_assert(N <= TEST_MAX_SIZE && N > 0);
 
   TEST_TYPE a[TEST_MAX_SIZE];
   for (unsigned i = 0; i < N; i++)
@@ -100,7 +104,7 @@ static int nomp_api_500_sum_array(int N) {
 #if defined(TEST_TOL)
   nomp_test_assert(fabs(sum - (N - 1) * N / 2) < TEST_TOL);
 #else
-  nomp_test_assert(sum == (N - 1) * N / 2);
+  nomp_test_assert(sum == (TEST_TYPE)((N - 1) * N / 2));
 #endif
 
   return 0;
@@ -108,14 +112,14 @@ static int nomp_api_500_sum_array(int N) {
 #undef nomp_api_500_sum_array
 
 #define nomp_api_500_condition TOKEN_PASTE(nomp_api_500_condition, TEST_SUFFIX)
-static int nomp_api_500_condition(int N) {
+static int nomp_api_500_condition(unsigned N) {
   nomp_test_assert(N <= TEST_MAX_SIZE);
 
   TEST_TYPE a[TEST_MAX_SIZE];
-  const int mid_point = (int)N / 2;
-  for (int i = 0; i < mid_point; ++i)
+  const unsigned mid_point = N / 2;
+  for (unsigned i = 0; i < mid_point; ++i)
     a[i] = 0;
-  for (int i = mid_point; i < N; ++i)
+  for (unsigned i = mid_point; i < N; ++i)
     a[i] = i;
 
   const char *knl_fmt =
@@ -132,7 +136,7 @@ static int nomp_api_500_condition(int N) {
 #if defined(TEST_TOL)
   nomp_test_assert(fabs(sum - mid_point) < TEST_TOL);
 #else
-  nomp_test_assert(sum == mid_point);
+  nomp_test_assert(sum == (TEST_TYPE)mid_point);
 #endif
 
   return 0;
@@ -165,8 +169,8 @@ static int nomp_api_500_dot_aux(const char *fmt, const char **clauses,
 }
 
 #define nomp_api_500_dot TOKEN_PASTE(nomp_api_500_dot, TEST_SUFFIX)
-static int nomp_api_500_dot(int N) {
-  nomp_test_assert(N <= TEST_MAX_SIZE);
+static int nomp_api_500_dot(unsigned N) {
+  nomp_test_assert(N <= TEST_MAX_SIZE && N > 0);
 
   TEST_TYPE a[TEST_MAX_SIZE], b[TEST_MAX_SIZE], total;
   for (unsigned i = 0; i < N; i++)
@@ -214,8 +218,8 @@ static int nomp_api_500_multiple_reductions_aux(const char *fmt, TEST_TYPE *a,
 
 #define nomp_api_500_multiple_reductions                                       \
   TOKEN_PASTE(nomp_api_500_multiple_reductions, TEST_SUFFIX)
-static int nomp_api_500_multiple_reductions(int N, int iterations) {
-  nomp_test_assert(N <= TEST_MAX_SIZE);
+static int nomp_api_500_multiple_reductions(unsigned N, unsigned iterations) {
+  nomp_test_assert(N <= TEST_MAX_SIZE && N > 0);
 
   const char *knl_fmt =
       "void foo(%s *a, int N, %s *total) {                               \n"
@@ -225,7 +229,7 @@ static int nomp_api_500_multiple_reductions(int N, int iterations) {
       "}                                                                 \n";
 
   TEST_TYPE a[TEST_MAX_SIZE];
-  for (int i = 1; i < iterations; ++i) {
+  for (unsigned i = 1; i < iterations; ++i) {
     for (unsigned j = 0; j < N; j++)
       a[j] = i * j;
 
