@@ -56,7 +56,7 @@ int nomp_log_(const char *desc, int logno, nomp_log_type type,
  *
  * @return void
  */
-void nomp_log_finalize();
+void nomp_log_finalize(void);
 
 /**
  * @defgroup nomp_profiler_utils Internal functions for profiling a
@@ -101,7 +101,7 @@ void nomp_profile(const char *name, int toggle, int sync);
  *
  * @return int
  */
-void nomp_profile_result();
+void nomp_profile_result(void);
 
 /**
  * @ingroup nomp_profiler_utils
@@ -109,7 +109,7 @@ void nomp_profile_result();
  *
  * @return void
  */
-void nomp_profile_finalize();
+void nomp_profile_finalize(void);
 
 #ifdef __cplusplus
 }
