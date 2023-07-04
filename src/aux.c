@@ -6,7 +6,7 @@ char *nomp_str_cat(unsigned n, unsigned max_len, ...) {
 
   unsigned max = NOMP_MAX_BUFSIZ, len = 0;
   char *out = nomp_calloc(char, max);
-  for (int i = 0; i < n; i++) {
+  for (unsigned i = 0; i < n; i++) {
     const char *s = va_arg(vargs, const char *);
     if (max <= len + strnlen(s, max_len)) {
       max = 3 * (len + strnlen(s, max_len)) / 2 + 1;
