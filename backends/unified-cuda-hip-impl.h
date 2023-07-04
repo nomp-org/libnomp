@@ -49,7 +49,7 @@
 
 #define check_driver(call)                                                     \
   check_error(call, backendError_t, backendSuccess, backendGetErrorName,       \
-              "operation");
+              "driver");
 
 #define check_rtc(call)                                                        \
   check_error(call, backendrtcResult, RTC_SUCCESS, backendrtcGetErrorString,   \
@@ -220,7 +220,7 @@ static int backend_device_query(struct nomp_backend_t *bnd, int device_id) {
   }
 
   int driver_version;
-  backendDriverGetVersion(&driver_version);
+  check_driver(backendDriverGetVersion(&driver_version));
   set_int_aux("device::driver", driver_version);
 
   set_string_aux("device::type", "gpu");
@@ -235,14 +235,14 @@ static int backend_device_query(struct nomp_backend_t *bnd, int device_id) {
 int backend_init(struct nomp_backend_t *bnd, const int platform_id,
                  const int device_id) {
   int num_devices;
-  check_runtime(backendGetDeviceCount(&num_devices));
+  check_driver(backendGetDeviceCount(&num_devices));
   if (device_id < 0 || device_id >= num_devices) {
     return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                     ERR_STR_USER_DEVICE_IS_INVALID, device_id);
   }
 
   check_driver(backendSetDevice(device_id));
-  check_runtime(backendFree(0));
+  check_driver(backendFree(0));
 
   nomp_check(backend_device_query(bnd, device_id));
 
