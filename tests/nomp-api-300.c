@@ -4,28 +4,28 @@
 #undef TEST_IMPL_H
 #undef TEST_MAX_SIZE
 
-static int test_matrix_addition() {
+static int test_matrix_addition(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(300_add, 40, 5)
   TEST_BUILTIN_TYPES(300_add, 16, 16)
   return err;
 }
 
-static int test_matrix_transpose() {
+static int test_matrix_transpose(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(300_transpose, 40, 5)
   TEST_BUILTIN_TYPES(300_transpose, 16, 16)
   return err;
 }
 
-static int test_matrix_matrix_multiplication() {
+static int test_matrix_matrix_multiplication(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(300_mxm, 10)
   TEST_BUILTIN_TYPES(300_mxm, 40)
   return err;
 }
 
-static int test_matrix_vector_multiplication() {
+static int test_matrix_vector_multiplication(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(300_vxm, 10)
   TEST_BUILTIN_TYPES(300_vxm, 40)

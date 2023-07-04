@@ -28,8 +28,8 @@ static int nomp_api_300_aux(const char *fmt, TEST_TYPE *a, TEST_TYPE *b,
 }
 
 #define nomp_api_300_add TOKEN_PASTE(nomp_api_300_add, TEST_SUFFIX)
-static int nomp_api_300_add(int rows, int cols) {
-  const int n = rows * cols;
+static int nomp_api_300_add(unsigned rows, unsigned cols) {
+  const unsigned n = rows * cols;
   nomp_test_assert(n <= TEST_MAX_SIZE2);
 
   TEST_TYPE a[TEST_MAX_SIZE2], b[TEST_MAX_SIZE2];
@@ -49,7 +49,7 @@ static int nomp_api_300_add(int rows, int cols) {
     nomp_test_assert(fabs(a[i] - 2 * n) < TEST_TOL);
 #else
   for (unsigned i = 0; i < n; i++)
-    nomp_test_assert(a[i] == 2 * n);
+    nomp_test_assert(a[i] == (TEST_TYPE)(2 * n));
 #endif
 
   return 0;
@@ -57,8 +57,8 @@ static int nomp_api_300_add(int rows, int cols) {
 #undef nomp_api_300_add
 
 #define nomp_api_300_transpose TOKEN_PASTE(nomp_api_300_transpose, TEST_SUFFIX)
-static int nomp_api_300_transpose(int rows, int cols) {
-  const int n = rows * cols;
+static int nomp_api_300_transpose(unsigned rows, unsigned cols) {
+  const unsigned n = rows * cols;
   nomp_test_assert(n <= TEST_MAX_SIZE2);
 
   TEST_TYPE a[TEST_MAX_SIZE2], b[TEST_MAX_SIZE2];
@@ -122,14 +122,14 @@ static int nomp_api_300_multiply_aux(const char *fmt, TEST_TYPE *a,
 }
 
 #define nomp_api_300_mxm TOKEN_PASTE(nomp_api_300_mxm, TEST_SUFFIX)
-static int nomp_api_300_mxm(int n) {
+static int nomp_api_300_mxm(unsigned n) {
   nomp_test_assert(n <= TEST_MAX_SIZE2);
 
   TEST_TYPE a[TEST_MAX_SIZE2], b[TEST_MAX_SIZE2], c[TEST_MAX_SIZE2];
   TEST_TYPE output_element = 0;
-  for (int i = 0; i < n; i++) {
+  for (unsigned i = 0; i < n; i++) {
     output_element += i * i;
-    for (int j = 0; j < n; j++)
+    for (unsigned j = 0; j < n; j++)
       a[i * n + j] = b[i + j * n] = j;
   }
 
@@ -159,15 +159,15 @@ static int nomp_api_300_mxm(int n) {
 #undef nomp_api_300_mxm
 
 #define nomp_api_300_vxm TOKEN_PASTE(nomp_api_300_vxm, TEST_SUFFIX)
-static int nomp_api_300_vxm(int n) {
+static int nomp_api_300_vxm(unsigned n) {
   nomp_test_assert(n <= TEST_MAX_SIZE);
 
   TEST_TYPE a[TEST_MAX_SIZE2], b[TEST_MAX_SIZE], c[TEST_MAX_SIZE];
   TEST_TYPE output_element = 0;
-  for (int i = 0; i < n; i++) {
+  for (unsigned i = 0; i < n; i++) {
     output_element += i * i;
     b[i] = i, c[i] = 0;
-    for (int j = 0; j < n; j++)
+    for (unsigned j = 0; j < n; j++)
       a[i * n + j] = j;
   }
 
