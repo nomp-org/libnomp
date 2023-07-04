@@ -23,7 +23,7 @@ static int nomp_api_215_aux(const char *fmt, TEST_TYPE *a, int n) {
 
 #define nomp_api_215_logical_ops                                               \
   TOKEN_PASTE(nomp_api_215_logical_ops, TEST_SUFFIX)
-static int nomp_api_215_logical_ops(int n) {
+static int nomp_api_215_logical_ops(unsigned n) {
   nomp_test_assert(n <= TEST_MAX_SIZE);
 
   TEST_TYPE a[TEST_MAX_SIZE];
@@ -58,7 +58,7 @@ static int nomp_api_215_logical_ops(int n) {
 
 #define nomp_api_215_ternary_ops                                               \
   TOKEN_PASTE(nomp_api_215_ternary_ops, TEST_SUFFIX)
-static int nomp_api_215_ternary_ops(int n) {
+static int nomp_api_215_ternary_ops(unsigned n) {
   nomp_test_assert(n <= TEST_MAX_SIZE);
 
   TEST_TYPE a[TEST_MAX_SIZE];

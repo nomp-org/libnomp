@@ -28,7 +28,7 @@ static int nomp_api_205_aux(const char *fmt, TEST_TYPE *a, TEST_TYPE *b,
 }
 
 #define nomp_api_205_add TOKEN_PASTE(nomp_api_205_add, TEST_SUFFIX)
-static int nomp_api_205_add(int n) {
+static int nomp_api_205_add(unsigned n) {
   nomp_test_assert(n <= TEST_MAX_SIZE);
 
   TEST_TYPE a[TEST_MAX_SIZE], b[TEST_MAX_SIZE], c[TEST_MAX_SIZE];
@@ -47,7 +47,7 @@ static int nomp_api_205_add(int n) {
     nomp_test_assert(fabs(a[i] - n - 5) < TEST_TOL);
 #else
   for (unsigned i = 0; i < n; i++)
-    nomp_test_assert(a[i] == n + 5);
+    nomp_test_assert(a[i] == (TEST_TYPE)(n + 5));
 #endif
 
   return 0;
@@ -55,7 +55,7 @@ static int nomp_api_205_add(int n) {
 #undef nomp_api_205_add
 
 #define nomp_api_205_mul TOKEN_PASTE(nomp_api_205_mul, TEST_SUFFIX)
-static int nomp_api_205_mul(int n) {
+static int nomp_api_205_mul(unsigned n) {
   nomp_test_assert(n <= TEST_MAX_SIZE);
 
   TEST_TYPE a[TEST_MAX_SIZE], b[TEST_MAX_SIZE], c[TEST_MAX_SIZE];
@@ -74,7 +74,7 @@ static int nomp_api_205_mul(int n) {
     nomp_test_assert(fabs(a[i] - 5 * (n - i) * i) < TEST_TOL);
 #else
   for (unsigned i = 0; i < n; i++)
-    nomp_test_assert(a[i] == 5 * (n - i) * i);
+    nomp_test_assert(a[i] == (TEST_TYPE)(5 * (n - i) * i));
 #endif
 
   return 0;
@@ -82,7 +82,7 @@ static int nomp_api_205_mul(int n) {
 #undef nomp_api_205_mul
 
 #define nomp_api_205_mul_sum TOKEN_PASTE(nomp_api_205_mul_sum, TEST_SUFFIX)
-static int nomp_api_205_mul_sum(int n) {
+static int nomp_api_205_mul_sum(unsigned n) {
   nomp_test_assert(n <= TEST_MAX_SIZE);
 
   TEST_TYPE a[TEST_MAX_SIZE], b[TEST_MAX_SIZE], c[TEST_MAX_SIZE];
@@ -101,7 +101,7 @@ static int nomp_api_205_mul_sum(int n) {
     nomp_test_assert(fabs(a[i] - (n - i) * i - 5) < TEST_TOL);
 #else
   for (unsigned i = 0; i < n; i++)
-    nomp_test_assert(a[i] == (n - i) * i + 5);
+    nomp_test_assert(a[i] == (TEST_TYPE)((n - i) * i + 5));
 #endif
 
   return 0;
@@ -109,7 +109,7 @@ static int nomp_api_205_mul_sum(int n) {
 #undef nomp_api_205_mul_sum
 
 #define nomp_api_205_linear TOKEN_PASTE(nomp_api_205_linear, TEST_SUFFIX)
-static int nomp_api_205_linear(int n) {
+static int nomp_api_205_linear(unsigned n) {
   nomp_test_assert(n <= TEST_MAX_SIZE);
 
   TEST_TYPE a[TEST_MAX_SIZE], b[TEST_MAX_SIZE], c[TEST_MAX_SIZE];
@@ -128,7 +128,7 @@ static int nomp_api_205_linear(int n) {
     nomp_test_assert(fabs(a[i] - n - 2 * i - 10) < TEST_TOL);
 #else
   for (unsigned i = 0; i < n; i++)
-    nomp_test_assert(a[i] == n + 2 * i + 10);
+    nomp_test_assert(a[i] == (TEST_TYPE)(n + 2 * i + 10));
 #endif
 
   return 0;

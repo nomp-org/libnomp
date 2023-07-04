@@ -23,7 +23,7 @@ static int nomp_api_210_aux(const char *fmt, TEST_TYPE *a, int n) {
 
 #define nomp_api_210_bitwise_and                                               \
   TOKEN_PASTE(nomp_api_210_bitwise_and, TEST_SUFFIX)
-static int nomp_api_210_bitwise_and(int n) {
+static int nomp_api_210_bitwise_and(unsigned n) {
   nomp_test_assert(n <= TEST_MAX_SIZE);
 
   TEST_TYPE a[TEST_MAX_SIZE];
@@ -46,7 +46,7 @@ static int nomp_api_210_bitwise_and(int n) {
 
 #define nomp_api_210_bitwise_or                                                \
   TOKEN_PASTE(nomp_api_210_bitwise_or, TEST_SUFFIX)
-static int nomp_api_210_bitwise_or(int n) {
+static int nomp_api_210_bitwise_or(unsigned n) {
   nomp_test_assert(n <= TEST_MAX_SIZE);
 
   TEST_TYPE a[TEST_MAX_SIZE];
@@ -69,7 +69,7 @@ static int nomp_api_210_bitwise_or(int n) {
 
 #define nomp_api_210_bitwise_xor                                               \
   TOKEN_PASTE(nomp_api_210_bitwise_xor, TEST_SUFFIX)
-static int nomp_api_210_bitwise_xor(int n) {
+static int nomp_api_210_bitwise_xor(unsigned n) {
   nomp_test_assert(n <= TEST_MAX_SIZE);
 
   TEST_TYPE a[TEST_MAX_SIZE];
@@ -92,7 +92,7 @@ static int nomp_api_210_bitwise_xor(int n) {
 
 #define nomp_api_210_bitwise_left_shift                                        \
   TOKEN_PASTE(nomp_api_210_bitwise_left_shift, TEST_SUFFIX)
-static int nomp_api_210_bitwise_left_shift(int n) {
+static int nomp_api_210_bitwise_left_shift(unsigned n) {
   nomp_test_assert(n <= TEST_MAX_SIZE);
 
   TEST_TYPE a[TEST_MAX_SIZE];
@@ -115,7 +115,7 @@ static int nomp_api_210_bitwise_left_shift(int n) {
 
 #define nomp_api_210_bitwise_right_shift                                       \
   TOKEN_PASTE(nomp_api_210_bitwise_right_shift, TEST_SUFFIX)
-static int nomp_api_210_bitwise_right_shift(int n) {
+static int nomp_api_210_bitwise_right_shift(unsigned n) {
   nomp_test_assert(n <= TEST_MAX_SIZE);
 
   TEST_TYPE a[TEST_MAX_SIZE];
@@ -138,7 +138,7 @@ static int nomp_api_210_bitwise_right_shift(int n) {
 
 #define nomp_api_210_bitwise_complement                                        \
   TOKEN_PASTE(nomp_api_210_bitwise_complement, TEST_SUFFIX)
-static int nomp_api_210_bitwise_complement(int n) {
+static int nomp_api_210_bitwise_complement(unsigned n) {
   nomp_test_assert(n <= TEST_MAX_SIZE);
 
   TEST_TYPE a[TEST_MAX_SIZE];
