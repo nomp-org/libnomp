@@ -9,7 +9,7 @@
 
 static const char *ERR_STR_OPENCL_FAILURE = "%s failed with error code: %d.";
 
-#define chk_cl(call, msg)                                                      \
+#define check(call, msg)                                                       \
   {                                                                            \
     cl_int err_ = (call);                                                      \
     if (err_ != CL_SUCCESS) {                                                  \
@@ -39,27 +39,27 @@ static int opencl_update(struct nomp_backend_t *bnd, struct nomp_mem_t *m,
     cl_mem *clm = nomp_calloc(cl_mem, 1);
     *clm = clCreateBuffer(ocl->ctx, CL_MEM_READ_WRITE,
                           NOMP_MEM_BYTES(start, end, usize), NULL, &err);
-    chk_cl(err, "clCreateBuffer");
+    check(err, "clCreateBuffer");
     m->bptr = (void *)clm, m->bsize = sizeof(cl_mem);
   }
 
   cl_mem *clm = (cl_mem *)m->bptr;
   if (op & NOMP_TO) {
-    chk_cl(clEnqueueWriteBuffer(ocl->queue, *clm, CL_TRUE,
-                                NOMP_MEM_OFFSET(start - m->idx0, usize),
-                                NOMP_MEM_BYTES(start, end, usize),
-                                (char *)m->hptr + NOMP_MEM_OFFSET(start, usize),
-                                0, NULL, NULL),
-           "clEnqueueWriteBuffer");
-  } else if (op == NOMP_FROM) {
-    chk_cl(clEnqueueReadBuffer(ocl->queue, *clm, CL_TRUE,
+    check(clEnqueueWriteBuffer(ocl->queue, *clm, CL_TRUE,
                                NOMP_MEM_OFFSET(start - m->idx0, usize),
                                NOMP_MEM_BYTES(start, end, usize),
                                (char *)m->hptr + NOMP_MEM_OFFSET(start, usize),
                                0, NULL, NULL),
-           "clEnqueueReadBuffer");
+          "clEnqueueWriteBuffer");
+  } else if (op == NOMP_FROM) {
+    check(clEnqueueReadBuffer(ocl->queue, *clm, CL_TRUE,
+                              NOMP_MEM_OFFSET(start - m->idx0, usize),
+                              NOMP_MEM_BYTES(start, end, usize),
+                              (char *)m->hptr + NOMP_MEM_OFFSET(start, usize),
+                              0, NULL, NULL),
+          "clEnqueueReadBuffer");
   } else if (op == NOMP_FREE) {
-    chk_cl(clReleaseMemObject(*clm), "clReleaseMemObject");
+    check(clReleaseMemObject(*clm), "clReleaseMemObject");
     nomp_free(&m->bptr);
   }
 
@@ -74,7 +74,7 @@ static int opencl_knl_build(struct nomp_backend_t *bnd, struct nomp_prog_t *prg,
   cl_int err;
   ocl_prg->prg = clCreateProgramWithSource(
       ocl->ctx, 1, (const char **)(&source), NULL, &err);
-  chk_cl(err, "clCreateProgramWithSource");
+  check(err, "clCreateProgramWithSource");
 
   err = clBuildProgram(ocl_prg->prg, 0, NULL, NULL, NULL, NULL);
   if (err != CL_SUCCESS) {
@@ -93,7 +93,7 @@ static int opencl_knl_build(struct nomp_backend_t *bnd, struct nomp_prog_t *prg,
   }
 
   ocl_prg->knl = clCreateKernel(ocl_prg->prg, name, &err);
-  chk_cl(err, "clCreateKernel");
+  check(err, "clCreateKernel");
   prg->bptr = (void *)ocl_prg;
 
   return 0;
@@ -102,15 +102,15 @@ static int opencl_knl_build(struct nomp_backend_t *bnd, struct nomp_prog_t *prg,
 static int opencl_knl_run(struct nomp_backend_t *bnd, struct nomp_prog_t *prg) {
   struct opencl_prog_t *ocl_prg = (struct opencl_prog_t *)prg->bptr;
 
-  for (int i = 0; i < prg->nargs; i++) {
-    chk_cl(clSetKernelArg(ocl_prg->knl, i, prg->args[i].size, prg->args[i].ptr),
-           "clSetKernelArg");
+  for (unsigned i = 0; i < prg->nargs; i++) {
+    check(clSetKernelArg(ocl_prg->knl, i, prg->args[i].size, prg->args[i].ptr),
+          "clSetKernelArg");
   }
 
   struct opencl_backend_t *ocl = (struct opencl_backend_t *)bnd->bptr;
-  chk_cl(clEnqueueNDRangeKernel(ocl->queue, ocl_prg->knl, prg->ndim, NULL,
-                                prg->gws, prg->local, 0, NULL, NULL),
-         "clEnqueueNDRangeKernel");
+  check(clEnqueueNDRangeKernel(ocl->queue, ocl_prg->knl, prg->ndim, NULL,
+                               prg->gws, prg->local, 0, NULL, NULL),
+        "clEnqueueNDRangeKernel");
 
   return 0;
 }
@@ -119,8 +119,8 @@ static int opencl_knl_free(struct nomp_prog_t *prg) {
   struct opencl_prog_t *ocl_prg = (struct opencl_prog_t *)prg->bptr;
 
   if (ocl_prg) {
-    chk_cl(clReleaseKernel(ocl_prg->knl), "clReleaseKernel");
-    chk_cl(clReleaseProgram(ocl_prg->prg), "clReleaseProgram");
+    check(clReleaseKernel(ocl_prg->knl), "clReleaseKernel");
+    check(clReleaseProgram(ocl_prg->prg), "clReleaseProgram");
   }
 
   nomp_free(&prg->bptr);
@@ -129,7 +129,7 @@ static int opencl_knl_free(struct nomp_prog_t *prg) {
 
 static int opencl_sync(struct nomp_backend_t *bnd) {
   struct opencl_backend_t *ocl = (struct opencl_backend_t *)bnd->bptr;
-  chk_cl(clFinish(ocl->queue), "clFinish");
+  check(clFinish(ocl->queue), "clFinish");
   return 0;
 }
 
@@ -137,8 +137,8 @@ static int opencl_finalize(struct nomp_backend_t *bnd) {
   struct opencl_backend_t *ocl = (struct opencl_backend_t *)bnd->bptr;
 
   if (ocl) {
-    chk_cl(clReleaseCommandQueue(ocl->queue), "clReleaseCommandQueue");
-    chk_cl(clReleaseContext(ocl->ctx), "clReleaseContext");
+    check(clReleaseCommandQueue(ocl->queue), "clReleaseCommandQueue");
+    check(clReleaseContext(ocl->ctx), "clReleaseContext");
   }
   nomp_free(&bnd->bptr);
 
@@ -156,8 +156,8 @@ static int opencl_device_query(struct nomp_backend_t *bnd, cl_device_id id) {
 #define set_string_info(PARAM, KEY)                                            \
   {                                                                            \
     char string[BUFSIZ];                                                       \
-    chk_cl(clGetDeviceInfo(id, PARAM, sizeof(string), string, NULL),           \
-           "clGetDeviceInfo");                                                 \
+    check(clGetDeviceInfo(id, PARAM, sizeof(string), string, NULL),            \
+          "clGetDeviceInfo");                                                  \
     set_string_aux(KEY, string);                                               \
   }
 
@@ -166,8 +166,8 @@ static int opencl_device_query(struct nomp_backend_t *bnd, cl_device_id id) {
   set_string_info(CL_DRIVER_VERSION, "device::driver");
 
   cl_device_type type;
-  chk_cl(clGetDeviceInfo(id, CL_DEVICE_TYPE, sizeof(type), &type, NULL),
-         "clGetDeviceInfo");
+  check(clGetDeviceInfo(id, CL_DEVICE_TYPE, sizeof(type), &type, NULL),
+        "clGetDeviceInfo");
   PyObject *obj = NULL;
   if (type & CL_DEVICE_TYPE_CPU)
     obj = PyUnicode_FromString("cpu");
@@ -189,31 +189,31 @@ static int opencl_device_query(struct nomp_backend_t *bnd, cl_device_id id) {
 int opencl_init(struct nomp_backend_t *bnd, const int platform_id,
                 const int device_id) {
   cl_uint num_platforms;
-  chk_cl(clGetPlatformIDs(0, NULL, &num_platforms), "clGetPlatformIDs");
-  if (platform_id < 0 | platform_id >= num_platforms) {
+  check(clGetPlatformIDs(0, NULL, &num_platforms), "clGetPlatformIDs");
+  if (platform_id < 0 | platform_id >= (int)num_platforms) {
     return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                     "Platform id %d provided to libnomp is not valid.",
                     platform_id);
   }
 
   cl_platform_id *cl_platforms = nomp_calloc(cl_platform_id, num_platforms);
-  chk_cl(clGetPlatformIDs(num_platforms, cl_platforms, &num_platforms),
-         "clGetPlatformIDs");
+  check(clGetPlatformIDs(num_platforms, cl_platforms, &num_platforms),
+        "clGetPlatformIDs");
   cl_platform_id platform = cl_platforms[platform_id];
   nomp_free(&cl_platforms);
 
   cl_uint num_devices;
-  chk_cl(clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 0, NULL, &num_devices),
-         "clGetDeviceIDs");
-  if (device_id < 0 || device_id >= num_devices) {
+  check(clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 0, NULL, &num_devices),
+        "clGetDeviceIDs");
+  if (device_id < 0 || device_id >= (int)num_devices) {
     return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                     ERR_STR_USER_DEVICE_IS_INVALID, device_id);
   }
 
   cl_device_id *cl_devices = nomp_calloc(cl_device_id, num_devices);
-  chk_cl(clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, num_devices, cl_devices,
-                        &num_devices),
-         "clGetDeviceIDs");
+  check(clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, num_devices, cl_devices,
+                       &num_devices),
+        "clGetDeviceIDs");
   cl_device_id device = cl_devices[device_id];
   nomp_free(&cl_devices);
 
@@ -223,9 +223,9 @@ int opencl_init(struct nomp_backend_t *bnd, const int platform_id,
   ocl->device_id = device;
   cl_int err;
   ocl->ctx = clCreateContext(NULL, 1, &device, NULL, NULL, &err);
-  chk_cl(err, "clCreateContext");
+  check(err, "clCreateContext");
   ocl->queue = clCreateCommandQueueWithProperties(ocl->ctx, device, 0, &err);
-  chk_cl(err, "clCreateCommandQueueWithProperties");
+  check(err, "clCreateCommandQueueWithProperties");
 
   bnd->bptr = (void *)ocl;
   bnd->update = opencl_update;
@@ -237,3 +237,5 @@ int opencl_init(struct nomp_backend_t *bnd, const int platform_id,
 
   return 0;
 }
+
+#undef check
