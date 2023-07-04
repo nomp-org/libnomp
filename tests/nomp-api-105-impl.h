@@ -17,7 +17,7 @@ static int nomp_api_105_aux(const char **clauses) {
 }
 
 #define nomp_api_105_valid TOKEN_PASTE(nomp_api_105_valid, TEST_SUFFIX)
-static int nomp_api_105_valid() {
+static int nomp_api_105_valid(void) {
   const char *clauses[4] = {"transform", "nomp-api-105", "transform", 0};
   nomp_check(nomp_api_105_aux(clauses));
 
@@ -26,7 +26,7 @@ static int nomp_api_105_valid() {
 #undef nomp_api_105_valid
 
 #define nomp_api_105_invalid TOKEN_PASTE(nomp_api_105_invalid, TEST_SUFFIX)
-static int nomp_api_105_invalid() {
+static int nomp_api_105_invalid(void) {
   const char *clauses[4] = {"transform", "nomp-api-105", "invalid_func", 0};
   int err = nomp_api_105_aux(clauses);
 
