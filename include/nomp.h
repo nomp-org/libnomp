@@ -301,7 +301,7 @@ int nomp_run(int id, ...);
  *
  * @return int
  */
-int nomp_sync();
+int nomp_sync(void);
 
 /**
  * @ingroup nomp_user_api

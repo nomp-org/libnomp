@@ -19,7 +19,7 @@ static inline int check_cmd_line(struct nomp_backend_t *bnd, int argc,
     return 0;
 
   unsigned i = 0;
-  while (i < argc) {
+  while (i < (unsigned)argc) {
     if (!strncmp("--nomp", argv[i], 6)) {
       nomp_check(check_cmd_line_aux(i + 1, argc, argv));
       if (!strncmp("--nomp-backend", argv[i], NOMP_MAX_BUFSIZ)) {
@@ -127,7 +127,7 @@ static inline int deallocate_scratch_memory(struct nomp_backend_t *bnd) {
 
 static inline int init_backend(struct nomp_backend_t *bnd) {
   size_t n = strnlen(bnd->backend, NOMP_MAX_BUFSIZ);
-  for (int i = 0; i < n; i++)
+  for (unsigned i = 0; i < n; i++)
     bnd->backend[i] = tolower(bnd->backend[i]);
 
   bnd->py_context = PyDict_New();
@@ -203,8 +203,8 @@ int nomp_init(int argc, const char **argv) {
 }
 
 static struct nomp_mem_t **mems = NULL;
-static int mems_n = 0;
-static int mems_max = 0;
+static unsigned mems_n = 0;
+static unsigned mems_max = 0;
 
 /**
  * @ingroup nomp_mem_utils
@@ -275,8 +275,8 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize,
 }
 
 static struct nomp_prog_t **progs = NULL;
-static int progs_n = 0;
-static int progs_max = 0;
+static unsigned progs_n = 0;
+static unsigned progs_max = 0;
 
 struct nomp_meta_t {
   char *file, *func;
@@ -440,7 +440,7 @@ int nomp_run(int id, ...) {
 
   struct nomp_arg_t *args = prg->args;
   struct nomp_mem_t *m;
-  int val, val_len;
+  int val;
   char str_val[64];
 
   va_list vargs;
@@ -461,7 +461,7 @@ int nomp_run(int id, ...) {
     case NOMP_PTR:
       m = mem_if_mapped(args[i].ptr);
       if (m == NULL) {
-        if (prg->redn_idx == i) {
+        if (prg->redn_idx == (int)i) {
           prg->redn_ptr = args[i].ptr;
           m = &nomp.scratch;
         } else {
@@ -490,7 +490,7 @@ int nomp_run(int id, ...) {
   return 0;
 }
 
-int nomp_sync() { return nomp.sync(&nomp); }
+int nomp_sync(void) { return nomp.sync(&nomp); }
 
 int nomp_finalize(void) {
   // Free bookkeeping structures for the logger and profiler since these can be
