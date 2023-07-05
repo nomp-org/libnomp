@@ -25,9 +25,9 @@ static inline int check_cmd_line(struct nomp_backend_t *bnd, int argc,
       if (!strncmp("--nomp-backend", argv[i], NOMP_MAX_BUFSIZ)) {
         strncpy(bnd->backend, argv[i + 1], NOMP_MAX_BUFSIZ);
       } else if (!strncmp("--nomp-platform", argv[i], NOMP_MAX_BUFSIZ)) {
-        bnd->platform_id = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
+        bnd->platform = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
       } else if (!strncmp("--nomp-device", argv[i], NOMP_MAX_BUFSIZ)) {
-        bnd->device_id = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
+        bnd->device = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
       } else if (!strncmp("--nomp-verbose", argv[i], NOMP_MAX_BUFSIZ)) {
         bnd->verbose = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
       } else if (!strncmp("--nomp-profile", argv[i], NOMP_MAX_BUFSIZ)) {
@@ -49,10 +49,10 @@ static inline int check_cmd_line(struct nomp_backend_t *bnd, int argc,
 static inline int check_env_vars(struct nomp_backend_t *bnd) {
   char *tmp = getenv("NOMP_PLATFORM");
   if (tmp)
-    bnd->platform_id = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
+    bnd->platform = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
 
   if ((tmp = getenv("NOMP_DEVICE")))
-    bnd->device_id = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
+    bnd->device = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
 
   if ((tmp = getenv("NOMP_VERBOSE")))
     bnd->verbose = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
@@ -76,7 +76,7 @@ static inline int init_configs(int argc, const char **argv,
                                struct nomp_backend_t *bnd) {
   // verbose, profile, device and platform id are all initialized to zero.
   // Everything else has to be set by user explicitly.
-  bnd->verbose = bnd->profile = bnd->device_id = bnd->platform_id = 0;
+  bnd->verbose = bnd->profile = bnd->device = bnd->platform = 0;
   strcpy(bnd->backend, ""), strcpy(bnd->install_dir, "");
 
   nomp_check(check_cmd_line(bnd, argc, argv));
@@ -94,8 +94,8 @@ static inline int init_configs(int argc, const char **argv,
 
   check_if_valid(bnd->verbose < 0, "--nomp-verbose", "NOMP_VERBOSE");
   check_if_valid(bnd->profile < 0, "--nomp-profile", "NOMP_PROFILE");
-  check_if_valid(bnd->platform_id < 0, "--nomp-platform", "NOMP_PLATFORM");
-  check_if_valid(bnd->device_id < 0, "--nomp-device", "NOMP_DEVICE");
+  check_if_valid(bnd->platform < 0, "--nomp-platform", "NOMP_PLATFORM");
+  check_if_valid(bnd->device < 0, "--nomp-device", "NOMP_DEVICE");
   check_if_valid(strlen(bnd->backend) == 0, "--nomp-backend", "NOMP_BACKEND");
   check_if_valid(strlen(bnd->install_dir) == 0, "--nomp-install-dir",
                  "NOMP_INSTALL_DIR");
@@ -105,7 +105,7 @@ static inline int init_configs(int argc, const char **argv,
   // Append nomp python directory to sys.path.
   char abs_dir[PATH_MAX + 32];
   strncpy(abs_dir, bnd->install_dir, PATH_MAX);
-  strncat(abs_dir, "/python", 32);
+  strncat(abs_dir, "/python", 16);
   nomp_check(nomp_py_append_to_sys_path(abs_dir));
   return 0;
 }
@@ -137,23 +137,23 @@ static inline int init_backend(struct nomp_backend_t *bnd) {
 
   if (strncmp(bnd->backend, "opencl", NOMP_MAX_BUFSIZ) == 0) {
 #if defined(OPENCL_ENABLED)
-    nomp_check(opencl_init(&nomp, bnd->platform_id, bnd->device_id));
+    nomp_check(opencl_init(&nomp, bnd->platform, bnd->device));
 #endif
   } else if (strncmp(bnd->backend, "cuda", NOMP_MAX_BUFSIZ) == 0) {
 #if defined(CUDA_ENABLED)
-    nomp_check(cuda_init(&nomp, bnd->platform_id, bnd->device_id));
+    nomp_check(cuda_init(&nomp, bnd->platform, bnd->device));
 #endif
   } else if (strncmp(bnd->backend, "hip", NOMP_MAX_BUFSIZ) == 0) {
 #if defined(HIP_ENABLED)
-    nomp_check(hip_init(&nomp, bnd->platform_id, bnd->device_id));
+    nomp_check(hip_init(&nomp, bnd->platform, bnd->device));
 #endif
   } else if (strncmp(bnd->backend, "sycl", NOMP_MAX_BUFSIZ) == 0) {
 #if defined(SYCL_ENABLED)
-    nomp_check(sycl_init(&nomp, bnd->platform_id, bnd->device_id));
+    nomp_check(sycl_init(&nomp, bnd->platform, bnd->device));
 #endif
   } else if (strncmp(bnd->backend, "ispc", NOMP_MAX_BUFSIZ) == 0) {
 #if defined(ISPC_ENABLED)
-    nomp_check(ispc_init(&nomp, bnd->platform_id, bnd->device_id));
+    nomp_check(ispc_init(&nomp, bnd->platform, bnd->device));
 #endif
   } else {
     return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,

@@ -13,7 +13,7 @@ static const char *ERR_STR_SYCL_FAILURE = "SYCL backend failed with error: %s.";
   }
 
 struct sycl_backend {
-  sycl::device device_id;
+  sycl::device device;
   sycl::queue queue;
   sycl::context ctx;
   char *compiler, *compiler_flags;
@@ -30,7 +30,7 @@ static int sycl_update(struct nomp_backend_t *bnd, struct nomp_mem_t *m,
 
   if (op & NOMP_ALLOC) {
     chk_sycl(m->bptr = sycl::malloc_device(NOMP_MEM_BYTES(start, end, usize),
-                                           sycl->device_id, sycl->ctx););
+                                           sycl->device, sycl->ctx););
   }
 
   if (op & NOMP_TO) {
@@ -139,27 +139,27 @@ static int check_env(struct sycl_backend *sycl) {
   return 0;
 }
 
-int sycl_init(struct nomp_backend_t *bnd, const int platform_id,
-              const int device_id) {
+int sycl_init(struct nomp_backend_t *bnd, const int platform,
+              const int device) {
   struct sycl_backend *sycl = nomp_calloc(struct sycl_backend, 1);
   bnd->bptr = (void *)sycl;
 
   auto sycl_platforms = sycl::platform().get_platforms();
-  if (platform_id < 0 | platform_id >= sycl_platforms.size()) {
+  if (platform < 0 | platform >= sycl_platforms.size()) {
     return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                     "Platform id %d provided to libnomp is not valid.",
-                    platform_id);
+                    platform);
   }
 
-  auto sycl_pdevices = sycl_platforms[platform_id].get_devices();
-  if (device_id < 0 || device_id >= sycl_pdevices.size()) {
+  auto sycl_pdevices = sycl_platforms[platform].get_devices();
+  if (device < 0 || device >= sycl_pdevices.size()) {
     return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                    ERR_STR_USER_DEVICE_IS_INVALID, device_id);
+                    ERR_STR_USER_DEVICE_IS_INVALID, device);
   }
 
-  sycl->device_id = sycl_pdevices[device_id];
-  sycl->ctx = sycl::context(sycl->device_id);
-  sycl->queue = sycl::queue(sycl->ctx, sycl->device_id);
+  sycl->device = sycl_pdevices[device];
+  sycl->ctx = sycl::context(sycl->device);
+  sycl->queue = sycl::queue(sycl->ctx, sycl->device);
   check_env(sycl);
 
   bnd->update = sycl_update;

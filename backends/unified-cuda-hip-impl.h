@@ -57,7 +57,7 @@
 
 #define backend_t TOKEN_PASTE(DRIVER, _backend_t)
 struct backend_t {
-  int device_id;
+  int device;
   backendDeviceProp_t prop;
 };
 
@@ -102,11 +102,6 @@ static int backend_update(struct nomp_backend_t *bnd, struct nomp_mem_t *m,
   }
 
   return 0;
-}
-
-#define backend_update_ptr TOKEN_PASTE(DRIVER, _update_ptr)
-static void backend_update_ptr(void **p, size_t *size, struct nomp_mem_t *m) {
-  *p = (void *)m->bptr, *size = sizeof(m->bptr);
 }
 
 #define backend_knl_build TOKEN_PASTE(DRIVER, _knl_build)
@@ -193,9 +188,9 @@ static int backend_finalize(struct nomp_backend_t *bnd) {
 }
 
 #define backend_device_query TOKEN_PASTE(DRIVER, _device_query)
-static int backend_device_query(struct nomp_backend_t *bnd, int device_id) {
+static int backend_device_query(struct nomp_backend_t *bnd, int device) {
   backendDeviceProp_t prop;
-  check_driver(backendGetDeviceProperties(&prop, device_id));
+  check_driver(backendGetDeviceProperties(&prop, device));
 
 #define set_string_aux(KEY, VAL)                                               \
   {                                                                            \
@@ -232,23 +227,21 @@ static int backend_device_query(struct nomp_backend_t *bnd, int device_id) {
 }
 
 #define backend_init TOKEN_PASTE(DRIVER, _init)
-int backend_init(struct nomp_backend_t *bnd, const int platform_id,
-                 const int device_id) {
+int backend_init(struct nomp_backend_t *bnd, const int platform,
+                 const int device) {
   int num_devices;
   check_driver(backendGetDeviceCount(&num_devices));
-  if (device_id < 0 || device_id >= num_devices) {
+  if (device < 0 || device >= num_devices) {
     return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                    ERR_STR_USER_DEVICE_IS_INVALID, device_id);
+                    ERR_STR_USER_DEVICE_IS_INVALID, device);
   }
 
-  check_driver(backendSetDevice(device_id));
+  check_driver(backendSetDevice(device));
   check_driver(backendFree(0));
 
-  nomp_check(backend_device_query(bnd, device_id));
-
   struct backend_t *backend = nomp_calloc(struct backend_t, 1);
-  backend->device_id = device_id;
-  check_driver(backendGetDeviceProperties(&backend->prop, device_id));
+  backend->device = device;
+  check_driver(backendGetDeviceProperties(&backend->prop, device));
 
   bnd->bptr = (void *)backend;
   bnd->update = backend_update;
@@ -257,6 +250,8 @@ int backend_init(struct nomp_backend_t *bnd, const int platform_id,
   bnd->knl_free = backend_knl_free;
   bnd->sync = backend_sync;
   bnd->finalize = backend_finalize;
+
+  nomp_check(backend_device_query(bnd, device));
 
   return 0;
 }
@@ -267,7 +262,6 @@ int backend_init(struct nomp_backend_t *bnd, const int platform_id,
 #undef backend_knl_free
 #undef backend_knl_run
 #undef backend_knl_build
-#undef backend_update_ptr
 #undef backend_update
 #undef backend_compile
 

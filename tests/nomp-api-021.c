@@ -35,7 +35,7 @@ static int test_invalid_nomp_backend(int argc, const char **argv) {
 }
 
 // NOMP_PLATFORM environment variable with invalid value.
-static int test_invalid_platform_id(int argc, const char **argv) {
+static int test_invalid_platform(int argc, const char **argv) {
   char *platform = NULL;
   set_test_env(platform, "NOMP_PLATFORM", "invalid");
 
@@ -53,7 +53,7 @@ static int test_invalid_platform_id(int argc, const char **argv) {
 }
 
 // NOMP_DEVICE environment variable with invalid value.
-static int test_invalid_device_id(int argc, const char **argv) {
+static int test_invalid_device(int argc, const char **argv) {
   char *device = NULL;
   set_test_env(device, "NOMP_DEVICE", "invalid");
 
@@ -96,7 +96,7 @@ static int test_invalid_nomp_verbose(int argc, const char **argv) {
 }
 
 // Run with a valid NOMP_PLATFORM environment variable.
-static int test_valid_platform_id(int argc, const char **argv) {
+static int test_valid_platform(int argc, const char **argv) {
   char *platform = NULL;
   set_test_env(platform, "NOMP_PLATFORM", "0");
 
@@ -109,7 +109,7 @@ static int test_valid_platform_id(int argc, const char **argv) {
 }
 
 // Run with a valid NOMP_DEVICE  environment variable.
-static int test_valid_device_id(int argc, const char **argv) {
+static int test_valid_device(int argc, const char **argv) {
   char *device = NULL;
   set_test_env(device, "NOMP_DEVICE", "0");
 
@@ -124,8 +124,8 @@ static int test_valid_device_id(int argc, const char **argv) {
 int main(int argc, const char *argv[]) {
   int err = 0;
   err |= SUBTEST(test_invalid_nomp_backend, argc, argv);
-  err |= SUBTEST(test_invalid_platform_id, argc, argv);
-  err |= SUBTEST(test_invalid_device_id, argc, argv);
+  err |= SUBTEST(test_invalid_platform, argc, argv);
+  err |= SUBTEST(test_invalid_device, argc, argv);
   err |= SUBTEST(test_invalid_nomp_verbose, argc, argv);
 
   nomp_test_assert(argc <= 64);
@@ -137,7 +137,7 @@ int main(int argc, const char *argv[]) {
     if (strncmp(argv[i], "--nomp-platform", NOMP_TEST_MAX_BUFSIZ))
       argvn[argcn] = strndup(argv[i], NOMP_TEST_MAX_BUFSIZ), argcn++;
   }
-  err |= SUBTEST(test_valid_platform_id, argcn, (const char **)argvn);
+  err |= SUBTEST(test_valid_platform, argcn, (const char **)argvn);
   for (unsigned i = 0; i < argcn; i++)
     nomp_free(&argvn[i]);
 
@@ -147,7 +147,7 @@ int main(int argc, const char *argv[]) {
     if (strncmp(argv[i], "--nomp-device", NOMP_TEST_MAX_BUFSIZ))
       argvn[argcn] = strndup(argv[i], NOMP_TEST_MAX_BUFSIZ), argcn++;
   }
-  err |= SUBTEST(test_valid_device_id, argcn, (const char **)argvn);
+  err |= SUBTEST(test_valid_device, argcn, (const char **)argvn);
   for (unsigned i = 0; i < argcn; i++)
     nomp_free(&argvn[i]);
 

@@ -39,7 +39,7 @@ struct nomp_mem_t {
 #define NOMP_MEM_BYTES(start, end, usize) (((end) - (start)) * (usize))
 
 struct nomp_arg_t {
-  char name[NOMP_MAX_BUFSIZ];
+  char name[NOMP_MAX_BUFSIZ + 1];
   size_t size;
   unsigned type;
   void *ptr;
@@ -69,8 +69,8 @@ struct nomp_prog_t {
 
 struct nomp_backend_t {
   // User configurations of the backend.
-  int platform_id, device_id, verbose, profile;
-  char backend[NOMP_MAX_BUFSIZ], install_dir[PATH_MAX];
+  int platform, device, verbose, profile;
+  char backend[NOMP_MAX_BUFSIZ + 1], install_dir[PATH_MAX + 1];
   // Pointers to backend functions used for backend dispatch.
   int (*update)(struct nomp_backend_t *, struct nomp_mem_t *,
                 const nomp_map_direction_t op, size_t start, size_t end,
@@ -110,12 +110,12 @@ extern "C" {
  * occurred during the initialization, otherwise returns 0.
  *
  * @param[in] backend Target backend for code generation.
- * @param[in] platform_id Target platform id.
- * @param[in] device_id Target device id.
+ * @param[in] platform Target platform id.
+ * @param[in] device Target device id.
  * @return int
  */
-int opencl_init(struct nomp_backend_t *backend, const int platform_id,
-                const int device_id);
+int opencl_init(struct nomp_backend_t *backend, const int platform,
+                const int device);
 
 /**
  * @ingroup nomp_backend_init
@@ -127,12 +127,12 @@ int opencl_init(struct nomp_backend_t *backend, const int platform_id,
  * occurred during the initialization, otherwise returns 0.
  *
  * @param[in] backend Target backend for code generation.
- * @param[in] platform_id Target platform id.
- * @param[in] device_id Target device id.
+ * @param[in] platform Target platform id.
+ * @param[in] device Target device id.
  * @return int
  */
-int sycl_init(struct nomp_backend_t *backend, const int platform_id,
-              const int device_id);
+int sycl_init(struct nomp_backend_t *backend, const int platform,
+              const int device);
 
 /**
  * @ingroup nomp_backend_init
@@ -143,12 +143,12 @@ int sycl_init(struct nomp_backend_t *backend, const int platform_id,
  * error occurred during the initialization, otherwise returns 0.
  *
  * @param[in] backend Target backend for code generation.
- * @param[in] platform_id Target platform id.
- * @param[in] device_id Target device id.
+ * @param[in] platform Target platform id.
+ * @param[in] device Target device id.
  * @return int
  */
-int cuda_init(struct nomp_backend_t *backend, const int platform_id,
-              const int device_id);
+int cuda_init(struct nomp_backend_t *backend, const int platform,
+              const int device);
 
 /**
  * @ingroup nomp_backend_init
@@ -159,12 +159,12 @@ int cuda_init(struct nomp_backend_t *backend, const int platform_id,
  * error occurred during the initialization, otherwise returns 0.
  *
  * @param[in] backend Target backend for code generation.
- * @param[in] platform_id Target platform id.
- * @param[in] device_id Target device id.
+ * @param[in] platform Target platform id.
+ * @param[in] device Target device id.
  * @return int
  */
-int hip_init(struct nomp_backend_t *backend, const int platform_id,
-             const int device_id);
+int hip_init(struct nomp_backend_t *backend, const int platform,
+             const int device);
 
 /**
  * @ingroup nomp_backend_init
@@ -176,11 +176,11 @@ int hip_init(struct nomp_backend_t *backend, const int platform_id,
  *
  * @param[in] backend Target backend for code generation.
  * @param[in] platform_type Target platform type.
- * @param[in] device_id Target device id.
+ * @param[in] device Target device id.
  * @return int
  */
 int ispc_init(struct nomp_backend_t *backend, const int platform_type,
-              const int device_id);
+              const int device);
 
 #ifdef __cplusplus
 }

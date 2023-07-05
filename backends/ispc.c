@@ -188,7 +188,7 @@ static int ispc_chk_env(struct ispc_backend *ispc) {
 static int ispc_sync(struct nomp_backend_t *bnd) { return 0; }
 
 int ispc_init(struct nomp_backend_t *bnd, const int platform_type,
-              const int device_id) {
+              const int device) {
   ispcrtSetErrorFunc(ispcrt_error);
   if (platform_type < 0 | platform_type >= 2) {
     return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
@@ -198,11 +198,11 @@ int ispc_init(struct nomp_backend_t *bnd, const int platform_type,
   uint32_t num_devices =
       ispcrtGetDeviceCount(nomp_to_ispc_device[platform_type]);
   chk_ispcrt("get device count", rt_error);
-  if (device_id < 0 || device_id >= num_devices) {
+  if (device < 0 || device >= num_devices) {
     return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                    ERR_STR_USER_DEVICE_IS_INVALID, device_id);
+                    ERR_STR_USER_DEVICE_IS_INVALID, device);
   }
-  ISPCRTDevice device = ispcrtGetDevice(platform_type, device_id);
+  ISPCRTDevice device = ispcrtGetDevice(platform_type, device);
   chk_ispcrt("device get", rt_error);
 
   struct ispc_backend *ispc = bnd->bptr = nomp_calloc(struct ispc_backend, 1);
