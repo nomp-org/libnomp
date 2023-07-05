@@ -11,6 +11,13 @@ static int test_matrix_addition(void) {
   return err;
 }
 
+static int test_matrix_addition_unsigned_bounds(void) {
+  int err = 0;
+  TEST_BUILTIN_TYPES(300_add_ui, 40, 5)
+  TEST_BUILTIN_TYPES(300_add_ui, 16, 16)
+  return err;
+}
+
 static int test_matrix_transpose(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(300_transpose, 40, 5)
@@ -37,6 +44,7 @@ int main(int argc, const char *argv[]) {
   nomp_check(err);
 
   err |= SUBTEST(test_matrix_addition);
+  err |= SUBTEST(test_matrix_addition_unsigned_bounds);
   err |= SUBTEST(test_matrix_transpose);
   err |= SUBTEST(test_matrix_vector_multiplication);
   err |= SUBTEST(test_matrix_matrix_multiplication);

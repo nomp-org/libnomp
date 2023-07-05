@@ -2,6 +2,62 @@
 
 #define TEST_MAX_SIZE2 (TEST_MAX_SIZE * TEST_MAX_SIZE)
 
+#define nomp_api_300_aux_ui TOKEN_PASTE(nomp_api_300_aux_ui, TEST_SUFFIX)
+static int nomp_api_300_aux_ui(const char *fmt, TEST_TYPE *a, TEST_TYPE *b,
+                               unsigned rows, unsigned cols, int n) {
+  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO));
+  nomp_test_chk(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO));
+
+  int id = -1;
+  const char *clauses[4] = {"transform", "nomp-api-300", "transform", 0};
+  char *knl = generate_knl(fmt, 2, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE));
+  nomp_test_chk(nomp_jit(&id, knl, clauses, 4, "a", sizeof(TEST_TYPE), NOMP_PTR,
+                         "b", sizeof(TEST_TYPE), NOMP_PTR, "rows",
+                         sizeof(unsigned), NOMP_UINT, "cols", sizeof(unsigned),
+                         NOMP_UINT));
+  nomp_free(&knl);
+
+  nomp_test_chk(nomp_run(id, a, b, &rows, &cols));
+
+  nomp_test_chk(nomp_sync());
+
+  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM));
+  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
+  nomp_test_chk(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
+
+  return 0;
+}
+
+#define nomp_api_300_add_ui TOKEN_PASTE(nomp_api_300_add_ui, TEST_SUFFIX)
+static int nomp_api_300_add_ui(unsigned rows, unsigned cols) {
+  const unsigned n = rows * cols;
+  nomp_test_assert(n <= TEST_MAX_SIZE2);
+
+  TEST_TYPE a[TEST_MAX_SIZE2], b[TEST_MAX_SIZE2];
+  for (unsigned i = 0; i < n; i++)
+    a[i] = 2 * n - i, b[i] = i;
+
+  const char *knl_fmt =
+      "void foo(%s *a, %s *b, unsigned rows, unsigned cols) {          \n"
+      "  for (int e = 0; e < rows; e++)                                \n"
+      "    for (int i = 0; i < cols; i++)                              \n"
+      "      a[e * cols + i] = a[e * cols + i] + b[e * cols + i];      \n"
+      "}                                                               \n";
+  nomp_api_300_aux_ui(knl_fmt, a, b, rows, cols, n);
+
+#if defined(TEST_TOL)
+  for (unsigned i = 0; i < n; i++)
+    nomp_test_assert(fabs(a[i] - 2 * n) < TEST_TOL);
+#else
+  for (unsigned i = 0; i < n; i++)
+    nomp_test_assert(a[i] == (TEST_TYPE)(2 * n));
+#endif
+
+  return 0;
+}
+#undef nomp_api_300_add_ui
+#undef nomp_api_300_aux_ui
+
 #define nomp_api_300_aux TOKEN_PASTE(nomp_api_300_aux, TEST_SUFFIX)
 static int nomp_api_300_aux(const char *fmt, TEST_TYPE *a, TEST_TYPE *b,
                             int rows, int cols, int n) {

@@ -1,5 +1,58 @@
 #include "nomp-test.h"
 
+#define nomp_api_200_aux_ui TOKEN_PASTE(nomp_api_200_aux_ui, TEST_SUFFIX)
+static int nomp_api_200_aux_ui(const char *fmt, TEST_TYPE *a, TEST_TYPE *b,
+                               unsigned n) {
+  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO));
+  nomp_test_chk(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO));
+
+  int id = -1;
+  const char *clauses[4] = {"transform", "nomp-api-200", "transform", 0};
+  char *knl = generate_knl(fmt, 2, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE));
+  nomp_test_chk(nomp_jit(&id, knl, clauses, 3, "a", sizeof(TEST_TYPE), NOMP_PTR,
+                         "b", sizeof(TEST_TYPE), NOMP_PTR, "N",
+                         sizeof(unsigned), NOMP_UINT));
+  nomp_free(&knl);
+
+  nomp_test_chk(nomp_run(id, a, b, &n));
+
+  nomp_test_chk(nomp_sync());
+
+  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM));
+  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
+  nomp_test_chk(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
+
+  return 0;
+}
+
+#define nomp_api_200_add_ui TOKEN_PASTE(nomp_api_200_add_ui, TEST_SUFFIX)
+static int nomp_api_200_add_ui(unsigned n) {
+  nomp_test_assert(n <= TEST_MAX_SIZE);
+
+  TEST_TYPE a[TEST_MAX_SIZE], b[TEST_MAX_SIZE];
+  for (unsigned i = 0; i < n; i++)
+    a[i] = n - i, b[i] = i;
+
+  const char *knl_fmt =
+      "void foo(%s *a, %s *b, int N) {                        \n"
+      "  for (int i = 0; i < N; i++)                          \n"
+      "    a[i] += b[i];                                      \n"
+      "}                                                      \n";
+  nomp_api_200_aux_ui(knl_fmt, a, b, n);
+
+#if defined(TEST_TOL)
+  for (unsigned i = 0; i < n; i++)
+    nomp_test_assert(fabs(a[i] - n) < TEST_TOL);
+#else
+  for (unsigned i = 0; i < n; i++)
+    nomp_test_assert(a[i] == (TEST_TYPE)n);
+#endif
+
+  return 0;
+}
+#undef nomp_api_200_add_ui
+#undef nomp_api_200_aux_ui
+
 #define nomp_api_200_aux TOKEN_PASTE(nomp_api_200_aux, TEST_SUFFIX)
 static int nomp_api_200_aux(const char *fmt, TEST_TYPE *a, TEST_TYPE *b,
                             int n) {
@@ -161,8 +214,8 @@ static int nomp_api_200_square(unsigned n) {
 }
 #undef nomp_api_200_square
 
-#define nomp_api_200_linear TOKEN_PASTE(nomp_api_200_linear, TEST_SUFFIX)
-static int nomp_api_200_linear(unsigned n) {
+#define nomp_api_200_assign TOKEN_PASTE(nomp_api_200_assign, TEST_SUFFIX)
+static int nomp_api_200_assign(unsigned n) {
   nomp_test_assert(n <= TEST_MAX_SIZE);
 
   TEST_TYPE a[TEST_MAX_SIZE] = {0}, b[TEST_MAX_SIZE] = {1, 2, 3, 4, 5};
@@ -184,5 +237,5 @@ static int nomp_api_200_linear(unsigned n) {
 
   return 0;
 }
-#undef nomp_api_200_linear
+#undef nomp_api_200_assign
 #undef nomp_api_200_aux

@@ -11,6 +11,13 @@ static int test_vector_addition(void) {
   return err;
 }
 
+static int test_vector_addition_unsigned_bounds(void) {
+  int err = 0;
+  TEST_BUILTIN_TYPES(200_add_ui, 10)
+  TEST_BUILTIN_TYPES(200_add_ui, 50)
+  return err;
+}
+
 static int test_vector_subtraction(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(200_sub, 10)
@@ -39,10 +46,10 @@ static int test_vector_square_sum(void) {
   return err;
 }
 
-static int test_vector_linear(void) {
+static int test_vector_assign(void) {
   int err = 0;
-  TEST_BUILTIN_TYPES(200_linear, 10)
-  TEST_BUILTIN_TYPES(200_linear, 50)
+  TEST_BUILTIN_TYPES(200_assign, 10)
+  TEST_BUILTIN_TYPES(200_assign, 50)
   return err;
 }
 
@@ -51,11 +58,12 @@ int main(int argc, const char *argv[]) {
   nomp_check(err);
 
   err |= SUBTEST(test_vector_addition);
+  err |= SUBTEST(test_vector_addition_unsigned_bounds);
   err |= SUBTEST(test_vector_subtraction);
   err |= SUBTEST(test_vector_multiplication_sum);
   err |= SUBTEST(test_vector_multiplication);
   err |= SUBTEST(test_vector_square_sum);
-  err |= SUBTEST(test_vector_linear);
+  err |= SUBTEST(test_vector_assign);
 
   err |= nomp_finalize();
   nomp_check(err);

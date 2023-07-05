@@ -229,7 +229,7 @@ static int nomp_api_500_multiple_reductions(unsigned N, unsigned iterations) {
       "}                                                                 \n";
 
   TEST_TYPE a[TEST_MAX_SIZE];
-  for (unsigned i = 1; i < iterations; ++i) {
+  for (unsigned i = 0; i < iterations; ++i) {
     for (unsigned j = 0; j < N; j++)
       a[j] = i * j;
 
