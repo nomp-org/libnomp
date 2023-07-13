@@ -10,7 +10,7 @@ static const char *ERR_STR_BACKEND_FAILURE = "CUDA %s failure: %s.";
 #define RUNTIME_COMPILATION nvrtc
 #define RUNTIME cu
 
-#define backendDeviceProp_t cudaDeviceProp
+#define backendDeviceProp_t struct cudaDeviceProp
 
 #define backendModuleLaunchKernel cuLaunchKernel
 

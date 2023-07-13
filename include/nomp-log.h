@@ -48,7 +48,7 @@ int nomp_log_(const char *desc, int logno, nomp_log_type type,
               const char *fname, unsigned line_no, ...);
 
 #define nomp_log(logno, type, desc, ...)                                       \
-  nomp_log_(desc, logno, type, __FILE__, __LINE__, ##__VA_ARGS__)
+  nomp_log_(desc, logno, type, __FILE__, __LINE__ __VA_OPT__(, ) __VA_ARGS__)
 
 /**
  * @ingroup nomp_log_utils

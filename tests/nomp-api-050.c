@@ -97,16 +97,16 @@ int main(int argc, const char *argv[]) {
   int err = nomp_init(argc, argv);
   nomp_check(err);
 
-  err |= SUBTEST(test_free_before_mapping);
-  err |= SUBTEST(test_d2h_before_h2d);
-  err |= SUBTEST(test_multiple_h2d_calls);
-  err |= SUBTEST(test_multiple_d2h_calls);
-  err |= SUBTEST(test_d2h_after_h2d);
-  err |= SUBTEST(test_free_after_h2d);
-  err |= SUBTEST(test_free_after_d2h);
-  err |= SUBTEST(test_in_range_d2h);
-  err |= SUBTEST(test_in_range_h2d);
-  err |= SUBTEST(test_dynamic_data_type);
+  err |= SUBTEST(test_free_before_mapping, );
+  err |= SUBTEST(test_d2h_before_h2d, );
+  err |= SUBTEST(test_multiple_h2d_calls, );
+  err |= SUBTEST(test_multiple_d2h_calls, );
+  err |= SUBTEST(test_d2h_after_h2d, );
+  err |= SUBTEST(test_free_after_h2d, );
+  err |= SUBTEST(test_free_after_d2h, );
+  err |= SUBTEST(test_in_range_d2h, );
+  err |= SUBTEST(test_in_range_h2d, );
+  err |= SUBTEST(test_dynamic_data_type, );
 
   err |= nomp_finalize();
   nomp_check(err);

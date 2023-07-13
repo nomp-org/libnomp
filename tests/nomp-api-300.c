@@ -36,10 +36,10 @@ int main(int argc, const char *argv[]) {
   int err = nomp_init(argc, argv);
   nomp_check(err);
 
-  err |= SUBTEST(test_matrix_addition);
-  err |= SUBTEST(test_matrix_transpose);
-  err |= SUBTEST(test_matrix_vector_multiplication);
-  err |= SUBTEST(test_matrix_matrix_multiplication);
+  err |= SUBTEST(test_matrix_addition, );
+  err |= SUBTEST(test_matrix_transpose, );
+  err |= SUBTEST(test_matrix_vector_multiplication, );
+  err |= SUBTEST(test_matrix_matrix_multiplication, );
 
   err |= nomp_finalize();
   nomp_check(err);

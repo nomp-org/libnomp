@@ -16,7 +16,7 @@ int main(int argc, const char *argv[]) {
   int err = nomp_init(argc, argv);
   nomp_check(err);
 
-  err |= SUBTEST(test_for_loop_bounds);
+  err |= SUBTEST(test_for_loop_bounds, );
 
   err |= nomp_finalize();
   nomp_check(err);
