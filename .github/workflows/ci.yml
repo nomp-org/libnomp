@@ -30,12 +30,12 @@ jobs:
     env:
       CC: ${{ matrix.compiler }}
     steps:
-      - name: Setup Github actions
+      - name: Setup GitHub actions
         uses: actions/checkout@v3
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3.13
         if: ${{ inputs.debug_enabled }}
-      - name: Setup conda-forge
+      - name: Setup conda environment
         id: setup_conda
         uses: conda-incubator/setup-miniconda@v2
         with:
@@ -47,7 +47,7 @@ jobs:
         with:
           path: ${{ env.LIBNOMP_ENV }}
           key:  conda-${{ runner.os }}-${{ hashFiles('environment.yml') }}-${{ hashFiles('requirements.txt') }}-${{ env.CACHE_NUMBER }}
-      - name: Update environment
+      - name: Update conda environment
         id: update_env
         run: |
           conda env update -n libnomp -f environment.yml
