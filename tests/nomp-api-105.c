@@ -7,14 +7,14 @@
 // Calling nomp_jit() with valid functions should not return an error.
 static int test_valid_clauses(void) {
   int err = 0;
-  TEST_BUILTIN_TYPES(105_valid);
+  TEST_BUILTIN_TYPES(105_valid, );
   return err;
 }
 
 // Calling nomp_jit() with invalid functions should return an error.
 static int test_invalid_clauses(void) {
   int err = 0;
-  TEST_BUILTIN_TYPES(105_invalid);
+  TEST_BUILTIN_TYPES(105_invalid, );
   return err;
 }
 
