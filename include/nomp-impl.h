@@ -29,67 +29,216 @@
 
 #include "nomp.h"
 
+/**
+ * @ingroup nomp_types
+ *
+ * @brief Represents a memory block that can be used for data storage and
+ * transfer between a host and a device.
+ */
 struct nomp_mem_t {
-  size_t idx0, idx1, usize;
-  void *hptr, *bptr;
+  /**
+   * @brief Starting index of a memory block.
+   */
+  size_t idx0;
+  /**
+   * @brief Ending index of a memory block.
+   */
+  size_t idx1;
+  /**
+   * @brief Size (in bytes) of each element in the memory block.
+   */
+  size_t usize;
+  /**
+   * @brief Pointer to the host memory.
+   */
+  void *hptr;
+  /**
+   * @brief Pointer to the device memory.
+   */
+  void *bptr;
+  /**
+   * @brief Size (in bytes) of allocated memory on device.
+   */
   size_t bsize;
 };
 
 #define NOMP_MEM_OFFSET(start, usize) ((start) * (usize))
 #define NOMP_MEM_BYTES(start, end, usize) (((end) - (start)) * (usize))
 
+/**
+ * @ingroup nomp_types
+ *
+ * @brief Represents a kernel argument.
+ */
 struct nomp_arg_t {
+  /**
+   * @brief Size (in bytes) of allocated memory on device.
+   */
   char name[NOMP_MAX_BUFSIZ];
+  /**
+   * @brief The name of the argument.
+   */
   size_t size;
+  /**
+   * @brief The size of the argument data.
+   */
   unsigned type;
+  /**
+   * @brief A pointer to the argument data.
+   */
   void *ptr;
 };
 
+/**
+ * @ingroup nomp_types
+ *
+ * @brief Struct to store meta information about kernel arguments.
+ */
 struct nomp_prog_t {
-  // Number of arguments of the kernel and meta info about
-  // arguments.
+  /**
+   * @brief Number of kernel arguments.
+   */
   unsigned nargs;
+  /**
+   * @brief Pointer to an array of kernel arguments.
+   */
   struct nomp_arg_t *args;
-  // Dimension of kernel launch parameters, their pymbolic
-  // expressions, and evaluated value of each dimension.
+  /**
+   * @brief Dimension of kernel launch parameters.
+   */
   unsigned ndim;
-  CVecBasic *sym_global, *sym_local;
-  size_t global[3], local[3], gws[3];
-  // Map of variable names and their values use to evaluate
-  // the kernel launch parameters.
+  /**
+   * @brief Pymbolic expressions for global dimensions.
+   */
+  CVecBasic *sym_global;
+  /**
+   * @brief Pymbolic expressions for local dimensions.
+   */
+  CVecBasic *sym_local;
+  /**
+   * @brief Sizes of each global dimensions.
+   */
+  size_t global[3];
+  /**
+   * @brief Sizes of each local dimensions.
+   */
+  size_t local[3];
+  /**
+   * @brief Global work size.
+   */
+  size_t gws[3];
+  /**
+   * @brief Map of variable names and their values use to evaluate the kernel
+   * launch parameters.
+   */
   CMapBasicBasic *map;
-  // Boolean flag to determine if the grid size should be evaluated or not.
+  /**
+   * @brief Boolean flag to determine if the grid size should be evaluated or
+   * not.
+   */
   int eval_grid;
-  // Pointer to keep track of backend specific data.
+  /**
+   * @brief Pointer to backend specific data.
+   */
   void *bptr;
-  // Reduction related metadata.
-  int redn_idx, redn_op, redn_type, redn_size;
+  /**
+   * @brief Reduction kernel id.
+   */
+  int redn_idx;
+  /**
+   * @brief Reduction operator.
+   */
+  int redn_op;
+  /**
+   * @brief Type of reduction.
+   */
+  int redn_type;
+  /**
+   * @brief Size of the array to be reduced.
+   */
+  int redn_size;
+  /**
+   * @brief A pointer to data to be reduced.
+   */
   void *redn_ptr;
 };
 
+/**
+ * @ingroup nomp_types
+ *
+ * @brief Struct to store user configurations and pointers to backend functions.
+ */
 struct nomp_backend_t {
   // User configurations of the backend.
-  int platform_id, device_id, verbose, profile;
-  char backend[NOMP_MAX_BUFSIZ], install_dir[PATH_MAX];
+  /**
+   * @brief Platform ID of the backend.
+   */
+  int platform_id;
+  /**
+   * @brief Device ID of the backend.
+   */
+  int device_id;
+  /**
+   * @brief Verbosity level.
+   */
+  int verbose;
+  /**
+   * @brief Profiler level.
+   */
+  int profile;
+  /**
+   * @brief Name of the backend.
+   */
+  char backend[NOMP_MAX_BUFSIZ];
+  /**
+   * @brief Nomp installation directory.
+   */
+  char install_dir[PATH_MAX];
   // Pointers to backend functions used for backend dispatch.
+  /**
+   * @brief Pointer to backend memory update function.
+   */
   int (*update)(struct nomp_backend_t *, struct nomp_mem_t *,
                 const nomp_map_direction_t op, size_t start, size_t end,
                 size_t usize);
+  /**
+   * @brief Pointer to backend kernel build function.
+   */
   int (*knl_build)(struct nomp_backend_t *, struct nomp_prog_t *, const char *,
                    const char *);
+  /**
+   * @brief Pointer to backend kernel run function.
+   */
   int (*knl_run)(struct nomp_backend_t *, struct nomp_prog_t *);
+  /**
+   * @brief Pointer to backend kernel free function.
+   */
   int (*knl_free)(struct nomp_prog_t *);
+  /**
+   * @brief Pointer to backend synchronization function.
+   */
   int (*sync)(struct nomp_backend_t *);
+  /**
+   * @brief Pointer to backend finalizing function.
+   */
   int (*finalize)(struct nomp_backend_t *);
-  // Scratch memory to be used as temporary memory for kernels (like
-  // reductions).
+  /**
+   * @brief Scratch memory to be used as temporary memory for kernels (like
+   * reductions).
+   */
   struct nomp_mem_t scratch;
-  // Python function object which will be called to perform annotations.
+  /**
+   * @brief Python function object which will be called to perform annotations.
+   */
   PyObject *py_annotate;
-  // Context info is used to pass necessary infomation to kernel
-  // transformations and annotations.
+  /**
+   * @brief Context info is used to pass necessary infomation to kernel
+   * transformations and annotations.
+   */
   PyObject *py_context;
-  // Pointer to keep track of backend specific data.
+  /**
+   * @brief Pointer to backend specific data.
+   */
   void *bptr;
 };
 

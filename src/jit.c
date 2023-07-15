@@ -99,8 +99,19 @@ static int compile_aux(const char *cc, const char *cflags, const char *src,
   return err;
 }
 
+/**
+ * @ingroup nomp_types
+ *
+ * @brief Struct to store information about a dynamic loaded function.
+ */
 struct function {
+  /**
+   * @brief Handle to the dynamic library that contains the function.
+   */
   void *dlh;
+  /**
+   * @brief Pointer to the function.
+   */
   void (*dlf)(void **);
 };
 

@@ -5,17 +5,64 @@
 static const char *ERR_STR_ISPC_FAILURE =
     "ISPC %s failed with error message: %s.";
 
+/**
+ * @ingroup nomp_types
+ *
+ * @brief Represents a memory block that can be used for data storage and
+ * transfer between a host and a device.
+ */
 struct ispc_backend {
-  char *ispc_cc, *cc, *ispc_flags, *cc_flags;
+  /**
+   * @brief Path to the ISPC compiler.
+   */
+  char *ispc_cc;
+  /**
+   * @brief Path to the C/C++ compiler.
+   */
+  char *cc;
+  /**
+   * @brief ISPC compiler flags.
+   */
+  char *ispc_flags;
+  /**
+   * @brief C/C++ compiler flags.
+   */
+  char *cc_flags;
+  /**
+   * @brief Handle to the selected device.
+   */
   ISPCRTDevice device;
+  /**
+   * @brief Type of device.
+   */
   ISPCRTDeviceType device_type;
+  /**
+   * @brief Handle to the task queue.
+   */
   ISPCRTTaskQueue queue;
+  /**
+   * @brief Flags to configure the creation of new memory views.
+   */
   ISPCRTNewMemoryViewFlags flags;
 };
 
+/**
+ * @ingroup nomp_types
+ *
+ * @brief Struct to store ISPC program information.
+ */
 struct ispc_prog {
+  /**
+   * @brief ID of the ISPC program.
+   */
   int ispc_id;
+  /**
+   * @brief Module of the ISPC program.
+   */
   ISPCRTModule module;
+  /**
+   * @brief Kernel of the ISPC program.
+   */
   ISPCRTKernel kernel;
 };
 
