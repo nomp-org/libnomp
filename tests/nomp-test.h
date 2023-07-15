@@ -47,7 +47,16 @@ inline static int subtest_(int err, const char *test_name) {
   printf("\t%s: %s\033[0m\n", test_name, result);
   return err;
 }
-#define SUBTEST(subtest, ...) subtest_(subtest(__VA_ARGS__), TOSTRING(subtest))
+#define TEST_ARGS_NUM_HELPER(_1, _2, _3, _4, _5, _6, _7, _8, N, ...) N
+#define TEST_ARGS_NUM(...)                                                     \
+  TEST_ARGS_NUM_HELPER(__VA_ARGS__, 2, 2, 2, 2, 2, 2, 2, 1, 0)
+
+#define SUBTEST_IMPL_WITH_2(subtest, ...)                                      \
+  subtest_(subtest(__VA_ARGS__), TOSTRING(subtest))
+#define SUBTEST_IMPL_WITH_1(subtest) subtest_(subtest(), TOSTRING(subtest))
+#define SUBTEST_IMPL(num, ...) SUBTEST_IMPL_WITH_##num(__VA_ARGS__)
+#define SUBTEST_HELPER(num, ...) SUBTEST_IMPL(num, __VA_ARGS__)
+#define SUBTEST(...) SUBTEST_HELPER(TEST_ARGS_NUM(__VA_ARGS__), __VA_ARGS__)
 
 #define nomp_test_assert(cond)                                                 \
   {                                                                            \

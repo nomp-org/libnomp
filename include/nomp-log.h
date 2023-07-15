@@ -47,8 +47,21 @@ int nomp_log_set_verbose(const int verbose);
 int nomp_log_(const char *desc, int logno, nomp_log_type type,
               const char *fname, unsigned line_no, ...);
 
-#define nomp_log(logno, type, desc, ...)                                       \
-  nomp_log_(desc, logno, type, __FILE__, __LINE__ __VA_OPT__(, ) __VA_ARGS__)
+#define nomp_num_helper(_1, _2, _3, _4, _5, _6, _7, _8, N, ...) N
+#define nomp_num(...) nomp_num_helper(__VA_ARGS__, 2, 2, 2, 2, 2, 2, 2, 1, 0)
+
+#define nomp_first_helper(first, ...) first
+#define nomp_first(...) nomp_first_helper(__VA_ARGS__, throwaway)
+
+#define nomp_rest_helper_2(first, ...) , __VA_ARGS__
+#define nomp_rest_helper_1(first)
+#define nomp_rest_helper_(num, ...) nomp_rest_helper_##num(__VA_ARGS__)
+#define nomp_rest_helper(num, ...) nomp_rest_helper_(num, __VA_ARGS__)
+#define nomp_rest(...) nomp_rest_helper(nomp_num(__VA_ARGS__), __VA_ARGS__)
+
+#define nomp_log(logno, type, ...)                                             \
+  nomp_log_(nomp_first(__VA_ARGS__), logno, type, __FILE__,                    \
+            __LINE__ nomp_rest(__VA_ARGS__))
 
 /**
  * @ingroup nomp_log_utils

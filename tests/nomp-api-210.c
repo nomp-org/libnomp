@@ -58,12 +58,12 @@ int main(int argc, const char *argv[]) {
   int err = nomp_init(argc, argv);
   nomp_check(err);
 
-  err |= SUBTEST(test_bitwise_and, );
-  err |= SUBTEST(test_bitwise_or, );
-  err |= SUBTEST(test_bitwise_xor, );
-  err |= SUBTEST(test_bitwise_left_shift, );
-  err |= SUBTEST(test_bitwise_right_shift, );
-  err |= SUBTEST(test_bitwise_complement, );
+  err |= SUBTEST(test_bitwise_and);
+  err |= SUBTEST(test_bitwise_or);
+  err |= SUBTEST(test_bitwise_xor);
+  err |= SUBTEST(test_bitwise_left_shift);
+  err |= SUBTEST(test_bitwise_right_shift);
+  err |= SUBTEST(test_bitwise_complement);
 
   err |= nomp_finalize();
   nomp_check(err);

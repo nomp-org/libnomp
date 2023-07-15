@@ -43,7 +43,7 @@ static int test_nomp_finalize_twice(int argc, const char **argv) {
 
 int main(int argc, const char *argv[]) {
   int err = 0;
-  err |= SUBTEST(test_first_nomp_finalize, );
+  err |= SUBTEST(test_first_nomp_finalize);
   err |= SUBTEST(test_nomp_init_twice, argc, argv);
   err |= SUBTEST(test_nomp_finalize_twice, argc, argv);
 

@@ -88,7 +88,7 @@ static inline int init_configs(int argc, const char **argv,
       return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,                  \
                       #ENVVAR " is missing or invalid. Set it with " CMDARG    \
                               " command line argument or " ENVVAR              \
-                              " environment variable.", );                     \
+                              " environment variable.");                       \
     }                                                                          \
   }
 
@@ -166,7 +166,7 @@ static inline int init_backend(struct nomp_backend_t *bnd) {
 int nomp_init(int argc, const char **argv) {
   if (initialized) {
     return nomp_log(NOMP_INITIALIZE_FAILURE, NOMP_ERROR,
-                    "libnomp is already initialized.", );
+                    "libnomp is already initialized.");
   }
 
   if (!Py_IsInitialized()) {
@@ -249,7 +249,7 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize,
       return nomp_log(NOMP_USER_MAP_OP_IS_INVALID, NOMP_ERROR,
                       "NOMP_FREE or NOMP_FROM can only be called "
                       "on a pointer "
-                      "which is already on the device.", );
+                      "which is already on the device.");
     }
     op |= NOMP_ALLOC;
     if (mems_n == mems_max) {
@@ -296,7 +296,7 @@ static int parse_clauses(struct nomp_meta_t *meta, struct nomp_prog_t *prg,
                         "\"transform\" clause should be followed "
                         "by a file name and a "
                         "function name. At least one of them is "
-                        "not provided.", );
+                        "not provided.");
       }
       nomp_check(nomp_check_py_script_path((const char *)clauses[i + 1]));
       meta->file = strndup(clauses[i + 1], PATH_MAX);
@@ -308,7 +308,7 @@ static int parse_clauses(struct nomp_meta_t *meta, struct nomp_prog_t *prg,
                         "\"annotate\" clause should be followed by "
                         "a key value "
                         "pair. At least one of them is not "
-                        "provided.", );
+                        "provided.");
       }
       const char *key = clauses[i + 1], *val = clauses[i + 2];
       PyObject *pkey =
@@ -324,7 +324,7 @@ static int parse_clauses(struct nomp_meta_t *meta, struct nomp_prog_t *prg,
                         "\"reduce\" clause should be followed by a "
                         "variable name and an "
                         "operation. At least one of them is not "
-                        "provided.", );
+                        "provided.");
       }
       for (unsigned j = 0; j < prg->nargs; j++) {
         if (strncmp(prg->args[j].name, clauses[i + 1], NOMP_MAX_BUFSIZ) == 0) {
@@ -343,7 +343,7 @@ static int parse_clauses(struct nomp_meta_t *meta, struct nomp_prog_t *prg,
       // device.
       return nomp_log(NOMP_NOT_IMPLEMENTED_ERROR, NOMP_ERROR,
                       "Pinned memory support is "
-                      "not yet implemented.", );
+                      "not yet implemented.");
     } else {
       return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                       "Clause \"%s\" passed into nomp_jit is not a "

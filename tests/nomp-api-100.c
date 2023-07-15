@@ -130,12 +130,12 @@ int main(int argc, const char *argv[]) {
   int err = nomp_init(argc, argv);
   nomp_check(err);
 
-  err |= SUBTEST(test_invalid_file, );
-  err |= SUBTEST(test_invalid_transform_function, );
-  err |= SUBTEST(test_invalid_clause, );
-  err |= SUBTEST(test_missing_filename, );
-  err |= SUBTEST(test_missing_user_callback, );
-  err |= SUBTEST(test_syntax_error_in_kernel, );
+  err |= SUBTEST(test_invalid_file);
+  err |= SUBTEST(test_invalid_transform_function);
+  err |= SUBTEST(test_invalid_clause);
+  err |= SUBTEST(test_missing_filename);
+  err |= SUBTEST(test_missing_user_callback);
+  err |= SUBTEST(test_syntax_error_in_kernel);
 
   err = nomp_finalize();
   nomp_check(err);

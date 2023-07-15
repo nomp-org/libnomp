@@ -50,12 +50,12 @@ int main(int argc, const char *argv[]) {
   int err = nomp_init(argc, argv);
   nomp_check(err);
 
-  err |= SUBTEST(test_vector_addition, );
-  err |= SUBTEST(test_vector_subtraction, );
-  err |= SUBTEST(test_vector_multiplication_sum, );
-  err |= SUBTEST(test_vector_multiplication, );
-  err |= SUBTEST(test_vector_square_sum, );
-  err |= SUBTEST(test_vector_linear, );
+  err |= SUBTEST(test_vector_addition);
+  err |= SUBTEST(test_vector_subtraction);
+  err |= SUBTEST(test_vector_multiplication_sum);
+  err |= SUBTEST(test_vector_multiplication);
+  err |= SUBTEST(test_vector_square_sum);
+  err |= SUBTEST(test_vector_linear);
 
   err |= nomp_finalize();
   nomp_check(err);

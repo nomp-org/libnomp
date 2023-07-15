@@ -39,9 +39,9 @@ int main(int argc, const char *argv[]) {
   nomp_check(nomp_init(argc, argv));
 
   int err = 0;
-  err |= SUBTEST(test_sum, );
-  err |= SUBTEST(test_dot, );
-  err |= SUBTEST(test_multiple_reductions, );
+  err |= SUBTEST(test_sum);
+  err |= SUBTEST(test_dot);
+  err |= SUBTEST(test_multiple_reductions);
   // FIXME: Fix the errors of the following kernels
   // err |= SUBTEST(test_sum_condition);
 

@@ -59,7 +59,7 @@ int nomp_py_realize_reduction(PyObject **knl, const char *var,
   }
   if (err) {
     return nomp_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,
-                    "Call to realize_reduction() failed.", );
+                    "Call to realize_reduction() failed.");
   }
 
   return 0;
@@ -85,7 +85,7 @@ int nomp_py_c_to_loopy(PyObject **knl, const char *src, const char *backend) {
   }
   if (err) {
     return nomp_log(NOMP_LOOPY_CONVERSION_FAILURE, NOMP_ERROR,
-                    "C to Loopy conversion failed.\n", );
+                    "C to Loopy conversion failed.\n");
   }
 
   return 0;
@@ -193,7 +193,7 @@ int nomp_py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
       }
       if (err) {
         return nomp_log(NOMP_LOOPY_KNL_NAME_NOT_FOUND, NOMP_ERROR,
-                        "Unable to get loopy kernel name.", );
+                        "Unable to get loopy kernel name.");
       }
 
       err = 1;
@@ -258,7 +258,7 @@ static int py_get_grid_size_aux(PyObject *exp, CVecBasic *vec) {
   }
   if (err) {
     return nomp_log(NOMP_LOOPY_GRIDSIZE_FAILURE, NOMP_ERROR,
-                    "Unable to evaluate grid sizes from loopy kernel.", );
+                    "Unable to evaluate grid sizes from loopy kernel.");
   }
 
   return 0;
@@ -302,7 +302,7 @@ int nomp_py_get_grid_size(struct nomp_prog_t *prg, PyObject *knl) {
   }
   if (err) {
     return nomp_log(NOMP_LOOPY_GRIDSIZE_FAILURE, NOMP_ERROR,
-                    "Unable to get grid sizes from loopy kernel.", );
+                    "Unable to get grid sizes from loopy kernel.");
   }
 
   return 0;
