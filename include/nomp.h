@@ -175,8 +175,8 @@ extern "C" {
  *
  * <b>Example usage:</b>
  * @code{.c}
- * const char *argv[] = {"--backend", "opencl", "-device", "0", "--platform",
- * "0"};
+ * const char *argv[] = {"--nomp-backend", "opencl", "--nomp-device", "0",
+ * "--nomp-platform", "0"};
  * int argc = 6;
  * int err = nomp_init(argc, argv);
  * @endcode

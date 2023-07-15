@@ -110,10 +110,10 @@ test case `nomp-api-200`:
 
 .. code-block:: bash
 
-    lnrun debug 200
+    lnrun debug api-200
 
 Additionally, you can set the port and the target device for the specific session.
-You can view the available options by :code:`lnrun -h debug`.
+You can view the available options by :code:`lnrun help debug`.
 
 By default the test starts on `localhost:5005`, and a debug viewer should be connected
 to this target address. For example, the following figure shows how clion connects to

@@ -95,5 +95,5 @@ arguments to initialize and use backends, devices, etc.
 
     ./foo --nomp-backend opencl --nomp-device 0
 
-Read more about arguments accepted by nomp_init() under
+Read more about arguments accepted by :cpp:func:`nomp_init()` under
 :doc:`User API <user-api>`.
