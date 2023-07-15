@@ -73,7 +73,7 @@ models for programming accelerators and complement them with `loopy`. `nomp` is:
 
    self
    build
-   usage
+   examples
    user-api
    internal-api
    developer-docs

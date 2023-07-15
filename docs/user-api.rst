@@ -20,8 +20,6 @@ Defines argument type.
    :project: libnomp
    :content-only:
 
-.. _group__nomp__errors:
-
 Errors
 ^^^^^^
 .. doxygengroup:: nomp_errors
