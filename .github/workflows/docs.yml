@@ -26,12 +26,12 @@ jobs:
       DOCSDIR: docs
       PUSH_ON_MAIN: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     steps:
-      - name: GitHub action setup
+      - name: Setup GitHub actions
         uses: actions/checkout@v3
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3.13
         if: ${{ inputs.debug_enabled }}
-      - name: Setup conda-forge
+      - name: Setup conda environment
         id: setup_conda
         uses: conda-incubator/setup-miniconda@v2
         with:
@@ -43,18 +43,18 @@ jobs:
           path: ${{ env.LIBNOMP_ENV }}
           key:  conda-${{ runner.os }}-${{ hashFiles('environment-dev.yml') }}-${{ hashFiles('requirements.txt') }}-${{ hashFiles('requirements-dev.txt') }}-${{ env.CACHE_NUMBER }}
         id: cache
-      - name: Update environment
+      - name: Update conda environment
         id: update_env
         run: |
           conda env update -n libnomp-dev -f environment-dev.yml
         if: steps.cache.outputs.cache-hit != 'true'
-      - name: Run doxygen
+      - name: Run Doxygen
         id: run_doxygen
         run: |
           mkdir -p ${BUILDDIR}
           cd ${BUILDDIR}
           (cat ../${DOCSDIR}/Doxyfile.in; echo 'OUTPUT_DIRECTORY = "."'; echo 'INPUT = "../include"';) | doxygen -
-      - name: Run sphinx
+      - name: Run Sphinx
         id: run_sphinx
         run: |
           cd ${DOCSDIR}
@@ -64,7 +64,7 @@ jobs:
         if: ${{ fromJSON(env.PUSH_ON_MAIN) }}
         run: |
           cd ${BUILDDIR}/sphinx && touch .nojekyll
-      - name: Deploy
+      - name: Deploy to gh-pages
         id: deploy
         if: ${{ fromJSON(env.PUSH_ON_MAIN) }}
         uses: JamesIves/github-pages-deploy-action@releases/v3
