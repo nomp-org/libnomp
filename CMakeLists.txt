@@ -7,6 +7,7 @@ option(ENABLE_ISPC "Build ISPC backend" OFF)
 option(ENABLE_HIP "Build HIP backend" OFF)
 option(ENABLE_SYCL "Build SYCL backend" OFF)
 option(ENABLE_DOCS "Enable Documentation" OFF)
+option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_CXX_STANDARD 17)
@@ -64,7 +65,18 @@ if (ENABLE_ISPC)
   find_package(ispcrt REQUIRED)
   list(APPEND SOURCES backends/ispc.c)
 endif()
+if (ENABLE_DOCS)
+  add_subdirectory ("docs")
+endif()
+
 add_library(nomp SHARED ${SOURCES})
+set_target_properties(nomp PROPERTIES
+  VERSION ${PROJECT_VERSION}
+  SOVERSION 1
+  PUBLIC_HEADER include/nomp.h)
+target_include_directories(nomp PRIVATE include)
+target_compile_options(nomp PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
+  $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic>)
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 target_link_libraries(nomp PRIVATE Python3::Python)
@@ -75,8 +87,6 @@ target_link_libraries(nomp PRIVATE OpenSSL::SSL)
 find_package(SymEngine REQUIRED HINTS $ENV{CONDA_PREFIX})
 target_include_directories(nomp PRIVATE ${SYMENGINE_INCLUDE_DIRS})
 target_link_libraries(nomp PRIVATE ${SYMENGINE_LIBRARIES})
-target_compile_options(nomp PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
-  $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic>)
 
 if (ENABLE_OPENCL)
   target_link_libraries(nomp PRIVATE OpenCL::OpenCL)
@@ -99,14 +109,20 @@ if (ENABLE_ISPC)
   target_compile_definitions(nomp PRIVATE ISPC_ENABLED)
 endif()
 
-set_target_properties(nomp PROPERTIES
-  VERSION ${PROJECT_VERSION}
-  SOVERSION 1
-  PUBLIC_HEADER include/nomp.h)
-target_include_directories(nomp PRIVATE include)
+# Add AddressSanitizer if it is enabled and supported.
+set(HAS_ADDRESS_SANITIZER FALSE)
+if (ENABLE_ASAN)
+  include(CheckLinkerFlag)
+  check_linker_flag(C -fsanitize=address ASAN_SUPPORTED)
+  set(HAS_ADDRESS_SANITIZER ${ASAN_SUPPORTED})
+  if (NOT HAS_ADDRESS_SANITIZER)
+    message(FATAL_ERROR "AddressSanitizer is enabled but not supported.")
+  endif()
+endif()
 
-if (ENABLE_DOCS)
-  add_subdirectory ("docs")
+if (HAS_ADDRESS_SANITIZER)
+  target_compile_options(nomp PRIVATE -fsanitize=address)
+  target_link_options(nomp PRIVATE -fsanitize=address)
 endif()
 
 file(GLOB TESTS tests/nomp-*.c)
@@ -118,8 +134,35 @@ foreach(test ${TESTS})
   target_include_directories(${test_exe} PRIVATE include tests)
   target_compile_options(${test_exe} PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
     $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic>)
+  if (HAS_ADDRESS_SANITIZER)
+    target_compile_options(${test_exe} PRIVATE -fsanitize=address)
+    target_link_options(${test_exe} PRIVATE -fsanitize=address)
+  endif()
   install (TARGETS ${test_exe} RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/tests)
 endforeach(test ${TESTS})
+
+# Add clang-format as a custom target if available.
+find_program(CLANG_FORMAT NAMES clang-format)
+if (CLANG_FORMAT)
+  add_custom_target(format
+    COMMAND
+      ${CLANG_FORMAT} -i ${CMAKE_CURRENT_SOURCE_DIR}/*/*.[ch]
+      ${CMAKE_CURRENT_SOURCE_DIR}/*/*.[ch]pp
+    COMMENT "Running clang-format ...")
+  add_custom_target(format-check
+    COMMAND ${CLANG_FORMAT} --dry-run --Werror -i
+      ${CMAKE_CURRENT_SOURCE_DIR}/*/*.[ch] ${CMAKE_CURRENT_SOURCE_DIR}/*/*.[ch]pp
+    COMMENT "Running clang-format check ...")
+endif()
+
+# Add clang-tidy as a custom target if available.
+find_program(CLANG_TIDY NAMES clang-tidy)
+if (CLANG_TIDY)
+  add_custom_target(tidy
+    COMMAND ${CLANG_TIDY} -p ${CMAKE_BINARY_DIR}
+      ${CMAKE_CURRENT_SOURCE_DIR}/*/*.[ch] ${CMAKE_CURRENT_SOURCE_DIR}/*/*.[ch]pp
+    COMMENT "Running clang-tidy ...")
+endif()
 
 install(TARGETS nomp LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
   PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
@@ -129,9 +172,9 @@ install(DIRECTORY tests/ DESTINATION ${CMAKE_INSTALL_PREFIX}/tests
   FILES_MATCHING PATTERN "*.py")
 
 install(DIRECTORY scripts/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
-  FILE_PERMISSIONS OWNER_READ OWNER_EXECUTE OWNER_WRITE GROUP_READ GROUP_EXECUTE
-  WORLD_READ WORLD_EXECUTE)
+  FILE_PERMISSIONS OWNER_READ OWNER_EXECUTE OWNER_WRITE
+  GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
 configure_file(nomp.pc.in nomp.pc @ONLY)
-install(FILES ${CMAKE_BINARY_DIR}/nomp.pc
-  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
+install(FILES ${CMAKE_BINARY_DIR}/nomp.pc DESTINATION
+  ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
