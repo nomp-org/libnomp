@@ -12,6 +12,7 @@
 : "${NOMP_ENABLE_CUDA:="OFF"}"
 : "${NOMP_ENABLE_HIP:="OFF"}"
 : "${NOMP_ENABLE_DOCS:="OFF"}"
+: "${NOMP_ENABLE_ASAN:="OFF"}"
 : "${NOMP_C_COMPILER:=""}"
 : "${NOMP_CXX_COMPILER:=""}"
 : "${NOMP_LNSTATE_PATH:="${NOMP_SOURCE_DIR}/.lnstate"}"
@@ -24,53 +25,45 @@ reset=$(tput sgr0)
 
 # Print the options.
 function print_help() {
-  echo -e "Usage: ${0} [-h|--help] [-btype|--build-type <build type>] " \
-    "[-bdir|--build-dir <build directory>] " \
-    "[-idir|--install-dir <install directory>] [-docs|--enable-docs] " \
-    "[-opencl|--enable-opencl] [--opencl-lib <opencl library path>] " \
-    "[--opencl-inc <opencl include path>] [-hip|--enable-hip] " \
-    "[-cuda|--enable-cuda] [-cc|--c-compiler] [-cxx|--cxx-compiler]\n\n" \
-    "${cyan}-h/--help:${reset} Print this help and exit.\n" \
-    "${cyan}-btype/--build-type:${reset} libnomp build type. " \
-    "(Default: ${NOMP_BUILD_TYPE}, Allowed: Debug, Release, RelWithDebInfo " \
-    "and MinSizeRel).\n" \
-    "${cyan}-bdir/--build-dir:${reset} libnomp build directory. " \
-    "(Default: ${NOMP_BUILD_DIR}).\n" \
-    "${cyan}-idir/--install-dir:${reset} libnomp install directory. "\
-    "(Default: ${NOMP_INSTALL_DIR}).\n" \
-    "${cyan}-docs/--enable-docs:${reset} Build user documentation. " \
-    "(Default: ${NOMP_ENABLE_DOCS}).\n" \
-    "${cyan}-opencl/--enable-opencl:${reset} Build with OpenCL backend. " \
-    "(Default: ${NOMP_ENABLE_OPENCL}).\n" \
-    "${cyan}--opencl-lib:${reset} Specify OpenCL library path.\n" \
-    "${cyan}--opencl-inc:${reset} Specify OpenCL include path.\n" \
-    "${cyan}-hip/--enable-hip:${reset} Build with HIP backend." \
-    "(Default: ${NOMP_ENABLE_HIP}).\n" \
-    "${cyan}-cuda/--enable-cuda:${reset} Build with Cuda backend." \
-    "(Default: ${NOMP_ENABLE_CUDA}).\n" \
-    "${cyan}-cc/--c-compiler:${reset} Specify C Compiler.\n" \
-    "${cyan}-cxx/--cxx-compiler:${reset} Specify CXX Compiler.\n" \
-    "${cyan}--prefix-path:${reset} Semicolon separated list of prefix paths " \
-    "for cmake.\n"
+  echo -e "Usage: ${0} [--help] [--cc <c compiler>] [--cxx <cxx compiler>] " \
+    "[--build-type <build type>] [--build-dir <build directory>] [--install-prefix <install directory>] " \
+    "[--prefix-path <cmake prefix path>] [--enable-hip] [--enable-cuda] [--enable-opencl] " \
+    "[--opencl-lib <opencl library path>] [--opencl-inc <opencl include path>] [--enable-docs]\n\n" \
+    "${cyan}--help:${reset} Print this help and exit.\n" \
+    "${cyan}--cc:${reset} C Compiler.\n" \
+    "${cyan}--cxx:${reset} CXX Compiler.\n" \
+    "${cyan}--build-type:${reset} Build type (Default: ${NOMP_BUILD_TYPE}, " \
+    "Allowed: Debug, Release, RelWithDebInfo and MinSizeRel).\n" \
+    "${cyan}--build-dir:${reset} Build directory (Default: ${NOMP_BUILD_DIR}).\n" \
+    "${cyan}--install-prefix:${reset} Install directory (Default: ${NOMP_INSTALL_DIR}).\n" \
+    "${cyan}--prefix-path:${reset} Semicolon separated list of prefix paths for CMake.\n" \
+    "${cyan}--enable-hip:${reset} Build with HIP backend (Default: ${NOMP_ENABLE_HIP}).\n" \
+    "${cyan}--enable-cuda:${reset} Build with Cuda backend (Default: ${NOMP_ENABLE_CUDA}).\n" \
+    "${cyan}--enable-opencl:${reset} Build with OpenCL backend (Default: ${NOMP_ENABLE_OPENCL}).\n" \
+    "${cyan}--opencl-lib:${reset} OpenCL library path.\n" \
+    "${cyan}--opencl-inc:${reset} OpenCL include path.\n" \
+    "${cyan}--enable-asan:${reset} Build user documentation (Default: ${NOMP_ENABLE_ASAN}).\n" \
+    "${cyan}--enable-docs:${reset} Build user documentation (Default: ${NOMP_ENABLE_DOCS})."
   exit 0
 }
 
 # Parse the options.
 while [ $# -gt 0 ]; do
   case $1 in
-  -h | --help) print_help ;;
-  -btype | --build-type) shift && NOMP_BUILD_TYPE=${1} ;;
-  -bdir | --build-dir) shift && NOMP_BUILD_DIR=$(realpath "${1}") ;;
-  -idir | --install-dir) shift && NOMP_INSTALL_DIR=$(realpath "${1}") ;;
-  -docs | --enable-docs) NOMP_ENABLE_DOCS="ON" ;;
-  -opencl | --enable-opencl) NOMP_ENABLE_OPENCL="ON" ;;
+  --help) print_help ;;
+  --cc) shift && NOMP_C_COMPILER="${1}" ;;
+  --cxx) shift && NOMP_CXX_COMPILER="${1}" ;;
+  --build-type) shift && NOMP_BUILD_TYPE=${1} ;;
+  --build-dir) shift && NOMP_BUILD_DIR=$(realpath "${1}") ;;
+  --install-prefix) shift && NOMP_INSTALL_DIR=$(realpath "${1}") ;;
+  --prefix-path) shift && NOMP_PREFIX_PATH="${1}" ;;
+  --enable-hip) NOMP_ENABLE_HIP="ON" ;;
+  --enable-cuda) NOMP_ENABLE_CUDA="ON" ;;
+  --enable-opencl) NOMP_ENABLE_OPENCL="ON" ;;
   --opencl-lib) shift && NOMP_OPENCL_LIBRARY=$(realpath "${1}") ;;
   --opencl-inc) shift && NOMP_OPENCL_INCLUDE_DIR=$(realpath "${1}") ;;
-  -hip | --enable-hip) NOMP_ENABLE_HIP="ON" ;;
-  -cuda | --enable-cuda) NOMP_ENABLE_CUDA="ON" ;;
-  -cc | --c-compiler) shift && NOMP_C_COMPILER="${1}" ;;
-  -cxx | --cxx-compiler) shift && NOMP_CXX_COMPILER="${1}" ;;
-  --prefix-path) shift && NOMP_PREFIX_PATH="${1}" ;;
+  --enable-asan) NOMP_ENABLE_ASAN="ON" ;;
+  --enable-docs) NOMP_ENABLE_DOCS="ON" ;;
   *) echo "${red}Invalid option: ${1}${reset}."
     echo "See ${cyan}./lncfg -h${reset} or ${cyan}./lncfg --help${reset} for " \
       "the accepted options."
@@ -81,27 +74,26 @@ done
 
 # Update the cmake options.
 NOMP_CMAKE_OPTS=()
-NOMP_CMAKE_OPTS+=("-DCMAKE_BUILD_TYPE=${NOMP_BUILD_TYPE}")
-NOMP_CMAKE_OPTS+=("-DCMAKE_INSTALL_PREFIX=${NOMP_INSTALL_DIR}")
-NOMP_CMAKE_OPTS+=("-DENABLE_DOCS=${NOMP_ENABLE_DOCS}")
-NOMP_CMAKE_OPTS+=("-DENABLE_OPENCL=${NOMP_ENABLE_OPENCL}")
-NOMP_CMAKE_OPTS+=("-DENABLE_HIP=${NOMP_ENABLE_HIP}")
-NOMP_CMAKE_OPTS+=("-DENABLE_CUDA=${NOMP_ENABLE_CUDA}")
-
-[[ -n ${NOMP_PREFIX_PATH} ]] &&
-  NOMP_CMAKE_OPTS+=("-DCMAKE_PREFIX_PATH=${NOMP_PREFIX_PATH}")
-
-[[ -n ${NOMP_OPENCL_LIBRARY} ]] &&
-  NOMP_CMAKE_OPTS+=("-DOpenCL_LIBRARY=${NOMP_OPENCL_LIBRARY}")
-
-[[ -n ${NOMP_OPENCL_INCLUDE_DIR} ]] &&
-  NOMP_CMAKE_OPTS+=("-DOpenCL_INCLUDE_DIR=${NOMP_OPENCL_INCLUDE_DIR}")
 
 [[ -n ${NOMP_C_COMPILER} ]] &&
   NOMP_CMAKE_OPTS+=("-D CMAKE_C_COMPILER=${NOMP_C_COMPILER}")
-
 [[ -n ${NOMP_CXX_COMPILER} ]] &&
   NOMP_CMAKE_OPTS+=("-D CMAKE_CXX_COMPILER=${NOMP_CXX_COMPILER}")
+
+NOMP_CMAKE_OPTS+=("-DCMAKE_BUILD_TYPE=${NOMP_BUILD_TYPE}")
+NOMP_CMAKE_OPTS+=("-DCMAKE_INSTALL_PREFIX=${NOMP_INSTALL_DIR}")
+[[ -n ${NOMP_PREFIX_PATH} ]] &&
+  NOMP_CMAKE_OPTS+=("-DCMAKE_PREFIX_PATH=${NOMP_PREFIX_PATH}")
+
+NOMP_CMAKE_OPTS+=("-DENABLE_HIP=${NOMP_ENABLE_HIP}")
+NOMP_CMAKE_OPTS+=("-DENABLE_CUDA=${NOMP_ENABLE_CUDA}")
+NOMP_CMAKE_OPTS+=("-DENABLE_OPENCL=${NOMP_ENABLE_OPENCL}")
+[[ -n ${NOMP_OPENCL_LIBRARY} ]] &&
+  NOMP_CMAKE_OPTS+=("-DOpenCL_LIBRARY=${NOMP_OPENCL_LIBRARY}")
+[[ -n ${NOMP_OPENCL_INCLUDE_DIR} ]] &&
+  NOMP_CMAKE_OPTS+=("-DOpenCL_INCLUDE_DIR=${NOMP_OPENCL_INCLUDE_DIR}")
+NOMP_CMAKE_OPTS+=("-DENABLE_ASAN=${NOMP_ENABLE_ASAN}")
+NOMP_CMAKE_OPTS+=("-DENABLE_DOCS=${NOMP_ENABLE_DOCS}")
 
 # Update variables for lnstate scripts.
 echo -e "NOMP_INSTALL_DIR=${NOMP_INSTALL_DIR}\n" \

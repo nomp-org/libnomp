@@ -3,12 +3,14 @@ channels:
   - conda-forge
   - anaconda
 dependencies:
-  - python=3.10
-  - pip
   - cmake=3.24
   - symengine=0.10.1
+  - clang-format=16
+  - clang-tools=16
+  - clangdev=16.0 # We need this since clang-tools don't install clang headers.
+  - doxygen
+  - python=3.10
+  - pip
   - pip:
     - -r requirements.txt
     - -r requirements-dev.txt
-  - clang-format=15.0.3
-  - doxygen

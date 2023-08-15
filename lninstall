@@ -45,10 +45,10 @@ if [[ ! -f "${NOMP_SHELL_CONFIG_FILE}" ]]; then
 fi
 
 function print_help() {
-  echo -e "Usage: ${0} [-h|--help] [-n|--no] [-y|--yes]\n" \
-    "${cyan}-h/--help:${reset} Print help for libnomp install.\n" \
-    "${cyan}-n/--no:${reset} Don't update shell configuration file.\n" \
-    "${cyan}-y/--yes:${reset} Update shell configuration file."
+  echo -e "Usage: ${0} [--help] [--no] [--yes]\n" \
+    "${cyan}--help:${reset} Print help for libnomp install.\n" \
+    "${cyan}--no:${reset} Don't update shell configuration file.\n" \
+    "${cyan}--yes:${reset} Update shell configuration file."
   exit 0
 }
 
@@ -56,9 +56,9 @@ function print_help() {
 NOMP_DEFAULT_PROMPT=""
 if [[ $# -gt 0 ]]; then
   case $1 in
-    -h | --help) print_help ;;
-    -n | --no) NOMP_DEFAULT_PROMPT="n" ;;
-    -y | --yes) NOMP_DEFAULT_PROMPT="y" ;;
+    --help) print_help ;;
+    --no) NOMP_DEFAULT_PROMPT="n" ;;
+    --yes) NOMP_DEFAULT_PROMPT="y" ;;
     *) echo "${red}Invalid option: ${1}${reset}."
     echo "See ${cyan}./${0} -h${reset} or ${cyan}./${0} --help${reset} for" \
       "the accepted options."
