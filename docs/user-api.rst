@@ -20,6 +20,11 @@ Defines argument type.
    :project: libnomp
    :content-only:
 
+.. doxygengroup:: nomp_structs
+   :project: libnomp
+   :content-only:
+   :members:
+
 .. _group__nomp__errors:
 
 Errors

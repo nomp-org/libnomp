@@ -9,7 +9,7 @@ const char *ERR_STR_USER_DEVICE_IS_INVALID =
     "Device id %d passed into libnomp is not valid.";
 
 /**
- * @ingroup nomp_types
+ * @ingroup nomp_structs
  *
  * @brief Struct to store information about a log entry.
  */

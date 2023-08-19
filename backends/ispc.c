@@ -6,7 +6,7 @@ static const char *ERR_STR_ISPC_FAILURE =
     "ISPC %s failed with error message: %s.";
 
 /**
- * @ingroup nomp_types
+ * @ingroup nomp_structs
  *
  * @brief Represents a memory block that can be used for data storage and
  * transfer between a host and a device.
@@ -47,7 +47,7 @@ struct ispc_backend {
 };
 
 /**
- * @ingroup nomp_types
+ * @ingroup nomp_structs
  *
  * @brief Struct to store ISPC program information.
  */

@@ -30,7 +30,12 @@
 #include "nomp.h"
 
 /**
- * @ingroup nomp_types
+ * @defgroup nomp_structs C Structs
+ * @brief C structs used in libnomp
+ */
+
+/**
+ * @ingroup nomp_structs
  *
  * @brief Represents a memory block that can be used for data storage and
  * transfer between a host and a device.
@@ -66,7 +71,7 @@ struct nomp_mem_t {
 #define NOMP_MEM_BYTES(start, end, usize) (((end) - (start)) * (usize))
 
 /**
- * @ingroup nomp_types
+ * @ingroup nomp_structs
  *
  * @brief Represents a kernel argument.
  */
@@ -90,7 +95,7 @@ struct nomp_arg_t {
 };
 
 /**
- * @ingroup nomp_types
+ * @ingroup nomp_structs
  *
  * @brief Struct to store meta information about kernel arguments.
  */
@@ -164,7 +169,7 @@ struct nomp_prog_t {
 };
 
 /**
- * @ingroup nomp_types
+ * @ingroup nomp_structs
  *
  * @brief Struct to store user configurations and pointers to backend functions.
  */

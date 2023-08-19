@@ -100,7 +100,7 @@ static int compile_aux(const char *cc, const char *cflags, const char *src,
 }
 
 /**
- * @ingroup nomp_types
+ * @ingroup nomp_structs
  *
  * @brief Struct to store information about a dynamic loaded function.
  */

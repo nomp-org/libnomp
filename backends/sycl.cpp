@@ -13,7 +13,7 @@ static const char *ERR_STR_SYCL_FAILURE = "SYCL backend failed with error: %s.";
   }
 
 /**
- * @ingroup nomp_types
+ * @ingroup nomp_structs
  *
  * @brief Struct to store SYCL backend specific data.
  */
@@ -41,7 +41,7 @@ struct sycl_backend {
 };
 
 /**
- * @ingroup nomp_types
+ * @ingroup nomp_structs
  *
  * @brief Struct to store SYCL program information.
  */
