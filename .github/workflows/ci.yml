@@ -13,9 +13,10 @@ on:
         default: false
 env:
   # Increase to reset cache manually
+  INSTALLDIR: install
   CACHE_NUMBER: 0
-  POCL_CACHE_NUMBER: 0
   LIBNOMP_ENV: /usr/share/miniconda/envs/libnomp
+  POCL_CACHE_NUMBER: 0
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -65,13 +66,13 @@ jobs:
       - name: Build libnomp
         id: build_libnomp
         run: |
-          echo "NOMP_INSTALL_DIR=${PWD}/../install" >> $GITHUB_ENV
-          ./lncfg -idir ../install --prefix-path ${CONDA_PREFIX} -opencl --opencl-lib ${CONDA_PREFIX}/lib/libOpenCL.so
+          ./lncfg --install-prefix ${INSTALLDIR} --prefix-path ${CONDA_PREFIX} \
+            --enable-opencl --opencl-lib ${CONDA_PREFIX}/lib/libOpenCL.so
           ./lninstall --no
       - name: Run libnomp tests
         id: run_libnomp
         run: |
-          ${NOMP_INSTALL_DIR}/bin/lnrun test -b opencl
+          ${INSTALLDIR}/bin/lnrun test -b opencl
       - name: Block to allow inspecting failures
         run: sleep 30m
         if: ${{ failure() && inputs.debug_enabled }}

@@ -13,6 +13,7 @@ on:
         default: false
 env:
   # Increase to reset cache manually
+  INSTALLDIR: install
   CACHE_NUMBER: 0
   LIBNOMP_ENV: /usr/share/miniconda/envs/libnomp-dev
 jobs:
@@ -22,8 +23,6 @@ jobs:
       run:
         shell: bash -l {0}
     env:
-      BUILDDIR: build
-      DOCSDIR: docs
       PUSH_ON_MAIN: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     steps:
       - name: Setup GitHub actions
@@ -48,22 +47,16 @@ jobs:
         run: |
           conda env update -n libnomp-dev -f environment-dev.yml
         if: steps.cache.outputs.cache-hit != 'true'
-      - name: Run Doxygen
-        id: run_doxygen
+      - name: Build documentation
+        id: build_docs
         run: |
-          mkdir -p ${BUILDDIR}
-          cd ${BUILDDIR}
-          (cat ../${DOCSDIR}/Doxyfile.in; echo 'OUTPUT_DIRECTORY = "."'; echo 'INPUT = "../include"';) | doxygen -
-      - name: Run Sphinx
-        id: run_sphinx
-        run: |
-          cd ${DOCSDIR}
-          sphinx-build -b html -W -Dbreathe_projects.libnomp=../${BUILDDIR}/xml . ../${BUILDDIR}/sphinx
-      - name: Create nojekyll
-        id: create_nojekyll
+          ./lncfg --install-prefix ${INSTALLDIR} --prefix-path ${CONDA_PREFIX} --enable-docs
+          ./lninstall --no
+      - name: Bypass Jekyll
+        id: bypass_jekyll
         if: ${{ fromJSON(env.PUSH_ON_MAIN) }}
         run: |
-          cd ${BUILDDIR}/sphinx && touch .nojekyll
+          cd ${INSTALLDIR}/docs && touch .nojekyll
       - name: Deploy to gh-pages
         id: deploy
         if: ${{ fromJSON(env.PUSH_ON_MAIN) }}
@@ -71,7 +64,7 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages
-          FOLDER: ${{ env.BUILDDIR }}/sphinx
+          FOLDER: ${{ env.INSTALLDIR }}/docs
       - name: Block to allow inspecting failures
         run: sleep 30m
         if: ${{ failure() && inputs.debug_enabled }}
