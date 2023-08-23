@@ -28,7 +28,7 @@ function print_help() {
   echo -e "Usage: ${0} [--help] [--cc <c compiler>] [--cxx <cxx compiler>] " \
     "[--build-type <build type>] [--build-dir <build directory>] [--install-prefix <install directory>] " \
     "[--prefix-path <cmake prefix path>] [--enable-hip] [--enable-cuda] [--enable-opencl] " \
-    "[--opencl-lib <opencl library path>] [--opencl-inc <opencl include path>] [--enable-docs]\n\n" \
+    "[--opencl-lib <opencl library path>] [--opencl-headers <opencl header path>] [--enable-docs]\n\n" \
     "${cyan}--help:${reset} Print this help and exit.\n" \
     "${cyan}--cc:${reset} C Compiler.\n" \
     "${cyan}--cxx:${reset} CXX Compiler.\n" \
@@ -41,7 +41,7 @@ function print_help() {
     "${cyan}--enable-cuda:${reset} Build with Cuda backend (Default: ${NOMP_ENABLE_CUDA}).\n" \
     "${cyan}--enable-opencl:${reset} Build with OpenCL backend (Default: ${NOMP_ENABLE_OPENCL}).\n" \
     "${cyan}--opencl-lib:${reset} OpenCL library path.\n" \
-    "${cyan}--opencl-inc:${reset} OpenCL include path.\n" \
+    "${cyan}--opencl-headers:${reset} OpenCL header path.\n" \
     "${cyan}--enable-asan:${reset} Build user documentation (Default: ${NOMP_ENABLE_ASAN}).\n" \
     "${cyan}--enable-docs:${reset} Build user documentation (Default: ${NOMP_ENABLE_DOCS})."
   exit 0
@@ -61,7 +61,7 @@ while [ $# -gt 0 ]; do
   --enable-cuda) NOMP_ENABLE_CUDA="ON" ;;
   --enable-opencl) NOMP_ENABLE_OPENCL="ON" ;;
   --opencl-lib) shift && NOMP_OPENCL_LIBRARY=$(realpath "${1}") ;;
-  --opencl-inc) shift && NOMP_OPENCL_INCLUDE_DIR=$(realpath "${1}") ;;
+  --opencl-headers) shift && NOMP_OPENCL_INCLUDE_DIR=$(realpath "${1}") ;;
   --enable-asan) NOMP_ENABLE_ASAN="ON" ;;
   --enable-docs) NOMP_ENABLE_DOCS="ON" ;;
   *) echo "${red}Invalid option: ${1}${reset}."

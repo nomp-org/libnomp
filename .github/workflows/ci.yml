@@ -72,7 +72,7 @@ jobs:
       - name: Run libnomp tests
         id: run_libnomp
         run: |
-          ${INSTALLDIR}/bin/lnrun test -b opencl
+          ${INSTALLDIR}/bin/lnrun test --backend opencl
       - name: Block to allow inspecting failures
         run: sleep 30m
         if: ${{ failure() && inputs.debug_enabled }}
