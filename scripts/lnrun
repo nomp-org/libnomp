@@ -9,8 +9,12 @@
 : "${NOMP_BROWSER:="google-chrome"}"
 : "${NOMP_TEST_GROUPS:="*"}"
 
-NOMP_BIN_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-NOMP_INSTALL_DIR="${NOMP_BIN_DIR}/../"
+# Check if NOMP_INSTALL_DIR is set, if not set it to parent directory of the
+# lnrun script location.
+if [ -z "${NOMP_INSTALL_DIR}" ]; then
+  NOMP_BIN_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+  export NOMP_INSTALL_DIR="${NOMP_BIN_DIR}/../"
+fi
 NOMP_TEST_DIR="${NOMP_INSTALL_DIR}/tests"
 
 # Terminal output colors.
@@ -20,98 +24,79 @@ cyan=$(tput setaf 6)
 reset=$(tput sgr0)
 
 function print_help_main() {
-  echo -e " NAME\n\t The runner tool for libnomp.\n\n" \
+  echo -e " NAME\n\t Helper script for libnomp.\n\n" \
     "SYNOPSIS\n" \
     "\t lnrun <command> [args]\n" \
     "\t lnrun [options]\n\n" \
     "OPTIONS\n" \
-    "\t ${cyan}-h${reset}, ${cyan}--help${reset}" \
-    "\t Print the usage details of each command of libnomp.\n\n" \
+    "\t ${cyan}help${reset}\t Print the usage details of each command of libnomp.\n\n" \
     "COMMANDS\n" \
-    "\t${cyan}t${reset}, ${cyan}test${reset} \t Run all the tests.\n" \
-    "\t${cyan}d${reset}, ${cyan}debug${reset} \t Debug a provided test " \
-    "case.\n" \
-    "\t${cyan}D${reset}, ${cyan}docs${reset} \t Open the user documentation " \
-    "on the web browser.\n\n" \
-    "To view the usage of each command, execute ${cyan}lnrun -h " \
-    "<command>${reset} or ${cyan}lnrun --help <command>${reset}."
+    "\t${cyan}test${reset} \t Run all the tests.\n" \
+    "\t${cyan}debug${reset} \t Debug a provided test case.\n" \
+    "\t${cyan}docs${reset} \t Open the user documentation on the web browser.\n\n" \
+    "To view the usage of each command, execute ${cyan}lnrun help <command>${reset}."
 }
 
 function print_help_test() {
-  echo -e " NAME\n\t Running the tests of libnomp.\n\n" \
+  echo -e " NAME\n\t Run libnomp tests.\n\n" \
     "SYNOPSIS\n" \
-    "\t lnrun t|test \t[-g|--groups <group-pattern>] " \
-    "[-t|--test-dir <test-directory>\n" \
-    "\t\t\t[-b|--backend <backend-name>] [-d|--device <device-index>] " \
-    "[-p|--platform <platform-index>]\n" \
-    "\t\t\t[-v|--verbose <verbose-level>] [-i|--install-dir <libnomp-directory>] \n" \
-    "\t\t\t[-as|--annts-script <annotation-script>] [-af|--annts-func <annotation-function>]\n\n" \
+    "\t lnrun test \t[--group <group pattern>] [--test-dir <test directory>\n" \
+    "\t\t\t[--backend <backend name>] [--device <device id>] [--platform <platform id>]\n" \
+    "\t\t\t[--verbose <verbose level>] [--install-dir <libnomp install directory>]\n\n" \
     "OPTIONS\n" \
-    "\t${cyan}-g/--group${reset}\t Pattern to filter the tests to be run " \
-    "(Default: ${NOMP_TEST_GROUPS}).\n" \
-    "\t${cyan}-t/--test-dir${reset}\t Specify the directory which the " \
-    "libnomp test resides (Default: ${NOMP_TEST_DIR}).\n" \
-    "\t${cyan}-b/--backend${reset}\t Backend to run the tests, case " \
-    "insensitive (Default: ${NOMP_BACKEND}).\n" \
-    "\t${cyan}-p/--platform${reset}\t Platform to run the tests, case " \
-    "insensitive (Default: ${NOMP_PLATFORM}).\n" \
-    "\t${cyan}-d/--device${reset}\t Device to run the tests, case " \
-    "insensitive (Default: ${NOMP_DEVICE}).\n" \
-    "\t${cyan}-v/--verbose${reset}\t Specify verbose level (Default: ${NOMP_VERBOSE}).\n" \
-    "\t${cyan}-i/--install-dir${reset}\t Specify the directory which the libnomp resides (Default: ${NOMP_INSTALL_DIR}).\n" \
-    "\t${cyan}-as/--annts-script${reset}\t Specify the directory which the annotation script resides.\n" \
-    "\t${cyan}-af/--annts-func${reset}\t Specify the annotation funtion name.\n\n" \
+    "\t${cyan}--group${reset}\t Pattern to filter the tests to be run (Default: ${NOMP_TEST_GROUPS}).\n" \
+    "\t${cyan}--test-dir${reset}\t Specify directory which libnomp test resides (Default: ${NOMP_TEST_DIR}).\n" \
+    "\t${cyan}--backend${reset}\t Backend to use for the tests, case insensitive (Default: ${NOMP_BACKEND}).\n" \
+    "\t${cyan}--platform${reset}\t Platform to use for the tests, case insensitive (Default: ${NOMP_PLATFORM}).\n" \
+    "\t${cyan}--device${reset}\t Device to run the tests, case insensitive (Default: ${NOMP_DEVICE}).\n" \
+    "\t${cyan}--verbose${reset}\t Verbose level (Default: ${NOMP_VERBOSE}).\n" \
+    "\t${cyan}--install-dir${reset}\t libnomp install directory (Default: ${NOMP_INSTALL_DIR}).\n" \
+    "\t${cyan}--annts-script${reset}\t Specify the directory which the annotation script resides.\n" \
+    "\t${cyan}--annts-func${reset}\t Specify the annotation funtion name.\n\n" \
     "EXAMPLES\n" \
     "\t Running all the tests:\n" \
     "\t\t $ ${cyan}lnrun test${reset}\n\n" \
-    "\t Running tests with the pattern 23* along with the CUDA backend:\n" \
-    "\t\t $ ${cyan}lnrun test -g 23* -b cuda${reset}"
+    "\t Running tests with the pattern api-23* along with the CUDA backend:\n" \
+    "\t\t $ ${cyan}lnrun test --group api-23* --backend cuda${reset}"
 }
 
 function print_help_debug() {
-  echo -e " NAME\n\t Debug the specified test\n\n" \
+  echo -e " NAME\n\t Debug a test with gdbserver.\n\n" \
     "SYNOPSIS\n" \
-    "\t lnrun d|debug \t[-P|--port <port-number>] " \
-    "[-b|--backend <backend-name>]\n" \
-    "\t\t\t[-d|--device <device-index>] [-p|--platform <platform-index>]\n" \
-    "\t\t\t[-v|--verbose <verbose-level>] [-i|--install-dir <libnomp-directory>] \n" \
-    "\t\t\t[-as|--annts-script <annotation-script>] [-af|--annts-func <annotation-function>]\n\n" \
+    "\t lnrun debug \t[--port <port-number>] [--backend <backend-name>]\n" \
+    "\t\t\t[--device <device-id>] [--platform <platform-id>]\n" \
+    "\t\t\t[--verbose <verbose-level>] [--install-dir <install directory>] \n" \
+    "\t\t\t[--annts-script <annotation-script>] [--annts-func <annotation-function>]\n\n" \
     "OPTIONS\n" \
-    "\t${cyan}-P/--port${reset}\t Port for which gdbserver host the test " \
-    "case (Default: ${NOMP_PORT}).\n" \
-    "\t${cyan}-b/--backend${reset}\t Backend to run the tests, case " \
-    "insensitive (Default: ${NOMP_BACKEND}).\n" \
-    "\t${cyan}-p/--platform${reset}\t Platform to run the tests, case " \
-    "insensitive (Default: ${NOMP_PLATFORM}).\n" \
-    "\t${cyan}-d/--device${reset}\t Device to run the tests, case " \
-    "insensitive (Default: ${NOMP_DEVICE}).\n" \
-    "\t${cyan}-v/--verbose${reset}\t Specify verbose level (Default: ${NOMP_VERBOSE}).\n" \
-    "\t${cyan}-i/--install-dir${reset}\t Specify the directory which the libnomp resides (Default: ${NOMP_INSTALL_DIR}).\n" \
-    "\t${cyan}-as/--annts-script${reset}\t Specify the directory which the annotation script resides.\n" \
-    "\t${cyan}-af/--annts-func${reset}\t Specify the annotation funtion name.\n\n" \
+    "\t${cyan}--port${reset}\t Port for which gdbserver host the test case (Default: ${NOMP_PORT}).\n" \
+    "\t${cyan}--backend${reset}\t Backend to use, case insensitive (Default: ${NOMP_BACKEND}).\n" \
+    "\t${cyan}--platform${reset}\t Platform to use, case insensitive (Default: ${NOMP_PLATFORM}).\n" \
+    "\t${cyan}--device${reset}\t Device to use, case insensitive (Default: ${NOMP_DEVICE}).\n" \
+    "\t${cyan}--verbose${reset}\t Verbose level (Default: ${NOMP_VERBOSE}).\n" \
+    "\t${cyan}--install-dir${reset}\t libnomp install directory (Default: ${NOMP_INSTALL_DIR}).\n" \
+    "\t${cyan}--annts-script${reset}\t Annotation script directory.\n" \
+    "\t${cyan}--annts-func${reset}\t Annotation funtion name.\n\n" \
     "EXAMPLES\n" \
-    "\t Debugging the test 240 on port 5005\n" \
-    "\t\t $ ${cyan}lnrun debug 240 ${reset}\n\n" \
-    "\t Debugging the test 110 in the CUDA platform\n" \
-    "\t\t $ ${cyan}lnrun debug 110 -p cuda${reset}"
+    "\t Debugging the test api-240 on port 5005\n" \
+    "\t\t $ ${cyan}lnrun debug api-240 ${reset}\n\n" \
+    "\t Debugging the test api-110 in the CUDA platform\n" \
+    "\t\t $ ${cyan}lnrun debug api-110 --backend cuda${reset}"
 }
 
 function print_help_docs() {
-  echo -e " NAME\n\t Opening the user documentation of libnomp in a web " \
-    "browser.\n\n" \
+  echo -e " NAME\n\t Open user documentation for libnomp in a web browser.\n\n" \
     "SYNOPSIS\n" \
-    "\t lnrun d|docs \t[-B|--browser <browser-name>]\n\n" \
+    "\t lnrun docs \t[--browser <browser-name>]\n\n" \
     "OPTIONS\n" \
-    "\t${cyan}-B/--browser${reset}\t Specifies the web browser to display " \
-    "the documentation (Default: ${NOMP_BROWSER}).\n\n" \
+    "\t${cyan}--browser${reset}\t Browser to display documentation (Default: ${NOMP_BROWSER}).\n\n" \
     "EXAMPLES\n" \
-    "\t Opening the user documentation on google chrome:\n" \
+    "\t Opening user documentation on google chrome:\n" \
     "\t\t $ ${cyan}lnrun docs${reset}\n\n" \
-    "\t Opening the user documentation on firefox:\n" \
-    "\t\t $ ${cyan}lnrun docs -B firefox${reset}"
+    "\t Opening user documentation on firefox:\n" \
+    "\t\t $ ${cyan}lnrun docs --browser firefox${reset}"
 }
 
-function run_tests() {
+function run_test() {
   [[ ${NOMP_TEST_GROUPS} == *"*"* ]] &&
     TESTS="${NOMP_TEST_DIR}/nomp-${NOMP_TEST_GROUPS}[^.py]" ||
     TESTS="${NOMP_TEST_DIR}/nomp-${NOMP_TEST_GROUPS}"
@@ -136,13 +121,13 @@ function run_tests() {
       ERR=$((ERR + 1))
     fi
   done
-  [ $ERR -gt 0 ] && echo -e "\n${red}There are test failures${reset}"
+  [ $ERR -gt 0 ] && echo -e "\n${red}There are test failures${reset}."
   cd -
   exit ${ERR}
 }
 
-function debug_test() {
-  TEST_NAME="nomp-api-${DEBUG_TEST}"
+function run_debug() {
+  TEST_NAME="nomp-${DEBUG_TEST}"
   BUILD_TEST="${NOMP_TEST_DIR}/${TEST_NAME}"
   if [[ -f "$BUILD_TEST" ]]; then
     echo -e "\nDebugging session started for: ${cyan}${TEST_NAME}${reset}"
@@ -153,12 +138,12 @@ function debug_test() {
     cd -
     echo "Debugging session ended"
   else
-    echo -e "\n${red}Test not found: nomp-api-${DEBUG_TEST}${reset}"
+    echo -e "\n${red}Test not found: nomp-${DEBUG_TEST}${reset}"
     exit 1
   fi
 }
 
-function open_docs() {
+function run_docs() {
   echo -e "Starting web browser..."
   "${NOMP_BROWSER}" "${NOMP_INSTALL_DIR}/docs/index.html"
 }
@@ -168,76 +153,72 @@ if [ $# -eq 0 ]; then
   exit 0
 fi
 
-# parse the command
+# Parse the command line arguments.
 while [ $# -gt 0 ]; do
   case $1 in
-  -h | --help)
+  help)
     shift
     case $1 in
-    t | test) print_help_test ;;
-    d | debug) print_help_debug ;;
-    D | docs) print_help_docs ;;
+    test) print_help_test ;;
+    debug) print_help_debug ;;
+    docs) print_help_docs ;;
     *) print_help_main ;;
     esac
     shift
     exit 0
     ;;
-  t | test)
+  test)
     shift
     while [ $# -gt 0 ]; do
       case $1 in
-      -g | --group) shift && NOMP_TEST_GROUPS="${1}" ;;
-      -t | --test-dir) shift && NOMP_TEST_DIR="${1}" ;;
-      -b | --backend) shift && NOMP_BACKEND="${1}" ;;
-      -p | --platform) shift && NOMP_PLATFORM="${1}" ;;
-      -d | --device) shift && NOMP_DEVICE="${1}" ;;
-      -v | --verbose) shift && NOMP_VERBOSE="${1}" ;;
+      --group) shift && NOMP_TEST_GROUPS="${1}" ;;
+      --test-dir) shift && NOMP_TEST_DIR="${1}" ;;
+      --backend) shift && NOMP_BACKEND="${1}" ;;
+      --platform) shift && NOMP_PLATFORM="${1}" ;;
+      --device) shift && NOMP_DEVICE="${1}" ;;
+      --verbose) shift && NOMP_VERBOSE="${1}" ;;
       *) echo "${red}Invalid argument: ${1}${reset}" &&
-        echo "See ${cyan}lnrun -h t|test ${reset} or ${cyan}lnrun" \
-          "--help t|test ${reset} for the accepted commands."
+        echo "See ${cyan}lnrun help test${reset} for accepted commands."
         exit 1 ;;
       esac
       shift
     done
-    run_tests
+    run_test
     ;;
-  d | debug)
+  debug)
     shift
     DEBUG_TEST="${1}"
     shift
     while [ $# -gt 0 ]; do
       case $1 in
-      -P | --port) shift && NOMP_PORT="${1}" ;;
-      -b | --backend) shift && NOMP_BACKEND="${1}" ;;
-      -p | --platform) shift && NOMP_PLATFORM="${1}" ;;
-      -d | --device) shift && NOMP_DEVICE="${1}" ;;
-      -v | --verbose) shift && NOMP_VERBOSE="${1}" ;;
+      --port) shift && NOMP_PORT="${1}" ;;
+      --backend) shift && NOMP_BACKEND="${1}" ;;
+      --platform) shift && NOMP_PLATFORM="${1}" ;;
+      --device) shift && NOMP_DEVICE="${1}" ;;
+      --verbose) shift && NOMP_VERBOSE="${1}" ;;
       *) echo "${red}Invalid argument: ${1}${reset}" &&
-        echo "See ${cyan}lnrun -h d|debug ${reset} or ${cyan}lnrun" \
-          "--help d|debug ${reset} for the accepted commands."
+        echo "See ${cyan}lnrun help debug${reset} for accepted commands."
         exit 1 ;;
       esac
       shift
     done
-    debug_test
+    run_debug
     ;;
-  D | docs)
+  docs)
     shift
     while [ $# -gt 0 ]; do
       case $1 in
-      -B | --browser) shift && NOMP_BROWSER="${1}" ;;
+      --browser) shift && NOMP_BROWSER="${1}" ;;
       *) echo "${red}Invalid argument: ${1}${reset}" &&
-        echo "See ${cyan}lnrun -h D|docs ${reset} or ${cyan}lnrun" \
-          "--help D|docs ${reset} for the accepted commands."
+        echo "See ${cyan}lnrun help docs${reset} for accepted commands."
         exit 1 ;;
       esac
       shift
     done
-    open_docs
+    run_docs
     ;;
   *) echo "${red}Invalid argument: ${1}${reset}" &&
-    echo "See ${cyan}lnrun -h${reset} or ${cyan}lnrun --help${reset} for" \
-      "the accepted commands."
+    echo "See ${cyan}lnrun help${reset} for the accepted commands."
     exit 1 ;;
   esac
   shift
