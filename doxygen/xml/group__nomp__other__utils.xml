@@ -1,0 +1,269 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.7" xml:lang="en-US">
+  <compounddef id="group__nomp__other__utils" kind="group">
+    <compoundname>nomp_other_utils</compoundname>
+    <title>Other helper functions.</title>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="group__nomp__other__utils_1gaa41545f888f512ee21adfa93171fd875" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>char *</type>
+        <definition>char * nomp_str_cat</definition>
+        <argsstring>(unsigned n, unsigned max_len,...)</argsstring>
+        <name>nomp_str_cat</name>
+        <param>
+          <type>unsigned</type>
+          <declname>n</declname>
+        </param>
+        <param>
+          <type>unsigned</type>
+          <declname>max_len</declname>
+        </param>
+        <param>
+          <type>...</type>
+        </param>
+        <briefdescription>
+<para>Concatenates <computeroutput>n</computeroutput> strings. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Concatenates <computeroutput>n</computeroutput> strings and returns a pointer to the resulting string. Each string should be at most <computeroutput>max_len</computeroutput> length long. Returned pointer need to be freed using <ref refid="group__nomp__mem__utils_1ga7f94b25dae56929daada2a73b36f6934" kindref="member">nomp_free()</ref>.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">n</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of strings to concatenate. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">max_len</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Maximum length of an individual string. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">...</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Strings to concatenate. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>char* </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-aux.h" line="32" column="6" declfile="/home/runner/work/libnomp/libnomp/include/nomp-aux.h" declline="32" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="group__nomp__other__utils_1gaa4339127cdf37003e45846181dc6da6b" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int nomp_str_toui</definition>
+        <argsstring>(const char *str, size_t size)</argsstring>
+        <name>nomp_str_toui</name>
+        <param>
+          <type>const char *</type>
+          <declname>str</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>size</declname>
+        </param>
+        <briefdescription>
+<para>Convert a string to unsigned long value if possible. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Convert input string <computeroutput>str</computeroutput> to an unsigned int value. Returns converted unsigned int value if successful, otherwise return -1. <computeroutput>size</computeroutput> denotes the maximum length of the string <computeroutput>str</computeroutput>.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">str</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>String to convert into unsigned int. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">size</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Length of the string. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-aux.h" line="46" column="5" declfile="/home/runner/work/libnomp/libnomp/include/nomp-aux.h" declline="46" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="group__nomp__other__utils_1gac1033679d119836202049eec6ba8248a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int nomp_path_len</definition>
+        <argsstring>(size_t *len, const char *path)</argsstring>
+        <name>nomp_path_len</name>
+        <param>
+          <type>size_t *</type>
+          <declname>len</declname>
+        </param>
+        <param>
+          <type>const char *</type>
+          <declname>path</declname>
+        </param>
+        <briefdescription>
+<para>Returns the length of a posix complaint path. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>If <computeroutput>len</computeroutput> is not NULL, it is set to the length of the path if the path length resoultion was successful. Otherwise, it is set to zero.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="out">len</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Lenth of path specified in <computeroutput>path</computeroutput>. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">path</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Path to get the maximum length. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-aux.h" line="59" column="5" declfile="/home/runner/work/libnomp/libnomp/include/nomp-aux.h" declline="59" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="group__nomp__other__utils_1gaefe9b0c641da88552b085c8d53a78c32" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int nomp_max</definition>
+        <argsstring>(unsigned n,...)</argsstring>
+        <name>nomp_max</name>
+        <param>
+          <type>unsigned</type>
+          <declname>n</declname>
+        </param>
+        <param>
+          <type>...</type>
+        </param>
+        <briefdescription>
+<para>Returns maximum among all integers passed. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns the maximum between two or more integers.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">n</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Total number of integers. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">...</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>List of integers to find the maximum of as a variable argument list. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-aux.h" line="72" column="5" declfile="/home/runner/work/libnomp/libnomp/include/nomp-aux.h" declline="72" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="group__nomp__other__utils_1ga55caaef28103f787bb6a480ed2cef09f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int nomp_check_py_script_path</definition>
+        <argsstring>(const char *path)</argsstring>
+        <name>nomp_check_py_script_path</name>
+        <param>
+          <type>const char *</type>
+          <declname>path</declname>
+        </param>
+        <briefdescription>
+<para>Check if the python script path exists. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><computeroutput>path</computeroutput> shouldn&apos;t contain the &quot;.py&quot; extension.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">path</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Total number of integers. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-aux.h" line="83" column="5" declfile="/home/runner/work/libnomp/libnomp/include/nomp-aux.h" declline="83" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="group__nomp__other__utils_1ga0e718e8165a885874754ce1cb827275d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>char *</type>
+        <definition>char * nomp_copy_env</definition>
+        <argsstring>(const char *name, size_t size)</argsstring>
+        <name>nomp_copy_env</name>
+        <param>
+          <type>const char *</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>size</declname>
+        </param>
+        <briefdescription>
+<para>Get a copy of the environment variable <computeroutput>name</computeroutput> if exists. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Return NULL if the environment variable is not set.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">name</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Name of the environment variable. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">size</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Maximum lenght of the environment variable value. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>char * </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-aux.h" line="95" column="6" declfile="/home/runner/work/libnomp/libnomp/include/nomp-aux.h" declline="95" declcolumn="6"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+  </compounddef>
+</doxygen>

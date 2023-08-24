@@ -1,0 +1,232 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.7" xml:lang="en-US">
+  <compounddef id="nomp-reduction_8h" kind="file" language="C++">
+    <compoundname>nomp-reduction.h</compoundname>
+    <includes refid="nomp-impl_8h" local="yes">nomp-impl.h</includes>
+    <incdepgraph>
+      <node id="13">
+        <label>nomp-aux.h</label>
+        <link refid="nomp-aux_8h"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>nomp-impl.h</label>
+        <link refid="nomp-impl_8h"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+      </node>
+      <node id="15">
+        <label>nomp-log.h</label>
+        <link refid="nomp-log_8h"/>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+      </node>
+      <node id="18">
+        <label>nomp-loopy.h</label>
+        <link refid="nomp-loopy_8h"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="19">
+        <label>nomp-mem.h</label>
+        <link refid="nomp-mem_8h"/>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>/home/runner/work/libnomp/libnomp/include/nomp-reduction.h</label>
+        <link refid="nomp-reduction_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="17">
+        <label>nomp.h</label>
+        <link refid="nomp_8h"/>
+        <childnode refid="16" relation="include">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>Python.h</label>
+      </node>
+      <node id="5">
+        <label>assert.h</label>
+      </node>
+      <node id="6">
+        <label>ctype.h</label>
+      </node>
+      <node id="7">
+        <label>limits.h</label>
+      </node>
+      <node id="8">
+        <label>math.h</label>
+      </node>
+      <node id="9">
+        <label>stdarg.h</label>
+      </node>
+      <node id="16">
+        <label>stddef.h</label>
+      </node>
+      <node id="10">
+        <label>stdio.h</label>
+      </node>
+      <node id="11">
+        <label>stdlib.h</label>
+      </node>
+      <node id="12">
+        <label>string.h</label>
+      </node>
+      <node id="4">
+        <label>symengine/cwrapper.h</label>
+      </node>
+      <node id="14">
+        <label>unistd.h</label>
+      </node>
+    </incdepgraph>
+      <sectiondef kind="define">
+      <memberdef kind="define" id="nomp-reduction_8h_1a1f0f524f088a4c566088461b5b21b3e9" prot="public" static="no">
+        <name>NOMP_SUM</name>
+        <initializer>0</initializer>
+        <briefdescription>
+<para>Sum reduction operation. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-reduction.h" line="16" column="9" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-reduction.h" bodystart="16" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="define" id="nomp-reduction_8h_1a5e43c7a9b1845b9207d7983e520b8895" prot="public" static="no">
+        <name>NOMP_PROD</name>
+        <initializer>1</initializer>
+        <briefdescription>
+<para>Product reduction operation. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-reduction.h" line="21" column="9" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-reduction.h" bodystart="21" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="nomp-reduction_8h_1a90acb2993ed8635570407c434577200a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int nomp_host_side_reduction</definition>
+        <argsstring>(struct nomp_backend_t *bnd, struct nomp_prog_t *prg, struct nomp_mem_t *m)</argsstring>
+        <name>nomp_host_side_reduction</name>
+        <param>
+          <type>struct <ref refid="structnomp__backend__t" kindref="compound">nomp_backend_t</ref> *</type>
+          <declname>bnd</declname>
+        </param>
+        <param>
+          <type>struct <ref refid="structnomp__prog__t" kindref="compound">nomp_prog_t</ref> *</type>
+          <declname>prg</declname>
+        </param>
+        <param>
+          <type>struct <ref refid="structnomp__mem__t" kindref="compound">nomp_mem_t</ref> *</type>
+          <declname>m</declname>
+        </param>
+        <briefdescription>
+<para>Perform host side reduction. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">bnd</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Active backend instance. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">prg</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Active program instance. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">m</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Memory used to store device side partial reductions. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-reduction.h" line="32" column="5" declfile="/home/runner/work/libnomp/libnomp/include/nomp-reduction.h" declline="32" declcolumn="5"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="preprocessor">#if<sp/>!defined(_NOMP_REDUCTION_H_)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>_NOMP_REDUCTION_H_</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="nomp-impl_8h" kindref="compound">nomp-impl.h</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight></codeline>
+<codeline lineno="16" refid="nomp-reduction_8h_1a1f0f524f088a4c566088461b5b21b3e9" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>NOMP_SUM<sp/>0</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="21" refid="nomp-reduction_8h_1a5e43c7a9b1845b9207d7983e520b8895" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>NOMP_PROD<sp/>1</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="22"><highlight class="normal"></highlight></codeline>
+<codeline lineno="32" refid="nomp-reduction_8h_1a90acb2993ed8635570407c434577200a" refkind="member"><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/><ref refid="nomp-reduction_8h_1a90acb2993ed8635570407c434577200a" kindref="member">nomp_host_side_reduction</ref>(</highlight><highlight class="keyword">struct</highlight><highlight class="normal"><sp/><ref refid="structnomp__backend__t" kindref="compound">nomp_backend_t</ref><sp/>*bnd,</highlight></codeline>
+<codeline lineno="33"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">struct</highlight><highlight class="normal"><sp/><ref refid="structnomp__prog__t" kindref="compound">nomp_prog_t</ref><sp/>*prg,<sp/></highlight><highlight class="keyword">struct</highlight><highlight class="normal"><sp/><ref refid="structnomp__mem__t" kindref="compound">nomp_mem_t</ref><sp/>*m);</highlight></codeline>
+<codeline lineno="34"><highlight class="normal"></highlight></codeline>
+<codeline lineno="35"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight></codeline>
+    </programlisting>
+    <location file="/home/runner/work/libnomp/libnomp/include/nomp-reduction.h"/>
+  </compounddef>
+</doxygen>

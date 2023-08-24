@@ -1,0 +1,142 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.7" xml:lang="en-US">
+  <compounddef id="group__nomp__profiler__utils" kind="group">
+    <compoundname>nomp_profiler_utils</compoundname>
+    <title>Internal functions for profiling a</title>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="group__nomp__profiler__utils_1ga9d4486cdc0b1071c8bc02300b89543e7" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int nomp_profile_set_level</definition>
+        <argsstring>(const int profile_level)</argsstring>
+        <name>nomp_profile_set_level</name>
+        <param>
+          <type>const int</type>
+          <declname>profile_level</declname>
+        </param>
+        <briefdescription>
+<para>Set the profile level for the nomp profiler. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">profile_level</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Profile level provided by the user. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-log.h" line="86" column="5" declfile="/home/runner/work/libnomp/libnomp/include/nomp-log.h" declline="86" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="group__nomp__profiler__utils_1gaf5783347e5874e3fc876c337328ebcc5" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void nomp_profile</definition>
+        <argsstring>(const char *name, int toggle, int sync)</argsstring>
+        <name>nomp_profile</name>
+        <param>
+          <type>const char *</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>toggle</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>sync</declname>
+        </param>
+        <briefdescription>
+<para>Toggles the timer and records the execution time between the two consecutive uses of the function. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>The function either starts or ends the timer by considering the toggle value. The function will start the timer if the toggle is 1. Else, it will capture the execution time and records in a log. <programlisting filename=".c"><codeline><highlight class="normal"><ref refid="group__nomp__profiler__utils_1gaf5783347e5874e3fc876c337328ebcc5" kindref="member">nomp_profile</ref>(</highlight><highlight class="stringliteral">&quot;Entry<sp/>Name&quot;</highlight><highlight class="normal">,<sp/>1,<sp/>nomp.profile,<sp/>1);</highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="comment">//<sp/>Code<sp/>to<sp/>be<sp/>measured</highlight><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"><ref refid="group__nomp__profiler__utils_1gaf5783347e5874e3fc876c337328ebcc5" kindref="member">nomp_profile</ref>(</highlight><highlight class="stringliteral">&quot;Entry<sp/>Name&quot;</highlight><highlight class="normal">,<sp/>0,<sp/>nomp.profile,<sp/>1);</highlight></codeline>
+</programlisting></para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">name</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Name of the execution time that is being profiled. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">toggle</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Toggles the timer between tick (start of timing) and a tock (end of timing). </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">sync</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Execute nomp_sync when toggling off the timer. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>void </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-log.h" line="108" column="6" declfile="/home/runner/work/libnomp/libnomp/include/nomp-log.h" declline="108" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="group__nomp__profiler__utils_1ga3e4823e7f77812677d07a6945b58f6c3" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void nomp_profile_result</definition>
+        <argsstring>(void)</argsstring>
+        <name>nomp_profile_result</name>
+        <param>
+          <type>void</type>
+        </param>
+        <briefdescription>
+<para>Prints all the execution times recorded by the program. This function is executed only when the <computeroutput>--nomp-profile</computeroutput> is provided. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-log.h" line="117" column="6" declfile="/home/runner/work/libnomp/libnomp/include/nomp-log.h" declline="117" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="group__nomp__profiler__utils_1gaa72982b6c77a157735a243f3d43096a8" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void nomp_profile_finalize</definition>
+        <argsstring>(void)</argsstring>
+        <name>nomp_profile_finalize</name>
+        <param>
+          <type>void</type>
+        </param>
+        <briefdescription>
+<para>Free variables used to keep track of time logs. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>void </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-log.h" line="125" column="6" declfile="/home/runner/work/libnomp/libnomp/include/nomp-log.h" declline="125" declcolumn="6"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Nomp program. </para>
+    </detaileddescription>
+  </compounddef>
+</doxygen>

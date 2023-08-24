@@ -1,0 +1,217 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.7" xml:lang="en-US">
+  <compounddef id="nomp_8h" kind="file" language="C++">
+    <compoundname>nomp.h</compoundname>
+    <includes local="no">stddef.h</includes>
+    <includedby refid="nomp-impl_8h" local="yes">/home/runner/work/libnomp/libnomp/include/nomp-impl.h</includedby>
+    <includedby refid="nomp-log_8h" local="yes">/home/runner/work/libnomp/libnomp/include/nomp-log.h</includedby>
+    <incdepgraph>
+      <node id="1">
+        <label>/home/runner/work/libnomp/libnomp/include/nomp.h</label>
+        <link refid="nomp_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>stddef.h</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="2">
+        <label>/home/runner/work/libnomp/libnomp/include/nomp-impl.h</label>
+        <link refid="nomp-impl_8h"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="4">
+        <label>/home/runner/work/libnomp/libnomp/include/nomp-log.h</label>
+        <link refid="nomp-log_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>/home/runner/work/libnomp/libnomp/include/nomp-reduction.h</label>
+        <link refid="nomp-reduction_8h"/>
+      </node>
+      <node id="1">
+        <label>/home/runner/work/libnomp/libnomp/include/nomp.h</label>
+        <link refid="nomp_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+      <sectiondef kind="define">
+      <member refid="group__nomp__errors_1ga52b8d0a91a2bd7ce49d5b04c7de2feb5" kind="define"><name>NOMP_USER_INPUT_IS_INVALID</name></member>
+      <member refid="group__nomp__errors_1ga14704356174635cb0bd692a83810cc54" kind="define"><name>NOMP_USER_MAP_PTR_IS_INVALID</name></member>
+      <member refid="group__nomp__errors_1gaa3a328eb103ab7732bcee5295b952f3d" kind="define"><name>NOMP_USER_MAP_OP_IS_INVALID</name></member>
+      <member refid="group__nomp__errors_1gacab9dfe45d867879b640d477339d6b58" kind="define"><name>NOMP_USER_LOG_ID_IS_INVALID</name></member>
+      <member refid="group__nomp__errors_1gae3a653c8477c8cea5db0d5292f98579b" kind="define"><name>NOMP_USER_KNL_ARG_TYPE_IS_INVALID</name></member>
+      <member refid="group__nomp__errors_1ga13ae026c6c02d62f0a980cc713fa6f9c" kind="define"><name>NOMP_INITIALIZE_FAILURE</name></member>
+      <member refid="group__nomp__errors_1ga7affd9633a37be919d471bf99304a956" kind="define"><name>NOMP_FINALIZE_FAILURE</name></member>
+      <member refid="group__nomp__errors_1ga7b1792597780372f46ac24737805d80f" kind="define"><name>NOMP_NOT_IMPLEMENTED_ERROR</name></member>
+      <member refid="group__nomp__errors_1gad411377fc36b3278318d135304df9011" kind="define"><name>NOMP_PY_CALL_FAILURE</name></member>
+      <member refid="group__nomp__errors_1gaa1c5a8fa4227bcc637a0d5569bb4bba0" kind="define"><name>NOMP_LOOPY_CONVERSION_FAILURE</name></member>
+      <member refid="group__nomp__errors_1ga97bd2bb5392be9d151cc2fc9248704bc" kind="define"><name>NOMP_LOOPY_KNL_NAME_NOT_FOUND</name></member>
+      <member refid="group__nomp__errors_1ga1da82121ad001ca2c288fae459349002" kind="define"><name>NOMP_LOOPY_CODEGEN_FAILURE</name></member>
+      <member refid="group__nomp__errors_1gaefb03433aaf2e8dcc970f44550362f34" kind="define"><name>NOMP_LOOPY_GRIDSIZE_FAILURE</name></member>
+      <member refid="group__nomp__errors_1ga5fec2498a76d3d5436049dca98b0dc1e" kind="define"><name>NOMP_CUDA_FAILURE</name></member>
+      <member refid="group__nomp__errors_1gaa10c74657396ae1be93ea0d71c0612f0" kind="define"><name>NOMP_HIP_FAILURE</name></member>
+      <member refid="group__nomp__errors_1gac8a9d1e0e7fe73b2ccef64eedc7f3ad3" kind="define"><name>NOMP_OPENCL_FAILURE</name></member>
+      <member refid="group__nomp__errors_1ga4eebf8bac5a52b077ff57a7c01548052" kind="define"><name>NOMP_SYCL_FAILURE</name></member>
+      <member refid="group__nomp__errors_1ga5fd2e0c292b1d898415030289be19ca1" kind="define"><name>NOMP_ISPC_FAILURE</name></member>
+      <member refid="group__nomp__errors_1ga69a43ed070537af9e7d342699852b6c4" kind="define"><name>NOMP_JIT_FAILURE</name></member>
+      <member refid="group__nomp__user__api_1gabfb8762cd93e8286f92bc1adee227c94" kind="define"><name>nomp_check</name></member>
+      </sectiondef>
+      <sectiondef kind="enum">
+      <member refid="group__nomp__types_1gaa080d702bfb6a51225d549bcb3c43389" kind="enum"><name>nomp_type_t</name></member>
+      <member refid="group__nomp__types_1ga9c8653d937b29cea004ff74e0ae465b1" kind="enum"><name>nomp_map_direction_t</name></member>
+      <memberdef kind="enum" id="nomp_8h_1ab9a322ab403d9d66a8ed27a6487aadba" prot="public" static="no" strong="no">
+        <type></type>
+        <name>nomp_log_type</name>
+        <enumvalue id="nomp_8h_1ab9a322ab403d9d66a8ed27a6487aadbaaaa0c64194b170401c9ccaf27b15e7ade" prot="public">
+          <name>NOMP_ERROR</name>
+          <initializer>= 0</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="nomp_8h_1ab9a322ab403d9d66a8ed27a6487aadbaab315fb41d2eba7385d173df5465543c9" prot="public">
+          <name>NOMP_WARNING</name>
+          <initializer>= 1</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="nomp_8h_1ab9a322ab403d9d66a8ed27a6487aadbaaf87f19553d6d80a0d2e3bb88dd1d01d6" prot="public">
+          <name>NOMP_INFORMATION</name>
+          <initializer>= 2</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="nomp_8h_1ab9a322ab403d9d66a8ed27a6487aadbaa8ad820a1a961db2f2f646ccb6848d7e0" prot="public">
+          <name>NOMP_INVALID</name>
+          <initializer>= 3</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <briefdescription>
+<para>nomp log type can be an error, warning or information. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp.h" line="325" column="1" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp.h" bodystart="325" bodyend="330"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="func">
+      <member refid="group__nomp__user__api_1ga9358288c50bff846af3475fdb09e2f5f" kind="function"><name>nomp_init</name></member>
+      <member refid="group__nomp__user__api_1gaa8dc9b167bf514e2f3cc4ff6f9dfb6a0" kind="function"><name>nomp_update</name></member>
+      <member refid="group__nomp__user__api_1gab793ec09db7c8a89656061e6d67c4d75" kind="function"><name>nomp_jit</name></member>
+      <member refid="group__nomp__user__api_1ga494dfc32c43ad18c16022bfdcaeec9c3" kind="function"><name>nomp_run</name></member>
+      <member refid="group__nomp__user__api_1ga83a0822a1fc905e1e21c680dce8fdaeb" kind="function"><name>nomp_sync</name></member>
+      <member refid="group__nomp__user__api_1ga64b207d004404af50b94e91a2b571107" kind="function"><name>nomp_get_log_str</name></member>
+      <member refid="group__nomp__user__api_1ga6100f1d4760f0d62ace45115288d19eb" kind="function"><name>nomp_get_log_no</name></member>
+      <member refid="group__nomp__user__api_1ga32958362294e5d8b4478ba76b831cb86" kind="function"><name>nomp_get_log_type</name></member>
+      <member refid="group__nomp__user__api_1gacbf8860cf851702394683d8eaf29c3e4" kind="function"><name>nomp_finalize</name></member>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="preprocessor">#if<sp/>!defined(_LIB_NOMP_H_)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>_LIB_NOMP_H_</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;stddef.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight></codeline>
+<codeline lineno="17" refid="group__nomp__types_1gaa080d702bfb6a51225d549bcb3c43389" refkind="member"><highlight class="normal"></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">enum</highlight><highlight class="normal"><sp/>{</highlight></codeline>
+<codeline lineno="18" refid="group__nomp__types_1ggaa080d702bfb6a51225d549bcb3c43389ae3069e6f069e8c00142f5fe791cf8da7" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="group__nomp__types_1ggaa080d702bfb6a51225d549bcb3c43389ae3069e6f069e8c00142f5fe791cf8da7" kindref="member">NOMP_INT</ref><sp/>=<sp/>2048,<sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="19" refid="group__nomp__types_1ggaa080d702bfb6a51225d549bcb3c43389afafc1afa19a95da2a95d42a021115c88" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="group__nomp__types_1ggaa080d702bfb6a51225d549bcb3c43389afafc1afa19a95da2a95d42a021115c88" kindref="member">NOMP_UINT</ref><sp/>=<sp/>4096,<sp/><sp/></highlight></codeline>
+<codeline lineno="20" refid="group__nomp__types_1ggaa080d702bfb6a51225d549bcb3c43389a82150f1b7512d525c2f57dab49ecee49" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="group__nomp__types_1ggaa080d702bfb6a51225d549bcb3c43389a82150f1b7512d525c2f57dab49ecee49" kindref="member">NOMP_FLOAT</ref><sp/>=<sp/>6144,<sp/></highlight></codeline>
+<codeline lineno="21"><highlight class="normal"><sp/><sp/><ref refid="group__nomp__types_1ggaa080d702bfb6a51225d549bcb3c43389a881d9a608e7999619b0dc20ca479782f" kindref="member">NOMP_PTR</ref><sp/>=<sp/>8192<sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="22" refid="group__nomp__types_1ggaa080d702bfb6a51225d549bcb3c43389a881d9a608e7999619b0dc20ca479782f" refkind="member"><highlight class="normal">}<sp/><ref refid="group__nomp__types_1gaa080d702bfb6a51225d549bcb3c43389" kindref="member">nomp_type_t</ref>;</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"></highlight></codeline>
+<codeline lineno="28" refid="group__nomp__types_1ga9c8653d937b29cea004ff74e0ae465b1" refkind="member"><highlight class="normal"></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">enum</highlight><highlight class="normal"><sp/>{</highlight></codeline>
+<codeline lineno="29" refid="group__nomp__types_1gga9c8653d937b29cea004ff74e0ae465b1a60da8641d193fa459abb6fccdd5fa787" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="group__nomp__types_1gga9c8653d937b29cea004ff74e0ae465b1a60da8641d193fa459abb6fccdd5fa787" kindref="member">NOMP_ALLOC</ref><sp/>=<sp/>1,<sp/></highlight></codeline>
+<codeline lineno="30"><highlight class="normal"><sp/><sp/><ref refid="group__nomp__types_1gga9c8653d937b29cea004ff74e0ae465b1a9982b527c0819a015f1cebbd47f7e85d" kindref="member">NOMP_TO</ref><sp/>=<sp/>2,<sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="32" refid="group__nomp__types_1gga9c8653d937b29cea004ff74e0ae465b1a34a64a0414aabd7449fef3dadc227372" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="group__nomp__types_1gga9c8653d937b29cea004ff74e0ae465b1a34a64a0414aabd7449fef3dadc227372" kindref="member">NOMP_FROM</ref><sp/>=<sp/>4,<sp/><sp/></highlight></codeline>
+<codeline lineno="33"><highlight class="normal"><sp/><sp/><ref refid="group__nomp__types_1gga9c8653d937b29cea004ff74e0ae465b1adce40162fbe1d3191ea2753afca6abcc" kindref="member">NOMP_FREE</ref><sp/>=<sp/>8<sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="34" refid="group__nomp__types_1gga9c8653d937b29cea004ff74e0ae465b1adce40162fbe1d3191ea2753afca6abcc" refkind="member"><highlight class="normal">}<sp/><ref refid="group__nomp__types_1ga9c8653d937b29cea004ff74e0ae465b1" kindref="member">nomp_map_direction_t</ref>;</highlight></codeline>
+<codeline lineno="35"><highlight class="normal"></highlight></codeline>
+<codeline lineno="46" refid="group__nomp__errors_1ga52b8d0a91a2bd7ce49d5b04c7de2feb5" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>NOMP_USER_INPUT_IS_INVALID<sp/>-128</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="51" refid="group__nomp__errors_1ga14704356174635cb0bd692a83810cc54" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>NOMP_USER_MAP_PTR_IS_INVALID<sp/>-130</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="56" refid="group__nomp__errors_1gaa3a328eb103ab7732bcee5295b952f3d" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>NOMP_USER_MAP_OP_IS_INVALID<sp/>-132</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="61" refid="group__nomp__errors_1gacab9dfe45d867879b640d477339d6b58" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>NOMP_USER_LOG_ID_IS_INVALID<sp/>-134</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="66" refid="group__nomp__errors_1gae3a653c8477c8cea5db0d5292f98579b" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>NOMP_USER_KNL_ARG_TYPE_IS_INVALID<sp/>-136</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="67"><highlight class="normal"></highlight></codeline>
+<codeline lineno="72" refid="group__nomp__errors_1ga13ae026c6c02d62f0a980cc713fa6f9c" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>NOMP_INITIALIZE_FAILURE<sp/>-256</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="77" refid="group__nomp__errors_1ga7affd9633a37be919d471bf99304a956" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>NOMP_FINALIZE_FAILURE<sp/>-258</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="82" refid="group__nomp__errors_1ga7b1792597780372f46ac24737805d80f" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>NOMP_NOT_IMPLEMENTED_ERROR<sp/>-260</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="83"><highlight class="normal"></highlight></codeline>
+<codeline lineno="88" refid="group__nomp__errors_1gad411377fc36b3278318d135304df9011" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>NOMP_PY_CALL_FAILURE<sp/>-384</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="93" refid="group__nomp__errors_1gaa1c5a8fa4227bcc637a0d5569bb4bba0" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>NOMP_LOOPY_CONVERSION_FAILURE<sp/>-386</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="98" refid="group__nomp__errors_1ga97bd2bb5392be9d151cc2fc9248704bc" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>NOMP_LOOPY_KNL_NAME_NOT_FOUND<sp/>-388</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="103" refid="group__nomp__errors_1ga1da82121ad001ca2c288fae459349002" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>NOMP_LOOPY_CODEGEN_FAILURE<sp/>-390</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="108" refid="group__nomp__errors_1gaefb03433aaf2e8dcc970f44550362f34" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>NOMP_LOOPY_GRIDSIZE_FAILURE<sp/>-392</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="113" refid="group__nomp__errors_1ga5fec2498a76d3d5436049dca98b0dc1e" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>NOMP_CUDA_FAILURE<sp/>-512</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="118" refid="group__nomp__errors_1gaa10c74657396ae1be93ea0d71c0612f0" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>NOMP_HIP_FAILURE<sp/>-514</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="123" refid="group__nomp__errors_1gac8a9d1e0e7fe73b2ccef64eedc7f3ad3" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>NOMP_OPENCL_FAILURE<sp/>-516</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="128" refid="group__nomp__errors_1ga4eebf8bac5a52b077ff57a7c01548052" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>NOMP_SYCL_FAILURE<sp/>-518</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="133" refid="group__nomp__errors_1ga5fd2e0c292b1d898415030289be19ca1" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>NOMP_ISPC_FAILURE<sp/>-520</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="138" refid="group__nomp__errors_1ga69a43ed070537af9e7d342699852b6c4" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>NOMP_JIT_FAILURE<sp/>-522</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="139"><highlight class="normal"></highlight></codeline>
+<codeline lineno="140"><highlight class="normal"></highlight><highlight class="preprocessor">#ifdef<sp/>__cplusplus</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="141"><highlight class="normal"></highlight><highlight class="keyword">extern</highlight><highlight class="normal"><sp/></highlight><highlight class="stringliteral">&quot;C&quot;</highlight><highlight class="normal"><sp/>{</highlight></codeline>
+<codeline lineno="142"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="143"><highlight class="normal"></highlight></codeline>
+<codeline lineno="184" refid="group__nomp__user__api_1ga9358288c50bff846af3475fdb09e2f5f" refkind="member"><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/><ref refid="group__nomp__user__api_1ga9358288c50bff846af3475fdb09e2f5f" kindref="member">nomp_init</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>argc,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/>**argv);</highlight></codeline>
+<codeline lineno="185"><highlight class="normal"></highlight></codeline>
+<codeline lineno="223" refid="group__nomp__user__api_1gaa8dc9b167bf514e2f3cc4ff6f9dfb6a0" refkind="member"><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/><ref refid="group__nomp__user__api_1gaa8dc9b167bf514e2f3cc4ff6f9dfb6a0" kindref="member">nomp_update</ref>(</highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>*ptr,<sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>start_idx,<sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>end_idx,<sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>unit_size,</highlight></codeline>
+<codeline lineno="224"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="group__nomp__types_1ga9c8653d937b29cea004ff74e0ae465b1" kindref="member">nomp_map_direction_t</ref><sp/>op);</highlight></codeline>
+<codeline lineno="225"><highlight class="normal"></highlight></codeline>
+<codeline lineno="263" refid="group__nomp__user__api_1gab793ec09db7c8a89656061e6d67c4d75" refkind="member"><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/><ref refid="group__nomp__user__api_1gab793ec09db7c8a89656061e6d67c4d75" kindref="member">nomp_jit</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>*</highlight><highlight class="keywordtype">id</highlight><highlight class="normal">,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/>*src,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/>**clauses,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nargs,<sp/>...);</highlight></codeline>
+<codeline lineno="264"><highlight class="normal"></highlight></codeline>
+<codeline lineno="294" refid="group__nomp__user__api_1ga494dfc32c43ad18c16022bfdcaeec9c3" refkind="member"><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/><ref refid="group__nomp__user__api_1ga494dfc32c43ad18c16022bfdcaeec9c3" kindref="member">nomp_run</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">id</highlight><highlight class="normal">,<sp/>...);</highlight></codeline>
+<codeline lineno="295"><highlight class="normal"></highlight></codeline>
+<codeline lineno="305" refid="group__nomp__user__api_1ga83a0822a1fc905e1e21c680dce8fdaeb" refkind="member"><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/><ref refid="group__nomp__user__api_1ga83a0822a1fc905e1e21c680dce8fdaeb" kindref="member">nomp_sync</ref>(</highlight><highlight class="keywordtype">void</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="306"><highlight class="normal"></highlight></codeline>
+<codeline lineno="314" refid="group__nomp__user__api_1gabfb8762cd93e8286f92bc1adee227c94" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>nomp_check(err)<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>\</highlight></codeline>
+<codeline lineno="315"><highlight class="preprocessor"><sp/><sp/>{<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>\</highlight></codeline>
+<codeline lineno="316"><highlight class="preprocessor"><sp/><sp/><sp/><sp/>int<sp/>err_<sp/>=<sp/>(err);<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>\</highlight></codeline>
+<codeline lineno="317"><highlight class="preprocessor"><sp/><sp/><sp/><sp/>if<sp/>(nomp_get_log_type(err_)<sp/>==<sp/>NOMP_ERROR)<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>\</highlight></codeline>
+<codeline lineno="318"><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/>return<sp/>err_;<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>\</highlight></codeline>
+<codeline lineno="319"><highlight class="preprocessor"><sp/><sp/>}</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="320"><highlight class="normal"></highlight></codeline>
+<codeline lineno="325" refid="nomp_8h_1ab9a322ab403d9d66a8ed27a6487aadba" refkind="member"><highlight class="normal"></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">enum</highlight><highlight class="normal"><sp/>{</highlight></codeline>
+<codeline lineno="326" refid="nomp_8h_1ab9a322ab403d9d66a8ed27a6487aadbaaaa0c64194b170401c9ccaf27b15e7ade" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="nomp_8h_1ab9a322ab403d9d66a8ed27a6487aadbaaaa0c64194b170401c9ccaf27b15e7ade" kindref="member">NOMP_ERROR</ref><sp/>=<sp/>0,</highlight></codeline>
+<codeline lineno="327" refid="nomp_8h_1ab9a322ab403d9d66a8ed27a6487aadbaab315fb41d2eba7385d173df5465543c9" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="nomp_8h_1ab9a322ab403d9d66a8ed27a6487aadbaab315fb41d2eba7385d173df5465543c9" kindref="member">NOMP_WARNING</ref><sp/>=<sp/>1,</highlight></codeline>
+<codeline lineno="328" refid="nomp_8h_1ab9a322ab403d9d66a8ed27a6487aadbaaf87f19553d6d80a0d2e3bb88dd1d01d6" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="nomp_8h_1ab9a322ab403d9d66a8ed27a6487aadbaaf87f19553d6d80a0d2e3bb88dd1d01d6" kindref="member">NOMP_INFORMATION</ref><sp/>=<sp/>2,</highlight></codeline>
+<codeline lineno="329"><highlight class="normal"><sp/><sp/><ref refid="nomp_8h_1ab9a322ab403d9d66a8ed27a6487aadbaa8ad820a1a961db2f2f646ccb6848d7e0" kindref="member">NOMP_INVALID</ref><sp/>=<sp/>3</highlight></codeline>
+<codeline lineno="330" refid="nomp_8h_1ab9a322ab403d9d66a8ed27a6487aadbaa8ad820a1a961db2f2f646ccb6848d7e0" refkind="member"><highlight class="normal">}<sp/><ref refid="nomp_8h_1ab9a322ab403d9d66a8ed27a6487aadba" kindref="member">nomp_log_type</ref>;</highlight></codeline>
+<codeline lineno="331"><highlight class="normal"></highlight></codeline>
+<codeline lineno="341" refid="group__nomp__user__api_1ga64b207d004404af50b94e91a2b571107" refkind="member"><highlight class="normal"></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/>*<ref refid="group__nomp__user__api_1ga64b207d004404af50b94e91a2b571107" kindref="member">nomp_get_log_str</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">id</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="342"><highlight class="normal"></highlight></codeline>
+<codeline lineno="352" refid="group__nomp__user__api_1ga6100f1d4760f0d62ace45115288d19eb" refkind="member"><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/><ref refid="group__nomp__user__api_1ga6100f1d4760f0d62ace45115288d19eb" kindref="member">nomp_get_log_no</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>log_id);</highlight></codeline>
+<codeline lineno="353"><highlight class="normal"></highlight></codeline>
+<codeline lineno="364" refid="group__nomp__user__api_1ga32958362294e5d8b4478ba76b831cb86" refkind="member"><highlight class="normal"><ref refid="nomp_8h_1ab9a322ab403d9d66a8ed27a6487aadba" kindref="member">nomp_log_type</ref><sp/><ref refid="group__nomp__user__api_1ga32958362294e5d8b4478ba76b831cb86" kindref="member">nomp_get_log_type</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>log_id);</highlight></codeline>
+<codeline lineno="365"><highlight class="normal"></highlight></codeline>
+<codeline lineno="377" refid="group__nomp__user__api_1gacbf8860cf851702394683d8eaf29c3e4" refkind="member"><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/><ref refid="group__nomp__user__api_1gacbf8860cf851702394683d8eaf29c3e4" kindref="member">nomp_finalize</ref>(</highlight><highlight class="keywordtype">void</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="378"><highlight class="normal"></highlight></codeline>
+<codeline lineno="379"><highlight class="normal"></highlight><highlight class="preprocessor">#ifdef<sp/>__cplusplus</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="380"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="381"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="382"><highlight class="normal"></highlight></codeline>
+<codeline lineno="383"><highlight class="normal"></highlight><highlight class="preprocessor">#endif<sp/></highlight><highlight class="comment">//<sp/>_LIB_NOMP_H_</highlight><highlight class="normal"></highlight></codeline>
+    </programlisting>
+    <location file="/home/runner/work/libnomp/libnomp/include/nomp.h"/>
+  </compounddef>
+</doxygen>

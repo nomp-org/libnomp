@@ -1,0 +1,269 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.7" xml:lang="en-US">
+  <compounddef id="structnomp__backend__t" kind="struct" language="C++" prot="public">
+    <compoundname>nomp_backend_t</compoundname>
+    <includes refid="nomp-impl_8h" local="no">nomp-impl.h</includes>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structnomp__backend__t_1a1ac422fa1f83a9e23791ddfcca58163f" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int nomp_backend_t::platform_id</definition>
+        <argsstring></argsstring>
+        <name>platform_id</name>
+        <qualifiedname>nomp_backend_t::platform_id</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="72" column="7" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" bodystart="72" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structnomp__backend__t_1a738f892b8c4ade13f7d2e1278f73f68b" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int nomp_backend_t::device_id</definition>
+        <argsstring></argsstring>
+        <name>device_id</name>
+        <qualifiedname>nomp_backend_t::device_id</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="72" column="19" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" bodystart="72" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structnomp__backend__t_1a5ad1a7a3abdf09f02a40dbc06eb8ed93" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int nomp_backend_t::verbose</definition>
+        <argsstring></argsstring>
+        <name>verbose</name>
+        <qualifiedname>nomp_backend_t::verbose</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="72" column="29" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" bodystart="72" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structnomp__backend__t_1a3e0168109f2611669992ee7ff32148a1" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int nomp_backend_t::profile</definition>
+        <argsstring></argsstring>
+        <name>profile</name>
+        <qualifiedname>nomp_backend_t::profile</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="72" column="37" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" bodystart="72" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structnomp__backend__t_1a9f262bd8295985fea4ff586a01012ae9" prot="public" static="no" mutable="no">
+        <type>char</type>
+        <definition>char nomp_backend_t::backend[NOMP_MAX_BUFSIZ]</definition>
+        <argsstring>[NOMP_MAX_BUFSIZ]</argsstring>
+        <name>backend</name>
+        <qualifiedname>nomp_backend_t::backend</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="73" column="8" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" bodystart="73" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structnomp__backend__t_1a9ac5b3ab76bb0ec8d57d6a9de3dedb28" prot="public" static="no" mutable="no">
+        <type>char</type>
+        <definition>char nomp_backend_t::install_dir[PATH_MAX]</definition>
+        <argsstring>[PATH_MAX]</argsstring>
+        <name>install_dir</name>
+        <qualifiedname>nomp_backend_t::install_dir</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="73" column="16" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" bodystart="73" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structnomp__backend__t_1a85377ad1e943ee6af6c326073c5c15d4" prot="public" static="no" mutable="no">
+        <type>int(*</type>
+        <definition>int(* nomp_backend_t::update) (struct nomp_backend_t *, struct nomp_mem_t *, const nomp_map_direction_t op, size_t start, size_t end, size_t usize)</definition>
+        <argsstring>)(struct nomp_backend_t *, struct nomp_mem_t *, const nomp_map_direction_t op, size_t start, size_t end, size_t usize)</argsstring>
+        <name>update</name>
+        <qualifiedname>nomp_backend_t::update</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="75" column="3" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" bodystart="75" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structnomp__backend__t_1a18b66989057fa5a59014a19c41e76ad4" prot="public" static="no" mutable="no">
+        <type>int(*</type>
+        <definition>int(* nomp_backend_t::knl_build) (struct nomp_backend_t *, struct nomp_prog_t *, const char *, const char *)</definition>
+        <argsstring>)(struct nomp_backend_t *, struct nomp_prog_t *, const char *, const char *)</argsstring>
+        <name>knl_build</name>
+        <qualifiedname>nomp_backend_t::knl_build</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="78" column="3" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" bodystart="78" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structnomp__backend__t_1aaddb19f721c2eea8a2bccfa60a936e23" prot="public" static="no" mutable="no">
+        <type>int(*</type>
+        <definition>int(* nomp_backend_t::knl_run) (struct nomp_backend_t *, struct nomp_prog_t *)</definition>
+        <argsstring>)(struct nomp_backend_t *, struct nomp_prog_t *)</argsstring>
+        <name>knl_run</name>
+        <qualifiedname>nomp_backend_t::knl_run</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="80" column="3" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" bodystart="80" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structnomp__backend__t_1aef43b466950f9a5401baa96ec6ba965d" prot="public" static="no" mutable="no">
+        <type>int(*</type>
+        <definition>int(* nomp_backend_t::knl_free) (struct nomp_prog_t *)</definition>
+        <argsstring>)(struct nomp_prog_t *)</argsstring>
+        <name>knl_free</name>
+        <qualifiedname>nomp_backend_t::knl_free</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="81" column="3" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" bodystart="81" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structnomp__backend__t_1a52f9ac0dd79fbabf5cfb54db49a3bb4d" prot="public" static="no" mutable="no">
+        <type>int(*</type>
+        <definition>int(* nomp_backend_t::sync) (struct nomp_backend_t *)</definition>
+        <argsstring>)(struct nomp_backend_t *)</argsstring>
+        <name>sync</name>
+        <qualifiedname>nomp_backend_t::sync</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="82" column="3" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" bodystart="82" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structnomp__backend__t_1a98945e5b38c38447385409008cba6372" prot="public" static="no" mutable="no">
+        <type>int(*</type>
+        <definition>int(* nomp_backend_t::finalize) (struct nomp_backend_t *)</definition>
+        <argsstring>)(struct nomp_backend_t *)</argsstring>
+        <name>finalize</name>
+        <qualifiedname>nomp_backend_t::finalize</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="83" column="3" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" bodystart="83" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structnomp__backend__t_1a0ce1be1fd7a45b380e0233b0387896f1" prot="public" static="no" mutable="no">
+        <type>struct <ref refid="structnomp__mem__t" kindref="compound">nomp_mem_t</ref></type>
+        <definition>struct nomp_mem_t nomp_backend_t::scratch</definition>
+        <argsstring></argsstring>
+        <name>scratch</name>
+        <qualifiedname>nomp_backend_t::scratch</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="86" column="19" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" bodystart="86" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structnomp__backend__t_1aa3e36a43420c4be7d5db8aaf207c742f" prot="public" static="no" mutable="no">
+        <type>PyObject *</type>
+        <definition>PyObject* nomp_backend_t::py_annotate</definition>
+        <argsstring></argsstring>
+        <name>py_annotate</name>
+        <qualifiedname>nomp_backend_t::py_annotate</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="88" column="12" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" bodystart="88" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structnomp__backend__t_1a270b1b573322dde59bc9459ab9b6bcb1" prot="public" static="no" mutable="no">
+        <type>PyObject *</type>
+        <definition>PyObject* nomp_backend_t::py_context</definition>
+        <argsstring></argsstring>
+        <name>py_context</name>
+        <qualifiedname>nomp_backend_t::py_context</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="91" column="12" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" bodystart="91" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structnomp__backend__t_1a4779f707d801b7b46ae4b80b26ac8d0b" prot="public" static="no" mutable="no">
+        <type>void *</type>
+        <definition>void* nomp_backend_t::bptr</definition>
+        <argsstring></argsstring>
+        <name>bptr</name>
+        <qualifiedname>nomp_backend_t::bptr</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="93" column="8" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" bodystart="93" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <collaborationgraph>
+      <node id="1">
+        <label>nomp_backend_t</label>
+        <link refid="structnomp__backend__t"/>
+        <childnode refid="2" relation="usage">
+          <edgelabel>scratch</edgelabel>
+        </childnode>
+      </node>
+      <node id="2">
+        <label>nomp_mem_t</label>
+        <link refid="structnomp__mem__t"/>
+      </node>
+    </collaborationgraph>
+    <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="70" column="1" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" bodystart="70" bodyend="94"/>
+    <listofallmembers>
+      <member refid="structnomp__backend__t_1a9f262bd8295985fea4ff586a01012ae9" prot="public" virt="non-virtual"><scope>nomp_backend_t</scope><name>backend</name></member>
+      <member refid="structnomp__backend__t_1a4779f707d801b7b46ae4b80b26ac8d0b" prot="public" virt="non-virtual"><scope>nomp_backend_t</scope><name>bptr</name></member>
+      <member refid="structnomp__backend__t_1a738f892b8c4ade13f7d2e1278f73f68b" prot="public" virt="non-virtual"><scope>nomp_backend_t</scope><name>device_id</name></member>
+      <member refid="structnomp__backend__t_1a98945e5b38c38447385409008cba6372" prot="public" virt="non-virtual"><scope>nomp_backend_t</scope><name>finalize</name></member>
+      <member refid="structnomp__backend__t_1a9ac5b3ab76bb0ec8d57d6a9de3dedb28" prot="public" virt="non-virtual"><scope>nomp_backend_t</scope><name>install_dir</name></member>
+      <member refid="structnomp__backend__t_1a18b66989057fa5a59014a19c41e76ad4" prot="public" virt="non-virtual"><scope>nomp_backend_t</scope><name>knl_build</name></member>
+      <member refid="structnomp__backend__t_1aef43b466950f9a5401baa96ec6ba965d" prot="public" virt="non-virtual"><scope>nomp_backend_t</scope><name>knl_free</name></member>
+      <member refid="structnomp__backend__t_1aaddb19f721c2eea8a2bccfa60a936e23" prot="public" virt="non-virtual"><scope>nomp_backend_t</scope><name>knl_run</name></member>
+      <member refid="structnomp__backend__t_1a1ac422fa1f83a9e23791ddfcca58163f" prot="public" virt="non-virtual"><scope>nomp_backend_t</scope><name>platform_id</name></member>
+      <member refid="structnomp__backend__t_1a3e0168109f2611669992ee7ff32148a1" prot="public" virt="non-virtual"><scope>nomp_backend_t</scope><name>profile</name></member>
+      <member refid="structnomp__backend__t_1aa3e36a43420c4be7d5db8aaf207c742f" prot="public" virt="non-virtual"><scope>nomp_backend_t</scope><name>py_annotate</name></member>
+      <member refid="structnomp__backend__t_1a270b1b573322dde59bc9459ab9b6bcb1" prot="public" virt="non-virtual"><scope>nomp_backend_t</scope><name>py_context</name></member>
+      <member refid="structnomp__backend__t_1a0ce1be1fd7a45b380e0233b0387896f1" prot="public" virt="non-virtual"><scope>nomp_backend_t</scope><name>scratch</name></member>
+      <member refid="structnomp__backend__t_1a52f9ac0dd79fbabf5cfb54db49a3bb4d" prot="public" virt="non-virtual"><scope>nomp_backend_t</scope><name>sync</name></member>
+      <member refid="structnomp__backend__t_1a85377ad1e943ee6af6c326073c5c15d4" prot="public" virt="non-virtual"><scope>nomp_backend_t</scope><name>update</name></member>
+      <member refid="structnomp__backend__t_1a5ad1a7a3abdf09f02a40dbc06eb8ed93" prot="public" virt="non-virtual"><scope>nomp_backend_t</scope><name>verbose</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

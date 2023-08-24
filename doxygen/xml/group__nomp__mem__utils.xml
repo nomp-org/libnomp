@@ -1,0 +1,115 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.7" xml:lang="en-US">
+  <compounddef id="group__nomp__mem__utils" kind="group">
+    <compoundname>nomp_mem_utils</compoundname>
+    <title>Host memory management functions</title>
+      <sectiondef kind="define">
+      <memberdef kind="define" id="group__nomp__mem__utils_1ga7f94b25dae56929daada2a73b36f6934" prot="public" static="no">
+        <name>nomp_free</name>
+        <param><defname>p</defname></param>
+        <initializer><ref refid="nomp-mem_8h_1a67bcb99be0e570565fb861b94cbc2783" kindref="member">nomp_free_</ref>((void **)p)</initializer>
+        <briefdescription>
+<para>Helper macro for deallocating or freeing a memory block using <ref refid="nomp-mem_8h_1a67bcb99be0e570565fb861b94cbc2783" kindref="member">nomp_free_()</ref>. File name and line number are passed implicitly. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>p</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Address of the pointer to the memory to deallocate. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>void </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-mem.h" line="37" column="9" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-mem.h" bodystart="37" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="define" id="group__nomp__mem__utils_1ga391260c7fa2d91cf34ce1ab3fd45398f" prot="public" static="no">
+        <name>nomp_calloc</name>
+        <param><defname>T</defname></param>
+        <param><defname>count</defname></param>
+        <initializer>  ((T *)<ref refid="nomp-mem_8h_1a94eb7f60e07c666f4eaaa7916551e26e" kindref="member">nomp_calloc_</ref>((count), sizeof(T), __FILE__, __LINE__))</initializer>
+        <briefdescription>
+<para>Helper macro for allocating an array in memory with elements initialized to 0 using <ref refid="nomp-mem_8h_1a94eb7f60e07c666f4eaaa7916551e26e" kindref="member">nomp_calloc_()</ref>. File name and line number are passed implicitly. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Type of element. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>count</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of elements. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Pointer of type T. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-mem.h" line="55" column="9" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-mem.h" bodystart="55" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="define" id="group__nomp__mem__utils_1gab9ebd934f0e5b373037c5e2bbe6a28dc" prot="public" static="no">
+        <name>nomp_realloc</name>
+        <param><defname>ptr</defname></param>
+        <param><defname>T</defname></param>
+        <param><defname>count</defname></param>
+        <initializer>  ((T *)<ref refid="nomp-mem_8h_1a4e71aab53294bb6698a1635eb90b5add" kindref="member">nomp_realloc_</ref>((ptr), (count) * sizeof(T), __FILE__, __LINE__))</initializer>
+        <briefdescription>
+<para>Helper macro for reallocating memory blocks using <ref refid="nomp-mem_8h_1a4e71aab53294bb6698a1635eb90b5add" kindref="member">nomp_realloc_()</ref>. File name and line number are passed implicitly. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>ptr</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Pointer to the memory area to be reallocated. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Type of element. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>count</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of elements. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Pointer of type T </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-mem.h" line="74" column="9" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-mem.h" bodystart="74" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,562 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.7" xml:lang="en-US">
+  <compounddef id="group__nomp__py__utils" kind="group">
+    <compoundname>nomp_py_utils</compoundname>
+    <title>Python helper functions</title>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="group__nomp__py__utils_1ga0209aaccf0a7671f3d843adac5e26c4e" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int nomp_py_append_to_sys_path</definition>
+        <argsstring>(const char *path)</argsstring>
+        <name>nomp_py_append_to_sys_path</name>
+        <param>
+          <type>const char *</type>
+          <declname>path</declname>
+        </param>
+        <briefdescription>
+<para>Appends specified path to system path. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">path</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Path to be appended to system path. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-loopy.h" line="25" column="5" declfile="/home/runner/work/libnomp/libnomp/include/nomp-loopy.h" declline="25" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="group__nomp__py__utils_1gab6f7c2660f4077d9e82e95b5710a3fe7" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int nomp_py_c_to_loopy</definition>
+        <argsstring>(PyObject **knl, const char *src, const char *backend)</argsstring>
+        <name>nomp_py_c_to_loopy</name>
+        <param>
+          <type>PyObject **</type>
+          <declname>knl</declname>
+        </param>
+        <param>
+          <type>const char *</type>
+          <declname>src</declname>
+        </param>
+        <param>
+          <type>const char *</type>
+          <declname>backend</declname>
+        </param>
+        <briefdescription>
+<para>Creates loopy kernel from C source. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="out">knl</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Loopy kernel object. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">src</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>C kernel source. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">backend</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Backend name. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-loopy.h" line="36" column="5" declfile="/home/runner/work/libnomp/libnomp/include/nomp-loopy.h" declline="36" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="group__nomp__py__utils_1ga1299017b3e5a66333d3944e4d95e3aee" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int nomp_py_realize_reduction</definition>
+        <argsstring>(PyObject **knl, const char *var, const PyObject *context)</argsstring>
+        <name>nomp_py_realize_reduction</name>
+        <param>
+          <type>PyObject **</type>
+          <declname>knl</declname>
+        </param>
+        <param>
+          <type>const char *</type>
+          <declname>var</declname>
+        </param>
+        <param>
+          <type>const PyObject *</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+<para>Realize reductions if present in the kernel. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="inout">knl</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Loopy kernel object. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">var</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Name of the reduction variable. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">context</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Python dictionary with context information. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-loopy.h" line="47" column="5" declfile="/home/runner/work/libnomp/libnomp/include/nomp-loopy.h" declline="47" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="group__nomp__py__utils_1ga8acbbdc8b68f5eb2a6678903a23e3236" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int nomp_py_set_annotate_func</definition>
+        <argsstring>(PyObject **func, const char *path)</argsstring>
+        <name>nomp_py_set_annotate_func</name>
+        <param>
+          <type>PyObject **</type>
+          <declname>func</declname>
+        </param>
+        <param>
+          <type>const char *</type>
+          <declname>path</declname>
+        </param>
+        <briefdescription>
+<para>Set the annotate function based on the path to annotation script and function. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="out">func</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Pointer to the annotate function. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">path</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Path to the annotation script followed by function name (path and function name must be separated by &quot;::&quot;). </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-loopy.h" line="60" column="5" declfile="/home/runner/work/libnomp/libnomp/include/nomp-loopy.h" declline="60" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="group__nomp__py__utils_1ga289e75a776b6c6aa5015c9e0524e21dd" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int nomp_py_apply_annotations</definition>
+        <argsstring>(PyObject **knl, PyObject *func, const PyObject *annts, const PyObject *context)</argsstring>
+        <name>nomp_py_apply_annotations</name>
+        <param>
+          <type>PyObject **</type>
+          <declname>knl</declname>
+        </param>
+        <param>
+          <type>PyObject *</type>
+          <declname>func</declname>
+        </param>
+        <param>
+          <type>const PyObject *</type>
+          <declname>annts</declname>
+        </param>
+        <param>
+          <type>const PyObject *</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+<para>Apply transformations on a loopy kernel based on annotations. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Apply the transformations to the loopy kernel <computeroutput>knl</computeroutput> based on the annotation function <computeroutput>func</computeroutput> and the key value pairs (annotations) passed in <computeroutput>annts</computeroutput>. <computeroutput>knl</computeroutput> will be modified based on the transformations.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="inout">knl</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Pointer to loopy kernel object. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">func</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Function which performs transformations based on annotations. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">annts</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Annotations (as a PyDict) to specify which transformations to apply. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">context</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Context (as a PyDict) to pass around information such as backend, device details, etc. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-loopy.h" line="78" column="5" declfile="/home/runner/work/libnomp/libnomp/include/nomp-loopy.h" declline="78" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="group__nomp__py__utils_1ga2fe69cb502367bcf4bcf277219053b58" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int nomp_py_apply_transform</definition>
+        <argsstring>(PyObject **knl, const char *file, const char *func, const PyObject *context)</argsstring>
+        <name>nomp_py_apply_transform</name>
+        <param>
+          <type>PyObject **</type>
+          <declname>knl</declname>
+        </param>
+        <param>
+          <type>const char *</type>
+          <declname>file</declname>
+        </param>
+        <param>
+          <type>const char *</type>
+          <declname>func</declname>
+        </param>
+        <param>
+          <type>const PyObject *</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+<para>Apply kernel specific user transformations on a loopy kernel. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Call the user transform function <computeroutput>func</computeroutput> in file <computeroutput>file</computeroutput> on the loopy kernel <computeroutput>knl</computeroutput>. <computeroutput>knl</computeroutput> will be modified based on the transformations. Function will return a non-zero value if there was an error after registering a log.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="inout">knl</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Pointer to loopy kernel object. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">file</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Path to the file containing transform function <computeroutput>func</computeroutput>. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">func</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Transform function. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">context</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Context (as a PyDict) to pass around information such as backend, device details, etc. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-loopy.h" line="97" column="5" declfile="/home/runner/work/libnomp/libnomp/include/nomp-loopy.h" declline="97" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="group__nomp__py__utils_1ga65963c0d8457c1fcf896563da46846d7" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int nomp_py_get_knl_name_and_src</definition>
+        <argsstring>(char **name, char **src, const PyObject *knl, const char *backend)</argsstring>
+        <name>nomp_py_get_knl_name_and_src</name>
+        <param>
+          <type>char **</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>char **</type>
+          <declname>src</declname>
+        </param>
+        <param>
+          <type>const PyObject *</type>
+          <declname>knl</declname>
+        </param>
+        <param>
+          <type>const char *</type>
+          <declname>backend</declname>
+        </param>
+        <briefdescription>
+<para>Get kernel name and generated source for the backend. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="out">name</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Kernel name as a C-string. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="out">src</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Kernel source as a C-string. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">knl</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Loopy kernel object. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">backend</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Backend name. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-loopy.h" line="110" column="5" declfile="/home/runner/work/libnomp/libnomp/include/nomp-loopy.h" declline="110" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="group__nomp__py__utils_1ga46bbb9aa0390791194197d612f70c72e" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int nomp_py_get_grid_size</definition>
+        <argsstring>(struct nomp_prog_t *prg, PyObject *knl)</argsstring>
+        <name>nomp_py_get_grid_size</name>
+        <param>
+          <type>struct <ref refid="structnomp__prog__t" kindref="compound">nomp_prog_t</ref> *</type>
+          <declname>prg</declname>
+        </param>
+        <param>
+          <type>PyObject *</type>
+          <declname>knl</declname>
+        </param>
+        <briefdescription>
+<para>Get global and local grid sizes as <computeroutput>pymoblic</computeroutput> expressions. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Grid sizes are stored in the program object itself.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">prg</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Nomp program object. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">knl</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Python kernel object. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-loopy.h" line="123" column="5" declfile="/home/runner/work/libnomp/libnomp/include/nomp-loopy.h" declline="123" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="group__nomp__py__utils_1gabecc810d31f97f69ad9bc05bc6c37037" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int nomp_symengine_eval_grid_size</definition>
+        <argsstring>(struct nomp_prog_t *prg)</argsstring>
+        <name>nomp_symengine_eval_grid_size</name>
+        <param>
+          <type>struct <ref refid="structnomp__prog__t" kindref="compound">nomp_prog_t</ref> *</type>
+          <declname>prg</declname>
+        </param>
+        <briefdescription>
+<para>Evaluate global and local grid sizes based on the dictionary <computeroutput>dict</computeroutput>. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">prg</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Nomp program. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-loopy.h" line="132" column="5" declfile="/home/runner/work/libnomp/libnomp/include/nomp-loopy.h" declline="132" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="group__nomp__py__utils_1ga07db966dfa26b166ed4ef03b88769bb4" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int nomp_symengine_update</definition>
+        <argsstring>(CMapBasicBasic *map, const char *key, const long val)</argsstring>
+        <name>nomp_symengine_update</name>
+        <param>
+          <type>CMapBasicBasic *</type>
+          <declname>map</declname>
+        </param>
+        <param>
+          <type>const char *</type>
+          <declname>key</declname>
+        </param>
+        <param>
+          <type>const long</type>
+          <declname>val</declname>
+        </param>
+        <briefdescription>
+<para>Map the keys and values to evaluate the kernel launch parameters. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">map</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>SymEngine object map. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">key</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Key as a C-string. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">val</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Value as a C-string. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-loopy.h" line="143" column="5" declfile="/home/runner/work/libnomp/libnomp/include/nomp-loopy.h" declline="143" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="group__nomp__py__utils_1gac33651d2915d8db9be94316cae2a2b56" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void nomp_py_print</definition>
+        <argsstring>(const char *msg, PyObject *obj)</argsstring>
+        <name>nomp_py_print</name>
+        <param>
+          <type>const char *</type>
+          <declname>msg</declname>
+        </param>
+        <param>
+          <type>PyObject *</type>
+          <declname>obj</declname>
+        </param>
+        <briefdescription>
+<para>Get the string representation of python object. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>msg</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Debug message before printing the object. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>obj</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Python object. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>void </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-loopy.h" line="153" column="6" declfile="/home/runner/work/libnomp/libnomp/include/nomp-loopy.h" declline="153" declcolumn="6"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+  </compounddef>
+</doxygen>

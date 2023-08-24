@@ -1,0 +1,263 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygenindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="index.xsd" version="1.9.7" xml:lang="en-US">
+  <compound refid="structnomp__arg__t" kind="struct"><name>nomp_arg_t</name>
+    <member refid="structnomp__arg__t_1a75e3831fb2f7236749b2e4e7fbdd34cd" kind="variable"><name>name</name></member>
+    <member refid="structnomp__arg__t_1ac96c281e33590a3757b85765fe5ac964" kind="variable"><name>size</name></member>
+    <member refid="structnomp__arg__t_1ae65811f365d78e49436fe623800de05c" kind="variable"><name>type</name></member>
+    <member refid="structnomp__arg__t_1a2bc0f2b92929267fa2066a31894a1d1e" kind="variable"><name>ptr</name></member>
+  </compound>
+  <compound refid="structnomp__backend__t" kind="struct"><name>nomp_backend_t</name>
+    <member refid="structnomp__backend__t_1a1ac422fa1f83a9e23791ddfcca58163f" kind="variable"><name>platform_id</name></member>
+    <member refid="structnomp__backend__t_1a738f892b8c4ade13f7d2e1278f73f68b" kind="variable"><name>device_id</name></member>
+    <member refid="structnomp__backend__t_1a5ad1a7a3abdf09f02a40dbc06eb8ed93" kind="variable"><name>verbose</name></member>
+    <member refid="structnomp__backend__t_1a3e0168109f2611669992ee7ff32148a1" kind="variable"><name>profile</name></member>
+    <member refid="structnomp__backend__t_1a9f262bd8295985fea4ff586a01012ae9" kind="variable"><name>backend</name></member>
+    <member refid="structnomp__backend__t_1a9ac5b3ab76bb0ec8d57d6a9de3dedb28" kind="variable"><name>install_dir</name></member>
+    <member refid="structnomp__backend__t_1a85377ad1e943ee6af6c326073c5c15d4" kind="variable"><name>update</name></member>
+    <member refid="structnomp__backend__t_1a18b66989057fa5a59014a19c41e76ad4" kind="variable"><name>knl_build</name></member>
+    <member refid="structnomp__backend__t_1aaddb19f721c2eea8a2bccfa60a936e23" kind="variable"><name>knl_run</name></member>
+    <member refid="structnomp__backend__t_1aef43b466950f9a5401baa96ec6ba965d" kind="variable"><name>knl_free</name></member>
+    <member refid="structnomp__backend__t_1a52f9ac0dd79fbabf5cfb54db49a3bb4d" kind="variable"><name>sync</name></member>
+    <member refid="structnomp__backend__t_1a98945e5b38c38447385409008cba6372" kind="variable"><name>finalize</name></member>
+    <member refid="structnomp__backend__t_1a0ce1be1fd7a45b380e0233b0387896f1" kind="variable"><name>scratch</name></member>
+    <member refid="structnomp__backend__t_1aa3e36a43420c4be7d5db8aaf207c742f" kind="variable"><name>py_annotate</name></member>
+    <member refid="structnomp__backend__t_1a270b1b573322dde59bc9459ab9b6bcb1" kind="variable"><name>py_context</name></member>
+    <member refid="structnomp__backend__t_1a4779f707d801b7b46ae4b80b26ac8d0b" kind="variable"><name>bptr</name></member>
+  </compound>
+  <compound refid="structnomp__mem__t" kind="struct"><name>nomp_mem_t</name>
+    <member refid="structnomp__mem__t_1a37e88fe8f3e0497b5dc1a3fe441fbbd9" kind="variable"><name>idx0</name></member>
+    <member refid="structnomp__mem__t_1a4b3ba5d6486813d0dc1d02d4b2e08f7a" kind="variable"><name>idx1</name></member>
+    <member refid="structnomp__mem__t_1a752821648ae4151ac93aee29351f9975" kind="variable"><name>usize</name></member>
+    <member refid="structnomp__mem__t_1a3126bcbf1e93510ca620b5d209feb6e5" kind="variable"><name>hptr</name></member>
+    <member refid="structnomp__mem__t_1a4ab8798272adcb6aa6ad21abd490f41d" kind="variable"><name>bptr</name></member>
+    <member refid="structnomp__mem__t_1a32e9a8c1fd4229f8855a1d1678be4ebc" kind="variable"><name>bsize</name></member>
+  </compound>
+  <compound refid="structnomp__prog__t" kind="struct"><name>nomp_prog_t</name>
+    <member refid="structnomp__prog__t_1a78d53d0981017cdd204648c3b078c502" kind="variable"><name>nargs</name></member>
+    <member refid="structnomp__prog__t_1a3e32e38162033c119498d709633153fd" kind="variable"><name>args</name></member>
+    <member refid="structnomp__prog__t_1ab4f1321962b5066096dd76f48ffc1f9c" kind="variable"><name>ndim</name></member>
+    <member refid="structnomp__prog__t_1a95fc1efd0db26c3e894965043452a995" kind="variable"><name>sym_global</name></member>
+    <member refid="structnomp__prog__t_1ace700e03140c4efbeda08b91ffcbb031" kind="variable"><name>sym_local</name></member>
+    <member refid="structnomp__prog__t_1a79c23dbbe0d11bb92727ae2307dd79c4" kind="variable"><name>global</name></member>
+    <member refid="structnomp__prog__t_1a83fc85c71c4ddd9ec66d81b43bbe894e" kind="variable"><name>local</name></member>
+    <member refid="structnomp__prog__t_1aef884532af2ce2ece7f711e87727c7a5" kind="variable"><name>gws</name></member>
+    <member refid="structnomp__prog__t_1aba73f0871b5ade92377d952b2ff783f4" kind="variable"><name>map</name></member>
+    <member refid="structnomp__prog__t_1a49e458c0ffbcb88ea1db4b218167be88" kind="variable"><name>eval_grid</name></member>
+    <member refid="structnomp__prog__t_1aae1a53a19b2f9e3b3e3c90dd8bff632e" kind="variable"><name>bptr</name></member>
+    <member refid="structnomp__prog__t_1a1cd58c8b4869952ba4c30d07d2e9efab" kind="variable"><name>redn_idx</name></member>
+    <member refid="structnomp__prog__t_1ad075ddc3cdffafaaa2ad56f55502ee18" kind="variable"><name>redn_op</name></member>
+    <member refid="structnomp__prog__t_1acedd8a3af7953fcfba6d3353590bd57c" kind="variable"><name>redn_type</name></member>
+    <member refid="structnomp__prog__t_1ab95c16ca2d5079f42b981b4c82e86a68" kind="variable"><name>redn_size</name></member>
+    <member refid="structnomp__prog__t_1a0bccf911197c6e2dacac64eb76fe184a" kind="variable"><name>redn_ptr</name></member>
+  </compound>
+  <compound refid="nomp-aux_8h" kind="file"><name>nomp-aux.h</name>
+    <member refid="group__nomp__other__utils_1gaa41545f888f512ee21adfa93171fd875" kind="function"><name>nomp_str_cat</name></member>
+    <member refid="group__nomp__other__utils_1gaa4339127cdf37003e45846181dc6da6b" kind="function"><name>nomp_str_toui</name></member>
+    <member refid="group__nomp__other__utils_1gac1033679d119836202049eec6ba8248a" kind="function"><name>nomp_path_len</name></member>
+    <member refid="group__nomp__other__utils_1gaefe9b0c641da88552b085c8d53a78c32" kind="function"><name>nomp_max</name></member>
+    <member refid="group__nomp__other__utils_1ga55caaef28103f787bb6a480ed2cef09f" kind="function"><name>nomp_check_py_script_path</name></member>
+    <member refid="group__nomp__other__utils_1ga0e718e8165a885874754ce1cb827275d" kind="function"><name>nomp_copy_env</name></member>
+  </compound>
+  <compound refid="nomp-impl_8h" kind="file"><name>nomp-impl.h</name>
+    <member refid="nomp-impl_8h_1a3024ccd4a9af5109d24e6c57565d74a1" kind="define"><name>_POSIX_C_SOURCE</name></member>
+    <member refid="nomp-impl_8h_1ac9efdaac9411d0868b715edccca3269d" kind="define"><name>PY_SSIZE_T_CLEAN</name></member>
+    <member refid="nomp-impl_8h_1ad47dee48c2fe6dea8ebc430840ce9eda" kind="define"><name>NOMP_MAX_BUFSIZ</name></member>
+    <member refid="nomp-impl_8h_1a254dc76b2e36149148c22daf0ae03378" kind="define"><name>NOMP_MAX_SRC_SIZE</name></member>
+    <member refid="nomp-impl_8h_1a8dcda3c87e5033afd1727cabb72cbca6" kind="define"><name>NOMP_MAX_CFLAGS_SIZE</name></member>
+    <member refid="nomp-impl_8h_1aad3f68a226c7ce1a2a2f66eed9d95c65" kind="define"><name>NOMP_MAX_KNL_ARGS</name></member>
+    <member refid="nomp-impl_8h_1aa5910d8541f78d404d7332ccc77e8f0a" kind="define"><name>NOMP_MAX_SCRATCH_SIZE</name></member>
+    <member refid="nomp-impl_8h_1a9d889d47f8305fe56186f8657ed85e96" kind="define"><name>NOMP_MEM_OFFSET</name></member>
+    <member refid="nomp-impl_8h_1a1a268fe12f0c25b1faeb4f96ea5aaee1" kind="define"><name>NOMP_MEM_BYTES</name></member>
+    <member refid="group__nomp__backend__utils_1gad2b5a46edf5760c93e37d9ec45fc256a" kind="function"><name>opencl_init</name></member>
+    <member refid="nomp-impl_8h_1aca27b8db318636bf44cbe68fc9fbdfdf" kind="function"><name>sycl_init</name></member>
+    <member refid="nomp-impl_8h_1a8591385fa4cf04b23e1536d15d4cdc11" kind="function"><name>cuda_init</name></member>
+    <member refid="nomp-impl_8h_1a4291c251c10bf491c536f464f1df80cf" kind="function"><name>hip_init</name></member>
+    <member refid="nomp-impl_8h_1a8132202b7578ae29a9f6503104affc8d" kind="function"><name>ispc_init</name></member>
+  </compound>
+  <compound refid="nomp-jit_8h" kind="file"><name>nomp-jit.h</name>
+    <member refid="group__nomp__compile__utils_1ga3da282551713dd9bd1914c33fde9d394" kind="function"><name>nomp_jit_compile</name></member>
+    <member refid="group__nomp__compile__utils_1gac18140ad38f4d100912b9a6b7b42b23e" kind="function"><name>nomp_jit_run</name></member>
+    <member refid="group__nomp__compile__utils_1gad927d252f891a85d96fd1ab686625136" kind="function"><name>nomp_jit_free</name></member>
+  </compound>
+  <compound refid="nomp-log_8h" kind="file"><name>nomp-log.h</name>
+    <member refid="nomp-log_8h_1a10b73b52d49e700f9efc16f6a63cc41d" kind="define"><name>NOMP_CASE_IMPL</name></member>
+    <member refid="nomp-log_8h_1a3d96b4fddb97fb5805a952aad0ed2090" kind="define"><name>NOMP_CASE</name></member>
+    <member refid="nomp-log_8h_1a430b8f041b86c2cc11ab1b2e055e776e" kind="define"><name>NOMP_FIRST_IMPL</name></member>
+    <member refid="nomp-log_8h_1a77d9c651350766cd5892396cc0681bcd" kind="define"><name>NOMP_FIRST</name></member>
+    <member refid="nomp-log_8h_1aeef031f7acb8c6b92973c856c9611fa8" kind="define"><name>NOMP_REST_IMPL_WITH_2</name></member>
+    <member refid="nomp-log_8h_1ab9d8c28ae4a9cd22896c043e12c74169" kind="define"><name>NOMP_REST_IMPL_WITH_1</name></member>
+    <member refid="nomp-log_8h_1a8995befffb8f45863965579b2db8ec2c" kind="define"><name>NOMP_REST_IMPL_</name></member>
+    <member refid="nomp-log_8h_1ace6d6cb4e22ab5a5e0b42f027d853603" kind="define"><name>NOMP_REST_IMPL</name></member>
+    <member refid="nomp-log_8h_1a1418481e539dcd41e86223d1bc9686c3" kind="define"><name>NOMP_REST</name></member>
+    <member refid="nomp-log_8h_1aa5ed6f44b3acbb60abaed299dbba9bef" kind="define"><name>nomp_log</name></member>
+    <member refid="nomp-log_8h_1aa816f4019f13af9bedf1ffb37b0787e5" kind="variable"><name>ERR_STR_USER_MAP_PTR_IS_INVALID</name></member>
+    <member refid="nomp-log_8h_1ae0477fe74a9d23e998928b422cca90c8" kind="variable"><name>ERR_STR_USER_DEVICE_IS_INVALID</name></member>
+    <member refid="group__nomp__log__utils_1ga7578540f00f0e132b9e227288b6c3320" kind="function"><name>nomp_log_set_verbose</name></member>
+    <member refid="group__nomp__log__utils_1gaea9e91949c6707c93d648e6854e8ac67" kind="function"><name>nomp_log_</name></member>
+    <member refid="group__nomp__log__utils_1ga26943238b328935d1b051f42c4475abb" kind="function"><name>nomp_log_finalize</name></member>
+    <member refid="group__nomp__profiler__utils_1ga9d4486cdc0b1071c8bc02300b89543e7" kind="function"><name>nomp_profile_set_level</name></member>
+    <member refid="group__nomp__profiler__utils_1gaf5783347e5874e3fc876c337328ebcc5" kind="function"><name>nomp_profile</name></member>
+    <member refid="group__nomp__profiler__utils_1ga3e4823e7f77812677d07a6945b58f6c3" kind="function"><name>nomp_profile_result</name></member>
+    <member refid="group__nomp__profiler__utils_1gaa72982b6c77a157735a243f3d43096a8" kind="function"><name>nomp_profile_finalize</name></member>
+  </compound>
+  <compound refid="nomp-loopy_8h" kind="file"><name>nomp-loopy.h</name>
+    <member refid="nomp-loopy_8h_1ac9efdaac9411d0868b715edccca3269d" kind="define"><name>PY_SSIZE_T_CLEAN</name></member>
+    <member refid="group__nomp__py__utils_1ga0209aaccf0a7671f3d843adac5e26c4e" kind="function"><name>nomp_py_append_to_sys_path</name></member>
+    <member refid="group__nomp__py__utils_1gab6f7c2660f4077d9e82e95b5710a3fe7" kind="function"><name>nomp_py_c_to_loopy</name></member>
+    <member refid="group__nomp__py__utils_1ga1299017b3e5a66333d3944e4d95e3aee" kind="function"><name>nomp_py_realize_reduction</name></member>
+    <member refid="group__nomp__py__utils_1ga8acbbdc8b68f5eb2a6678903a23e3236" kind="function"><name>nomp_py_set_annotate_func</name></member>
+    <member refid="group__nomp__py__utils_1ga289e75a776b6c6aa5015c9e0524e21dd" kind="function"><name>nomp_py_apply_annotations</name></member>
+    <member refid="group__nomp__py__utils_1ga2fe69cb502367bcf4bcf277219053b58" kind="function"><name>nomp_py_apply_transform</name></member>
+    <member refid="group__nomp__py__utils_1ga65963c0d8457c1fcf896563da46846d7" kind="function"><name>nomp_py_get_knl_name_and_src</name></member>
+    <member refid="group__nomp__py__utils_1ga46bbb9aa0390791194197d612f70c72e" kind="function"><name>nomp_py_get_grid_size</name></member>
+    <member refid="group__nomp__py__utils_1gabecc810d31f97f69ad9bc05bc6c37037" kind="function"><name>nomp_symengine_eval_grid_size</name></member>
+    <member refid="group__nomp__py__utils_1ga07db966dfa26b166ed4ef03b88769bb4" kind="function"><name>nomp_symengine_update</name></member>
+    <member refid="group__nomp__py__utils_1gac33651d2915d8db9be94316cae2a2b56" kind="function"><name>nomp_py_print</name></member>
+  </compound>
+  <compound refid="nomp-mem_8h" kind="file"><name>nomp-mem.h</name>
+    <member refid="group__nomp__mem__utils_1ga7f94b25dae56929daada2a73b36f6934" kind="define"><name>nomp_free</name></member>
+    <member refid="group__nomp__mem__utils_1ga391260c7fa2d91cf34ce1ab3fd45398f" kind="define"><name>nomp_calloc</name></member>
+    <member refid="group__nomp__mem__utils_1gab9ebd934f0e5b373037c5e2bbe6a28dc" kind="define"><name>nomp_realloc</name></member>
+    <member refid="nomp-mem_8h_1af204d1e264807ecdcfc423d243f1f364" kind="function"><name>check_if_null</name></member>
+    <member refid="nomp-mem_8h_1a67bcb99be0e570565fb861b94cbc2783" kind="function"><name>nomp_free_</name></member>
+    <member refid="nomp-mem_8h_1a94eb7f60e07c666f4eaaa7916551e26e" kind="function"><name>nomp_calloc_</name></member>
+    <member refid="nomp-mem_8h_1a4e71aab53294bb6698a1635eb90b5add" kind="function"><name>nomp_realloc_</name></member>
+  </compound>
+  <compound refid="nomp-reduction_8h" kind="file"><name>nomp-reduction.h</name>
+    <member refid="nomp-reduction_8h_1a1f0f524f088a4c566088461b5b21b3e9" kind="define"><name>NOMP_SUM</name></member>
+    <member refid="nomp-reduction_8h_1a5e43c7a9b1845b9207d7983e520b8895" kind="define"><name>NOMP_PROD</name></member>
+    <member refid="nomp-reduction_8h_1a90acb2993ed8635570407c434577200a" kind="function"><name>nomp_host_side_reduction</name></member>
+  </compound>
+  <compound refid="nomp_8h" kind="file"><name>nomp.h</name>
+    <member refid="group__nomp__errors_1ga52b8d0a91a2bd7ce49d5b04c7de2feb5" kind="define"><name>NOMP_USER_INPUT_IS_INVALID</name></member>
+    <member refid="group__nomp__errors_1ga14704356174635cb0bd692a83810cc54" kind="define"><name>NOMP_USER_MAP_PTR_IS_INVALID</name></member>
+    <member refid="group__nomp__errors_1gaa3a328eb103ab7732bcee5295b952f3d" kind="define"><name>NOMP_USER_MAP_OP_IS_INVALID</name></member>
+    <member refid="group__nomp__errors_1gacab9dfe45d867879b640d477339d6b58" kind="define"><name>NOMP_USER_LOG_ID_IS_INVALID</name></member>
+    <member refid="group__nomp__errors_1gae3a653c8477c8cea5db0d5292f98579b" kind="define"><name>NOMP_USER_KNL_ARG_TYPE_IS_INVALID</name></member>
+    <member refid="group__nomp__errors_1ga13ae026c6c02d62f0a980cc713fa6f9c" kind="define"><name>NOMP_INITIALIZE_FAILURE</name></member>
+    <member refid="group__nomp__errors_1ga7affd9633a37be919d471bf99304a956" kind="define"><name>NOMP_FINALIZE_FAILURE</name></member>
+    <member refid="group__nomp__errors_1ga7b1792597780372f46ac24737805d80f" kind="define"><name>NOMP_NOT_IMPLEMENTED_ERROR</name></member>
+    <member refid="group__nomp__errors_1gad411377fc36b3278318d135304df9011" kind="define"><name>NOMP_PY_CALL_FAILURE</name></member>
+    <member refid="group__nomp__errors_1gaa1c5a8fa4227bcc637a0d5569bb4bba0" kind="define"><name>NOMP_LOOPY_CONVERSION_FAILURE</name></member>
+    <member refid="group__nomp__errors_1ga97bd2bb5392be9d151cc2fc9248704bc" kind="define"><name>NOMP_LOOPY_KNL_NAME_NOT_FOUND</name></member>
+    <member refid="group__nomp__errors_1ga1da82121ad001ca2c288fae459349002" kind="define"><name>NOMP_LOOPY_CODEGEN_FAILURE</name></member>
+    <member refid="group__nomp__errors_1gaefb03433aaf2e8dcc970f44550362f34" kind="define"><name>NOMP_LOOPY_GRIDSIZE_FAILURE</name></member>
+    <member refid="group__nomp__errors_1ga5fec2498a76d3d5436049dca98b0dc1e" kind="define"><name>NOMP_CUDA_FAILURE</name></member>
+    <member refid="group__nomp__errors_1gaa10c74657396ae1be93ea0d71c0612f0" kind="define"><name>NOMP_HIP_FAILURE</name></member>
+    <member refid="group__nomp__errors_1gac8a9d1e0e7fe73b2ccef64eedc7f3ad3" kind="define"><name>NOMP_OPENCL_FAILURE</name></member>
+    <member refid="group__nomp__errors_1ga4eebf8bac5a52b077ff57a7c01548052" kind="define"><name>NOMP_SYCL_FAILURE</name></member>
+    <member refid="group__nomp__errors_1ga5fd2e0c292b1d898415030289be19ca1" kind="define"><name>NOMP_ISPC_FAILURE</name></member>
+    <member refid="group__nomp__errors_1ga69a43ed070537af9e7d342699852b6c4" kind="define"><name>NOMP_JIT_FAILURE</name></member>
+    <member refid="group__nomp__user__api_1gabfb8762cd93e8286f92bc1adee227c94" kind="define"><name>nomp_check</name></member>
+    <member refid="group__nomp__types_1gaa080d702bfb6a51225d549bcb3c43389" kind="enum"><name>nomp_type_t</name></member>
+    <member refid="group__nomp__types_1ga9c8653d937b29cea004ff74e0ae465b1" kind="enum"><name>nomp_map_direction_t</name></member>
+    <member refid="nomp_8h_1ab9a322ab403d9d66a8ed27a6487aadba" kind="enum"><name>nomp_log_type</name></member>
+    <member refid="nomp_8h_1ab9a322ab403d9d66a8ed27a6487aadbaaaa0c64194b170401c9ccaf27b15e7ade" kind="enumvalue"><name>NOMP_ERROR</name></member>
+    <member refid="nomp_8h_1ab9a322ab403d9d66a8ed27a6487aadbaab315fb41d2eba7385d173df5465543c9" kind="enumvalue"><name>NOMP_WARNING</name></member>
+    <member refid="nomp_8h_1ab9a322ab403d9d66a8ed27a6487aadbaaf87f19553d6d80a0d2e3bb88dd1d01d6" kind="enumvalue"><name>NOMP_INFORMATION</name></member>
+    <member refid="nomp_8h_1ab9a322ab403d9d66a8ed27a6487aadbaa8ad820a1a961db2f2f646ccb6848d7e0" kind="enumvalue"><name>NOMP_INVALID</name></member>
+    <member refid="group__nomp__user__api_1ga9358288c50bff846af3475fdb09e2f5f" kind="function"><name>nomp_init</name></member>
+    <member refid="group__nomp__user__api_1gaa8dc9b167bf514e2f3cc4ff6f9dfb6a0" kind="function"><name>nomp_update</name></member>
+    <member refid="group__nomp__user__api_1gab793ec09db7c8a89656061e6d67c4d75" kind="function"><name>nomp_jit</name></member>
+    <member refid="group__nomp__user__api_1ga494dfc32c43ad18c16022bfdcaeec9c3" kind="function"><name>nomp_run</name></member>
+    <member refid="group__nomp__user__api_1ga83a0822a1fc905e1e21c680dce8fdaeb" kind="function"><name>nomp_sync</name></member>
+    <member refid="group__nomp__user__api_1ga64b207d004404af50b94e91a2b571107" kind="function"><name>nomp_get_log_str</name></member>
+    <member refid="group__nomp__user__api_1ga6100f1d4760f0d62ace45115288d19eb" kind="function"><name>nomp_get_log_no</name></member>
+    <member refid="group__nomp__user__api_1ga32958362294e5d8b4478ba76b831cb86" kind="function"><name>nomp_get_log_type</name></member>
+    <member refid="group__nomp__user__api_1gacbf8860cf851702394683d8eaf29c3e4" kind="function"><name>nomp_finalize</name></member>
+  </compound>
+  <compound refid="group__nomp__other__utils" kind="group"><name>nomp_other_utils</name>
+    <member refid="group__nomp__other__utils_1gaa41545f888f512ee21adfa93171fd875" kind="function"><name>nomp_str_cat</name></member>
+    <member refid="group__nomp__other__utils_1gaa4339127cdf37003e45846181dc6da6b" kind="function"><name>nomp_str_toui</name></member>
+    <member refid="group__nomp__other__utils_1gac1033679d119836202049eec6ba8248a" kind="function"><name>nomp_path_len</name></member>
+    <member refid="group__nomp__other__utils_1gaefe9b0c641da88552b085c8d53a78c32" kind="function"><name>nomp_max</name></member>
+    <member refid="group__nomp__other__utils_1ga55caaef28103f787bb6a480ed2cef09f" kind="function"><name>nomp_check_py_script_path</name></member>
+    <member refid="group__nomp__other__utils_1ga0e718e8165a885874754ce1cb827275d" kind="function"><name>nomp_copy_env</name></member>
+  </compound>
+  <compound refid="group__nomp__backend__utils" kind="group"><name>nomp_backend_utils</name>
+    <member refid="group__nomp__backend__utils_1gad2b5a46edf5760c93e37d9ec45fc256a" kind="function"><name>opencl_init</name></member>
+  </compound>
+  <compound refid="group__nomp__compile__utils" kind="group"><name>nomp_compile_utils</name>
+    <member refid="group__nomp__compile__utils_1ga3da282551713dd9bd1914c33fde9d394" kind="function"><name>nomp_jit_compile</name></member>
+    <member refid="group__nomp__compile__utils_1gac18140ad38f4d100912b9a6b7b42b23e" kind="function"><name>nomp_jit_run</name></member>
+    <member refid="group__nomp__compile__utils_1gad927d252f891a85d96fd1ab686625136" kind="function"><name>nomp_jit_free</name></member>
+  </compound>
+  <compound refid="group__nomp__log__utils" kind="group"><name>nomp_log_utils</name>
+    <member refid="group__nomp__log__utils_1ga7578540f00f0e132b9e227288b6c3320" kind="function"><name>nomp_log_set_verbose</name></member>
+    <member refid="group__nomp__log__utils_1gaea9e91949c6707c93d648e6854e8ac67" kind="function"><name>nomp_log_</name></member>
+    <member refid="group__nomp__log__utils_1ga26943238b328935d1b051f42c4475abb" kind="function"><name>nomp_log_finalize</name></member>
+  </compound>
+  <compound refid="group__nomp__profiler__utils" kind="group"><name>nomp_profiler_utils</name>
+    <member refid="group__nomp__profiler__utils_1ga9d4486cdc0b1071c8bc02300b89543e7" kind="function"><name>nomp_profile_set_level</name></member>
+    <member refid="group__nomp__profiler__utils_1gaf5783347e5874e3fc876c337328ebcc5" kind="function"><name>nomp_profile</name></member>
+    <member refid="group__nomp__profiler__utils_1ga3e4823e7f77812677d07a6945b58f6c3" kind="function"><name>nomp_profile_result</name></member>
+    <member refid="group__nomp__profiler__utils_1gaa72982b6c77a157735a243f3d43096a8" kind="function"><name>nomp_profile_finalize</name></member>
+  </compound>
+  <compound refid="group__nomp__py__utils" kind="group"><name>nomp_py_utils</name>
+    <member refid="group__nomp__py__utils_1ga0209aaccf0a7671f3d843adac5e26c4e" kind="function"><name>nomp_py_append_to_sys_path</name></member>
+    <member refid="group__nomp__py__utils_1gab6f7c2660f4077d9e82e95b5710a3fe7" kind="function"><name>nomp_py_c_to_loopy</name></member>
+    <member refid="group__nomp__py__utils_1ga1299017b3e5a66333d3944e4d95e3aee" kind="function"><name>nomp_py_realize_reduction</name></member>
+    <member refid="group__nomp__py__utils_1ga8acbbdc8b68f5eb2a6678903a23e3236" kind="function"><name>nomp_py_set_annotate_func</name></member>
+    <member refid="group__nomp__py__utils_1ga289e75a776b6c6aa5015c9e0524e21dd" kind="function"><name>nomp_py_apply_annotations</name></member>
+    <member refid="group__nomp__py__utils_1ga2fe69cb502367bcf4bcf277219053b58" kind="function"><name>nomp_py_apply_transform</name></member>
+    <member refid="group__nomp__py__utils_1ga65963c0d8457c1fcf896563da46846d7" kind="function"><name>nomp_py_get_knl_name_and_src</name></member>
+    <member refid="group__nomp__py__utils_1ga46bbb9aa0390791194197d612f70c72e" kind="function"><name>nomp_py_get_grid_size</name></member>
+    <member refid="group__nomp__py__utils_1gabecc810d31f97f69ad9bc05bc6c37037" kind="function"><name>nomp_symengine_eval_grid_size</name></member>
+    <member refid="group__nomp__py__utils_1ga07db966dfa26b166ed4ef03b88769bb4" kind="function"><name>nomp_symengine_update</name></member>
+    <member refid="group__nomp__py__utils_1gac33651d2915d8db9be94316cae2a2b56" kind="function"><name>nomp_py_print</name></member>
+  </compound>
+  <compound refid="group__nomp__mem__utils" kind="group"><name>nomp_mem_utils</name>
+    <member refid="group__nomp__mem__utils_1ga7f94b25dae56929daada2a73b36f6934" kind="define"><name>nomp_free</name></member>
+    <member refid="group__nomp__mem__utils_1ga391260c7fa2d91cf34ce1ab3fd45398f" kind="define"><name>nomp_calloc</name></member>
+    <member refid="group__nomp__mem__utils_1gab9ebd934f0e5b373037c5e2bbe6a28dc" kind="define"><name>nomp_realloc</name></member>
+  </compound>
+  <compound refid="group__nomp__reduction__ops" kind="group"><name>nomp_reduction_ops</name>
+  </compound>
+  <compound refid="group__nomp__types" kind="group"><name>nomp_types</name>
+    <member refid="group__nomp__types_1gaa080d702bfb6a51225d549bcb3c43389" kind="enum"><name>nomp_type_t</name></member>
+    <member refid="group__nomp__types_1ggaa080d702bfb6a51225d549bcb3c43389ae3069e6f069e8c00142f5fe791cf8da7" kind="enumvalue"><name>NOMP_INT</name></member>
+    <member refid="group__nomp__types_1ggaa080d702bfb6a51225d549bcb3c43389afafc1afa19a95da2a95d42a021115c88" kind="enumvalue"><name>NOMP_UINT</name></member>
+    <member refid="group__nomp__types_1ggaa080d702bfb6a51225d549bcb3c43389a82150f1b7512d525c2f57dab49ecee49" kind="enumvalue"><name>NOMP_FLOAT</name></member>
+    <member refid="group__nomp__types_1ggaa080d702bfb6a51225d549bcb3c43389a881d9a608e7999619b0dc20ca479782f" kind="enumvalue"><name>NOMP_PTR</name></member>
+    <member refid="group__nomp__types_1ga9c8653d937b29cea004ff74e0ae465b1" kind="enum"><name>nomp_map_direction_t</name></member>
+    <member refid="group__nomp__types_1gga9c8653d937b29cea004ff74e0ae465b1a60da8641d193fa459abb6fccdd5fa787" kind="enumvalue"><name>NOMP_ALLOC</name></member>
+    <member refid="group__nomp__types_1gga9c8653d937b29cea004ff74e0ae465b1a9982b527c0819a015f1cebbd47f7e85d" kind="enumvalue"><name>NOMP_TO</name></member>
+    <member refid="group__nomp__types_1gga9c8653d937b29cea004ff74e0ae465b1a34a64a0414aabd7449fef3dadc227372" kind="enumvalue"><name>NOMP_FROM</name></member>
+    <member refid="group__nomp__types_1gga9c8653d937b29cea004ff74e0ae465b1adce40162fbe1d3191ea2753afca6abcc" kind="enumvalue"><name>NOMP_FREE</name></member>
+  </compound>
+  <compound refid="group__nomp__errors" kind="group"><name>nomp_errors</name>
+    <member refid="group__nomp__errors_1ga52b8d0a91a2bd7ce49d5b04c7de2feb5" kind="define"><name>NOMP_USER_INPUT_IS_INVALID</name></member>
+    <member refid="group__nomp__errors_1ga14704356174635cb0bd692a83810cc54" kind="define"><name>NOMP_USER_MAP_PTR_IS_INVALID</name></member>
+    <member refid="group__nomp__errors_1gaa3a328eb103ab7732bcee5295b952f3d" kind="define"><name>NOMP_USER_MAP_OP_IS_INVALID</name></member>
+    <member refid="group__nomp__errors_1gacab9dfe45d867879b640d477339d6b58" kind="define"><name>NOMP_USER_LOG_ID_IS_INVALID</name></member>
+    <member refid="group__nomp__errors_1gae3a653c8477c8cea5db0d5292f98579b" kind="define"><name>NOMP_USER_KNL_ARG_TYPE_IS_INVALID</name></member>
+    <member refid="group__nomp__errors_1ga13ae026c6c02d62f0a980cc713fa6f9c" kind="define"><name>NOMP_INITIALIZE_FAILURE</name></member>
+    <member refid="group__nomp__errors_1ga7affd9633a37be919d471bf99304a956" kind="define"><name>NOMP_FINALIZE_FAILURE</name></member>
+    <member refid="group__nomp__errors_1ga7b1792597780372f46ac24737805d80f" kind="define"><name>NOMP_NOT_IMPLEMENTED_ERROR</name></member>
+    <member refid="group__nomp__errors_1gad411377fc36b3278318d135304df9011" kind="define"><name>NOMP_PY_CALL_FAILURE</name></member>
+    <member refid="group__nomp__errors_1gaa1c5a8fa4227bcc637a0d5569bb4bba0" kind="define"><name>NOMP_LOOPY_CONVERSION_FAILURE</name></member>
+    <member refid="group__nomp__errors_1ga97bd2bb5392be9d151cc2fc9248704bc" kind="define"><name>NOMP_LOOPY_KNL_NAME_NOT_FOUND</name></member>
+    <member refid="group__nomp__errors_1ga1da82121ad001ca2c288fae459349002" kind="define"><name>NOMP_LOOPY_CODEGEN_FAILURE</name></member>
+    <member refid="group__nomp__errors_1gaefb03433aaf2e8dcc970f44550362f34" kind="define"><name>NOMP_LOOPY_GRIDSIZE_FAILURE</name></member>
+    <member refid="group__nomp__errors_1ga5fec2498a76d3d5436049dca98b0dc1e" kind="define"><name>NOMP_CUDA_FAILURE</name></member>
+    <member refid="group__nomp__errors_1gaa10c74657396ae1be93ea0d71c0612f0" kind="define"><name>NOMP_HIP_FAILURE</name></member>
+    <member refid="group__nomp__errors_1gac8a9d1e0e7fe73b2ccef64eedc7f3ad3" kind="define"><name>NOMP_OPENCL_FAILURE</name></member>
+    <member refid="group__nomp__errors_1ga4eebf8bac5a52b077ff57a7c01548052" kind="define"><name>NOMP_SYCL_FAILURE</name></member>
+    <member refid="group__nomp__errors_1ga5fd2e0c292b1d898415030289be19ca1" kind="define"><name>NOMP_ISPC_FAILURE</name></member>
+    <member refid="group__nomp__errors_1ga69a43ed070537af9e7d342699852b6c4" kind="define"><name>NOMP_JIT_FAILURE</name></member>
+  </compound>
+  <compound refid="group__nomp__user__api" kind="group"><name>nomp_user_api</name>
+    <member refid="group__nomp__user__api_1ga9358288c50bff846af3475fdb09e2f5f" kind="function"><name>nomp_init</name></member>
+    <member refid="group__nomp__user__api_1gaa8dc9b167bf514e2f3cc4ff6f9dfb6a0" kind="function"><name>nomp_update</name></member>
+    <member refid="group__nomp__user__api_1gab793ec09db7c8a89656061e6d67c4d75" kind="function"><name>nomp_jit</name></member>
+    <member refid="group__nomp__user__api_1ga494dfc32c43ad18c16022bfdcaeec9c3" kind="function"><name>nomp_run</name></member>
+    <member refid="group__nomp__user__api_1ga83a0822a1fc905e1e21c680dce8fdaeb" kind="function"><name>nomp_sync</name></member>
+    <member refid="group__nomp__user__api_1ga64b207d004404af50b94e91a2b571107" kind="function"><name>nomp_get_log_str</name></member>
+    <member refid="group__nomp__user__api_1ga6100f1d4760f0d62ace45115288d19eb" kind="function"><name>nomp_get_log_no</name></member>
+    <member refid="group__nomp__user__api_1ga32958362294e5d8b4478ba76b831cb86" kind="function"><name>nomp_get_log_type</name></member>
+    <member refid="group__nomp__user__api_1gacbf8860cf851702394683d8eaf29c3e4" kind="function"><name>nomp_finalize</name></member>
+    <member refid="group__nomp__user__api_1gabfb8762cd93e8286f92bc1adee227c94" kind="define"><name>nomp_check</name></member>
+  </compound>
+  <compound refid="dir_d44c64559bbebec7f509842c48db8b23" kind="dir"><name>/home/runner/work/libnomp/libnomp/include</name>
+  </compound>
+</doxygenindex>

@@ -1,0 +1,610 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.7" xml:lang="en-US">
+  <compounddef id="nomp-impl_8h" kind="file" language="C++">
+    <compoundname>nomp-impl.h</compoundname>
+    <includes local="no">Python.h</includes>
+    <includes local="no">symengine/cwrapper.h</includes>
+    <includes local="no">assert.h</includes>
+    <includes local="no">ctype.h</includes>
+    <includes local="no">limits.h</includes>
+    <includes local="no">math.h</includes>
+    <includes local="no">stdarg.h</includes>
+    <includes local="no">stdio.h</includes>
+    <includes local="no">stdlib.h</includes>
+    <includes local="no">string.h</includes>
+    <includes refid="nomp-aux_8h" local="yes">nomp-aux.h</includes>
+    <includes refid="nomp-log_8h" local="yes">nomp-log.h</includes>
+    <includes refid="nomp-loopy_8h" local="yes">nomp-loopy.h</includes>
+    <includes refid="nomp-mem_8h" local="yes">nomp-mem.h</includes>
+    <includes refid="nomp_8h" local="yes">nomp.h</includes>
+    <includedby refid="nomp-reduction_8h" local="yes">/home/runner/work/libnomp/libnomp/include/nomp-reduction.h</includedby>
+    <incdepgraph>
+      <node id="12">
+        <label>nomp-aux.h</label>
+        <link refid="nomp-aux_8h"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>/home/runner/work/libnomp/libnomp/include/nomp-impl.h</label>
+        <link refid="nomp-impl_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+      </node>
+      <node id="14">
+        <label>nomp-log.h</label>
+        <link refid="nomp-log_8h"/>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+      </node>
+      <node id="17">
+        <label>nomp-loopy.h</label>
+        <link refid="nomp-loopy_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="18">
+        <label>nomp-mem.h</label>
+        <link refid="nomp-mem_8h"/>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+      </node>
+      <node id="16">
+        <label>nomp.h</label>
+        <link refid="nomp_8h"/>
+        <childnode refid="15" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>Python.h</label>
+      </node>
+      <node id="4">
+        <label>assert.h</label>
+      </node>
+      <node id="5">
+        <label>ctype.h</label>
+      </node>
+      <node id="6">
+        <label>limits.h</label>
+      </node>
+      <node id="7">
+        <label>math.h</label>
+      </node>
+      <node id="8">
+        <label>stdarg.h</label>
+      </node>
+      <node id="15">
+        <label>stddef.h</label>
+      </node>
+      <node id="9">
+        <label>stdio.h</label>
+      </node>
+      <node id="10">
+        <label>stdlib.h</label>
+      </node>
+      <node id="11">
+        <label>string.h</label>
+      </node>
+      <node id="3">
+        <label>symengine/cwrapper.h</label>
+      </node>
+      <node id="13">
+        <label>unistd.h</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="1">
+        <label>/home/runner/work/libnomp/libnomp/include/nomp-impl.h</label>
+        <link refid="nomp-impl_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>/home/runner/work/libnomp/libnomp/include/nomp-reduction.h</label>
+        <link refid="nomp-reduction_8h"/>
+      </node>
+    </invincdepgraph>
+    <innerclass refid="structnomp__mem__t" prot="public">nomp_mem_t</innerclass>
+    <innerclass refid="structnomp__arg__t" prot="public">nomp_arg_t</innerclass>
+    <innerclass refid="structnomp__prog__t" prot="public">nomp_prog_t</innerclass>
+    <innerclass refid="structnomp__backend__t" prot="public">nomp_backend_t</innerclass>
+      <sectiondef kind="define">
+      <memberdef kind="define" id="nomp-impl_8h_1a3024ccd4a9af5109d24e6c57565d74a1" prot="public" static="no">
+        <name>_POSIX_C_SOURCE</name>
+        <initializer>200809L</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="4" column="9" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" bodystart="4" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="define" id="nomp-impl_8h_1ac9efdaac9411d0868b715edccca3269d" prot="public" static="no">
+        <name>PY_SSIZE_T_CLEAN</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="6" column="9" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" bodystart="6" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="define" id="nomp-impl_8h_1ad47dee48c2fe6dea8ebc430840ce9eda" prot="public" static="no">
+        <name>NOMP_MAX_BUFSIZ</name>
+        <initializer>128</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="19" column="9" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" bodystart="19" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="define" id="nomp-impl_8h_1a254dc76b2e36149148c22daf0ae03378" prot="public" static="no">
+        <name>NOMP_MAX_SRC_SIZE</name>
+        <initializer>16384</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="20" column="9" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" bodystart="20" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="define" id="nomp-impl_8h_1a8dcda3c87e5033afd1727cabb72cbca6" prot="public" static="no">
+        <name>NOMP_MAX_CFLAGS_SIZE</name>
+        <initializer>16384</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="21" column="9" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" bodystart="21" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="define" id="nomp-impl_8h_1aad3f68a226c7ce1a2a2f66eed9d95c65" prot="public" static="no">
+        <name>NOMP_MAX_KNL_ARGS</name>
+        <initializer>64</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="22" column="9" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" bodystart="22" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="define" id="nomp-impl_8h_1aa5910d8541f78d404d7332ccc77e8f0a" prot="public" static="no">
+        <name>NOMP_MAX_SCRATCH_SIZE</name>
+        <initializer>(32768 * sizeof(double))</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="23" column="9" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" bodystart="23" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="define" id="nomp-impl_8h_1a9d889d47f8305fe56186f8657ed85e96" prot="public" static="no">
+        <name>NOMP_MEM_OFFSET</name>
+        <param><defname>start</defname></param>
+        <param><defname>usize</defname></param>
+        <initializer>((start) * (usize))</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="38" column="9" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" bodystart="38" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="define" id="nomp-impl_8h_1a1a268fe12f0c25b1faeb4f96ea5aaee1" prot="public" static="no">
+        <name>NOMP_MEM_BYTES</name>
+        <param><defname>start</defname></param>
+        <param><defname>end</defname></param>
+        <param><defname>usize</defname></param>
+        <initializer>(((end) - (start)) * (usize))</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="39" column="9" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" bodystart="39" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="func">
+      <member refid="group__nomp__backend__utils_1gad2b5a46edf5760c93e37d9ec45fc256a" kind="function"><name>opencl_init</name></member>
+      <memberdef kind="function" id="nomp-impl_8h_1aca27b8db318636bf44cbe68fc9fbdfdf" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int sycl_init</definition>
+        <argsstring>(struct nomp_backend_t *backend, const int platform_id, const int device_id)</argsstring>
+        <name>sycl_init</name>
+        <param>
+          <type>struct <ref refid="structnomp__backend__t" kindref="compound">nomp_backend_t</ref> *</type>
+          <declname>backend</declname>
+        </param>
+        <param>
+          <type>const int</type>
+          <declname>platform_id</declname>
+        </param>
+        <param>
+          <type>const int</type>
+          <declname>device_id</declname>
+        </param>
+        <briefdescription>
+<para>Initializes SYCL backend with the specified platform and device. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Initializes SYCL backend while creating a command queue using the given platform id and device id. Returns a positive value if an error occurred during the initialization, otherwise returns 0.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">backend</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Target backend for code generation. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">platform_id</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Target platform id. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">device_id</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Target device id. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="134" column="5" declfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" declline="134" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="nomp-impl_8h_1a8591385fa4cf04b23e1536d15d4cdc11" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int cuda_init</definition>
+        <argsstring>(struct nomp_backend_t *backend, const int platform_id, const int device_id)</argsstring>
+        <name>cuda_init</name>
+        <param>
+          <type>struct <ref refid="structnomp__backend__t" kindref="compound">nomp_backend_t</ref> *</type>
+          <declname>backend</declname>
+        </param>
+        <param>
+          <type>const int</type>
+          <declname>platform_id</declname>
+        </param>
+        <param>
+          <type>const int</type>
+          <declname>device_id</declname>
+        </param>
+        <briefdescription>
+<para>Initializes Cuda backend with the specified platform and device. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Initializes Cuda backend using the given device id. Platform id is not used in the initialization of Cuda backend. Returns a negative value if an error occurred during the initialization, otherwise returns 0.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">backend</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Target backend for code generation. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">platform_id</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Target platform id. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">device_id</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Target device id. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="150" column="5" declfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" declline="150" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="nomp-impl_8h_1a4291c251c10bf491c536f464f1df80cf" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int hip_init</definition>
+        <argsstring>(struct nomp_backend_t *backend, const int platform_id, const int device_id)</argsstring>
+        <name>hip_init</name>
+        <param>
+          <type>struct <ref refid="structnomp__backend__t" kindref="compound">nomp_backend_t</ref> *</type>
+          <declname>backend</declname>
+        </param>
+        <param>
+          <type>const int</type>
+          <declname>platform_id</declname>
+        </param>
+        <param>
+          <type>const int</type>
+          <declname>device_id</declname>
+        </param>
+        <briefdescription>
+<para>Initializes HIP backend with the specified platform and device. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Initializes HIP backend using the given device id. Platform id is not used in the initialization of HIP backend. Returns a negative value if an error occurred during the initialization, otherwise returns 0.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">backend</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Target backend for code generation. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">platform_id</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Target platform id. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">device_id</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Target device id. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="166" column="5" declfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" declline="166" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="nomp-impl_8h_1a8132202b7578ae29a9f6503104affc8d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int ispc_init</definition>
+        <argsstring>(struct nomp_backend_t *backend, const int platform_type, const int device_id)</argsstring>
+        <name>ispc_init</name>
+        <param>
+          <type>struct <ref refid="structnomp__backend__t" kindref="compound">nomp_backend_t</ref> *</type>
+          <declname>backend</declname>
+        </param>
+        <param>
+          <type>const int</type>
+          <declname>platform_type</declname>
+        </param>
+        <param>
+          <type>const int</type>
+          <declname>device_id</declname>
+        </param>
+        <briefdescription>
+<para>Initializes ISPC backend with the specified platform and device. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Initializes ISPC backend using the given device id and platform type. Returns a negative value if an error occurred during the initialization, otherwise returns 0.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">backend</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Target backend for code generation. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">platform_type</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Target platform type. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">device_id</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Target device id. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="182" column="5" declfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" declline="182" declcolumn="5"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="preprocessor">#if<sp/>!defined(_LIB_NOMP_IMPL_H_)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>_LIB_NOMP_IMPL_H_</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4" refid="nomp-impl_8h_1a3024ccd4a9af5109d24e6c57565d74a1" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>_POSIX_C_SOURCE<sp/>200809L</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight></codeline>
+<codeline lineno="6" refid="nomp-impl_8h_1ac9efdaac9411d0868b715edccca3269d" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>PY_SSIZE_T_CLEAN</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;Python.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;symengine/cwrapper.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;assert.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;ctype.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;limits.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;math.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;stdarg.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;stdio.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;stdlib.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="17"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;string.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="18"><highlight class="normal"></highlight></codeline>
+<codeline lineno="19" refid="nomp-impl_8h_1ad47dee48c2fe6dea8ebc430840ce9eda" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>NOMP_MAX_BUFSIZ<sp/>128</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="20" refid="nomp-impl_8h_1a254dc76b2e36149148c22daf0ae03378" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>NOMP_MAX_SRC_SIZE<sp/>16384</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="21" refid="nomp-impl_8h_1a8dcda3c87e5033afd1727cabb72cbca6" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>NOMP_MAX_CFLAGS_SIZE<sp/>16384</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="22" refid="nomp-impl_8h_1aad3f68a226c7ce1a2a2f66eed9d95c65" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>NOMP_MAX_KNL_ARGS<sp/>64</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="23" refid="nomp-impl_8h_1aa5910d8541f78d404d7332ccc77e8f0a" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>NOMP_MAX_SCRATCH_SIZE<sp/>(32768<sp/>*<sp/>sizeof(double))</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="24"><highlight class="normal"></highlight></codeline>
+<codeline lineno="25"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="nomp-aux_8h" kindref="compound">nomp-aux.h</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="26"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="nomp-log_8h" kindref="compound">nomp-log.h</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="27"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="nomp-loopy_8h" kindref="compound">nomp-loopy.h</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="28"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="nomp-mem_8h" kindref="compound">nomp-mem.h</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="29"><highlight class="normal"></highlight></codeline>
+<codeline lineno="30"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="nomp_8h" kindref="compound">nomp.h</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="31"><highlight class="normal"></highlight></codeline>
+<codeline lineno="32" refid="structnomp__mem__t" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structnomp__mem__t" kindref="compound">nomp_mem_t</ref><sp/>{</highlight></codeline>
+<codeline lineno="33" refid="structnomp__mem__t_1a37e88fe8f3e0497b5dc1a3fe441fbbd9" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/><ref refid="structnomp__mem__t_1a37e88fe8f3e0497b5dc1a3fe441fbbd9" kindref="member">idx0</ref>,<sp/><ref refid="structnomp__mem__t_1a4b3ba5d6486813d0dc1d02d4b2e08f7a" kindref="member">idx1</ref>,<sp/><ref refid="structnomp__mem__t_1a752821648ae4151ac93aee29351f9975" kindref="member">usize</ref>;</highlight></codeline>
+<codeline lineno="34" refid="structnomp__mem__t_1a4ab8798272adcb6aa6ad21abd490f41d" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>*<ref refid="structnomp__mem__t_1a3126bcbf1e93510ca620b5d209feb6e5" kindref="member">hptr</ref>,<sp/>*<ref refid="structnomp__mem__t_1a4ab8798272adcb6aa6ad21abd490f41d" kindref="member">bptr</ref>;</highlight></codeline>
+<codeline lineno="35" refid="structnomp__mem__t_1a32e9a8c1fd4229f8855a1d1678be4ebc" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/><ref refid="structnomp__mem__t_1a32e9a8c1fd4229f8855a1d1678be4ebc" kindref="member">bsize</ref>;</highlight></codeline>
+<codeline lineno="36"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="37"><highlight class="normal"></highlight></codeline>
+<codeline lineno="38" refid="nomp-impl_8h_1a9d889d47f8305fe56186f8657ed85e96" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>NOMP_MEM_OFFSET(start,<sp/>usize)<sp/>((start)<sp/>*<sp/>(usize))</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="39" refid="nomp-impl_8h_1a1a268fe12f0c25b1faeb4f96ea5aaee1" refkind="member"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>NOMP_MEM_BYTES(start,<sp/>end,<sp/>usize)<sp/>(((end)<sp/>-<sp/>(start))<sp/>*<sp/>(usize))</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="40"><highlight class="normal"></highlight></codeline>
+<codeline lineno="41" refid="structnomp__arg__t" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structnomp__arg__t" kindref="compound">nomp_arg_t</ref><sp/>{</highlight></codeline>
+<codeline lineno="42" refid="structnomp__arg__t_1a75e3831fb2f7236749b2e4e7fbdd34cd" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/><ref refid="structnomp__arg__t_1a75e3831fb2f7236749b2e4e7fbdd34cd" kindref="member">name</ref>[<ref refid="nomp-impl_8h_1ad47dee48c2fe6dea8ebc430840ce9eda" kindref="member">NOMP_MAX_BUFSIZ</ref>];</highlight></codeline>
+<codeline lineno="43" refid="structnomp__arg__t_1ac96c281e33590a3757b85765fe5ac964" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/><ref refid="structnomp__arg__t_1ac96c281e33590a3757b85765fe5ac964" kindref="member">size</ref>;</highlight></codeline>
+<codeline lineno="44" refid="structnomp__arg__t_1ae65811f365d78e49436fe623800de05c" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/><ref refid="structnomp__arg__t_1ae65811f365d78e49436fe623800de05c" kindref="member">type</ref>;</highlight></codeline>
+<codeline lineno="45" refid="structnomp__arg__t_1a2bc0f2b92929267fa2066a31894a1d1e" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>*<ref refid="structnomp__arg__t_1a2bc0f2b92929267fa2066a31894a1d1e" kindref="member">ptr</ref>;</highlight></codeline>
+<codeline lineno="46"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="47"><highlight class="normal"></highlight></codeline>
+<codeline lineno="48" refid="structnomp__prog__t" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structnomp__prog__t" kindref="compound">nomp_prog_t</ref><sp/>{</highlight></codeline>
+<codeline lineno="49"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>Number<sp/>of<sp/>arguments<sp/>of<sp/>the<sp/>kernel<sp/>and<sp/>meta<sp/>info<sp/>about</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="50"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>arguments.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="51" refid="structnomp__prog__t_1a78d53d0981017cdd204648c3b078c502" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/><ref refid="structnomp__prog__t_1a78d53d0981017cdd204648c3b078c502" kindref="member">nargs</ref>;</highlight></codeline>
+<codeline lineno="52" refid="structnomp__prog__t_1a3e32e38162033c119498d709633153fd" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structnomp__arg__t" kindref="compound">nomp_arg_t</ref><sp/>*<ref refid="structnomp__prog__t_1a3e32e38162033c119498d709633153fd" kindref="member">args</ref>;</highlight></codeline>
+<codeline lineno="53"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>Dimension<sp/>of<sp/>kernel<sp/>launch<sp/>parameters,<sp/>their<sp/>pymbolic</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="54"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>expressions,<sp/>and<sp/>evaluated<sp/>value<sp/>of<sp/>each<sp/>dimension.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="55" refid="structnomp__prog__t_1ab4f1321962b5066096dd76f48ffc1f9c" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/><ref refid="structnomp__prog__t_1ab4f1321962b5066096dd76f48ffc1f9c" kindref="member">ndim</ref>;</highlight></codeline>
+<codeline lineno="56" refid="structnomp__prog__t_1a95fc1efd0db26c3e894965043452a995" refkind="member"><highlight class="normal"><sp/><sp/>CVecBasic<sp/>*<ref refid="structnomp__prog__t_1a95fc1efd0db26c3e894965043452a995" kindref="member">sym_global</ref>,<sp/>*<ref refid="structnomp__prog__t_1ace700e03140c4efbeda08b91ffcbb031" kindref="member">sym_local</ref>;</highlight></codeline>
+<codeline lineno="57" refid="structnomp__prog__t_1a79c23dbbe0d11bb92727ae2307dd79c4" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/><ref refid="structnomp__prog__t_1a79c23dbbe0d11bb92727ae2307dd79c4" kindref="member">global</ref>[3],<sp/><ref refid="structnomp__prog__t_1a83fc85c71c4ddd9ec66d81b43bbe894e" kindref="member">local</ref>[3],<sp/><ref refid="structnomp__prog__t_1aef884532af2ce2ece7f711e87727c7a5" kindref="member">gws</ref>[3];</highlight></codeline>
+<codeline lineno="58"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>Map<sp/>of<sp/>variable<sp/>names<sp/>and<sp/>their<sp/>values<sp/>use<sp/>to<sp/>evaluate</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="59"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>the<sp/>kernel<sp/>launch<sp/>parameters.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="60" refid="structnomp__prog__t_1aba73f0871b5ade92377d952b2ff783f4" refkind="member"><highlight class="normal"><sp/><sp/>CMapBasicBasic<sp/>*<ref refid="structnomp__prog__t_1aba73f0871b5ade92377d952b2ff783f4" kindref="member">map</ref>;</highlight></codeline>
+<codeline lineno="61"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>Boolean<sp/>flag<sp/>to<sp/>determine<sp/>if<sp/>the<sp/>grid<sp/>size<sp/>should<sp/>be<sp/>evaluated<sp/>or<sp/>not.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="62" refid="structnomp__prog__t_1a49e458c0ffbcb88ea1db4b218167be88" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/><ref refid="structnomp__prog__t_1a49e458c0ffbcb88ea1db4b218167be88" kindref="member">eval_grid</ref>;</highlight></codeline>
+<codeline lineno="63"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>Pointer<sp/>to<sp/>keep<sp/>track<sp/>of<sp/>backend<sp/>specific<sp/>data.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="64" refid="structnomp__prog__t_1aae1a53a19b2f9e3b3e3c90dd8bff632e" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>*<ref refid="structnomp__prog__t_1aae1a53a19b2f9e3b3e3c90dd8bff632e" kindref="member">bptr</ref>;</highlight></codeline>
+<codeline lineno="65"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>Reduction<sp/>related<sp/>metadata.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="66" refid="structnomp__prog__t_1a1cd58c8b4869952ba4c30d07d2e9efab" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/><ref refid="structnomp__prog__t_1a1cd58c8b4869952ba4c30d07d2e9efab" kindref="member">redn_idx</ref>,<sp/><ref refid="structnomp__prog__t_1ad075ddc3cdffafaaa2ad56f55502ee18" kindref="member">redn_op</ref>,<sp/><ref refid="structnomp__prog__t_1acedd8a3af7953fcfba6d3353590bd57c" kindref="member">redn_type</ref>,<sp/><ref refid="structnomp__prog__t_1ab95c16ca2d5079f42b981b4c82e86a68" kindref="member">redn_size</ref>;</highlight></codeline>
+<codeline lineno="67" refid="structnomp__prog__t_1a0bccf911197c6e2dacac64eb76fe184a" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>*<ref refid="structnomp__prog__t_1a0bccf911197c6e2dacac64eb76fe184a" kindref="member">redn_ptr</ref>;</highlight></codeline>
+<codeline lineno="68"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="69"><highlight class="normal"></highlight></codeline>
+<codeline lineno="70" refid="structnomp__backend__t" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structnomp__backend__t" kindref="compound">nomp_backend_t</ref><sp/>{</highlight></codeline>
+<codeline lineno="71"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>User<sp/>configurations<sp/>of<sp/>the<sp/>backend.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="72" refid="structnomp__backend__t_1a738f892b8c4ade13f7d2e1278f73f68b" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/><ref refid="structnomp__backend__t_1a1ac422fa1f83a9e23791ddfcca58163f" kindref="member">platform_id</ref>,<sp/><ref refid="structnomp__backend__t_1a738f892b8c4ade13f7d2e1278f73f68b" kindref="member">device_id</ref>,<sp/><ref refid="structnomp__backend__t_1a5ad1a7a3abdf09f02a40dbc06eb8ed93" kindref="member">verbose</ref>,<sp/><ref refid="structnomp__backend__t_1a3e0168109f2611669992ee7ff32148a1" kindref="member">profile</ref>;</highlight></codeline>
+<codeline lineno="73" refid="structnomp__backend__t_1a9f262bd8295985fea4ff586a01012ae9" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/><ref refid="structnomp__backend__t_1a9f262bd8295985fea4ff586a01012ae9" kindref="member">backend</ref>[<ref refid="nomp-impl_8h_1ad47dee48c2fe6dea8ebc430840ce9eda" kindref="member">NOMP_MAX_BUFSIZ</ref>],<sp/><ref refid="structnomp__backend__t_1a9ac5b3ab76bb0ec8d57d6a9de3dedb28" kindref="member">install_dir</ref>[PATH_MAX];</highlight></codeline>
+<codeline lineno="74"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>Pointers<sp/>to<sp/>backend<sp/>functions<sp/>used<sp/>for<sp/>backend<sp/>dispatch.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="75" refid="structnomp__backend__t_1a85377ad1e943ee6af6c326073c5c15d4" refkind="member"><highlight class="normal"><sp/><sp/>int<sp/>(*<ref refid="structnomp__backend__t_1a85377ad1e943ee6af6c326073c5c15d4" kindref="member">update</ref>)(</highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structnomp__backend__t" kindref="compound">nomp_backend_t</ref><sp/>*,<sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structnomp__mem__t" kindref="compound">nomp_mem_t</ref><sp/>*,</highlight></codeline>
+<codeline lineno="76"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="group__nomp__types_1ga9c8653d937b29cea004ff74e0ae465b1" kindref="member">nomp_map_direction_t</ref><sp/>op,<sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>start,<sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>end,</highlight></codeline>
+<codeline lineno="77"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>usize);</highlight></codeline>
+<codeline lineno="78" refid="structnomp__backend__t_1a18b66989057fa5a59014a19c41e76ad4" refkind="member"><highlight class="normal"><sp/><sp/>int<sp/>(*<ref refid="structnomp__backend__t_1a18b66989057fa5a59014a19c41e76ad4" kindref="member">knl_build</ref>)(</highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structnomp__backend__t" kindref="compound">nomp_backend_t</ref><sp/>*,<sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structnomp__prog__t" kindref="compound">nomp_prog_t</ref><sp/>*,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/>*,</highlight></codeline>
+<codeline lineno="79"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/>*);</highlight></codeline>
+<codeline lineno="80" refid="structnomp__backend__t_1aaddb19f721c2eea8a2bccfa60a936e23" refkind="member"><highlight class="normal"><sp/><sp/>int<sp/>(*<ref refid="structnomp__backend__t_1aaddb19f721c2eea8a2bccfa60a936e23" kindref="member">knl_run</ref>)(</highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structnomp__backend__t" kindref="compound">nomp_backend_t</ref><sp/>*,<sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structnomp__prog__t" kindref="compound">nomp_prog_t</ref><sp/>*);</highlight></codeline>
+<codeline lineno="81" refid="structnomp__backend__t_1aef43b466950f9a5401baa96ec6ba965d" refkind="member"><highlight class="normal"><sp/><sp/>int<sp/>(*<ref refid="structnomp__backend__t_1aef43b466950f9a5401baa96ec6ba965d" kindref="member">knl_free</ref>)(</highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structnomp__prog__t" kindref="compound">nomp_prog_t</ref><sp/>*);</highlight></codeline>
+<codeline lineno="82" refid="structnomp__backend__t_1a52f9ac0dd79fbabf5cfb54db49a3bb4d" refkind="member"><highlight class="normal"><sp/><sp/>int<sp/>(*<ref refid="structnomp__backend__t_1a52f9ac0dd79fbabf5cfb54db49a3bb4d" kindref="member">sync</ref>)(</highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structnomp__backend__t" kindref="compound">nomp_backend_t</ref><sp/>*);</highlight></codeline>
+<codeline lineno="83" refid="structnomp__backend__t_1a98945e5b38c38447385409008cba6372" refkind="member"><highlight class="normal"><sp/><sp/>int<sp/>(*<ref refid="structnomp__backend__t_1a98945e5b38c38447385409008cba6372" kindref="member">finalize</ref>)(</highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structnomp__backend__t" kindref="compound">nomp_backend_t</ref><sp/>*);</highlight></codeline>
+<codeline lineno="84"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>Scratch<sp/>memory<sp/>to<sp/>be<sp/>used<sp/>as<sp/>temporary<sp/>memory<sp/>for<sp/>kernels<sp/>(like</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="85"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>reductions).</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="86" refid="structnomp__backend__t_1a0ce1be1fd7a45b380e0233b0387896f1" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structnomp__mem__t" kindref="compound">nomp_mem_t</ref><sp/><ref refid="structnomp__backend__t_1a0ce1be1fd7a45b380e0233b0387896f1" kindref="member">scratch</ref>;</highlight></codeline>
+<codeline lineno="87"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>Python<sp/>function<sp/>object<sp/>which<sp/>will<sp/>be<sp/>called<sp/>to<sp/>perform<sp/>annotations.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="88" refid="structnomp__backend__t_1aa3e36a43420c4be7d5db8aaf207c742f" refkind="member"><highlight class="normal"><sp/><sp/>PyObject<sp/>*<ref refid="structnomp__backend__t_1aa3e36a43420c4be7d5db8aaf207c742f" kindref="member">py_annotate</ref>;</highlight></codeline>
+<codeline lineno="89"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>Context<sp/>info<sp/>is<sp/>used<sp/>to<sp/>pass<sp/>necessary<sp/>infomation<sp/>to<sp/>kernel</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="90"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>transformations<sp/>and<sp/>annotations.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="91" refid="structnomp__backend__t_1a270b1b573322dde59bc9459ab9b6bcb1" refkind="member"><highlight class="normal"><sp/><sp/>PyObject<sp/>*<ref refid="structnomp__backend__t_1a270b1b573322dde59bc9459ab9b6bcb1" kindref="member">py_context</ref>;</highlight></codeline>
+<codeline lineno="92"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>Pointer<sp/>to<sp/>keep<sp/>track<sp/>of<sp/>backend<sp/>specific<sp/>data.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="93" refid="structnomp__backend__t_1a4779f707d801b7b46ae4b80b26ac8d0b" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>*<ref refid="structnomp__backend__t_1a4779f707d801b7b46ae4b80b26ac8d0b" kindref="member">bptr</ref>;</highlight></codeline>
+<codeline lineno="94"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="95"><highlight class="normal"></highlight></codeline>
+<codeline lineno="96"><highlight class="normal"></highlight><highlight class="preprocessor">#ifdef<sp/>__cplusplus</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="97"><highlight class="normal"></highlight><highlight class="keyword">extern</highlight><highlight class="normal"><sp/></highlight><highlight class="stringliteral">&quot;C&quot;</highlight><highlight class="normal"><sp/>{</highlight></codeline>
+<codeline lineno="98"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="99"><highlight class="normal"></highlight></codeline>
+<codeline lineno="117" refid="group__nomp__backend__utils_1gad2b5a46edf5760c93e37d9ec45fc256a" refkind="member"><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/><ref refid="group__nomp__backend__utils_1gad2b5a46edf5760c93e37d9ec45fc256a" kindref="member">opencl_init</ref>(</highlight><highlight class="keyword">struct</highlight><highlight class="normal"><sp/><ref refid="structnomp__backend__t" kindref="compound">nomp_backend_t</ref><sp/>*backend,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>platform_id,</highlight></codeline>
+<codeline lineno="118"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>device_id);</highlight></codeline>
+<codeline lineno="119"><highlight class="normal"></highlight></codeline>
+<codeline lineno="134" refid="nomp-impl_8h_1aca27b8db318636bf44cbe68fc9fbdfdf" refkind="member"><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/><ref refid="nomp-impl_8h_1aca27b8db318636bf44cbe68fc9fbdfdf" kindref="member">sycl_init</ref>(</highlight><highlight class="keyword">struct</highlight><highlight class="normal"><sp/><ref refid="structnomp__backend__t" kindref="compound">nomp_backend_t</ref><sp/>*backend,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>platform_id,</highlight></codeline>
+<codeline lineno="135"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>device_id);</highlight></codeline>
+<codeline lineno="136"><highlight class="normal"></highlight></codeline>
+<codeline lineno="150" refid="nomp-impl_8h_1a8591385fa4cf04b23e1536d15d4cdc11" refkind="member"><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/><ref refid="nomp-impl_8h_1a8591385fa4cf04b23e1536d15d4cdc11" kindref="member">cuda_init</ref>(</highlight><highlight class="keyword">struct</highlight><highlight class="normal"><sp/><ref refid="structnomp__backend__t" kindref="compound">nomp_backend_t</ref><sp/>*backend,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>platform_id,</highlight></codeline>
+<codeline lineno="151"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>device_id);</highlight></codeline>
+<codeline lineno="152"><highlight class="normal"></highlight></codeline>
+<codeline lineno="166" refid="nomp-impl_8h_1a4291c251c10bf491c536f464f1df80cf" refkind="member"><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/><ref refid="nomp-impl_8h_1a4291c251c10bf491c536f464f1df80cf" kindref="member">hip_init</ref>(</highlight><highlight class="keyword">struct</highlight><highlight class="normal"><sp/><ref refid="structnomp__backend__t" kindref="compound">nomp_backend_t</ref><sp/>*backend,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>platform_id,</highlight></codeline>
+<codeline lineno="167"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>device_id);</highlight></codeline>
+<codeline lineno="168"><highlight class="normal"></highlight></codeline>
+<codeline lineno="182" refid="nomp-impl_8h_1a8132202b7578ae29a9f6503104affc8d" refkind="member"><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/><ref refid="nomp-impl_8h_1a8132202b7578ae29a9f6503104affc8d" kindref="member">ispc_init</ref>(</highlight><highlight class="keyword">struct</highlight><highlight class="normal"><sp/><ref refid="structnomp__backend__t" kindref="compound">nomp_backend_t</ref><sp/>*backend,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>platform_type,</highlight></codeline>
+<codeline lineno="183"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>device_id);</highlight></codeline>
+<codeline lineno="184"><highlight class="normal"></highlight></codeline>
+<codeline lineno="185"><highlight class="normal"></highlight><highlight class="preprocessor">#ifdef<sp/>__cplusplus</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="186"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="187"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="188"><highlight class="normal"></highlight></codeline>
+<codeline lineno="189"><highlight class="normal"></highlight><highlight class="preprocessor">#endif<sp/></highlight><highlight class="comment">//<sp/>_LIB_NOMP_IMPL_H_</highlight><highlight class="normal"></highlight></codeline>
+    </programlisting>
+    <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h"/>
+  </compounddef>
+</doxygen>

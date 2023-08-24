@@ -1,0 +1,15 @@
+PROJECT_NAME           = "libnomp"
+PROJECT_NUMBER         = 0.0.1
+PROJECT_BRIEF          = "nomp runtime library"
+OUTPUT_DIRECTORY       = "/home/runner/work/libnomp/libnomp/build/docs/doxygen"
+INPUT                  = "/home/runner/work/libnomp/libnomp/include"
+OPTIMIZE_OUTPUT_FOR_C  = YES
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+FILE_PATTERNS          = *.h
+RECURSIVE              = YES
+GENERATE_HTML          = NO
+GENERATE_LATEX         = NO
+GENERATE_XML           = YES
+WARN_AS_ERROR          = FAIL_ON_WARNINGS

@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.7" xml:lang="en-US">
+  <compounddef id="group__nomp__backend__utils" kind="group">
+    <compoundname>nomp_backend_utils</compoundname>
+    <title>Backend init functions</title>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="group__nomp__backend__utils_1gad2b5a46edf5760c93e37d9ec45fc256a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int opencl_init</definition>
+        <argsstring>(struct nomp_backend_t *backend, const int platform_id, const int device_id)</argsstring>
+        <name>opencl_init</name>
+        <param>
+          <type>struct <ref refid="structnomp__backend__t" kindref="compound">nomp_backend_t</ref> *</type>
+          <declname>backend</declname>
+        </param>
+        <param>
+          <type>const int</type>
+          <declname>platform_id</declname>
+        </param>
+        <param>
+          <type>const int</type>
+          <declname>device_id</declname>
+        </param>
+        <briefdescription>
+<para>Initializes OpenCL backend with the specified platform and device. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Initializes OpenCL backend while creating a command queue using the given platform id and device id. Returns a negative value if an error occurred during the initialization, otherwise returns 0.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">backend</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Target backend for code generation. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">platform_id</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Target platform id. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">device_id</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Target device id. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" line="117" column="5" declfile="/home/runner/work/libnomp/libnomp/include/nomp-impl.h" declline="117" declcolumn="5"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+  </compounddef>
+</doxygen>

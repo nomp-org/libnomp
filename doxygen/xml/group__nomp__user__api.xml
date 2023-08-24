@@ -1,0 +1,479 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.7" xml:lang="en-US">
+  <compounddef id="group__nomp__user__api" kind="group">
+    <compoundname>nomp_user_api</compoundname>
+    <title>User API functions</title>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="group__nomp__user__api_1ga9358288c50bff846af3475fdb09e2f5f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int nomp_init</definition>
+        <argsstring>(int argc, const char **argv)</argsstring>
+        <name>nomp_init</name>
+        <param>
+          <type>int</type>
+          <declname>argc</declname>
+        </param>
+        <param>
+          <type>const char **</type>
+          <declname>argv</declname>
+        </param>
+        <briefdescription>
+<para>Initializes libnomp with the specified backend, platform, device, etc. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Initializes nomp code generation for the specified backend (e.g., OpenCL, Cuda, etc) using command line arguments. Also platform id, device id, verbose level, annotation script and annotation function can be specified as well. Returns a negative value if an error occurs during the initialization, otherwise returns 0. Calling this method twice (without nomp_finalize in between) will return an error (but not segfault). Currently only supports Cuda and OpenCL backends.</para>
+<para><bold>Accepted arguments:</bold> <itemizedlist>
+<listitem><para><computeroutput>--nomp-backend &lt;backend-name&gt;</computeroutput> Specify backend type (Default: opencl). </para>
+</listitem>
+<listitem><para><computeroutput>--nomp-platform &lt;platform-index&gt;</computeroutput> Specify platform id (Default: 0). </para>
+</listitem>
+<listitem><para><computeroutput>--nomp-device &lt;device-index&gt;</computeroutput> Specify device id (Default: 0). </para>
+</listitem>
+<listitem><para><computeroutput>--nomp-verbose &lt;verbose-level&gt;</computeroutput> Specify verbose level (Default: 0). </para>
+</listitem>
+<listitem><para><computeroutput>--nomp-profile &lt;profile-level&gt;</computeroutput> Specify profile level (Default: 0). </para>
+</listitem>
+<listitem><para><computeroutput>--nomp-install-dir &lt;install-dir&gt;</computeroutput> Specify <computeroutput>libnomp</computeroutput> install directory. </para>
+</listitem>
+<listitem><para><computeroutput>--nomp-function &lt;annotation-function&gt;</computeroutput> Specify the annotation function name.</para>
+</listitem>
+</itemizedlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">argc</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The number of arguments to <ref refid="group__nomp__user__api_1ga9358288c50bff846af3475fdb09e2f5f" kindref="member">nomp_init()</ref>. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">argv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Arguments as strings, values followed by options. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>int</para>
+</simplesect>
+<bold>Example usage:</bold> <programlisting filename=".c"><codeline><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/>*argv[]<sp/>=<sp/>{</highlight><highlight class="stringliteral">&quot;--backend&quot;</highlight><highlight class="normal">,<sp/></highlight><highlight class="stringliteral">&quot;opencl&quot;</highlight><highlight class="normal">,<sp/></highlight><highlight class="stringliteral">&quot;-device&quot;</highlight><highlight class="normal">,<sp/></highlight><highlight class="stringliteral">&quot;0&quot;</highlight><highlight class="normal">,<sp/></highlight><highlight class="stringliteral">&quot;--platform&quot;</highlight><highlight class="normal">,</highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="stringliteral">&quot;0&quot;</highlight><highlight class="normal">};</highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>argc<sp/>=<sp/>6;</highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>err<sp/>=<sp/><ref refid="group__nomp__user__api_1ga9358288c50bff846af3475fdb09e2f5f" kindref="member">nomp_init</ref>(argc,<sp/>argv);</highlight></codeline>
+</programlisting> </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp.h" line="184" column="5" declfile="/home/runner/work/libnomp/libnomp/include/nomp.h" declline="184" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="group__nomp__user__api_1gaa8dc9b167bf514e2f3cc4ff6f9dfb6a0" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int nomp_update</definition>
+        <argsstring>(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size, nomp_map_direction_t op)</argsstring>
+        <name>nomp_update</name>
+        <param>
+          <type>void *</type>
+          <declname>ptr</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>start_idx</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>end_idx</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>unit_size</declname>
+        </param>
+        <param>
+          <type><ref refid="group__nomp__types_1ga9c8653d937b29cea004ff74e0ae465b1" kindref="member">nomp_map_direction_t</ref></type>
+          <declname>op</declname>
+        </param>
+        <briefdescription>
+<para>Performs device to host (D2H) and host to device (H2D) memory transfers, allocating and freeing of memory in the device. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">ptr</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Pointer to the host memory location. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">start_idx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Start index in the vector to start copying. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">end_idx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>End index in the vector to end the copying. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">unit_size</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Size of a single vector element. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">op</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Operation to perform (One of <ref refid="group__nomp__types_1ga9c8653d937b29cea004ff74e0ae465b1" kindref="member">nomp_map_direction_t</ref>). </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>int</para>
+</simplesect>
+Operation <computeroutput>op</computeroutput> will be performed on the array slice [<computeroutput>start_idx</computeroutput>, <computeroutput>end_idx</computeroutput>), i.e., on array elements start_idx, ... end_idx - 1. This method returns a non-zero value if there is an error and 0 otherwise.</para>
+<para><bold>Example usage:</bold> <programlisting filename=".c"><codeline><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>N<sp/>=<sp/>10;</highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>a[10];</highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(</highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/>i<sp/>=<sp/>0;<sp/>i<sp/>&lt;<sp/>N;<sp/>i++)</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/>a[i]<sp/>=<sp/>i;</highlight></codeline>
+<codeline><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="comment">//<sp/>Copy<sp/>the<sp/>value<sp/>of<sp/>`a`<sp/>into<sp/>device</highlight><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>err<sp/>=<sp/><ref refid="group__nomp__user__api_1gaa8dc9b167bf514e2f3cc4ff6f9dfb6a0" kindref="member">nomp_update</ref>(a,<sp/>0,<sp/>N,<sp/></highlight><highlight class="keyword">sizeof</highlight><highlight class="normal">(</highlight><highlight class="keywordtype">double</highlight><highlight class="normal">),<sp/><ref refid="group__nomp__types_1gga9c8653d937b29cea004ff74e0ae465b1a9982b527c0819a015f1cebbd47f7e85d" kindref="member">NOMP_TO</ref>);</highlight></codeline>
+<codeline><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="comment">//<sp/>Execution<sp/>of<sp/>a<sp/>kernel<sp/>which<sp/>uses<sp/>`a`</highlight><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal">...</highlight></codeline>
+<codeline><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="comment">//<sp/>Copy<sp/>the<sp/>updated<sp/>value<sp/>of<sp/>`a`<sp/>from<sp/>device</highlight><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal">int<sp/>err<sp/>=<sp/><ref refid="group__nomp__user__api_1gaa8dc9b167bf514e2f3cc4ff6f9dfb6a0" kindref="member">nomp_update</ref>(a,<sp/>0,<sp/>N,<sp/></highlight><highlight class="keyword">sizeof</highlight><highlight class="normal">(</highlight><highlight class="keywordtype">double</highlight><highlight class="normal">),<sp/><ref refid="group__nomp__types_1gga9c8653d937b29cea004ff74e0ae465b1a34a64a0414aabd7449fef3dadc227372" kindref="member">NOMP_FROM</ref>);</highlight></codeline>
+<codeline><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="comment">//<sp/>Free<sp/>the<sp/>device<sp/>memory<sp/>allocated<sp/>for<sp/>`a`</highlight><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>err<sp/>=<sp/><ref refid="group__nomp__user__api_1gaa8dc9b167bf514e2f3cc4ff6f9dfb6a0" kindref="member">nomp_update</ref>(a,<sp/>0,<sp/>N,<sp/></highlight><highlight class="keyword">sizeof</highlight><highlight class="normal">(</highlight><highlight class="keywordtype">double</highlight><highlight class="normal">),<sp/><ref refid="group__nomp__types_1gga9c8653d937b29cea004ff74e0ae465b1adce40162fbe1d3191ea2753afca6abcc" kindref="member">NOMP_FREE</ref>);</highlight></codeline>
+</programlisting> </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp.h" line="223" column="5" declfile="/home/runner/work/libnomp/libnomp/include/nomp.h" declline="223" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="group__nomp__user__api_1gab793ec09db7c8a89656061e6d67c4d75" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int nomp_jit</definition>
+        <argsstring>(int *id, const char *src, const char **clauses, int nargs,...)</argsstring>
+        <name>nomp_jit</name>
+        <param>
+          <type>int *</type>
+          <declname>id</declname>
+        </param>
+        <param>
+          <type>const char *</type>
+          <declname>src</declname>
+        </param>
+        <param>
+          <type>const char **</type>
+          <declname>clauses</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>nargs</declname>
+        </param>
+        <param>
+          <type>...</type>
+        </param>
+        <briefdescription>
+<para>Generate and compile a kernel for the targe backend (OpenCL, etc.) from C source. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Target backend is the one provided during the initialization of libnomp using <ref refid="group__nomp__user__api_1ga9358288c50bff846af3475fdb09e2f5f" kindref="member">nomp_init()</ref>. User defined code transformations will be applied based on the clauses specified in <computeroutput>clauses</computeroutput> argument. Additional kernel meta data can be passed using the <computeroutput>clauses</computeroutput> as well. After <computeroutput>clauses</computeroutput>, number of arguments to the kernel must be provided. Then for each argument, three values has to be passed. First is the argument name as a string. Second is is the <computeroutput>sizeof</computeroutput> argument and the third if argument type (one of <ref refid="group__nomp__types" kindref="compound">Data Types</ref>).</para>
+<para><bold>Example usage:</bold> <programlisting filename=".c"><codeline><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>N<sp/>=<sp/>10;</highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>a[10],<sp/>b[10];</highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(</highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/>i<sp/>=<sp/>0;<sp/>i<sp/>&lt;<sp/>N;<sp/>i++)<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/>a[i]<sp/>=<sp/>i;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/>b[i]<sp/>=<sp/>10<sp/>-i</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/>*knl<sp/>=<sp/></highlight><highlight class="stringliteral">&quot;for<sp/>(unsigned<sp/>i<sp/>=<sp/>0;<sp/>i<sp/>&lt;<sp/>N;<sp/>i++)<sp/>a[i]<sp/>+=<sp/>b[i];&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">id</highlight><highlight class="normal"><sp/>=<sp/>-1;</highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/>*clauses[4]<sp/>=<sp/>{</highlight><highlight class="stringliteral">&quot;transform&quot;</highlight><highlight class="normal">,<sp/></highlight><highlight class="stringliteral">&quot;file&quot;</highlight><highlight class="normal">,<sp/></highlight><highlight class="stringliteral">&quot;function&quot;</highlight><highlight class="normal">,<sp/>0};</highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>err<sp/>=<sp/><ref refid="group__nomp__user__api_1gab793ec09db7c8a89656061e6d67c4d75" kindref="member">nomp_jit</ref>(&amp;</highlight><highlight class="keywordtype">id</highlight><highlight class="normal">,<sp/>knl,<sp/>clauses,<sp/>3,<sp/></highlight><highlight class="stringliteral">&quot;a&quot;</highlight><highlight class="normal">,<sp/></highlight><highlight class="keyword">sizeof</highlight><highlight class="normal">(a[0]),<sp/><ref refid="group__nomp__types_1ggaa080d702bfb6a51225d549bcb3c43389a881d9a608e7999619b0dc20ca479782f" kindref="member">NOMP_PTR</ref>,<sp/></highlight><highlight class="stringliteral">&quot;b&quot;</highlight><highlight class="normal">,</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">sizeof</highlight><highlight class="normal">(b[0]),<sp/><ref refid="group__nomp__types_1ggaa080d702bfb6a51225d549bcb3c43389a881d9a608e7999619b0dc20ca479782f" kindref="member">NOMP_PTR</ref>,<sp/></highlight><highlight class="stringliteral">&quot;N&quot;</highlight><highlight class="normal">,<sp/></highlight><highlight class="keyword">sizeof</highlight><highlight class="normal">(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal">),<sp/><ref refid="group__nomp__types_1ggaa080d702bfb6a51225d549bcb3c43389ae3069e6f069e8c00142f5fe791cf8da7" kindref="member">NOMP_INT</ref>);</highlight></codeline>
+</programlisting></para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="out">id</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Id of the generated kernel. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">src</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Kernel source in C. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">clauses</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Clauses to provide meta information about the kernel. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">nargs</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of arguments to the kernel. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">...</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Three values for each argument: identifier, sizeof(argument) and argument type. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp.h" line="263" column="5" declfile="/home/runner/work/libnomp/libnomp/include/nomp.h" declline="263" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="group__nomp__user__api_1ga494dfc32c43ad18c16022bfdcaeec9c3" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int nomp_run</definition>
+        <argsstring>(int id,...)</argsstring>
+        <name>nomp_run</name>
+        <param>
+          <type>int</type>
+          <declname>id</declname>
+        </param>
+        <param>
+          <type>...</type>
+        </param>
+        <briefdescription>
+<para>Runs the kernel generated by <ref refid="group__nomp__user__api_1gab793ec09db7c8a89656061e6d67c4d75" kindref="member">nomp_jit()</ref>. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Runs the kernel with a given kernel id. Kernel id is followed by the arguments (i.e., pointers and pointer to scalar variables).</para>
+<para><bold>Example usage:</bold> <programlisting filename=".c"><codeline><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>N<sp/>=<sp/>10;</highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>a[10],<sp/>b[10];</highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(</highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/>i<sp/>=<sp/>0;<sp/>i<sp/>&lt;<sp/>N;<sp/>i++)<sp/>{</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/>a[i]<sp/>=<sp/>i;</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/>b[i]<sp/>=<sp/>10<sp/>-i</highlight></codeline>
+<codeline><highlight class="normal">}</highlight></codeline>
+<codeline><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">id</highlight><highlight class="normal"><sp/>=<sp/>-1;</highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/>*knl<sp/>=<sp/></highlight><highlight class="stringliteral">&quot;for<sp/>(unsigned<sp/>i<sp/>=<sp/>0;<sp/>i<sp/>&lt;<sp/>N;<sp/>i++)<sp/>a[i]<sp/>+=<sp/>b[i];&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/>*clauses[4]<sp/>=<sp/>{</highlight><highlight class="stringliteral">&quot;transform&quot;</highlight><highlight class="normal">,<sp/></highlight><highlight class="stringliteral">&quot;file&quot;</highlight><highlight class="normal">,<sp/></highlight><highlight class="stringliteral">&quot;function&quot;</highlight><highlight class="normal">,<sp/>0};</highlight></codeline>
+<codeline><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>err<sp/>=<sp/><ref refid="group__nomp__user__api_1gab793ec09db7c8a89656061e6d67c4d75" kindref="member">nomp_jit</ref>(&amp;</highlight><highlight class="keywordtype">id</highlight><highlight class="normal">,<sp/>knl,<sp/>clauses,<sp/>3,<sp/></highlight><highlight class="stringliteral">&quot;a&quot;</highlight><highlight class="normal">,<sp/></highlight><highlight class="keyword">sizeof</highlight><highlight class="normal">(a[0]),<sp/><ref refid="group__nomp__types_1ggaa080d702bfb6a51225d549bcb3c43389a881d9a608e7999619b0dc20ca479782f" kindref="member">NOMP_PTR</ref>,<sp/></highlight><highlight class="stringliteral">&quot;b&quot;</highlight><highlight class="normal">,</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">sizeof</highlight><highlight class="normal">(b[0]),<sp/><ref refid="group__nomp__types_1ggaa080d702bfb6a51225d549bcb3c43389a881d9a608e7999619b0dc20ca479782f" kindref="member">NOMP_PTR</ref>,<sp/></highlight><highlight class="stringliteral">&quot;N&quot;</highlight><highlight class="normal">,<sp/></highlight><highlight class="keyword">sizeof</highlight><highlight class="normal">(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal">),<sp/><ref refid="group__nomp__types_1ggaa080d702bfb6a51225d549bcb3c43389ae3069e6f069e8c00142f5fe791cf8da7" kindref="member">NOMP_INT</ref>);</highlight></codeline>
+<codeline><highlight class="normal">err<sp/>=<sp/><ref refid="group__nomp__user__api_1ga494dfc32c43ad18c16022bfdcaeec9c3" kindref="member">nomp_run</ref>(</highlight><highlight class="keywordtype">id</highlight><highlight class="normal">,<sp/>a,<sp/>b,<sp/>&amp;N);</highlight></codeline>
+</programlisting></para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">id</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Id of the kernel to be run. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">...</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Arguments to the kernel.</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp.h" line="294" column="5" declfile="/home/runner/work/libnomp/libnomp/include/nomp.h" declline="294" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="group__nomp__user__api_1ga83a0822a1fc905e1e21c680dce8fdaeb" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int nomp_sync</definition>
+        <argsstring>(void)</argsstring>
+        <name>nomp_sync</name>
+        <param>
+          <type>void</type>
+        </param>
+        <briefdescription>
+<para>Synchronize task execution on device. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Implement a host-side barrier till the device finish executing all the previous nomp kernels and/or memory copies.</para>
+<para><simplesect kind="return"><para>int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp.h" line="305" column="5" declfile="/home/runner/work/libnomp/libnomp/include/nomp.h" declline="305" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="group__nomp__user__api_1ga64b207d004404af50b94e91a2b571107" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>char *</type>
+        <definition>char * nomp_get_log_str</definition>
+        <argsstring>(int id)</argsstring>
+        <name>nomp_get_log_str</name>
+        <param>
+          <type>int</type>
+          <declname>id</declname>
+        </param>
+        <briefdescription>
+<para>Return the log description given the log id. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns the log description given the log id. Returns NULL if the id is invalid. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">id</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>id of the error. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>char* </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp.h" line="341" column="6" declfile="/home/runner/work/libnomp/libnomp/include/nomp.h" declline="341" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="group__nomp__user__api_1ga6100f1d4760f0d62ace45115288d19eb" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int nomp_get_log_no</definition>
+        <argsstring>(int log_id)</argsstring>
+        <name>nomp_get_log_no</name>
+        <param>
+          <type>int</type>
+          <declname>log_id</declname>
+        </param>
+        <briefdescription>
+<para>Return log number. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns the log number given the log_id. If log_id is invalid return NOMP_USER_LOG_ID_IS_INVALID. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">log_id</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>id of the log. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp.h" line="352" column="5" declfile="/home/runner/work/libnomp/libnomp/include/nomp.h" declline="352" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="group__nomp__user__api_1ga32958362294e5d8b4478ba76b831cb86" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="nomp_8h_1ab9a322ab403d9d66a8ed27a6487aadba" kindref="member">nomp_log_type</ref></type>
+        <definition>nomp_log_type nomp_get_log_type</definition>
+        <argsstring>(int log_id)</argsstring>
+        <name>nomp_get_log_type</name>
+        <param>
+          <type>int</type>
+          <declname>log_id</declname>
+        </param>
+        <briefdescription>
+<para>Return log type. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns the log type given the log_id. Log type is either NOMP_ERROR, NOMP_INFORMATION or NOMP_WARNING. If log_id is invalid return NOMP_INVALID. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">log_id</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>id of the log. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp.h" line="364" column="15" declfile="/home/runner/work/libnomp/libnomp/include/nomp.h" declline="364" declcolumn="15"/>
+      </memberdef>
+      <memberdef kind="function" id="group__nomp__user__api_1gacbf8860cf851702394683d8eaf29c3e4" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int nomp_finalize</definition>
+        <argsstring>(void)</argsstring>
+        <name>nomp_finalize</name>
+        <param>
+          <type>void</type>
+        </param>
+        <briefdescription>
+<para>Finalizes libnomp runtime. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Frees allocated runtime resources for libnomp. Returns a non-zero value if an error occurs during the finalize process, otherwise returns 0. Calling this method before <ref refid="group__nomp__user__api_1ga9358288c50bff846af3475fdb09e2f5f" kindref="member">nomp_init()</ref> will return an error. Calling this method twice will also return an error.</para>
+<para><simplesect kind="return"><para>int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp.h" line="377" column="5" declfile="/home/runner/work/libnomp/libnomp/include/nomp.h" declline="377" declcolumn="5"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="define">
+      <memberdef kind="define" id="group__nomp__user__api_1gabfb8762cd93e8286f92bc1adee227c94" prot="public" static="no">
+        <name>nomp_check</name>
+        <param><defname>err</defname></param>
+        <initializer>  {                                                                            \
+    int err_ = (err);                                                          \
+    if (<ref refid="group__nomp__user__api_1ga32958362294e5d8b4478ba76b831cb86" kindref="member">nomp_get_log_type</ref>(err_) == <ref refid="nomp_8h_1ab9a322ab403d9d66a8ed27a6487aadbaaaa0c64194b170401c9ccaf27b15e7ade" kindref="member">NOMP_ERROR</ref>)                                 \
+      return err_;                                                             \
+  }</initializer>
+        <briefdescription>
+<para>Check nomp API return values for errors. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">err</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Return value from nomp API. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/runner/work/libnomp/libnomp/include/nomp.h" line="314" column="9" bodyfile="/home/runner/work/libnomp/libnomp/include/nomp.h" bodystart="314" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>libnomp API functions defined in <computeroutput><ref refid="nomp_8h" kindref="compound">nomp.h</ref></computeroutput>. </para>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+  </compounddef>
+</doxygen>
