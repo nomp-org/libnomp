@@ -8,41 +8,41 @@ Clone `libnomp`_ repo and change directory to `libnomp`:
 
 .. code-block:: bash
 
-    git clone https://github.com/nomp-org/libnomp.git
-    cd libnomp
+   git clone https://github.com/nomp-org/libnomp.git
+   cd libnomp
 
 Install dependencies using `conda`_ to build and run `libnomp`:
 
 .. code-block:: bash
 
-    conda env create -f environment.yml
-    conda activate libnomp
+   conda env create -f environment.yml
+   conda activate libnomp
 
 You can use mamba to install the dependencies faster.
 
 .. code-block:: bash
 
-    mamba env create -f environment.yml
-    mamba activate libnomp
+   mamba env create -f environment.yml
+   mamba activate libnomp
 
 If you are planning on contributing to `libnomp`, install the dev dependencies
 instead:
 
 .. code-block:: bash
 
-    conda env create -f environment-dev.yml
-    conda activate libnomp-dev
+   conda env create -f environment-dev.yml
+   conda activate libnomp-dev
 
 Similarly, you can install the dev dependencies with mamba as well:
 
 .. code-block:: bash
 
-    mamba env create -f environment-dev.yml
-    mamba activate libnomp-dev
+   mamba env create -f environment-dev.yml
+   mamba activate libnomp-dev
 
-Use `lncfg` to configure CMake build and `lninstall` to install `libnomp`. To
-see the available options, check out `lncfg -h` or `lncfg ---help`. `libnomp`
-currently supports the following backends:
+Use `lncfg` to configure CMake build and `lnbuild` to build/install `libnomp`. To
+see the available options, check out `lncfg --help`. `libnomp` currently supports
+the following backends:
 
 #. OpenCL
 #. CUDA
@@ -55,43 +55,60 @@ commands:
 
 .. code-block:: bash
 
-    cd libnomp
-    ./lncfg --enable-opencl --install-dir ${HOME}/.nomp
-    ./lninstall
+   cd libnomp
+   ./lncfg --enable-opencl --install-prefix ${HOME}/.nomp
+   ./lnbuild
 
-If the installation is successful, `lninstall` will prompt you to update the
-shell configuration file (e.g., `.bashrc`) to set `NOMP_INSTALL_DIR` and append
-`PATH` variable with `NOMP_INSTALL_DIR/bin`. `NOMP_INSTALL_DIR` environment
-variable must be set in order to use `libnomp`. This will also enable you to use
-`lnrun` script without using its full path to open documentation, run tests,
-debug tests, etc. You can avoid this prompt by either providing `--yes` or
-`--no` to the `lninstall` script. You have to open a new shell in order for
-changes to take affect.
-
-.. code-block:: bash
-
-    cd libnomp
-    ./lncfg --enable-opencl --install-dir ${HOME}/.nomp
-    ./lninstall --yes
-
-You can manually set the `NOMP_INSTALL_DIR` variable as well.
+If the installation is successful, `lnbuild` will prompt you to update the shell
+configuration file (e.g., `.bashrc`) to set `NOMP_INSTALL_DIR` and append `PATH`
+variable with `NOMP_INSTALL_DIR/bin`. `NOMP_INSTALL_DIR` environment variable must
+be set to `libnomp` install directory or should be passed as a command line
+argument using `--nomp-install-dir` in order to use `libnomp`. Setting the
+environment variable and adding `NOMP_INSTALL_DIR/bin` to `PATH` variable will
+enable you to use `lnrun` script without using its full path to open documentation,
+run tests, debug tests, etc. You can avoid this prompt by either providing
+`--update yes` or `--update no` to the `lnbuild` script. You have to open a new shell
+in order for changes to take affect in case you update the shell configuration file.
 
 .. code-block:: bash
 
-    export NOMP_INSTALL_DIR=${HOME}/.nomp
+   cd libnomp
+   ./lncfg --enable-opencl --install-prefix ${HOME}/.nomp
+   ./lnbuild --update yes
+
+You can manually set the `NOMP_INSTALL_DIR` variable as well. Use `lnbuild --help`
+to see all the availble options supported by `lnbuild` script.
+
+.. code-block:: bash
+
+   export NOMP_INSTALL_DIR=${HOME}/.nomp
 
 You might additionally want to specify OpenCL library path as below if CMake
 can't find OpenCL:
 
 .. code-block:: bash
 
-    ./lncfg --enable-opencl --opencl-lib /lib/x86_64-linux-gnu/libOpenCL.so
+   ./lncfg --enable-opencl --opencl-lib /lib/x86_64-linux-gnu/libOpenCL.so
 
 If you used `conda` to install OpenCL (for example `pocl`_), do the following:
 
 .. code-block:: bash
 
-    ./lncfg --enable-opencl --opencl-lib ${CONDA_PREFIX}/lib/libOpenCL.so --opencl-inc ${CONDA_PREFIX}/include
+   ./lncfg --enable-opencl --opencl-lib ${CONDA_PREFIX}/lib/libOpenCL.so --opencl-headers ${CONDA_PREFIX}/include
+
+
+Run `libnomp` tests
+-------------------
+
+You can run `libnomp` tests by executing `lnrun test` command. See below for
+a few examples on how to use the script:
+
+.. code-block:: bash
+
+   lnrun test
+   lnrun test --backend opencl
+
+Use `lnrun help` to see all supported options.
 
 nompcc
 ------
@@ -156,14 +173,14 @@ dependencies using `conda`. You can enable docs by passing either `-docs` or
 .. code-block:: bash
 
     ./lncfg --enable-docs
-    ./lninstall
+    ./lnbuild
 
 Use `lnrun` to open the user documentation locally. You can specify the browser
-with option `-B`. For example, to open the documentation in firefox:
+with option `--browser`. For example, to open the documentation in firefox:
 
 .. code-block:: bash
 
-    lnrun docs -B firefox
+    lnrun docs --browser firefox
 
 If you do not specify the browser, it opens the documentation in chrome by
 default.

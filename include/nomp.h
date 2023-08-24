@@ -160,13 +160,14 @@ extern "C" {
  * Cuda and OpenCL backends.
  *
  * <b>Accepted arguments:</b>
- * \arg `-b|--backend <backend-name>` Specify backend type (Default: opencl).
- * \arg `-p|--platform <platform-index>` Specify platform id (Default: 0).
- * \arg `-d|--device <device-index>` Specify device id (Default: 0).
- * \arg `-v|--verbose <verbose-level>` Specify verbose level (Default: 0).
- * \arg `-as|--annts-script <annotation-script>` Specify the directory which the
- * annotation script resides. \arg `-af|--annts-func <annotation-function>`
- * Specify the annotation function name.
+ * \arg `--nomp-backend <backend-name>` Specify backend type (Default: opencl).
+ * \arg `--nomp-platform <platform-index>` Specify platform id (Default: 0).
+ * \arg `--nomp-device <device-index>` Specify device id (Default: 0).
+ * \arg `--nomp-verbose <verbose-level>` Specify verbose level (Default: 0).
+ * \arg `--nomp-profile <profile-level>` Specify profile level (Default: 0).
+ * \arg `--nomp-install-dir <install-dir>` Specify `libnomp` install directory.
+ * \arg `--nomp-function <annotation-function>` Specify the annotation function
+ * name.
  *
  * @param[in] argc The number of arguments to nomp_init().
  * @param[in] argv Arguments as strings, values followed by options.
