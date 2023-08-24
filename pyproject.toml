@@ -4,10 +4,16 @@ include_trailing_comma = true
 force_grid_wrap = 0
 use_parentheses = true
 line_length = 80
+skip_glob = ['build/*', 'docs/*']
 
 [tool.black]
 line_length = 80
 preview = true
+exclude = 'build/|docs/'
 
-[tool.pylint.format]
+[tool.pylint.MASTER]
+ignore-paths = ['^build/.*$', '^docs/.*$']
+fail-under = 9.8
+
+[tool.pylint.FORMAT]
 max-line-length = 80

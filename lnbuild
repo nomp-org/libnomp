@@ -47,21 +47,38 @@ fi
 function print_help() {
   echo -e "Usage: ${0} [--help] [--no] [--yes]\n" \
     "${cyan}--help:${reset} Print help for libnomp install.\n" \
-    "${cyan}--update [yes|no]${reset} Don't update shell configuration file.\n" \
-    "${cyan}--install [yes|no]${reset} Run install target.\n" \
-    "${cyan}--format [yes|no]${reset} Run format target.\n" \
-    "${cyan}--tidy [yes|no]${reset} Run tidy target.\n" \
-  exit 0
+    "${cyan}--install [yes|no]${reset} Run install target (Default: yes).\n" \
+    "${cyan}--format [yes|no]${reset} Run format target (Default: no).\n" \
+    "${cyan}--format-check [yes|no]${reset} Run format-check target (Default: no).\n" \
+    "${cyan}--tidy [yes|no]${reset} Run tidy target (Default: no).\n" \
+    "${cyan}--pylint [yes|no]${reset} Run pylint target (Default: no).\n" \
+    "${cyan}--black [yes|no]${reset} Run black target (Default: no).\n" \
+    "${cyan}--black-check [yes|no]${reset} Run black-check target (Default: no).\n" \
+    "${cyan}--isort [yes|no]${reset} Run isort target (Default: no).\n" \
+    "${cyan}--isort-check [yes|no]${reset} Run isort-check target (Default: no).\n" \
+    "${cyan}--flake8 [yes|no]${reset} Run flake8 target (Default: no).\n" \
+    "${cyan}--update [yes|no]${reset} Don't update shell configuration file (Default: Interactive).\n"
 }
 
 # Read in command line arguments.
-: ${NOMP_PROMPT:=""}
 : ${NOMP_INSTALL:="yes"}
 : ${NOMP_FORMAT:="no"}
+: ${NOMP_FORMAT_CHECK:="no"}
 : ${NOMP_TIDY:="no"}
+: ${NOMP_PYLINT:="no"}
+: ${NOMP_BLACK:="no"}
+: ${NOMP_BLACK_CHECK:="no"}
+: ${NOMP_ISORT:="no"}
+: ${NOMP_ISORT_CHECK:="no"}
+: ${NOMP_FLAKE8:="no"}
+: ${NOMP_PROMPT:=""}
 while [[ $# -gt 0 ]]; do
   case $1 in
-    --help) print_help ;;
+    --help)
+      shift
+      print_help
+      exit 0
+      ;;
     --install)
       NOMP_INSTALL=$(echo "$2" | tr '[:upper:]' '[:lower:]')
       shift
@@ -72,8 +89,43 @@ while [[ $# -gt 0 ]]; do
       shift
       shift
       ;;
+    --format-check)
+      NOMP_FORMAT_CHECK=$(echo "$2" | tr '[:upper:]' '[:lower:]')
+      shift
+      shift
+      ;;
     --tidy)
       NOMP_TIDY=$(echo "$2" | tr '[:upper:]' '[:lower:]')
+      shift
+      shift
+      ;;
+    --pylint)
+      NOMP_PYLINT=$(echo "$2" | tr '[:upper:]' '[:lower:]')
+      shift
+      shift
+      ;;
+    --black)
+      NOMP_BLACK=$(echo "$2" | tr '[:upper:]' '[:lower:]')
+      shift
+      shift
+      ;;
+    --black-check)
+      NOMP_BLACK_CHECK=$(echo "$2" | tr '[:upper:]' '[:lower:]')
+      shift
+      shift
+      ;;
+    --isort)
+      NOMP_ISORT=$(echo "$2" | tr '[:upper:]' '[:lower:]')
+      shift
+      shift
+      ;;
+    --isort-check)
+      NOMP_ISORT_CHECK=$(echo "$2" | tr '[:upper:]' '[:lower:]')
+      shift
+      shift
+      ;;
+    --flake8)
+      NOMP_FLAKE8=$(echo "$2" | tr '[:upper:]' '[:lower:]')
       shift
       shift
       ;;
@@ -90,21 +142,58 @@ done
 
 if [[ ${NOMP_FORMAT} == "yes" ]]; then
   cmake --build "${NOMP_BUILD_DIR}" --target format
+  [[ $? -ne 0 ]] && exit 1
+fi
+
+if [[ ${NOMP_FORMAT_CHECK} == "yes" ]]; then
+  cmake --build "${NOMP_BUILD_DIR}" --target format-check
+  [[ $? -ne 0 ]] && exit 1
 fi
 
 if [[ ${NOMP_TIDY} == "yes" ]]; then
   cmake --build "${NOMP_BUILD_DIR}" --target tidy
+  [[ $? -ne 0 ]] && exit 1
 fi
 
-# Helper function to update the shell configuration file.
-function update_shellrc() {
-  PROMPT="$1"
-  if [[ -z "${PROMPT}" ]]; then
-    read -p "Update ${NOMP_SHELL_CONFIG_FILE} with nomp environment variables? [yes|no]: " INPUT
-    PROMPT=$(echo "${INPUT}" | tr '[:upper:]' '[:lower:]') 
-  fi
+if [[ ${NOMP_PYLINT} == "yes" ]]; then
+  cmake --build "${NOMP_BUILD_DIR}" --target pylint
+  [[ $? -ne 0 ]] && exit 1
+fi
 
-  [[ "${PROMPT}" != "yes" ]] && exit 0
+if [[ ${NOMP_BLACK} == "yes" ]]; then
+  cmake --build "${NOMP_BUILD_DIR}" --target black
+  [[ $? -ne 0 ]] && exit 1
+fi
+
+if [[ ${NOMP_BLACK_CHECK} == "yes" ]]; then
+  cmake --build "${NOMP_BUILD_DIR}" --target black-check
+  [[ $? -ne 0 ]] && exit 1
+fi
+
+if [[ ${NOMP_ISORT} == "yes" ]]; then
+  cmake --build "${NOMP_BUILD_DIR}" --target isort
+  [[ $? -ne 0 ]] && exit 1
+fi
+
+if [[ ${NOMP_ISORT_CHECK} == "yes" ]]; then
+  cmake --build "${NOMP_BUILD_DIR}" --target isort-check
+  [[ $? -ne 0 ]] && exit 1
+fi
+
+if [[ ${NOMP_FLAKE8} == "yes" ]]; then
+  cmake --build "${NOMP_BUILD_DIR}" --target flake8
+  [[ $? -ne 0 ]] && exit 1
+fi
+
+if [[ ${NOMP_INSTALL} == "yes" ]]; then
+  cmake --build "${NOMP_BUILD_DIR}" --target install
+  [[ $? -ne 0 ]] && exit 1
+
+  if [[ -z "${NOMP_PROMPT}" ]]; then
+    read -p "Update ${NOMP_SHELL_CONFIG_FILE} with nomp environment variables? [yes|no]: " INPUT
+    NOMP_PROMPT=$(echo "${INPUT}" | tr '[:upper:]' '[:lower:]')
+  fi
+  [[ "${NOMP_PROMPT}" != "yes" ]] && exit 0
 
   if [[ -f ${NOMP_SHELL_CONFIG_FILE} ]]; then
     echo -e "${NOMP_ENVIRONMENT}" >> "${NOMP_SHELL_CONFIG_FILE}"
@@ -114,11 +203,4 @@ function update_shellrc() {
     echo "${red}Shell configration file ${NOMP_SHELL_CONFIG_FILE} doesn't exist{reset}."
     exit 1
   fi
-}
-
-if [[ ${NOMP_INSTALL} == "yes" ]]; then
-  cmake --build "${NOMP_BUILD_DIR}" --target install
-  RETURN_CODE=$?
-  [[ ${RETURN_CODE} -ne 0 ]] && echo "${red}Failed to install libnomp${reset}." && exit 1
-  update_shellrc "${NOMP_PROMPT}" && exit 0
 fi

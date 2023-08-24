@@ -13,9 +13,9 @@ on:
         default: false
 env:
   # Increase to reset cache manually
-  INSTALLDIR: install
   CACHE_NUMBER: 0
   LIBNOMP_ENV: /usr/share/miniconda/envs/libnomp
+  INSTALLDIR: install
   POCL_CACHE_NUMBER: 0
 jobs:
   ci:
