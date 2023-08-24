@@ -26,6 +26,10 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 # outside the build tree to the install RPATH
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
+if (ENABLE_DOCS)
+  add_subdirectory ("docs")
+endif()
+
 set(SOURCES src/nomp.c src/loopy.c src/symengine.c src/aux.c src/log.c src/jit.c
   src/reduction.c)
 if (ENABLE_OPENCL)
@@ -64,9 +68,6 @@ if (ENABLE_ISPC)
   find_package(OpenMP REQUIRED)
   find_package(ispcrt REQUIRED)
   list(APPEND SOURCES backends/ispc.c)
-endif()
-if (ENABLE_DOCS)
-  add_subdirectory ("docs")
 endif()
 
 add_library(nomp SHARED ${SOURCES})
@@ -162,6 +163,44 @@ if (CLANG_TIDY)
     COMMAND ${CLANG_TIDY} -p ${CMAKE_BINARY_DIR}
       ${CMAKE_CURRENT_SOURCE_DIR}/*/*.[ch] ${CMAKE_CURRENT_SOURCE_DIR}/*/*.[ch]pp
     COMMENT "Running clang-tidy ...")
+endif()
+
+# Add pylint as a custom target if available.
+find_program(PYLINT NAMES pylint)
+if (PYLINT)
+  add_custom_target(pylint
+    COMMAND ${PYLINT} --recursive=yes ${CMAKE_CURRENT_SOURCE_DIR}/
+    COMMENT "Running pylint ...")
+endif()
+
+# Add black as a custom target if available.
+find_program(BLACK NAMES black)
+if (BLACK)
+  add_custom_target(black
+    COMMAND ${BLACK} ${CMAKE_CURRENT_SOURCE_DIR}/
+    COMMENT "Running black ...")
+  add_custom_target(black-check
+    COMMAND ${BLACK} --check ${CMAKE_CURRENT_SOURCE_DIR}/
+    COMMENT "Running black check ...")
+endif()
+
+# Add isort as a custom target if available.
+find_program(ISORT NAMES isort)
+if (ISORT)
+  add_custom_target(isort
+    COMMAND ${ISORT} ${CMAKE_CURRENT_SOURCE_DIR}/
+    COMMENT "Running isort ...")
+  add_custom_target(isort-check
+    COMMAND ${ISORT} --check-only ${CMAKE_CURRENT_SOURCE_DIR}/
+    COMMENT "Running isort check ...")
+endif()
+
+# Add flake8 as a custom target if available.
+find_program(FLAKE8 NAMES flake8)
+if (FLAKE8)
+  add_custom_target(flake8
+    COMMAND ${FLAKE8} ${CMAKE_CURRENT_SOURCE_DIR}/
+    COMMENT "Running flake8 ...")
 endif()
 
 install(TARGETS nomp LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
