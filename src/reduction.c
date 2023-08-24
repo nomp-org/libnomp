@@ -21,6 +21,15 @@
 NOMP_FOR_EACH_DOMAIN(NOMP_REDUCTION, SUM)
 NOMP_FOR_EACH_DOMAIN(NOMP_REDUCTION, PROD)
 
+/**
+ * @ingroup nomp_reduction_utils
+ * @brief Perform host side reduction.
+ *
+ * @param[in] backend Active backend instance.
+ * @param[in] prg Active program instance.
+ * @param[in] m Memory used to store device side partial reductions.
+ * @return int
+ */
 int nomp_host_side_reduction(struct nomp_backend_t *backend,
                              struct nomp_prog_t *prg, struct nomp_mem_t *m) {
   int dom = prg->redn_type, op = prg->redn_op;

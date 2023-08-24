@@ -163,6 +163,40 @@ static inline int init_backend(struct nomp_backend_t *bnd) {
   return 0;
 }
 
+/**
+ * @ingroup nomp_user_api
+ * @brief Initializes libnomp with the specified backend, platform, device, etc.
+ *
+ * @details Initializes nomp code generation for the specified backend (e.g.,
+ * OpenCL, Cuda, etc) using command line arguments. Also platform id, device id,
+ * verbose level, annotation script and annotation function can be specified as
+ * well. Returns a negative value if an error occurs during the initialization,
+ * otherwise returns 0. Calling this method twice (without nomp_finalize in
+ * between) will return an error (but not segfault). Currently only supports
+ * Cuda and OpenCL backends.
+ *
+ * <b>Accepted arguments:</b>
+ * \arg `--nomp-backend <backend-name>` Specify backend type (Default: opencl).
+ * \arg `--nomp-platform <platform-index>` Specify platform id (Default: 0).
+ * \arg `--nomp-device <device-index>` Specify device id (Default: 0).
+ * \arg `--nomp-verbose <verbose-level>` Specify verbose level (Default: 0).
+ * \arg `--nomp-profile <profile-level>` Specify profile level (Default: 0).
+ * \arg `--nomp-install-dir <install-dir>` Specify `libnomp` install directory.
+ * \arg `--nomp-function <annotation-function>` Specify the annotation function
+ * name.
+ *
+ * @param[in] argc The number of arguments to nomp_init().
+ * @param[in] argv Arguments as strings, values followed by options.
+ * @return int
+ *
+ * <b>Example usage:</b>
+ * @code{.c}
+ * const char *argv[] = {"--nomp-backend", "opencl", "--nomp-device", "0",
+ * "--nomp-platform", "0"};
+ * int argc = 6;
+ * int err = nomp_init(argc, argv);
+ * @endcode
+ */
 int nomp_init(int argc, const char **argv) {
   if (initialized) {
     return nomp_log(NOMP_INITIALIZE_FAILURE, NOMP_ERROR,
@@ -238,6 +272,43 @@ static unsigned mem_if_exist(void *p, size_t idx0, size_t idx1, size_t usize) {
   return mems_n;
 }
 
+/**
+ * @ingroup nomp_user_api
+ * @brief Performs device to host (D2H) and host to device (H2D) memory
+ * transfers, allocating and freeing of memory in the device.
+ *
+ * @param[in] ptr Pointer to the host memory location.
+ * @param[in] idx0 Start index in the vector to start copying.
+ * @param[in] idx1 End index in the vector to end the copying.
+ * @param[in] usize Size of a single vector element.
+ * @param[in] op Operation to perform (One of #nomp_map_direction_t).
+ * @return int
+ *
+ * @details Operation \p op will be performed on the array slice [\p start_idx,
+ * \p end_idx), i.e., on array elements start_idx, ... end_idx - 1. This method
+ * returns a non-zero value if there is an error and 0 otherwise.
+ *
+ * <b>Example usage:</b>
+ * @code{.c}
+ * int N = 10;
+ * double a[10];
+ * for (unsigned i = 0; i < N; i++)
+ *   a[i] = i;
+ *
+ * // Copy the value of `a` into device
+ * int err = nomp_update(a, 0, N, sizeof(double), NOMP_TO);
+ *
+ * // Execution of a kernel which uses `a`
+ * ...
+ *
+ * // Copy the updated value of `a` from device
+ * int err = nomp_update(a, 0, N, sizeof(double), NOMP_FROM);
+ *
+ * // Free the device memory allocated for `a`
+ * int err = nomp_update(a, 0, N, sizeof(double), NOMP_FREE);
+ *
+ * @endcode
+ */
 int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize,
                 nomp_map_direction_t op) {
   nomp_profile("nomp_update", 1, 1);
@@ -371,6 +442,43 @@ static inline struct nomp_prog_t *init_args(int progs_n, int nargs,
   return prg;
 }
 
+/**
+ * @ingroup nomp_user_api
+ * @brief Generate and compile a kernel for the targe backend (OpenCL, etc.)
+ * from C source.
+ *
+ * @details Target backend is the one provided during the initialization of
+ * libnomp using nomp_init(). User defined code transformations will be applied
+ * based on the clauses specified in \p clauses argument. Additional kernel meta
+ * data can be passed using the \p clauses as well. After \p clauses, number of
+ * arguments to the kernel must be provided. Then for each argument, three
+ * values has to be passed. First is the argument name as a string. Second is
+ * is the `sizeof` argument and the third if argument type (one of @ref
+ * nomp_user_types).
+ *
+ * <b>Example usage:</b>
+ * @code{.c}
+ * int N = 10;
+ * double a[10], b[10];
+ * for (unsigned i = 0; i < N; i++) {
+ *   a[i] = i;
+ *   b[i] = 10 -i
+ * }
+ * const char *knl = "for (unsigned i = 0; i < N; i++) a[i] += b[i];"
+ * static int id = -1;
+ * const char *clauses[4] = {"transform", "file", "function", 0};
+ * int err = nomp_jit(&id, knl, clauses, 3, "a", sizeof(a[0]), NOMP_PTR, "b",
+ *   sizeof(b[0]), NOMP_PTR, "N", sizeof(int), NOMP_INT);
+ * @endcode
+ *
+ * @param[out] id Id of the generated kernel.
+ * @param[in] csrc Kernel source in C.
+ * @param[in] clauses Clauses to provide meta information about the kernel.
+ * @param[in] nargs Number of arguments to the kernel.
+ * @param[in] ... Three values for each argument: identifier, sizeof(argument)
+ * and argument type.
+ * @return int
+ */
 int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
   if (*id >= 0)
     return 0;
@@ -428,6 +536,35 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
   return 0;
 }
 
+/**
+ * @ingroup nomp_user_api
+ * @brief Runs the kernel generated by nomp_jit().
+ *
+ * @details Runs the kernel with a given kernel id. Kernel id is followed by the
+ * arguments (i.e., pointers and pointer to scalar variables).
+ *
+ * <b>Example usage:</b>
+ * @code{.c}
+ * int N = 10;
+ * double a[10], b[10];
+ * for (unsigned i = 0; i < N; i++) {
+ *   a[i] = i;
+ *   b[i] = 10 -i
+ * }
+ *
+ * static int id = -1;
+ * const char *knl = "for (unsigned i = 0; i < N; i++) a[i] += b[i];"
+ * const char *clauses[4] = {"transform", "file", "function", 0};
+ * int err = nomp_jit(&id, knl, clauses, 3, "a", sizeof(a[0]), NOMP_PTR, "b",
+ *   sizeof(b[0]), NOMP_PTR, "N", sizeof(int), NOMP_INT);
+ * err = nomp_run(id, a, b, &N);
+ * @endcode
+ *
+ * @param[in] id Id of the kernel to be run.
+ * @param[in] ...  Arguments to the kernel.
+ *
+ * @return int
+ */
 int nomp_run(int id, ...) {
   if (id < 0) {
     return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
@@ -487,8 +624,28 @@ int nomp_run(int id, ...) {
   return 0;
 }
 
+/**
+ * @ingroup nomp_user_api
+ * @brief Synchronize task execution on device.
+ *
+ * Implement a host-side barrier till the device finish executing all the
+ * previous nomp kernels and/or memory copies.
+ *
+ * @return int
+ */
 int nomp_sync(void) { return nomp.sync(&nomp); }
 
+/**
+ * @ingroup nomp_user_api
+ * @brief Finalizes libnomp runtime.
+ *
+ * @details Frees allocated runtime resources for libnomp. Returns a non-zero
+ * value if an error occurs during the finalize process, otherwise returns 0.
+ * Calling this method before nomp_init() will return an error. Calling this
+ * method twice will also return an error.
+ *
+ * @return int
+ */
 int nomp_finalize(void) {
   // Free bookkeeping structures for the logger and profiler since these can be
   // released irrespective of whether libnomp is initialized or not.

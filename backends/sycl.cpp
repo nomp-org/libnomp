@@ -139,6 +139,20 @@ static int check_env(struct sycl_backend *sycl) {
   return 0;
 }
 
+/**
+ * @ingroup nomp_backend_init
+ * @brief Initializes SYCL backend with the specified platform and
+ * device.
+ *
+ * Initializes SYCL backend while creating a command queue using the
+ * given platform id and device id. Returns a positive value if an error
+ * occurred during the initialization, otherwise returns 0.
+ *
+ * @param[in] bnd Target backend for code generation.
+ * @param[in] platform_id Target platform id.
+ * @param[in] device_id Target device id.
+ * @return int
+ */
 int sycl_init(struct nomp_backend_t *bnd, const int platform_id,
               const int device_id) {
   struct sycl_backend *sycl = nomp_calloc(struct sycl_backend, 1);

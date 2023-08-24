@@ -20,6 +20,13 @@ static unsigned logs_max = 0;
 static const char *LOG_TYPE_STRING[] = {"Error", "Warning", "Info"};
 static int verbose = 0;
 
+/**
+ * @ingroup nomp_log_utils
+ * @brief Set the verbose level for the log functions.
+ *
+ * @param[in] verbose_in Verbose level provided by the user.
+ * @return int
+ */
 int nomp_log_set_verbose(const int verbose_in) {
   if (verbose_in < 0 || verbose_in > 3) {
     return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
@@ -31,6 +38,25 @@ int nomp_log_set_verbose(const int verbose_in) {
   return 0;
 }
 
+/**
+ * @ingroup nomp_log_utils
+ * @brief Register a log with libnomp runtime.
+ *
+ * @details Register a log given a description of the log, log number and log
+ * type. Returns a unique log id in case of errors which can be used to query
+ * log later on success. In case of information or warnings, nomp_log()
+ * returns 0 and details are printed to stdout based on the verbose level which
+ * is either set by --nomp-verbose command line argument or NOMP_VERBOSE
+ * environment variable. On failure, nomp_log_() returns -1. Use
+ * nomp_log() macro to by pass the arguments \p fname and \p line_no.
+ *
+ * @param[in] description Detailed description of the log.
+ * @param[in] logno Log number which is defined in nomp.h
+ * @param[in] type Type of the log (one of @ref nomp_log_type)
+ * @param[in] fname File name in which the nomp_log_() is called.
+ * @param[in] line Line number where the nomp_log_() is called.
+ * @return int
+ */
 int nomp_log_(const char *description, int logno, nomp_log_type type,
               const char *fname, unsigned line, ...) {
   char buf[BUFSIZ];
@@ -69,6 +95,15 @@ int nomp_log_(const char *description, int logno, nomp_log_type type,
   return type == NOMP_ERROR ? logs_n : 0;
 }
 
+/**
+ * @ingroup nomp_user_api
+ * @brief Return the log description given the log id.
+ *
+ * @details Returns the log description given the log id. Returns NULL if the
+ * id is invalid.
+ * @param[in] id id of the error.
+ * @return char*
+ */
 char *nomp_get_log_str(int id) {
   if (id <= 0 || id > (int)logs_n)
     return NULL;
@@ -76,18 +111,43 @@ char *nomp_get_log_str(int id) {
   return strndup(logs[id - 1].description, BUFSIZ);
 }
 
+/**
+ * @ingroup nomp_user_api
+ * @brief Return log number.
+ *
+ * @details Returns the log number given the log_id. If log_id
+ * is invalid return NOMP_USER_LOG_ID_IS_INVALID.
+ * @param[in] log_id id of the log.
+ * @return int
+ */
 int nomp_get_log_no(int log_id) {
   if (log_id <= 0 || log_id > (int)logs_n)
     return NOMP_USER_LOG_ID_IS_INVALID;
   return logs[log_id - 1].logno;
 }
 
+/**
+ * @ingroup nomp_user_api
+ * @brief Return log type.
+ *
+ * @details Returns the log type given the log_id. Log type is either
+ * NOMP_ERROR, NOMP_INFORMATION or NOMP_WARNING. If log_id is invalid return
+ * NOMP_INVALID.
+ * @param[in] log_id id of the log.
+ * @return int
+ */
 nomp_log_type nomp_get_log_type(int log_id) {
   if (log_id <= 0 || log_id > (int)logs_n)
     return NOMP_INVALID;
   return logs[log_id - 1].type;
 }
 
+/**
+ * @ingroup nomp_log_utils
+ * @brief Free variables used to keep track of logs.
+ *
+ * @return void
+ */
 void nomp_log_finalize(void) {
   for (unsigned i = 0; i < logs_n; i++)
     nomp_free(&logs[i].description);
@@ -107,6 +167,13 @@ static unsigned time_logs_n = 0;
 static unsigned time_logs_max = 0;
 static int profile_level = 0;
 
+/**
+ * @ingroup nomp_profiler_utils
+ * @brief Set the profile level for the nomp profiler.
+ *
+ * @param[in] profile_level_in Profile level provided by the user.
+ * @return int
+ */
 int nomp_profile_set_level(const int profile_level_in) {
   profile_level = profile_level_in;
   return 0;
@@ -120,6 +187,26 @@ static unsigned find_time_log(const char *entry) {
   return time_logs_n;
 }
 
+/**
+ * @ingroup nomp_profiler_utils
+ * @brief Toggles the timer and records the execution time between the two
+ * consecutive uses of the function.
+ *
+ * @details The function either starts or ends the timer by considering the
+ * toggle value. The function will start the timer if the toggle is 1. Else,
+ * it will capture the execution time and records in a log.
+ * @code{.c}
+ * nomp_profile("Entry Name", 1, nomp.profile, 1);
+ * // Code to be measured
+ * nomp_profile("Entry Name", 0, nomp.profile, 1);
+ * @endcode
+ *
+ * @param[in] name Name of the execution time that is being profiled.
+ * @param[in] toggle Toggles the timer between tick (start of timing) and a tock
+ * (end of timing).
+ * @param[in] sync Execute nomp_sync when toggling off the timer.
+ * @return void
+ */
 void nomp_profile(const char *name, const int toggle, const int sync) {
   if (profile_level == 0)
     return;
@@ -167,6 +254,13 @@ void nomp_profile(const char *name, const int toggle, const int sync) {
   }
 }
 
+/**
+ * @ingroup nomp_profiler_utils
+ * @brief Prints all the execution times recorded by the program.
+ * This function is executed only when the `--nomp-profile` is provided.
+ *
+ * @return int
+ */
 void nomp_profile_result(void) {
   if (profile_level == 0)
     return;
@@ -183,6 +277,12 @@ void nomp_profile_result(void) {
   }
 }
 
+/**
+ * @ingroup nomp_profiler_utils
+ * @brief Free variables used to keep track of time logs.
+ *
+ * @return void
+ */
 void nomp_profile_finalize(void) {
   for (unsigned i = 0; i < time_logs_n; i++)
     nomp_free(&time_logs[i].entry);
