@@ -1,6 +1,15 @@
 #include "nomp-impl.h"
 #include <symengine/cwrapper.h>
 
+/**
+ * @ingroup nomp_py_utils
+ * @brief Map the keys and values to evaluate the kernel launch parameters.
+ *
+ * @param[in] map SymEngine object map.
+ * @param[in] key Key as a C-string.
+ * @param[in] val Value as a C-string.
+ * @return int
+ */
 int nomp_symengine_update(CMapBasicBasic *map, const char *key,
                           const long val) {
   basic a, b, c;
@@ -31,6 +40,13 @@ static int symengine_evaluate(size_t *out, unsigned i, CVecBasic *vec,
   return 0;
 }
 
+/**
+ * @ingroup nomp_py_utils
+ * @brief Evaluate global and local grid sizes based on the dictionary `dict`.
+ *
+ * @param[in] prg Nomp program.
+ * @return int
+ */
 int nomp_symengine_eval_grid_size(struct nomp_prog_t *prg) {
   // If the expressions are not NULL, iterate through them and evaluate with
   // pymbolic. Also, we should calculate and store a hash of the dict that

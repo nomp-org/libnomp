@@ -9,6 +9,14 @@ static const char *get_knl_src = "get_knl_src";
 static const char *get_knl_name = "get_knl_name";
 static const char *realize_reduction = "realize_reduction";
 
+/**
+ * @ingroup nomp_py_utils
+ * @brief Get the string representation of python object.
+ *
+ * @param msg Debug message before printing the object.
+ * @param obj Python object.
+ * @return void
+ */
 void nomp_py_print(const char *msg, PyObject *obj) {
   PyObject *repr = PyObject_Repr(obj);
   PyObject *py_str = PyUnicode_AsEncodedString(repr, "utf-8", "~E~");
@@ -17,6 +25,13 @@ void nomp_py_print(const char *msg, PyObject *obj) {
   Py_XDECREF(repr), Py_XDECREF(py_str);
 }
 
+/**
+ * @ingroup nomp_py_utils
+ * @brief Appends specified path to system path.
+ *
+ * @param[in] path Path to be appended to system path.
+ * @return int
+ */
 int nomp_py_append_to_sys_path(const char *path) {
   int err = 1;
   PyObject *sys = PyImport_ImportModule("sys");
@@ -37,6 +52,15 @@ int nomp_py_append_to_sys_path(const char *path) {
   return 0;
 }
 
+/**
+ * @ingroup nomp_py_utils
+ * @brief Realize reductions if present in the kernel.
+ *
+ * @param[in,out] knl Loopy kernel object.
+ * @param[in] var Name of the reduction variable.
+ * @param[in] context Python dictionary with context information.
+ * @return int
+ */
 int nomp_py_realize_reduction(PyObject **knl, const char *var,
                               const PyObject *context) {
   int err = 1;
@@ -65,6 +89,15 @@ int nomp_py_realize_reduction(PyObject **knl, const char *var,
   return 0;
 }
 
+/**
+ * @ingroup nomp_py_utils
+ * @brief Creates loopy kernel from C source.
+ *
+ * @param[out] knl Loopy kernel object.
+ * @param[in] src C kernel source.
+ * @param[in] backend Backend name.
+ * @return int
+ */
 int nomp_py_c_to_loopy(PyObject **knl, const char *src, const char *backend) {
   int err = 1;
   PyObject *lpy_api = PyUnicode_FromString(module_loopy_api);
@@ -91,6 +124,16 @@ int nomp_py_c_to_loopy(PyObject **knl, const char *src, const char *backend) {
   return 0;
 }
 
+/**
+ * @ingroup nomp_py_utils
+ * @brief Set the annotate function based on the path to annotation script and
+ * function.
+ *
+ * @param[out] annotate_func Pointer to the annotate function.
+ * @param[in] path_ Path to the annotation script followed by function name
+ * (path and function name must be separated by "::").
+ * @return int
+ */
 int nomp_py_set_annotate_func(PyObject **annotate_func, const char *path_) {
   // Find file and function from path.
   char *path = strndup(path_, PATH_MAX + NOMP_MAX_BUFSIZ);
@@ -124,6 +167,22 @@ int nomp_py_set_annotate_func(PyObject **annotate_func, const char *path_) {
   return err;
 }
 
+/**
+ * @ingroup nomp_py_utils
+ * @brief Apply transformations on a loopy kernel based on annotations.
+ *
+ * Apply the transformations to the loopy kernel \p knl based on the annotation
+ * function \p func and the key value pairs (annotations) passed in \p annts.
+ * \p knl will be modified based on the transformations.
+ *
+ * @param[in,out] knl Pointer to loopy kernel object.
+ * @param[in] func Function which performs transformations based on annotations.
+ * @param[in] annts Annotations (as a PyDict) to specify which transformations
+ * to apply.
+ * @param[in] context Context (as a PyDict) to pass around information such
+ * as backend, device details, etc.
+ * @return int
+ */
 int nomp_py_apply_annotations(PyObject **knl, PyObject *func,
                               const PyObject *annts, const PyObject *context) {
   if (knl && *knl && func) {
@@ -138,6 +197,22 @@ int nomp_py_apply_annotations(PyObject **knl, PyObject *func,
   return 0;
 }
 
+/**
+ * @ingroup nomp_py_utils
+ * @brief Apply kernel specific user transformations on a loopy kernel.
+ *
+ * Call the user transform function \p func in file \p file on the loopy
+ * kernel \p knl. \p knl will be modified based on the transformations.
+ * Function will return a non-zero value if there was an error after
+ * registering a log.
+ *
+ * @param[in,out] knl Pointer to loopy kernel object.
+ * @param[in] file Path to the file containing transform function \p func.
+ * @param[in] func Transform function.
+ * @param[in] context Context (as a PyDict) to pass around information such
+ * as backend, device details, etc.
+ * @return int
+ */
 int nomp_py_apply_transform(PyObject **knl, const char *file, const char *func,
                             const PyObject *context) {
   // If either file, or func are NULL, we don't have to do anything:
@@ -171,6 +246,16 @@ int nomp_py_apply_transform(PyObject **knl, const char *file, const char *func,
   return 0;
 }
 
+/**
+ * @ingroup nomp_py_utils
+ * @brief Get kernel name and generated source for the backend.
+ *
+ * @param[out] name Kernel name as a C-string.
+ * @param[out] src Kernel source as a C-string.
+ * @param[in] knl Loopy kernel object.
+ * @param[in] backend Backend name.
+ * @return int
+ */
 int nomp_py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
                                  const char *backend) {
   int err = 1;
@@ -264,6 +349,16 @@ static int py_get_grid_size_aux(PyObject *exp, CVecBasic *vec) {
   return 0;
 }
 
+/**
+ * @ingroup nomp_py_utils
+ * @brief Get global and local grid sizes as `pymoblic` expressions.
+ *
+ * Grid sizes are stored in the program object itself.
+ *
+ * @param[in] prg Nomp program object.
+ * @param[in] knl Python kernel object.
+ * @return int
+ */
 int nomp_py_get_grid_size(struct nomp_prog_t *prg, PyObject *knl) {
   int err = 1;
   if (knl) {

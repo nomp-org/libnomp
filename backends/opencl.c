@@ -186,6 +186,19 @@ static int opencl_device_query(struct nomp_backend_t *bnd, cl_device_id id) {
   return 0;
 }
 
+/**
+ * @ingroup nomp_backend_init
+ * @brief Initializes OpenCL backend with the specified platform and device.
+ *
+ * Initializes OpenCL backend while creating a command queue using the
+ * given platform id and device id. Returns a negative value if an error
+ * occurred during the initialization, otherwise returns 0.
+ *
+ * @param[in] bnd Target backend for code generation.
+ * @param[in] platform_id Target platform id.
+ * @param[in] device_id Target device id.
+ * @return int
+ */
 int opencl_init(struct nomp_backend_t *bnd, const int platform_id,
                 const int device_id) {
   cl_uint num_platforms;

@@ -4,30 +4,26 @@
 #include "nomp-impl.h"
 
 /**
- * @defgroup nomp_reduction_ops Reduction operations supported by nomp.
- *
+ * @defgroup nomp_reduction_ops Reduction operations
  * @brief Defines reduction operations allowed in nomp kernels.
  */
 
 /**
- * @ingroup nomp_reduction_op
+ * @ingroup nomp_reduction_ops
+ * @def NOMP_SUM
  * @brief Sum reduction operation.
  */
 #define NOMP_SUM 0
 /**
- * @ingroup nomp_reduction_op
+ * @ingroup nomp_reduction_ops
+ * @def NOMP_PROD
  * @brief Product reduction operation.
  */
 #define NOMP_PROD 1
 
 /**
- * @ingroup nomp_reduction_utils
- * @brief Perform host side reduction.
- *
- * @param[in] bnd Active backend instance.
- * @param[in] prg Active program instance.
- * @param[in] m Memory used to store device side partial reductions.
- * @return int
+ * @defgroup nomp_reduction_utils Reduction utilities
+ * @brief Perform host side reductions.
  */
 int nomp_host_side_reduction(struct nomp_backend_t *bnd,
                              struct nomp_prog_t *prg, struct nomp_mem_t *m);

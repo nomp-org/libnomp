@@ -98,87 +98,22 @@ extern "C" {
 #endif
 
 /**
- * @defgroup nomp_backend_utils Backend init functions
+ * @defgroup nomp_backend_init Backend init functions
+ * @brief Functions for initializing each backend.
  */
 
-/**
- * @ingroup nomp_backend_utils
- * @brief Initializes OpenCL backend with the specified platform and device.
- *
- * Initializes OpenCL backend while creating a command queue using the
- * given platform id and device id. Returns a negative value if an error
- * occurred during the initialization, otherwise returns 0.
- *
- * @param[in] backend Target backend for code generation.
- * @param[in] platform_id Target platform id.
- * @param[in] device_id Target device id.
- * @return int
- */
 int opencl_init(struct nomp_backend_t *backend, const int platform_id,
                 const int device_id);
 
-/**
- * @ingroup nomp_backend_init
- * @brief Initializes SYCL backend with the specified platform and
- * device.
- *
- * Initializes SYCL backend while creating a command queue using the
- * given platform id and device id. Returns a positive value if an error
- * occurred during the initialization, otherwise returns 0.
- *
- * @param[in] backend Target backend for code generation.
- * @param[in] platform_id Target platform id.
- * @param[in] device_id Target device id.
- * @return int
- */
 int sycl_init(struct nomp_backend_t *backend, const int platform_id,
               const int device_id);
 
-/**
- * @ingroup nomp_backend_init
- * @brief Initializes Cuda backend with the specified platform and device.
- *
- * Initializes Cuda backend using the given device id. Platform id is not
- * used in the initialization of Cuda backend. Returns a negative value if an
- * error occurred during the initialization, otherwise returns 0.
- *
- * @param[in] backend Target backend for code generation.
- * @param[in] platform_id Target platform id.
- * @param[in] device_id Target device id.
- * @return int
- */
 int cuda_init(struct nomp_backend_t *backend, const int platform_id,
               const int device_id);
 
-/**
- * @ingroup nomp_backend_init
- * @brief Initializes HIP backend with the specified platform and device.
- *
- * Initializes HIP backend using the given device id. Platform id is not
- * used in the initialization of HIP backend. Returns a negative value if an
- * error occurred during the initialization, otherwise returns 0.
- *
- * @param[in] backend Target backend for code generation.
- * @param[in] platform_id Target platform id.
- * @param[in] device_id Target device id.
- * @return int
- */
 int hip_init(struct nomp_backend_t *backend, const int platform_id,
              const int device_id);
 
-/**
- * @ingroup nomp_backend_init
- * @brief Initializes ISPC backend with the specified platform and device.
- *
- * Initializes ISPC backend using the given device id and platform type.
- * Returns a negative value if an error occurred during the initialization,
- * otherwise returns 0.
- *
- * @param[in] backend Target backend for code generation.
- * @param[in] platform_type Target platform type.
- * @param[in] device_id Target device id.
- * @return int
- */
 int ispc_init(struct nomp_backend_t *backend, const int platform_type,
               const int device_id);
 
