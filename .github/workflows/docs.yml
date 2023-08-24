@@ -51,7 +51,7 @@ jobs:
         id: build_docs
         run: |
           ./lncfg --install-prefix ${INSTALLDIR} --prefix-path ${CONDA_PREFIX} --enable-docs
-          ./lninstall --no
+          ./lnbuild --install yes --update no
       - name: Bypass Jekyll
         id: bypass_jekyll
         if: ${{ fromJSON(env.PUSH_ON_MAIN) }}

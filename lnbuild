@@ -1,0 +1,124 @@
+#!/bin/bash
+
+# Script variables.
+: "${NOMP_SOURCE_DIR:="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"}"
+: "${NOMP_SHELL_CONFIG_FILE:="${HOME}/.bashrc"}"
+
+# Terminal output colors.
+red=$(tput setaf 1)
+green=$(tput setaf 2)
+cyan=$(tput setaf 6)
+reset=$(tput sgr0)
+
+# Read state variables created by lncfg.
+NOMP_LNSTATE_PATH="${NOMP_SOURCE_DIR}/.lnstate"
+if [[ -f "${NOMP_LNSTATE_PATH}" ]]; then
+  source "${NOMP_LNSTATE_PATH}"
+else
+  echo "${red}You should run ./lncfg before running ${0}${reset}."
+  exit 1
+fi
+if [[ -z "${NOMP_INSTALL_DIR}" ]]; then
+  echo "${red}NOMP_INSTALL_DIR is not set in .lnstate file${reset}."
+  exit 1
+fi
+
+# Create commands which goes in shell configuration.
+NOMP_ENVIRONMENT=$(cat <<-END
+# Setup nomp environment variables.
+export NOMP_INSTALL_DIR=${NOMP_INSTALL_DIR}
+# Add lnrun script to path.
+export PATH=${NOMP_INSTALL_DIR}/bin:\${PATH}
+END
+)
+
+# Check if the specified shell configuration file exists. If not, look for
+# common config files.
+if [[ ! -f "${NOMP_SHELL_CONFIG_FILE}" ]]; then
+  if [[ -f "${HOME}/.bashrc" ]]; then
+    NOMP_SHELL_CONFIG_FILE="${HOME}/.bashrc"
+  elif [[ -f "${HOME}/.zshrc" ]]; then
+    NOMP_SHELL_CONFIG_FILE="${HOME}/.zshrc"
+  else
+    NOMP_SHELL_CONFIG_FILE=""
+  fi
+fi
+
+function print_help() {
+  echo -e "Usage: ${0} [--help] [--no] [--yes]\n" \
+    "${cyan}--help:${reset} Print help for libnomp install.\n" \
+    "${cyan}--update [yes|no]${reset} Don't update shell configuration file.\n" \
+    "${cyan}--install [yes|no]${reset} Run install target.\n" \
+    "${cyan}--format [yes|no]${reset} Run format target.\n" \
+    "${cyan}--tidy [yes|no]${reset} Run tidy target.\n" \
+  exit 0
+}
+
+# Read in command line arguments.
+: ${NOMP_PROMPT:=""}
+: ${NOMP_INSTALL:="yes"}
+: ${NOMP_FORMAT:="no"}
+: ${NOMP_TIDY:="no"}
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --help) print_help ;;
+    --install)
+      NOMP_INSTALL=$(echo "$2" | tr '[:upper:]' '[:lower:]')
+      shift
+      shift
+      ;;
+    --format)
+      NOMP_FORMAT=$(echo "$2" | tr '[:upper:]' '[:lower:]')
+      shift
+      shift
+      ;;
+    --tidy)
+      NOMP_TIDY=$(echo "$2" | tr '[:upper:]' '[:lower:]')
+      shift
+      shift
+      ;;
+    --update)
+      NOMP_PROMPT=$(echo "$2" | tr '[:upper:]' '[:lower:]')
+      shift
+      shift
+      ;;
+    *) echo "${red}Invalid option: ${1}${reset}."
+    echo "See ${cyan}./${0} --help${reset} for the accepted options."
+    exit 1 ;;
+  esac
+done
+
+if [[ ${NOMP_FORMAT} == "yes" ]]; then
+  cmake --build "${NOMP_BUILD_DIR}" --target format
+fi
+
+if [[ ${NOMP_TIDY} == "yes" ]]; then
+  cmake --build "${NOMP_BUILD_DIR}" --target tidy
+fi
+
+# Helper function to update the shell configuration file.
+function update_shellrc() {
+  PROMPT="$1"
+  if [[ -z "${PROMPT}" ]]; then
+    read -p "Update ${NOMP_SHELL_CONFIG_FILE} with nomp environment variables? [yes|no]: " INPUT
+    PROMPT=$(echo "${INPUT}" | tr '[:upper:]' '[:lower:]') 
+  fi
+
+  [[ "${PROMPT}" != "yes" ]] && exit 0
+
+  if [[ -f ${NOMP_SHELL_CONFIG_FILE} ]]; then
+    echo -e "${NOMP_ENVIRONMENT}" >> "${NOMP_SHELL_CONFIG_FILE}"
+    echo "${green}Successfully exported variables to ${NOMP_SHELL_CONFIG_FILE}${reset}."
+    exit 0
+  else
+    echo "${red}Shell configration file ${NOMP_SHELL_CONFIG_FILE} doesn't exist{reset}."
+    exit 1
+  fi
+}
+
+if [[ ${NOMP_INSTALL} == "yes" ]]; then
+  cmake --build "${NOMP_BUILD_DIR}" --target install
+  RETURN_CODE=$?
+  [[ ${RETURN_CODE} -ne 0 ]] && echo "${red}Failed to install libnomp${reset}." && exit 1
+  update_shellrc "${NOMP_PROMPT}" && exit 0
+fi
