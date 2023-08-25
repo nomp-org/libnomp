@@ -21,7 +21,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Internal API" href="internal-api.html" />
-    <link rel="prev" title="Nomp Examples" href="usage.html" /> 
+    <link rel="prev" title="Nomp Examples" href="examples.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -43,10 +43,11 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="build.html">Build Instructions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="usage.html">Nomp Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Nomp Examples</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">User API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#functions">Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data-types">Data Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#functions">Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#macros">Macros</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#errors">Errors</a></li>
 </ul>
 </li>
@@ -82,8 +83,146 @@
 </div>
 <section id="user-api">
 <h1>User API<a class="headerlink" href="#user-api" title="Permalink to this heading"></a></h1>
+<section id="data-types">
+<h2>Data Types<a class="headerlink" href="#data-types" title="Permalink to this heading"></a></h2>
+<p>Defines argument type.</p>
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv411nomp_type_t">
+<span id="_CPPv311nomp_type_t"></span><span id="_CPPv211nomp_type_t"></span><span class="target" id="group__nomp__user__types_1gaa080d702bfb6a51225d549bcb3c43389"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_type_t</span></span></span><a class="headerlink" href="#_CPPv411nomp_type_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Defines argument types for a nomp kernel. Currently, only integer, float or pointer types are supported. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11nomp_type_t8NOMP_INTE">
+<span id="_CPPv3N11nomp_type_t8NOMP_INTE"></span><span id="_CPPv2N11nomp_type_t8NOMP_INTE"></span><span class="target" id="group__nomp__user__types_1ggaa080d702bfb6a51225d549bcb3c43389ae3069e6f069e8c00142f5fe791cf8da7"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_INT</span></span></span><a class="headerlink" href="#_CPPv4N11nomp_type_t8NOMP_INTE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Signed integer argument type. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11nomp_type_t9NOMP_UINTE">
+<span id="_CPPv3N11nomp_type_t9NOMP_UINTE"></span><span id="_CPPv2N11nomp_type_t9NOMP_UINTE"></span><span class="target" id="group__nomp__user__types_1ggaa080d702bfb6a51225d549bcb3c43389afafc1afa19a95da2a95d42a021115c88"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_UINT</span></span></span><a class="headerlink" href="#_CPPv4N11nomp_type_t9NOMP_UINTE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Unsigned integer argument type. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11nomp_type_t10NOMP_FLOATE">
+<span id="_CPPv3N11nomp_type_t10NOMP_FLOATE"></span><span id="_CPPv2N11nomp_type_t10NOMP_FLOATE"></span><span class="target" id="group__nomp__user__types_1ggaa080d702bfb6a51225d549bcb3c43389a82150f1b7512d525c2f57dab49ecee49"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_FLOAT</span></span></span><a class="headerlink" href="#_CPPv4N11nomp_type_t10NOMP_FLOATE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Floating point argument type. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11nomp_type_t8NOMP_PTRE">
+<span id="_CPPv3N11nomp_type_t8NOMP_PTRE"></span><span id="_CPPv2N11nomp_type_t8NOMP_PTRE"></span><span class="target" id="group__nomp__user__types_1ggaa080d702bfb6a51225d549bcb3c43389a881d9a608e7999619b0dc20ca479782f"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_PTR</span></span></span><a class="headerlink" href="#_CPPv4N11nomp_type_t8NOMP_PTRE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Pointer argument type. </p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv420nomp_map_direction_t">
+<span id="_CPPv320nomp_map_direction_t"></span><span id="_CPPv220nomp_map_direction_t"></span><span class="target" id="group__nomp__user__types_1ga9c8653d937b29cea004ff74e0ae465b1"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_map_direction_t</span></span></span><a class="headerlink" href="#_CPPv420nomp_map_direction_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Defines the update method (or operation) in <a class="reference internal" href="#group__nomp__user__api_1ga16da3dc2343fe9929cf9351fea226f2d"><span class="std std-ref">nomp_update()</span></a>. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N20nomp_map_direction_t10NOMP_ALLOCE">
+<span id="_CPPv3N20nomp_map_direction_t10NOMP_ALLOCE"></span><span id="_CPPv2N20nomp_map_direction_t10NOMP_ALLOCE"></span><span class="target" id="group__nomp__user__types_1gga9c8653d937b29cea004ff74e0ae465b1a60da8641d193fa459abb6fccdd5fa787"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_ALLOC</span></span></span><a class="headerlink" href="#_CPPv4N20nomp_map_direction_t10NOMP_ALLOCE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Allocate memory on the device. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N20nomp_map_direction_t7NOMP_TOE">
+<span id="_CPPv3N20nomp_map_direction_t7NOMP_TOE"></span><span id="_CPPv2N20nomp_map_direction_t7NOMP_TOE"></span><span class="target" id="group__nomp__user__types_1gga9c8653d937b29cea004ff74e0ae465b1a9982b527c0819a015f1cebbd47f7e85d"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_TO</span></span></span><a class="headerlink" href="#_CPPv4N20nomp_map_direction_t7NOMP_TOE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Copy host data to device. Memory will be allocated if not allocated. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N20nomp_map_direction_t9NOMP_FROME">
+<span id="_CPPv3N20nomp_map_direction_t9NOMP_FROME"></span><span id="_CPPv2N20nomp_map_direction_t9NOMP_FROME"></span><span class="target" id="group__nomp__user__types_1gga9c8653d937b29cea004ff74e0ae465b1a34a64a0414aabd7449fef3dadc227372"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_FROM</span></span></span><a class="headerlink" href="#_CPPv4N20nomp_map_direction_t9NOMP_FROME" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Copy device data to host. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N20nomp_map_direction_t9NOMP_FREEE">
+<span id="_CPPv3N20nomp_map_direction_t9NOMP_FREEE"></span><span id="_CPPv2N20nomp_map_direction_t9NOMP_FREEE"></span><span class="target" id="group__nomp__user__types_1gga9c8653d937b29cea004ff74e0ae465b1adce40162fbe1d3191ea2753afca6abcc"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_FREE</span></span></span><a class="headerlink" href="#_CPPv4N20nomp_map_direction_t9NOMP_FREEE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Free memory allocated on the device. </p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv413nomp_log_type">
+<span id="_CPPv313nomp_log_type"></span><span id="_CPPv213nomp_log_type"></span><span class="target" id="group__nomp__user__types_1gab9a322ab403d9d66a8ed27a6487aadba"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_log_type</span></span></span><a class="headerlink" href="#_CPPv413nomp_log_type" title="Permalink to this definition"></a><br /></dt>
+<dd><p>nomp log type can be an error, warning or information. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N13nomp_log_type10NOMP_ERRORE">
+<span id="_CPPv3N13nomp_log_type10NOMP_ERRORE"></span><span id="_CPPv2N13nomp_log_type10NOMP_ERRORE"></span><span class="target" id="group__nomp__user__types_1ggab9a322ab403d9d66a8ed27a6487aadbaaaa0c64194b170401c9ccaf27b15e7ade"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_ERROR</span></span></span><a class="headerlink" href="#_CPPv4N13nomp_log_type10NOMP_ERRORE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N13nomp_log_type12NOMP_WARNINGE">
+<span id="_CPPv3N13nomp_log_type12NOMP_WARNINGE"></span><span id="_CPPv2N13nomp_log_type12NOMP_WARNINGE"></span><span class="target" id="group__nomp__user__types_1ggab9a322ab403d9d66a8ed27a6487aadbaab315fb41d2eba7385d173df5465543c9"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_WARNING</span></span></span><a class="headerlink" href="#_CPPv4N13nomp_log_type12NOMP_WARNINGE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N13nomp_log_type16NOMP_INFORMATIONE">
+<span id="_CPPv3N13nomp_log_type16NOMP_INFORMATIONE"></span><span id="_CPPv2N13nomp_log_type16NOMP_INFORMATIONE"></span><span class="target" id="group__nomp__user__types_1ggab9a322ab403d9d66a8ed27a6487aadbaaf87f19553d6d80a0d2e3bb88dd1d01d6"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_INFORMATION</span></span></span><a class="headerlink" href="#_CPPv4N13nomp_log_type16NOMP_INFORMATIONE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N13nomp_log_type12NOMP_INVALIDE">
+<span id="_CPPv3N13nomp_log_type12NOMP_INVALIDE"></span><span id="_CPPv2N13nomp_log_type12NOMP_INVALIDE"></span><span class="target" id="group__nomp__user__types_1ggab9a322ab403d9d66a8ed27a6487aadbaa8ad820a1a961db2f2f646ccb6848d7e0"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_INVALID</span></span></span><a class="headerlink" href="#_CPPv4N13nomp_log_type12NOMP_INVALIDE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="functions">
 <h2>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h2>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416nomp_get_log_stri">
+<span id="_CPPv316nomp_get_log_stri"></span><span id="_CPPv216nomp_get_log_stri"></span><span id="nomp_get_log_str__i"></span><span class="target" id="group__nomp__user__api_1ga64b207d004404af50b94e91a2b571107"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_get_log_str</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416nomp_get_log_stri" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Return the log description given the log id. </p>
+<p>Returns the log description given the log id. Returns NULL if the id is invalid. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>id</strong> – <strong>[in]</strong> id of the error. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>char* </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415nomp_get_log_noi">
+<span id="_CPPv315nomp_get_log_noi"></span><span id="_CPPv215nomp_get_log_noi"></span><span id="nomp_get_log_no__i"></span><span class="target" id="group__nomp__user__api_1ga6100f1d4760f0d62ace45115288d19eb"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_get_log_no</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">log_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415nomp_get_log_noi" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Return log number. </p>
+<p>Returns the log number given the log_id. If log_id is invalid return NOMP_USER_LOG_ID_IS_INVALID. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>log_id</strong> – <strong>[in]</strong> id of the log. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417nomp_get_log_typei">
+<span id="_CPPv317nomp_get_log_typei"></span><span id="_CPPv217nomp_get_log_typei"></span><span id="nomp_get_log_type__i"></span><span class="target" id="group__nomp__user__api_1ga32958362294e5d8b4478ba76b831cb86"></span><a class="reference internal" href="#_CPPv413nomp_log_type" title="nomp_log_type"><span class="n"><span class="pre">nomp_log_type</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_get_log_type</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">log_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417nomp_get_log_typei" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Return log type. </p>
+<p>Returns the log type given the log_id. Log type is either NOMP_ERROR, NOMP_INFORMATION or NOMP_WARNING. If log_id is invalid return NOMP_INVALID. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>log_id</strong> – <strong>[in]</strong> id of the log. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int </p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv49nomp_initiPPKc">
 <span id="_CPPv39nomp_initiPPKc"></span><span id="_CPPv29nomp_initiPPKc"></span><span id="nomp_init__i.cCPP"></span><span class="target" id="group__nomp__user__api_1ga9358288c50bff846af3475fdb09e2f5f"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_init</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">argc</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">argv</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49nomp_initiPPKc" title="Permalink to this definition"></a><br /></dt>
@@ -98,8 +237,8 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">--nomp-install-dir</span> <span class="pre">&lt;install-dir&gt;</span></code> Specify <code class="docutils literal notranslate"><span class="pre">libnomp</span></code> install directory. </p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">--nomp-function</span> <span class="pre">&lt;annotation-function&gt;</span></code> Specify the annotation function name.</p></li>
 </ul>
-<strong>Example usage:</strong> <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;--backend&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;opencl&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;-device&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;0&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;--platform&quot;</span><span class="p">,</span>
-<span class="s">&quot;0&quot;</span><span class="p">};</span>
+<strong>Example usage:</strong> <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;--nomp-backend&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;opencl&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;--nomp-device&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;0&quot;</span><span class="p">,</span>
+<span class="s">&quot;--nomp-platform&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;0&quot;</span><span class="p">};</span>
 <span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span>
 <span class="kt">int</span><span class="w"> </span><span class="n">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nomp_init</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="n">argv</span><span class="p">);</span>
 </pre></div>
@@ -120,7 +259,7 @@
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv411nomp_updatePv6size_t6size_t6size_t20nomp_map_direction_t">
-<span id="_CPPv311nomp_updatePv6size_t6size_t6size_t20nomp_map_direction_t"></span><span id="_CPPv211nomp_updatePv6size_t6size_t6size_t20nomp_map_direction_t"></span><span id="nomp_update__voidP.s.s.s.nomp_map_direction_t"></span><span class="target" id="group__nomp__user__api_1gaa8dc9b167bf514e2f3cc4ff6f9dfb6a0"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_update</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ptr</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_idx</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">end_idx</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">unit_size</span></span>, <a class="reference internal" href="#_CPPv420nomp_map_direction_t" title="nomp_map_direction_t"><span class="n"><span class="pre">nomp_map_direction_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">op</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411nomp_updatePv6size_t6size_t6size_t20nomp_map_direction_t" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv311nomp_updatePv6size_t6size_t6size_t20nomp_map_direction_t"></span><span id="_CPPv211nomp_updatePv6size_t6size_t6size_t20nomp_map_direction_t"></span><span id="nomp_update__voidP.s.s.s.nomp_map_direction_t"></span><span class="target" id="group__nomp__user__api_1ga16da3dc2343fe9929cf9351fea226f2d"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_update</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ptr</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">idx0</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">idx1</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">usize</span></span>, <a class="reference internal" href="#_CPPv420nomp_map_direction_t" title="nomp_map_direction_t"><span class="n"><span class="pre">nomp_map_direction_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">op</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411nomp_updatePv6size_t6size_t6size_t20nomp_map_direction_t" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Performs device to host (D2H) and host to device (H2D) memory transfers, allocating and freeing of memory in the device. </p>
 <p>
 Operation <code class="docutils literal notranslate"><span class="pre">op</span></code> will be performed on the array slice [<code class="docutils literal notranslate"><span class="pre">start_idx</span></code>, <code class="docutils literal notranslate"><span class="pre">end_idx</span></code>), i.e., on array elements start_idx, … end_idx - 1. This method returns a non-zero value if there is an error and 0 otherwise.</p>
@@ -147,10 +286,10 @@ Operation <code class="docutils literal notranslate"><span class="pre">op</span>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ptr</strong> – <strong>[in]</strong> Pointer to the host memory location. </p></li>
-<li><p><strong>start_idx</strong> – <strong>[in]</strong> Start index in the vector to start copying. </p></li>
-<li><p><strong>end_idx</strong> – <strong>[in]</strong> End index in the vector to end the copying. </p></li>
-<li><p><strong>unit_size</strong> – <strong>[in]</strong> Size of a single vector element. </p></li>
-<li><p><strong>op</strong> – <strong>[in]</strong> Operation to perform (One of <a class="reference internal" href="#group__nomp__types_1ga9c8653d937b29cea004ff74e0ae465b1"><span class="std std-ref">nomp_map_direction_t</span></a>). </p></li>
+<li><p><strong>idx0</strong> – <strong>[in]</strong> Start index in the vector to start copying. </p></li>
+<li><p><strong>idx1</strong> – <strong>[in]</strong> End index in the vector to end the copying. </p></li>
+<li><p><strong>usize</strong> – <strong>[in]</strong> Size of a single vector element. </p></li>
+<li><p><strong>op</strong> – <strong>[in]</strong> Operation to perform (One of <a class="reference internal" href="#group__nomp__user__types_1ga9c8653d937b29cea004ff74e0ae465b1"><span class="std std-ref">nomp_map_direction_t</span></a>). </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -161,9 +300,9 @@ Operation <code class="docutils literal notranslate"><span class="pre">op</span>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv48nomp_jitPiPKcPPKciz">
-<span id="_CPPv38nomp_jitPiPKcPPKciz"></span><span id="_CPPv28nomp_jitPiPKcPPKciz"></span><span id="nomp_jit__iP.cCP.cCPP.i.z"></span><span class="target" id="group__nomp__user__api_1gab793ec09db7c8a89656061e6d67c4d75"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_jit</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">src</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">clauses</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nargs</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48nomp_jitPiPKcPPKciz" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv38nomp_jitPiPKcPPKciz"></span><span id="_CPPv28nomp_jitPiPKcPPKciz"></span><span id="nomp_jit__iP.cCP.cCPP.i.z"></span><span class="target" id="group__nomp__user__api_1ga3c5307206d678abff8683e6cac4c983f"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_jit</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">csrc</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">clauses</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nargs</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48nomp_jitPiPKcPPKciz" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Generate and compile a kernel for the targe backend (OpenCL, etc.) from C source. </p>
-<p>Target backend is the one provided during the initialization of libnomp using <a class="reference internal" href="#group__nomp__user__api_1ga9358288c50bff846af3475fdb09e2f5f"><span class="std std-ref">nomp_init()</span></a>. User defined code transformations will be applied based on the clauses specified in <code class="docutils literal notranslate"><span class="pre">clauses</span></code> argument. Additional kernel meta data can be passed using the <code class="docutils literal notranslate"><span class="pre">clauses</span></code> as well. After <code class="docutils literal notranslate"><span class="pre">clauses</span></code>, number of arguments to the kernel must be provided. Then for each argument, three values has to be passed. First is the argument name as a string. Second is is the <code class="docutils literal notranslate"><span class="pre">sizeof</span></code> argument and the third if argument type (one of Data Types).</p>
+<p>Target backend is the one provided during the initialization of libnomp using <a class="reference internal" href="#group__nomp__user__api_1ga9358288c50bff846af3475fdb09e2f5f"><span class="std std-ref">nomp_init()</span></a>. User defined code transformations will be applied based on the clauses specified in <code class="docutils literal notranslate"><span class="pre">clauses</span></code> argument. Additional kernel meta data can be passed using the <code class="docutils literal notranslate"><span class="pre">clauses</span></code> as well. After <code class="docutils literal notranslate"><span class="pre">clauses</span></code>, number of arguments to the kernel must be provided. Then for each argument, three values has to be passed. First is the argument name as a string. Second is is the <code class="docutils literal notranslate"><span class="pre">sizeof</span></code> argument and the third if argument type (one of User types).</p>
 <p><strong>Example usage:</strong> <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
 <span class="kt">double</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span><span class="w"> </span><span class="n">b</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span>
 <span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
@@ -182,7 +321,7 @@ Operation <code class="docutils literal notranslate"><span class="pre">op</span>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>id</strong> – <strong>[out]</strong> Id of the generated kernel. </p></li>
-<li><p><strong>src</strong> – <strong>[in]</strong> Kernel source in C. </p></li>
+<li><p><strong>csrc</strong> – <strong>[in]</strong> Kernel source in C. </p></li>
 <li><p><strong>clauses</strong> – <strong>[in]</strong> Clauses to provide meta information about the kernel. </p></li>
 <li><p><strong>nargs</strong> – <strong>[in]</strong> Number of arguments to the kernel. </p></li>
 <li><p><strong>...</strong> – <strong>[in]</strong> Three values for each argument: identifier, sizeof(argument) and argument type. </p></li>
@@ -197,7 +336,7 @@ Operation <code class="docutils literal notranslate"><span class="pre">op</span>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv48nomp_runiz">
 <span id="_CPPv38nomp_runiz"></span><span id="_CPPv28nomp_runiz"></span><span id="nomp_run__i.z"></span><span class="target" id="group__nomp__user__api_1ga494dfc32c43ad18c16022bfdcaeec9c3"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_run</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48nomp_runiz" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Runs the kernel generated by <a class="reference internal" href="#group__nomp__user__api_1gab793ec09db7c8a89656061e6d67c4d75"><span class="std std-ref">nomp_jit()</span></a>. </p>
+<dd><p>Runs the kernel generated by <a class="reference internal" href="#group__nomp__user__api_1ga3c5307206d678abff8683e6cac4c983f"><span class="std std-ref">nomp_jit()</span></a>. </p>
 <p>Runs the kernel with a given kernel id. Kernel id is followed by the arguments (i.e., pointers and pointer to scalar variables).</p>
 <p><strong>Example usage:</strong> <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
 <span class="kt">double</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span><span class="w"> </span><span class="n">b</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span>
@@ -241,51 +380,6 @@ Operation <code class="docutils literal notranslate"><span class="pre">op</span>
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv416nomp_get_log_stri">
-<span id="_CPPv316nomp_get_log_stri"></span><span id="_CPPv216nomp_get_log_stri"></span><span id="nomp_get_log_str__i"></span><span class="target" id="group__nomp__user__api_1ga64b207d004404af50b94e91a2b571107"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_get_log_str</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416nomp_get_log_stri" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Return the log description given the log id. </p>
-<p>Returns the log description given the log id. Returns NULL if the id is invalid. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>id</strong> – <strong>[in]</strong> id of the error. </p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>char* </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv415nomp_get_log_noi">
-<span id="_CPPv315nomp_get_log_noi"></span><span id="_CPPv215nomp_get_log_noi"></span><span id="nomp_get_log_no__i"></span><span class="target" id="group__nomp__user__api_1ga6100f1d4760f0d62ace45115288d19eb"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_get_log_no</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">log_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415nomp_get_log_noi" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Return log number. </p>
-<p>Returns the log number given the log_id. If log_id is invalid return NOMP_USER_LOG_ID_IS_INVALID. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>log_id</strong> – <strong>[in]</strong> id of the log. </p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>int </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv417nomp_get_log_typei">
-<span id="_CPPv317nomp_get_log_typei"></span><span id="_CPPv217nomp_get_log_typei"></span><span id="nomp_get_log_type__i"></span><span class="target" id="group__nomp__user__api_1ga32958362294e5d8b4478ba76b831cb86"></span><span class="n"><span class="pre">nomp_log_type</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_get_log_type</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">log_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417nomp_get_log_typei" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Return log type. </p>
-<p>Returns the log type given the log_id. Log type is either NOMP_ERROR, NOMP_INFORMATION or NOMP_WARNING. If log_id is invalid return NOMP_INVALID. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>log_id</strong> – <strong>[in]</strong> id of the log. </p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>int </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv413nomp_finalizev">
 <span id="_CPPv313nomp_finalizev"></span><span id="_CPPv213nomp_finalizev"></span><span id="nomp_finalize__void"></span><span class="target" id="group__nomp__user__api_1gacbf8860cf851702394683d8eaf29c3e4"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_finalize</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413nomp_finalizev" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Finalizes libnomp runtime. </p>
@@ -297,9 +391,12 @@ Operation <code class="docutils literal notranslate"><span class="pre">op</span>
 </dl>
 </dd></dl>
 
+</section>
+<section id="macros">
+<h2>Macros<a class="headerlink" href="#macros" title="Permalink to this heading"></a></h2>
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.nomp_check">
-<span class="target" id="group__nomp__user__api_1gabfb8762cd93e8286f92bc1adee227c94"></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_check</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">err</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nomp_check" title="Permalink to this definition"></a><br /></dt>
+<span class="target" id="group__nomp__user__macros_1gabfb8762cd93e8286f92bc1adee227c94"></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_check</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">err</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nomp_check" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Check nomp API return values for errors. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -311,185 +408,119 @@ Operation <code class="docutils literal notranslate"><span class="pre">op</span>
 </dd></dl>
 
 </section>
-<section id="data-types">
-<h2>Data Types<a class="headerlink" href="#data-types" title="Permalink to this heading"></a></h2>
-<p>Defines argument type.</p>
-<dl class="cpp enum">
-<dt class="sig sig-object cpp" id="_CPPv411nomp_type_t">
-<span id="_CPPv311nomp_type_t"></span><span id="_CPPv211nomp_type_t"></span><span class="target" id="group__nomp__types_1gaa080d702bfb6a51225d549bcb3c43389"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_type_t</span></span></span><a class="headerlink" href="#_CPPv411nomp_type_t" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Defines argument types for a nomp kernel. Currently, only integer, float or pointer types are supported. </p>
-<p><em>Values:</em></p>
-<dl class="cpp enumerator">
-<dt class="sig sig-object cpp" id="_CPPv4N11nomp_type_t8NOMP_INTE">
-<span id="_CPPv3N11nomp_type_t8NOMP_INTE"></span><span id="_CPPv2N11nomp_type_t8NOMP_INTE"></span><span class="target" id="group__nomp__types_1ggaa080d702bfb6a51225d549bcb3c43389ae3069e6f069e8c00142f5fe791cf8da7"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_INT</span></span></span><a class="headerlink" href="#_CPPv4N11nomp_type_t8NOMP_INTE" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Signed integer argument type. </p>
-</dd></dl>
-
-<dl class="cpp enumerator">
-<dt class="sig sig-object cpp" id="_CPPv4N11nomp_type_t9NOMP_UINTE">
-<span id="_CPPv3N11nomp_type_t9NOMP_UINTE"></span><span id="_CPPv2N11nomp_type_t9NOMP_UINTE"></span><span class="target" id="group__nomp__types_1ggaa080d702bfb6a51225d549bcb3c43389afafc1afa19a95da2a95d42a021115c88"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_UINT</span></span></span><a class="headerlink" href="#_CPPv4N11nomp_type_t9NOMP_UINTE" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Unsigned integer argument type. </p>
-</dd></dl>
-
-<dl class="cpp enumerator">
-<dt class="sig sig-object cpp" id="_CPPv4N11nomp_type_t10NOMP_FLOATE">
-<span id="_CPPv3N11nomp_type_t10NOMP_FLOATE"></span><span id="_CPPv2N11nomp_type_t10NOMP_FLOATE"></span><span class="target" id="group__nomp__types_1ggaa080d702bfb6a51225d549bcb3c43389a82150f1b7512d525c2f57dab49ecee49"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_FLOAT</span></span></span><a class="headerlink" href="#_CPPv4N11nomp_type_t10NOMP_FLOATE" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Floating point argument type. </p>
-</dd></dl>
-
-<dl class="cpp enumerator">
-<dt class="sig sig-object cpp" id="_CPPv4N11nomp_type_t8NOMP_PTRE">
-<span id="_CPPv3N11nomp_type_t8NOMP_PTRE"></span><span id="_CPPv2N11nomp_type_t8NOMP_PTRE"></span><span class="target" id="group__nomp__types_1ggaa080d702bfb6a51225d549bcb3c43389a881d9a608e7999619b0dc20ca479782f"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_PTR</span></span></span><a class="headerlink" href="#_CPPv4N11nomp_type_t8NOMP_PTRE" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Pointer argument type. </p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="cpp enum">
-<dt class="sig sig-object cpp" id="_CPPv420nomp_map_direction_t">
-<span id="_CPPv320nomp_map_direction_t"></span><span id="_CPPv220nomp_map_direction_t"></span><span class="target" id="group__nomp__types_1ga9c8653d937b29cea004ff74e0ae465b1"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_map_direction_t</span></span></span><a class="headerlink" href="#_CPPv420nomp_map_direction_t" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Defines the update direction (or operation) in <a class="reference internal" href="#group__nomp__user__api_1gaa8dc9b167bf514e2f3cc4ff6f9dfb6a0"><span class="std std-ref">nomp_update()</span></a>. </p>
-<p><em>Values:</em></p>
-<dl class="cpp enumerator">
-<dt class="sig sig-object cpp" id="_CPPv4N20nomp_map_direction_t10NOMP_ALLOCE">
-<span id="_CPPv3N20nomp_map_direction_t10NOMP_ALLOCE"></span><span id="_CPPv2N20nomp_map_direction_t10NOMP_ALLOCE"></span><span class="target" id="group__nomp__types_1gga9c8653d937b29cea004ff74e0ae465b1a60da8641d193fa459abb6fccdd5fa787"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_ALLOC</span></span></span><a class="headerlink" href="#_CPPv4N20nomp_map_direction_t10NOMP_ALLOCE" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Allocate memory on the device. </p>
-</dd></dl>
-
-<dl class="cpp enumerator">
-<dt class="sig sig-object cpp" id="_CPPv4N20nomp_map_direction_t7NOMP_TOE">
-<span id="_CPPv3N20nomp_map_direction_t7NOMP_TOE"></span><span id="_CPPv2N20nomp_map_direction_t7NOMP_TOE"></span><span class="target" id="group__nomp__types_1gga9c8653d937b29cea004ff74e0ae465b1a9982b527c0819a015f1cebbd47f7e85d"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_TO</span></span></span><a class="headerlink" href="#_CPPv4N20nomp_map_direction_t7NOMP_TOE" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Copy host data to device. Memory will be allocated if not allocated. </p>
-</dd></dl>
-
-<dl class="cpp enumerator">
-<dt class="sig sig-object cpp" id="_CPPv4N20nomp_map_direction_t9NOMP_FROME">
-<span id="_CPPv3N20nomp_map_direction_t9NOMP_FROME"></span><span id="_CPPv2N20nomp_map_direction_t9NOMP_FROME"></span><span class="target" id="group__nomp__types_1gga9c8653d937b29cea004ff74e0ae465b1a34a64a0414aabd7449fef3dadc227372"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_FROM</span></span></span><a class="headerlink" href="#_CPPv4N20nomp_map_direction_t9NOMP_FROME" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Copy device data to host. </p>
-</dd></dl>
-
-<dl class="cpp enumerator">
-<dt class="sig sig-object cpp" id="_CPPv4N20nomp_map_direction_t9NOMP_FREEE">
-<span id="_CPPv3N20nomp_map_direction_t9NOMP_FREEE"></span><span id="_CPPv2N20nomp_map_direction_t9NOMP_FREEE"></span><span class="target" id="group__nomp__types_1gga9c8653d937b29cea004ff74e0ae465b1adce40162fbe1d3191ea2753afca6abcc"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_FREE</span></span></span><a class="headerlink" href="#_CPPv4N20nomp_map_direction_t9NOMP_FREEE" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Free memory allocated on the device. </p>
-</dd></dl>
-
-</dd></dl>
-
-</section>
 <section id="errors">
-<span id="group-nomp-errors"></span><h2>Errors<a class="headerlink" href="#errors" title="Permalink to this heading"></a></h2>
+<h2>Errors<a class="headerlink" href="#errors" title="Permalink to this heading"></a></h2>
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_USER_INPUT_IS_INVALID">
-<span class="target" id="group__nomp__errors_1ga52b8d0a91a2bd7ce49d5b04c7de2feb5"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_USER_INPUT_IS_INVALID</span></span></span><a class="headerlink" href="#c.NOMP_USER_INPUT_IS_INVALID" title="Permalink to this definition"></a><br /></dt>
+<span class="target" id="group__nomp__user__errors_1ga52b8d0a91a2bd7ce49d5b04c7de2feb5"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_USER_INPUT_IS_INVALID</span></span></span><a class="headerlink" href="#c.NOMP_USER_INPUT_IS_INVALID" title="Permalink to this definition"></a><br /></dt>
 <dd><p>One of the inputs to a libnomp function call are not valid. </p>
 </dd></dl>
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_USER_MAP_PTR_IS_INVALID">
-<span class="target" id="group__nomp__errors_1ga14704356174635cb0bd692a83810cc54"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_USER_MAP_PTR_IS_INVALID</span></span></span><a class="headerlink" href="#c.NOMP_USER_MAP_PTR_IS_INVALID" title="Permalink to this definition"></a><br /></dt>
+<span class="target" id="group__nomp__user__errors_1ga14704356174635cb0bd692a83810cc54"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_USER_MAP_PTR_IS_INVALID</span></span></span><a class="headerlink" href="#c.NOMP_USER_MAP_PTR_IS_INVALID" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Map pointer provided to libnomp is not valid. </p>
 </dd></dl>
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_USER_MAP_OP_IS_INVALID">
-<span class="target" id="group__nomp__errors_1gaa3a328eb103ab7732bcee5295b952f3d"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_USER_MAP_OP_IS_INVALID</span></span></span><a class="headerlink" href="#c.NOMP_USER_MAP_OP_IS_INVALID" title="Permalink to this definition"></a><br /></dt>
+<span class="target" id="group__nomp__user__errors_1gaa3a328eb103ab7732bcee5295b952f3d"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_USER_MAP_OP_IS_INVALID</span></span></span><a class="headerlink" href="#c.NOMP_USER_MAP_OP_IS_INVALID" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Map operation provided to libnomp is not applicable. </p>
 </dd></dl>
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_USER_LOG_ID_IS_INVALID">
-<span class="target" id="group__nomp__errors_1gacab9dfe45d867879b640d477339d6b58"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_USER_LOG_ID_IS_INVALID</span></span></span><a class="headerlink" href="#c.NOMP_USER_LOG_ID_IS_INVALID" title="Permalink to this definition"></a><br /></dt>
+<span class="target" id="group__nomp__user__errors_1gacab9dfe45d867879b640d477339d6b58"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_USER_LOG_ID_IS_INVALID</span></span></span><a class="headerlink" href="#c.NOMP_USER_LOG_ID_IS_INVALID" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Log id provided to libnomp is not valid. </p>
 </dd></dl>
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_USER_KNL_ARG_TYPE_IS_INVALID">
-<span class="target" id="group__nomp__errors_1gae3a653c8477c8cea5db0d5292f98579b"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_USER_KNL_ARG_TYPE_IS_INVALID</span></span></span><a class="headerlink" href="#c.NOMP_USER_KNL_ARG_TYPE_IS_INVALID" title="Permalink to this definition"></a><br /></dt>
+<span class="target" id="group__nomp__user__errors_1gae3a653c8477c8cea5db0d5292f98579b"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_USER_KNL_ARG_TYPE_IS_INVALID</span></span></span><a class="headerlink" href="#c.NOMP_USER_KNL_ARG_TYPE_IS_INVALID" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Kernel argument type provided to libnomp is not valid. </p>
 </dd></dl>
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_INITIALIZE_FAILURE">
-<span class="target" id="group__nomp__errors_1ga13ae026c6c02d62f0a980cc713fa6f9c"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_INITIALIZE_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_INITIALIZE_FAILURE" title="Permalink to this definition"></a><br /></dt>
+<span class="target" id="group__nomp__user__errors_1ga13ae026c6c02d62f0a980cc713fa6f9c"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_INITIALIZE_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_INITIALIZE_FAILURE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>libnomp is already initialized. </p>
 </dd></dl>
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_FINALIZE_FAILURE">
-<span class="target" id="group__nomp__errors_1ga7affd9633a37be919d471bf99304a956"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_FINALIZE_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_FINALIZE_FAILURE" title="Permalink to this definition"></a><br /></dt>
+<span class="target" id="group__nomp__user__errors_1ga7affd9633a37be919d471bf99304a956"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_FINALIZE_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_FINALIZE_FAILURE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Failed to finalize libnomp. </p>
 </dd></dl>
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_NOT_IMPLEMENTED_ERROR">
-<span class="target" id="group__nomp__errors_1ga7b1792597780372f46ac24737805d80f"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_NOT_IMPLEMENTED_ERROR</span></span></span><a class="headerlink" href="#c.NOMP_NOT_IMPLEMENTED_ERROR" title="Permalink to this definition"></a><br /></dt>
+<span class="target" id="group__nomp__user__errors_1ga7b1792597780372f46ac24737805d80f"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_NOT_IMPLEMENTED_ERROR</span></span></span><a class="headerlink" href="#c.NOMP_NOT_IMPLEMENTED_ERROR" title="Permalink to this definition"></a><br /></dt>
 <dd><p>The feature is not implemented. </p>
 </dd></dl>
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_PY_CALL_FAILURE">
-<span class="target" id="group__nomp__errors_1gad411377fc36b3278318d135304df9011"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_PY_CALL_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_PY_CALL_FAILURE" title="Permalink to this definition"></a><br /></dt>
+<span class="target" id="group__nomp__user__errors_1gad411377fc36b3278318d135304df9011"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_PY_CALL_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_PY_CALL_FAILURE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>A python call made by libnomp failed. </p>
 </dd></dl>
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_LOOPY_CONVERSION_FAILURE">
-<span class="target" id="group__nomp__errors_1gaa1c5a8fa4227bcc637a0d5569bb4bba0"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_LOOPY_CONVERSION_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_LOOPY_CONVERSION_FAILURE" title="Permalink to this definition"></a><br /></dt>
+<span class="target" id="group__nomp__user__errors_1gaa1c5a8fa4227bcc637a0d5569bb4bba0"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_LOOPY_CONVERSION_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_LOOPY_CONVERSION_FAILURE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Loopy conversion failed. </p>
 </dd></dl>
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_LOOPY_KNL_NAME_NOT_FOUND">
-<span class="target" id="group__nomp__errors_1ga97bd2bb5392be9d151cc2fc9248704bc"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_LOOPY_KNL_NAME_NOT_FOUND</span></span></span><a class="headerlink" href="#c.NOMP_LOOPY_KNL_NAME_NOT_FOUND" title="Permalink to this definition"></a><br /></dt>
+<span class="target" id="group__nomp__user__errors_1ga97bd2bb5392be9d151cc2fc9248704bc"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_LOOPY_KNL_NAME_NOT_FOUND</span></span></span><a class="headerlink" href="#c.NOMP_LOOPY_KNL_NAME_NOT_FOUND" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Failed to find loopy kernel. </p>
 </dd></dl>
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_LOOPY_CODEGEN_FAILURE">
-<span class="target" id="group__nomp__errors_1ga1da82121ad001ca2c288fae459349002"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_LOOPY_CODEGEN_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_LOOPY_CODEGEN_FAILURE" title="Permalink to this definition"></a><br /></dt>
+<span class="target" id="group__nomp__user__errors_1ga1da82121ad001ca2c288fae459349002"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_LOOPY_CODEGEN_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_LOOPY_CODEGEN_FAILURE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Code generation from loopy kernel failed. </p>
 </dd></dl>
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_LOOPY_GRIDSIZE_FAILURE">
-<span class="target" id="group__nomp__errors_1gaefb03433aaf2e8dcc970f44550362f34"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_LOOPY_GRIDSIZE_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_LOOPY_GRIDSIZE_FAILURE" title="Permalink to this definition"></a><br /></dt>
+<span class="target" id="group__nomp__user__errors_1gaefb03433aaf2e8dcc970f44550362f34"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_LOOPY_GRIDSIZE_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_LOOPY_GRIDSIZE_FAILURE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Code generation from loopy kernel failed. </p>
 </dd></dl>
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_CUDA_FAILURE">
-<span class="target" id="group__nomp__errors_1ga5fec2498a76d3d5436049dca98b0dc1e"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_CUDA_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_CUDA_FAILURE" title="Permalink to this definition"></a><br /></dt>
+<span class="target" id="group__nomp__user__errors_1ga5fec2498a76d3d5436049dca98b0dc1e"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_CUDA_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_CUDA_FAILURE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>libnomp Cuda operation failed. </p>
 </dd></dl>
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_HIP_FAILURE">
-<span class="target" id="group__nomp__errors_1gaa10c74657396ae1be93ea0d71c0612f0"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_HIP_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_HIP_FAILURE" title="Permalink to this definition"></a><br /></dt>
+<span class="target" id="group__nomp__user__errors_1gaa10c74657396ae1be93ea0d71c0612f0"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_HIP_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_HIP_FAILURE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>libnomp HIP failed. </p>
 </dd></dl>
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_OPENCL_FAILURE">
-<span class="target" id="group__nomp__errors_1gac8a9d1e0e7fe73b2ccef64eedc7f3ad3"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_OPENCL_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_OPENCL_FAILURE" title="Permalink to this definition"></a><br /></dt>
+<span class="target" id="group__nomp__user__errors_1gac8a9d1e0e7fe73b2ccef64eedc7f3ad3"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_OPENCL_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_OPENCL_FAILURE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>libnomp OpenCL failure. </p>
 </dd></dl>
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_SYCL_FAILURE">
-<span class="target" id="group__nomp__errors_1ga4eebf8bac5a52b077ff57a7c01548052"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_SYCL_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_SYCL_FAILURE" title="Permalink to this definition"></a><br /></dt>
+<span class="target" id="group__nomp__user__errors_1ga4eebf8bac5a52b077ff57a7c01548052"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_SYCL_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_SYCL_FAILURE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>libnomp SYCL failure. </p>
 </dd></dl>
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_ISPC_FAILURE">
-<span class="target" id="group__nomp__errors_1ga5fd2e0c292b1d898415030289be19ca1"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_ISPC_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_ISPC_FAILURE" title="Permalink to this definition"></a><br /></dt>
+<span class="target" id="group__nomp__user__errors_1ga5fd2e0c292b1d898415030289be19ca1"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_ISPC_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_ISPC_FAILURE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>libnomp ISPC failure. </p>
 </dd></dl>
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_JIT_FAILURE">
-<span class="target" id="group__nomp__errors_1ga69a43ed070537af9e7d342699852b6c4"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_JIT_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_JIT_FAILURE" title="Permalink to this definition"></a><br /></dt>
+<span class="target" id="group__nomp__user__errors_1ga69a43ed070537af9e7d342699852b6c4"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_JIT_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_JIT_FAILURE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>libnomp JIT failure. </p>
 </dd></dl>
 
@@ -500,7 +531,7 @@ Operation <code class="docutils literal notranslate"><span class="pre">op</span>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="usage.html" class="btn btn-neutral float-left" title="Nomp Examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="examples.html" class="btn btn-neutral float-left" title="Nomp Examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="internal-api.html" class="btn btn-neutral float-right" title="Internal API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

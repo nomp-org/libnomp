@@ -43,13 +43,14 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="build.html">Build Instructions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="usage.html">Nomp Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Nomp Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user-api.html">User API</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Internal API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#backend-init-functions">Backend init functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#python-helper-functions">Python helper functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#memory-management-functions">Memory management functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#kernel-compilation-functions">Kernel compilation functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reductions-and-related-functions">Reductions and related functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#logging-functions">Logging functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#profiler-functions">Profiler functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#other-helper-functions">Other helper functions</a></li>
@@ -89,14 +90,52 @@
 <section id="backend-init-functions">
 <h2>Backend init functions<a class="headerlink" href="#backend-init-functions" title="Permalink to this heading"></a></h2>
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49ispc_initP14nomp_backend_tKiKi">
+<span id="_CPPv39ispc_initP14nomp_backend_tKiKi"></span><span id="_CPPv29ispc_initP14nomp_backend_tKiKi"></span><span id="ispc_init__nomp_backend_tP.iC.iC"></span><span class="target" id="group__nomp__backend__init_1ga6cd90e2e576bb783a8de0a7b8361af75"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ispc_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">nomp_backend_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">bnd</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">platform_type</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">device_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49ispc_initP14nomp_backend_tKiKi" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Initializes ISPC backend with the specified platform and device. </p>
+<p>Initializes ISPC backend using the given device id and platform type. Returns a negative value if an error occurred during the initialization, otherwise returns 0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bnd</strong> – <strong>[in]</strong> Target backend for code generation. </p></li>
+<li><p><strong>platform_type</strong> – <strong>[in]</strong> Target platform type. </p></li>
+<li><p><strong>device_id</strong> – <strong>[in]</strong> Target device id. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv411opencl_initP14nomp_backend_tKiKi">
-<span id="_CPPv311opencl_initP14nomp_backend_tKiKi"></span><span id="_CPPv211opencl_initP14nomp_backend_tKiKi"></span><span id="opencl_init__nomp_backend_tP.iC.iC"></span><span class="target" id="group__nomp__backend__utils_1gad2b5a46edf5760c93e37d9ec45fc256a"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">opencl_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">nomp_backend_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">backend</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">platform_id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">device_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411opencl_initP14nomp_backend_tKiKi" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv311opencl_initP14nomp_backend_tKiKi"></span><span id="_CPPv211opencl_initP14nomp_backend_tKiKi"></span><span id="opencl_init__nomp_backend_tP.iC.iC"></span><span class="target" id="group__nomp__backend__init_1ga3d6ad028e5bde1ede75eb26da54f8eb2"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">opencl_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">nomp_backend_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">bnd</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">platform_id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">device_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411opencl_initP14nomp_backend_tKiKi" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Initializes OpenCL backend with the specified platform and device. </p>
 <p>Initializes OpenCL backend while creating a command queue using the given platform id and device id. Returns a negative value if an error occurred during the initialization, otherwise returns 0.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>backend</strong> – <strong>[in]</strong> Target backend for code generation. </p></li>
+<li><p><strong>bnd</strong> – <strong>[in]</strong> Target backend for code generation. </p></li>
+<li><p><strong>platform_id</strong> – <strong>[in]</strong> Target platform id. </p></li>
+<li><p><strong>device_id</strong> – <strong>[in]</strong> Target device id. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49sycl_initP14nomp_backend_tKiKi">
+<span id="_CPPv39sycl_initP14nomp_backend_tKiKi"></span><span id="_CPPv29sycl_initP14nomp_backend_tKiKi"></span><span id="sycl_init__nomp_backend_tP.iC.iC"></span><span class="target" id="group__nomp__backend__init_1ga551bd42a5dedda1b750b5a75a831803a"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sycl_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">nomp_backend_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">bnd</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">platform_id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">device_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49sycl_initP14nomp_backend_tKiKi" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Initializes SYCL backend with the specified platform and device. </p>
+<p>Initializes SYCL backend while creating a command queue using the given platform id and device id. Returns a positive value if an error occurred during the initialization, otherwise returns 0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bnd</strong> – <strong>[in]</strong> Target backend for code generation. </p></li>
 <li><p><strong>platform_id</strong> – <strong>[in]</strong> Target platform id. </p></li>
 <li><p><strong>device_id</strong> – <strong>[in]</strong> Target device id. </p></li>
 </ul>
@@ -111,30 +150,29 @@
 <section id="python-helper-functions">
 <h2>Python helper functions<a class="headerlink" href="#python-helper-functions" title="Permalink to this heading"></a></h2>
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413nomp_py_printPKcP8PyObject">
+<span id="_CPPv313nomp_py_printPKcP8PyObject"></span><span id="_CPPv213nomp_py_printPKcP8PyObject"></span><span id="nomp_py_print__cCP.PyObjectP"></span><span class="target" id="group__nomp__py__utils_1gac33651d2915d8db9be94316cae2a2b56"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_print</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">msg</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">obj</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413nomp_py_printPKcP8PyObject" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Get the string representation of python object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msg</strong> – Debug message before printing the object. </p></li>
+<li><p><strong>obj</strong> – Python object. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>void </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv426nomp_py_append_to_sys_pathPKc">
 <span id="_CPPv326nomp_py_append_to_sys_pathPKc"></span><span id="_CPPv226nomp_py_append_to_sys_pathPKc"></span><span id="nomp_py_append_to_sys_path__cCP"></span><span class="target" id="group__nomp__py__utils_1ga0209aaccf0a7671f3d843adac5e26c4e"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_append_to_sys_path</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">path</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv426nomp_py_append_to_sys_pathPKc" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Appends specified path to system path. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>path</strong> – <strong>[in]</strong> Path to be appended to system path. </p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>int </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv418nomp_py_c_to_loopyPP8PyObjectPKcPKc">
-<span id="_CPPv318nomp_py_c_to_loopyPP8PyObjectPKcPKc"></span><span id="_CPPv218nomp_py_c_to_loopyPP8PyObjectPKcPKc"></span><span id="nomp_py_c_to_loopy__PyObjectPP.cCP.cCP"></span><span class="target" id="group__nomp__py__utils_1gab6f7c2660f4077d9e82e95b5710a3fe7"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_c_to_loopy</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">knl</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">src</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">backend</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418nomp_py_c_to_loopyPP8PyObjectPKcPKc" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Creates loopy kernel from C source. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>knl</strong> – <strong>[out]</strong> Loopy kernel object. </p></li>
-<li><p><strong>src</strong> – <strong>[in]</strong> C kernel source. </p></li>
-<li><p><strong>backend</strong> – <strong>[in]</strong> Backend name. </p></li>
-</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>int </p>
@@ -161,14 +199,32 @@
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv418nomp_py_c_to_loopyPP8PyObjectPKcPKc">
+<span id="_CPPv318nomp_py_c_to_loopyPP8PyObjectPKcPKc"></span><span id="_CPPv218nomp_py_c_to_loopyPP8PyObjectPKcPKc"></span><span id="nomp_py_c_to_loopy__PyObjectPP.cCP.cCP"></span><span class="target" id="group__nomp__py__utils_1gab6f7c2660f4077d9e82e95b5710a3fe7"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_c_to_loopy</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">knl</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">src</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">backend</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418nomp_py_c_to_loopyPP8PyObjectPKcPKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Creates loopy kernel from C source. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>knl</strong> – <strong>[out]</strong> Loopy kernel object. </p></li>
+<li><p><strong>src</strong> – <strong>[in]</strong> C kernel source. </p></li>
+<li><p><strong>backend</strong> – <strong>[in]</strong> Backend name. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv425nomp_py_set_annotate_funcPP8PyObjectPKc">
-<span id="_CPPv325nomp_py_set_annotate_funcPP8PyObjectPKc"></span><span id="_CPPv225nomp_py_set_annotate_funcPP8PyObjectPKc"></span><span id="nomp_py_set_annotate_func__PyObjectPP.cCP"></span><span class="target" id="group__nomp__py__utils_1ga8acbbdc8b68f5eb2a6678903a23e3236"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_set_annotate_func</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">func</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">path</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425nomp_py_set_annotate_funcPP8PyObjectPKc" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv325nomp_py_set_annotate_funcPP8PyObjectPKc"></span><span id="_CPPv225nomp_py_set_annotate_funcPP8PyObjectPKc"></span><span id="nomp_py_set_annotate_func__PyObjectPP.cCP"></span><span class="target" id="group__nomp__py__utils_1ga4c1e18890cbd9d221416d1a782087aac"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_set_annotate_func</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">annotate_func</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">path_</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425nomp_py_set_annotate_funcPP8PyObjectPKc" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Set the annotate function based on the path to annotation script and function. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>func</strong> – <strong>[out]</strong> Pointer to the annotate function. </p></li>
-<li><p><strong>path</strong> – <strong>[in]</strong> Path to the annotation script followed by function name (path and function name must be separated by “::”). </p></li>
+<li><p><strong>annotate_func</strong> – <strong>[out]</strong> Pointer to the annotate function. </p></li>
+<li><p><strong>path_</strong> – <strong>[in]</strong> Path to the annotation script followed by function name (path and function name must be separated by “::”). </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -255,20 +311,6 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv429nomp_symengine_eval_grid_sizeP11nomp_prog_t">
-<span id="_CPPv329nomp_symengine_eval_grid_sizeP11nomp_prog_t"></span><span id="_CPPv229nomp_symengine_eval_grid_sizeP11nomp_prog_t"></span><span id="nomp_symengine_eval_grid_size__nomp_prog_tP"></span><span class="target" id="group__nomp__py__utils_1gabecc810d31f97f69ad9bc05bc6c37037"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_symengine_eval_grid_size</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">nomp_prog_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">prg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv429nomp_symengine_eval_grid_sizeP11nomp_prog_t" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Evaluate global and local grid sizes based on the dictionary <code class="docutils literal notranslate"><span class="pre">dict</span></code>. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>prg</strong> – <strong>[in]</strong> Nomp program. </p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>int </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv421nomp_symengine_updateP14CMapBasicBasicPKcKl">
 <span id="_CPPv321nomp_symengine_updateP14CMapBasicBasicPKcKl"></span><span id="_CPPv221nomp_symengine_updateP14CMapBasicBasicPKcKl"></span><span id="nomp_symengine_update__CMapBasicBasicP.cCP.lC"></span><span class="target" id="group__nomp__py__utils_1ga07db966dfa26b166ed4ef03b88769bb4"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_symengine_update</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">CMapBasicBasic</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">map</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">key</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421nomp_symengine_updateP14CMapBasicBasicPKcKl" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Map the keys and values to evaluate the kernel launch parameters. </p>
@@ -287,18 +329,15 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv413nomp_py_printPKcP8PyObject">
-<span id="_CPPv313nomp_py_printPKcP8PyObject"></span><span id="_CPPv213nomp_py_printPKcP8PyObject"></span><span id="nomp_py_print__cCP.PyObjectP"></span><span class="target" id="group__nomp__py__utils_1gac33651d2915d8db9be94316cae2a2b56"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_print</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">msg</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">obj</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413nomp_py_printPKcP8PyObject" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Get the string representation of python object. </p>
+<dt class="sig sig-object cpp" id="_CPPv429nomp_symengine_eval_grid_sizeP11nomp_prog_t">
+<span id="_CPPv329nomp_symengine_eval_grid_sizeP11nomp_prog_t"></span><span id="_CPPv229nomp_symengine_eval_grid_sizeP11nomp_prog_t"></span><span id="nomp_symengine_eval_grid_size__nomp_prog_tP"></span><span class="target" id="group__nomp__py__utils_1gabecc810d31f97f69ad9bc05bc6c37037"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_symengine_eval_grid_size</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">nomp_prog_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">prg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv429nomp_symengine_eval_grid_sizeP11nomp_prog_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Evaluate global and local grid sizes based on the dictionary <code class="docutils literal notranslate"><span class="pre">dict</span></code>. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>msg</strong> – Debug message before printing the object. </p></li>
-<li><p><strong>obj</strong> – Python object. </p></li>
-</ul>
+<dd class="field-odd"><p><strong>prg</strong> – <strong>[in]</strong> Nomp program. </p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>void </p>
+<dd class="field-even"><p>int </p>
 </dd>
 </dl>
 </dd></dl>
@@ -306,6 +345,21 @@
 </section>
 <section id="memory-management-functions">
 <h2>Memory management functions<a class="headerlink" href="#memory-management-functions" title="Permalink to this heading"></a></h2>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413mem_if_mappedPv">
+<span id="_CPPv313mem_if_mappedPv"></span><span id="_CPPv213mem_if_mappedPv"></span><span id="mem_if_mapped__voidP"></span><span class="target" id="group__nomp__mem__utils_1ga52f4e1a84b9b10e9aa519d2f2a947311"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">nomp_mem_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">mem_if_mapped</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413mem_if_mappedPv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the nomp_mem object corresponding to host pointer <code class="docutils literal notranslate"><span class="pre">p</span></code>. </p>
+<p>Returns the nomp_mem object corresponding to host ponter <code class="docutils literal notranslate"><span class="pre">p</span></code>. If no buffer has been allocated for <code class="docutils literal notranslate"><span class="pre">p</span></code> on the device, returns NULL.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>p</strong> – <strong>[in]</strong> Host pointer </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>struct nomp_mem_t * </p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.nomp_free">
 <span class="target" id="group__nomp__mem__utils_1ga7f94b25dae56929daada2a73b36f6934"></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_free</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nomp_free" title="Permalink to this definition"></a><br /></dt>
@@ -417,15 +471,48 @@
 </dd></dl>
 
 </section>
+<section id="reductions-and-related-functions">
+<h2>Reductions and related functions<a class="headerlink" href="#reductions-and-related-functions" title="Permalink to this heading"></a></h2>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.NOMP_SUM">
+<span class="target" id="group__nomp__reduction__ops_1ga1f0f524f088a4c566088461b5b21b3e9"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_SUM</span></span></span><a class="headerlink" href="#c.NOMP_SUM" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sum reduction operation. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.NOMP_PROD">
+<span class="target" id="group__nomp__reduction__ops_1ga5e43c7a9b1845b9207d7983e520b8895"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_PROD</span></span></span><a class="headerlink" href="#c.NOMP_PROD" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Product reduction operation. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv424nomp_host_side_reductionP14nomp_backend_tP11nomp_prog_tP10nomp_mem_t">
+<span id="_CPPv324nomp_host_side_reductionP14nomp_backend_tP11nomp_prog_tP10nomp_mem_t"></span><span id="_CPPv224nomp_host_side_reductionP14nomp_backend_tP11nomp_prog_tP10nomp_mem_t"></span><span id="nomp_host_side_reduction__nomp_backend_tP.nomp_prog_tP.nomp_mem_tP"></span><span class="target" id="group__nomp__reduction__utils_1ga827eca70bce314d686e792a4cabc81c3"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_host_side_reduction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">nomp_backend_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">backend</span></span>, <span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">nomp_prog_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">prg</span></span>, <span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">nomp_mem_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">m</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424nomp_host_side_reductionP14nomp_backend_tP11nomp_prog_tP10nomp_mem_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Perform host side reduction. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>backend</strong> – <strong>[in]</strong> Active backend instance. </p></li>
+<li><p><strong>prg</strong> – <strong>[in]</strong> Active program instance. </p></li>
+<li><p><strong>m</strong> – <strong>[in]</strong> Memory used to store device side partial reductions. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int </p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 <section id="logging-functions">
 <h2>Logging functions<a class="headerlink" href="#logging-functions" title="Permalink to this heading"></a></h2>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv420nomp_log_set_verboseKi">
-<span id="_CPPv320nomp_log_set_verboseKi"></span><span id="_CPPv220nomp_log_set_verboseKi"></span><span id="nomp_log_set_verbose__iC"></span><span class="target" id="group__nomp__log__utils_1ga7578540f00f0e132b9e227288b6c3320"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_log_set_verbose</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">verbose</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420nomp_log_set_verboseKi" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv320nomp_log_set_verboseKi"></span><span id="_CPPv220nomp_log_set_verboseKi"></span><span id="nomp_log_set_verbose__iC"></span><span class="target" id="group__nomp__log__utils_1ga5d4f23effb386458340644a3dec0038d"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_log_set_verbose</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">verbose_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420nomp_log_set_verboseKi" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Set the verbose level for the log functions. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>verbose</strong> – <strong>[in]</strong> Verbose level provided by the user. </p>
+<dd class="field-odd"><p><strong>verbose_in</strong> – <strong>[in]</strong> Verbose level provided by the user. </p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>int </p>
@@ -435,17 +522,17 @@
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv49nomp_log_PKci13nomp_log_typePKcjz">
-<span id="_CPPv39nomp_log_PKci13nomp_log_typePKcjz"></span><span id="_CPPv29nomp_log_PKci13nomp_log_typePKcjz"></span><span id="nomp_log___cCP.i.nomp_log_type.cCP.unsigned.z"></span><span class="target" id="group__nomp__log__utils_1gaea9e91949c6707c93d648e6854e8ac67"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_log_</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">desc</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">logno</span></span>, <span class="n"><span class="pre">nomp_log_type</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">type</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">fname</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line_no</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49nomp_log_PKci13nomp_log_typePKcjz" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv39nomp_log_PKci13nomp_log_typePKcjz"></span><span id="_CPPv29nomp_log_PKci13nomp_log_typePKcjz"></span><span id="nomp_log___cCP.i.nomp_log_type.cCP.unsigned.z"></span><span class="target" id="group__nomp__log__utils_1ga1e04dc6b8d279fa08a032ce3730324f1"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_log_</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">description</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">logno</span></span>, <a class="reference internal" href="user-api.html#_CPPv413nomp_log_type" title="nomp_log_type"><span class="n"><span class="pre">nomp_log_type</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">type</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">fname</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49nomp_log_PKci13nomp_log_typePKcjz" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Register a log with libnomp runtime. </p>
-<p>Register a log given a description of the log, log number and log type. Returns a unique log id in case of errors which can be used to query log later on success. In case of information or warnings, nomp_log() returns 0 and details are printed to stdout based on the verbose level which is either set by &amp;#8212;nomp-verbose command line argument or NOMP_VERBOSE environment variable. On failure, <a class="reference internal" href="#group__nomp__log__utils_1gaea9e91949c6707c93d648e6854e8ac67"><span class="std std-ref">nomp_log_()</span></a> returns -1. Use nomp_log() macro to by pass the arguments <code class="docutils literal notranslate"><span class="pre">fname</span></code> and <code class="docutils literal notranslate"><span class="pre">line_no</span></code>.</p>
+<p>Register a log given a description of the log, log number and log type. Returns a unique log id in case of errors which can be used to query log later on success. In case of information or warnings, <a class="reference internal" href="#group__nomp__log__utils_1gaa5ed6f44b3acbb60abaed299dbba9bef"><span class="std std-ref">nomp_log()</span></a> returns 0 and details are printed to stdout based on the verbose level which is either set by &amp;#8212;nomp-verbose command line argument or NOMP_VERBOSE environment variable. On failure, <a class="reference internal" href="#group__nomp__log__utils_1ga1e04dc6b8d279fa08a032ce3730324f1"><span class="std std-ref">nomp_log_()</span></a> returns -1. Use <a class="reference internal" href="#group__nomp__log__utils_1gaa5ed6f44b3acbb60abaed299dbba9bef"><span class="std std-ref">nomp_log()</span></a> macro to by pass the arguments <code class="docutils literal notranslate"><span class="pre">fname</span></code> and <code class="docutils literal notranslate"><span class="pre">line_no</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>description</strong> – <strong>[in]</strong> Detailed description of the log. </p></li>
 <li><p><strong>logno</strong> – <strong>[in]</strong> Log number which is defined in nomp.h </p></li>
-<li><p><strong>type</strong> – <strong>[in]</strong> Type of the log (one of nomp_log_type) </p></li>
-<li><p><strong>desc</strong> – <strong>[in]</strong> Detailed description of the log. </p></li>
-<li><p><strong>fname</strong> – <strong>[in]</strong> File name in which the <a class="reference internal" href="#group__nomp__log__utils_1gaea9e91949c6707c93d648e6854e8ac67"><span class="std std-ref">nomp_log_()</span></a> is called. </p></li>
-<li><p><strong>line_no</strong> – <strong>[in]</strong> Line number where the <a class="reference internal" href="#group__nomp__log__utils_1gaea9e91949c6707c93d648e6854e8ac67"><span class="std std-ref">nomp_log_()</span></a> is called. </p></li>
+<li><p><strong>type</strong> – <strong>[in]</strong> Type of the log (one of <a class="reference internal" href="user-api.html#group__nomp__user__types_1gab9a322ab403d9d66a8ed27a6487aadba"><span class="std std-ref">nomp_log_type</span></a>) </p></li>
+<li><p><strong>fname</strong> – <strong>[in]</strong> File name in which the <a class="reference internal" href="#group__nomp__log__utils_1ga1e04dc6b8d279fa08a032ce3730324f1"><span class="std std-ref">nomp_log_()</span></a> is called. </p></li>
+<li><p><strong>line</strong> – <strong>[in]</strong> Line number where the <a class="reference internal" href="#group__nomp__log__utils_1ga1e04dc6b8d279fa08a032ce3730324f1"><span class="std std-ref">nomp_log_()</span></a> is called. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -465,16 +552,30 @@
 </dl>
 </dd></dl>
 
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.nomp_log">
+<span class="target" id="group__nomp__log__utils_1gaa5ed6f44b3acbb60abaed299dbba9bef"></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_log</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">logno</span></span>, <span class="n"><span class="pre">type</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nomp_log" title="Permalink to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logno</strong> – Log number or the error number. </p></li>
+<li><p><strong>type</strong> – Log type. </p></li>
+<li><p><strong>...</strong> – Log message. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="profiler-functions">
 <h2>Profiler functions<a class="headerlink" href="#profiler-functions" title="Permalink to this heading"></a></h2>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv422nomp_profile_set_levelKi">
-<span id="_CPPv322nomp_profile_set_levelKi"></span><span id="_CPPv222nomp_profile_set_levelKi"></span><span id="nomp_profile_set_level__iC"></span><span class="target" id="group__nomp__profiler__utils_1ga9d4486cdc0b1071c8bc02300b89543e7"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_profile_set_level</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">profile_level</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422nomp_profile_set_levelKi" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv322nomp_profile_set_levelKi"></span><span id="_CPPv222nomp_profile_set_levelKi"></span><span id="nomp_profile_set_level__iC"></span><span class="target" id="group__nomp__profiler__utils_1ga9ff7d18226de2e99484261b8578a706b"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_profile_set_level</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">profile_level_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422nomp_profile_set_levelKi" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Set the profile level for the nomp profiler. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>profile_level</strong> – <strong>[in]</strong> Profile level provided by the user. </p>
+<dd class="field-odd"><p><strong>profile_level_in</strong> – <strong>[in]</strong> Profile level provided by the user. </p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>int </p>
@@ -483,8 +584,8 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv412nomp_profilePKcii">
-<span id="_CPPv312nomp_profilePKcii"></span><span id="_CPPv212nomp_profilePKcii"></span><span id="nomp_profile__cCP.i.i"></span><span class="target" id="group__nomp__profiler__utils_1gaf5783347e5874e3fc876c337328ebcc5"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_profile</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">toggle</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">sync</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412nomp_profilePKcii" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv412nomp_profilePKcKiKi">
+<span id="_CPPv312nomp_profilePKcKiKi"></span><span id="_CPPv212nomp_profilePKcKiKi"></span><span id="nomp_profile__cCP.iC.iC"></span><span class="target" id="group__nomp__profiler__utils_1ga07b4af7f15c2b1c7b8e71e0bd0e0a44c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_profile</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">toggle</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">sync</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412nomp_profilePKcKiKi" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Toggles the timer and records the execution time between the two consecutive uses of the function. </p>
 <p>The function either starts or ends the timer by considering the toggle value. The function will start the timer if the toggle is 1. Else, it will capture the execution time and records in a log. <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nomp_profile</span><span class="p">(</span><span class="s">&quot;Entry Name&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">nomp</span><span class="p">.</span><span class="n">profile</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
 <span class="c1">// Code to be measured</span>

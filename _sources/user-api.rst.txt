@@ -6,24 +6,28 @@
 User API
 ========
 
+Data Types
+^^^^^^^^^^
+Defines argument type.
+
+.. doxygengroup:: nomp_user_types
+   :project: libnomp
+   :content-only:
+
 Functions
 ^^^^^^^^^
 .. doxygengroup:: nomp_user_api
    :project: libnomp
    :content-only:
 
-Data Types
-^^^^^^^^^^
-Defines argument type.
-
-.. doxygengroup:: nomp_types
+Macros
+^^^^^^
+.. doxygengroup:: nomp_user_macros
    :project: libnomp
    :content-only:
 
-.. _group__nomp__errors:
-
 Errors
 ^^^^^^
-.. doxygengroup:: nomp_errors
+.. doxygengroup:: nomp_user_errors
    :project: libnomp
    :content-only:

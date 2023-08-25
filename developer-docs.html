@@ -42,7 +42,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="build.html">Build Instructions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="usage.html">Nomp Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Nomp Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user-api.html">User API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="internal-api.html">Internal API</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Developer Documentation</a><ul>
@@ -168,11 +168,11 @@ As a prerequisite you have to install the <cite>gdbserver</cite> which you can i
 </div>
 <p>Use <code class="code docutils literal notranslate"><span class="pre">lnrun</span> <span class="pre">debug</span></code> command to host the debugging session. If you want to debug the
 test case <cite>nomp-api-200</cite>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lnrun<span class="w"> </span>debug<span class="w"> </span><span class="m">200</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lnrun<span class="w"> </span>debug<span class="w"> </span>api-200
 </pre></div>
 </div>
 <p>Additionally, you can set the port and the target device for the specific session.
-You can view the available options by <code class="code docutils literal notranslate"><span class="pre">lnrun</span> <span class="pre">-h</span> <span class="pre">debug</span></code>.</p>
+You can view the available options by <code class="code docutils literal notranslate"><span class="pre">lnrun</span> <span class="pre">help</span> <span class="pre">debug</span></code>.</p>
 <p>By default the test starts on <cite>localhost:5005</cite>, and a debug viewer should be connected
 to this target address. For example, the following figure shows how clion connects to
 the test case using remote debug.</p>

@@ -8,7 +8,7 @@ Internal API
 
 Backend init functions
 ^^^^^^^^^^^^^^^^^^^^^^
-.. doxygengroup:: nomp_backend_utils
+.. doxygengroup:: nomp_backend_init
    :project: libnomp
    :content-only:
 
@@ -27,6 +27,16 @@ Memory management functions
 Kernel compilation functions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. doxygengroup:: nomp_compile_utils
+   :project: libnomp
+   :content-only:
+
+Reductions and related functions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. doxygengroup:: nomp_reduction_ops
+   :project: libnomp
+   :content-only:
+
+.. doxygengroup:: nomp_reduction_utils
    :project: libnomp
    :content-only:
 
