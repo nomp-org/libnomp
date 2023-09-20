@@ -8,9 +8,9 @@ static int free_before_mapping(unsigned s, unsigned e) {
   TEST_TYPE a[TEST_MAX_SIZE] = {0};
 
   int err = nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FREE);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_MAP_OP_IS_INVALID);
+  nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_MAP_OP_IS_INVALID);
 
-  char *desc = nomp_get_log_str(err);
+  char *desc = nomp_get_err_str(err);
   int eq = logcmp(
       desc, "\\[Error\\] "
             ".*libnomp\\/src\\/nomp.c:[0-9]* NOMP_FREE or NOMP_FROM can only "
@@ -28,9 +28,9 @@ static int d2h_before_h2d(unsigned s, unsigned e) {
 
   TEST_TYPE a[TEST_MAX_SIZE] = {0};
   int err = nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FROM);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_MAP_OP_IS_INVALID);
+  nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_MAP_OP_IS_INVALID);
 
-  char *desc = nomp_get_log_str(err);
+  char *desc = nomp_get_err_str(err);
   int eq = logcmp(
       desc, "\\[Error\\] "
             ".*libnomp\\/src\\/nomp.c:[0-9]* NOMP_FREE or NOMP_FROM can only "
