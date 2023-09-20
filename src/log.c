@@ -81,7 +81,7 @@ unsigned nomp_log_(const char *description, int errorno, nomp_log_type type,
   // Print the logs based on the verbose level.
   if ((verbose > 0 && type == NOMP_ERROR) ||
       (verbose > 1 && type == NOMP_WARNING) ||
-      (verbose > 2 && type == NOMP_INFORMATION))
+      (verbose > 2 && type == NOMP_INFO))
     printf("%s\n", desc);
 
   if (type == NOMP_ERROR) {

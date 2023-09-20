@@ -232,6 +232,8 @@ int nomp_init(int argc, const char **argv) {
 
   initialized = 1;
 
+  nomp_log(0, NOMP_INFO, "libnomp initialized successfully.");
+
   return 0;
 }
 
