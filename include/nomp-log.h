@@ -55,12 +55,13 @@ unsigned nomp_log_(const char *desc, int errorno, nomp_log_type type,
  * @brief Log an error, warning or an info message. Use this instead of
  * using the @ref nomp_log_ function directly.
  *
- * @param logno Log number or the error number.
+ * @param errorno Error number (One of @ref nomp_user_errors. used only when
+ * type is an error).
  * @param type Log type one of the @ref nomp_log_type.
  * @param ... Log message as a C-string with arguments.
  */
-#define nomp_log(logno, type, ...)                                             \
-  nomp_log_(NOMP_FIRST(__VA_ARGS__), logno, type, __FILE__,                    \
+#define nomp_log(errorno, type, ...)                                           \
+  nomp_log_(NOMP_FIRST(__VA_ARGS__), errorno, type, __FILE__,                  \
             __LINE__ NOMP_REST(__VA_ARGS__))
 
 void nomp_log_finalize(void);

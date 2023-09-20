@@ -44,12 +44,14 @@ int nomp_log_set_verbose(const int verbose_in) {
  * @brief Register a log with libnomp runtime.
  *
  * @details Register a log given a description of the log, error number and log
- * type. Returns a unique id if the log type is an error. This can be used to
- * query the error log. If the log type is an information or a warning,
- * @ref nomp_log() returns 0 and details are printed to stdout based on the
- * verbose level (which is set by either --nomp-verbose command line argument
- * or NOMP_VERBOSE environment variable). On failure, nomp_log_() returns -1.
- * Use nomp_log() macro to by pass the arguments \p fname and \p line_no.
+ * type. This function returns a unique id if the log type is an error and this
+ * can be used to query the error log. If the log type is an information or a
+ * warning, nomp_log() returns 0 and \p description is printed to stdout based
+ * on the verbose level (which is set by either --nomp-verbose command line
+ * argument or NOMP_VERBOSE environment variable) and not recorded by the
+ * libnomp runtime. Also, the \p errorno is ignored if the log type is not an
+ * error. On failure, nomp_log_() returns -1. Use nomp_log() macro to by pass
+ * the arguments \p fname and \p line_no.
  *
  * @param[in] description Detailed description of the log.
  * @param[in] errorno Log number which is defined in nomp.h
