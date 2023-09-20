@@ -100,8 +100,8 @@ static int test_valid_platform_id(int argc, const char **argv) {
   char *platform = NULL;
   set_test_env(platform, "NOMP_PLATFORM", "0");
 
-  nomp_test_chk(nomp_init(argc, argv));
-  nomp_test_chk(nomp_finalize());
+  nomp_test_check(nomp_init(argc, argv));
+  nomp_test_check(nomp_finalize());
 
   reset_env(platform, "NOMP_PLATFORM");
 
@@ -113,8 +113,8 @@ static int test_valid_device_id(int argc, const char **argv) {
   char *device = NULL;
   set_test_env(device, "NOMP_DEVICE", "0");
 
-  nomp_test_chk(nomp_init(argc, argv));
-  nomp_test_chk(nomp_finalize());
+  nomp_test_check(nomp_init(argc, argv));
+  nomp_test_check(nomp_finalize());
 
   reset_env(device, "NOMP_DEVICE");
 

@@ -5,8 +5,8 @@ static int test_valid_arguments(const char *backend) {
                          "0",     "--nomp-platform", "0"};
   int argc = 7;
 
-  nomp_test_chk(nomp_init(argc, argv));
-  nomp_test_chk(nomp_finalize());
+  nomp_test_check(nomp_init(argc, argv));
+  nomp_test_check(nomp_finalize());
 
   return 0;
 }
@@ -17,8 +17,8 @@ static int test_ignore_non_argument_string(const char *backend) {
                          "--nomp-platform", "0"};
   int argc = 8;
 
-  nomp_test_chk(nomp_init(argc, argv));
-  nomp_test_chk(nomp_finalize());
+  nomp_test_check(nomp_init(argc, argv));
+  nomp_test_check(nomp_finalize());
 
   return 0;
 }
@@ -28,8 +28,8 @@ static int test_invalid_argument_flag(const char *backend) {
                          "--nomp-platform", "0",     "--unknown-arg", "value"};
   int argc = 8;
 
-  nomp_test_chk(nomp_init(argc, argv));
-  nomp_test_chk(nomp_finalize());
+  nomp_test_check(nomp_init(argc, argv));
+  nomp_test_check(nomp_finalize());
 
   return 0;
 }

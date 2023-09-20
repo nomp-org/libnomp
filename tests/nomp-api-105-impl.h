@@ -19,7 +19,7 @@ static int nomp_api_105_aux(const char **clauses) {
 #define nomp_api_105_valid TOKEN_PASTE(nomp_api_105_valid, TEST_SUFFIX)
 static int nomp_api_105_valid(void) {
   const char *clauses[4] = {"transform", "nomp-api-105", "transform", 0};
-  nomp_test_chk(nomp_api_105_aux(clauses));
+  nomp_test_check(nomp_api_105_aux(clauses));
 
   return 0;
 }

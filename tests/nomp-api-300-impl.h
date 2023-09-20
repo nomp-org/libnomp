@@ -5,24 +5,25 @@
 #define nomp_api_300_aux TOKEN_PASTE(nomp_api_300_aux, TEST_SUFFIX)
 static int nomp_api_300_aux(const char *fmt, TEST_TYPE *a, TEST_TYPE *b,
                             int rows, int cols, int n) {
-  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO));
-  nomp_test_chk(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO));
+  nomp_test_check(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO));
+  nomp_test_check(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO));
 
   int id = -1;
   const char *clauses[4] = {"transform", "nomp-api-300", "transform", 0};
   char *knl = generate_knl(fmt, 2, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE));
-  nomp_test_chk(nomp_jit(&id, knl, clauses, 4, "a", sizeof(TEST_TYPE), NOMP_PTR,
-                         "b", sizeof(TEST_TYPE), NOMP_PTR, "rows", sizeof(int),
-                         NOMP_INT, "cols", sizeof(int), NOMP_INT));
+  nomp_test_check(nomp_jit(&id, knl, clauses, 4, "a", sizeof(TEST_TYPE),
+                           NOMP_PTR, "b", sizeof(TEST_TYPE), NOMP_PTR, "rows",
+                           sizeof(int), NOMP_INT, "cols", sizeof(int),
+                           NOMP_INT));
   nomp_free(&knl);
 
-  nomp_test_chk(nomp_run(id, a, b, &rows, &cols));
+  nomp_test_check(nomp_run(id, a, b, &rows, &cols));
 
-  nomp_test_chk(nomp_sync());
+  nomp_test_check(nomp_sync());
 
-  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM));
-  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
-  nomp_test_chk(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
+  nomp_test_check(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM));
+  nomp_test_check(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
+  nomp_test_check(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
 
   return 0;
 }
@@ -95,28 +96,28 @@ static int nomp_api_300_multiply_aux(const char *fmt, TEST_TYPE *a,
                                      TEST_TYPE *b, TEST_TYPE *c, int n,
                                      int a_size, int b_size,
                                      const char *transform_name) {
-  nomp_test_chk(nomp_update(a, 0, a_size, sizeof(TEST_TYPE), NOMP_TO));
-  nomp_test_chk(nomp_update(b, 0, b_size, sizeof(TEST_TYPE), NOMP_TO));
-  nomp_test_chk(nomp_update(c, 0, b_size, sizeof(TEST_TYPE), NOMP_ALLOC));
+  nomp_test_check(nomp_update(a, 0, a_size, sizeof(TEST_TYPE), NOMP_TO));
+  nomp_test_check(nomp_update(b, 0, b_size, sizeof(TEST_TYPE), NOMP_TO));
+  nomp_test_check(nomp_update(c, 0, b_size, sizeof(TEST_TYPE), NOMP_ALLOC));
 
   int id = -1;
   const char *clauses[4] = {"transform", "nomp-api-300", transform_name, 0};
   char *knl = generate_knl(fmt, 3, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE),
                            TOSTRING(TEST_TYPE));
-  nomp_test_chk(nomp_jit(&id, knl, clauses, 4, "a", sizeof(TEST_TYPE), NOMP_PTR,
-                         "b", sizeof(TEST_TYPE), NOMP_PTR, "c",
-                         sizeof(TEST_TYPE), NOMP_PTR, "size", sizeof(int),
-                         NOMP_INT));
+  nomp_test_check(nomp_jit(&id, knl, clauses, 4, "a", sizeof(TEST_TYPE),
+                           NOMP_PTR, "b", sizeof(TEST_TYPE), NOMP_PTR, "c",
+                           sizeof(TEST_TYPE), NOMP_PTR, "size", sizeof(int),
+                           NOMP_INT));
   nomp_free(&knl);
 
-  nomp_test_chk(nomp_run(id, a, b, c, &n));
+  nomp_test_check(nomp_run(id, a, b, c, &n));
 
-  nomp_test_chk(nomp_sync());
+  nomp_test_check(nomp_sync());
 
-  nomp_test_chk(nomp_update(c, 0, b_size, sizeof(TEST_TYPE), NOMP_FROM));
-  nomp_test_chk(nomp_update(a, 0, a_size, sizeof(TEST_TYPE), NOMP_FREE));
-  nomp_test_chk(nomp_update(b, 0, b_size, sizeof(TEST_TYPE), NOMP_FREE));
-  nomp_test_chk(nomp_update(c, 0, b_size, sizeof(TEST_TYPE), NOMP_FREE));
+  nomp_test_check(nomp_update(c, 0, b_size, sizeof(TEST_TYPE), NOMP_FROM));
+  nomp_test_check(nomp_update(a, 0, a_size, sizeof(TEST_TYPE), NOMP_FREE));
+  nomp_test_check(nomp_update(b, 0, b_size, sizeof(TEST_TYPE), NOMP_FREE));
+  nomp_test_check(nomp_update(c, 0, b_size, sizeof(TEST_TYPE), NOMP_FREE));
 
   return 0;
 }
