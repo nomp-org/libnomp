@@ -76,7 +76,8 @@ static inline int init_configs(int argc, const char **argv,
                                struct nomp_backend_t *bnd) {
   // verbose, profile, device and platform id are all initialized to zero.
   // Everything else has to be set by user explicitly.
-  bnd->verbose = bnd->profile = bnd->device_id = bnd->platform_id = 0;
+  bnd->verbose = 1;
+  bnd->profile = bnd->device_id = bnd->platform_id = 0;
   strcpy(bnd->backend, ""), strcpy(bnd->install_dir, "");
 
   nomp_check(check_cmd_line(bnd, argc, argv));
@@ -198,6 +199,9 @@ static inline int init_backend(struct nomp_backend_t *bnd) {
  * @endcode
  */
 int nomp_init(int argc, const char **argv) {
+  // Set verbose to 1 so that only errors are printed to stdout.
+  nomp_log_set_verbose(1);
+
   if (initialized) {
     return nomp_log(NOMP_INITIALIZE_FAILURE, NOMP_ERROR,
                     "libnomp is already initialized.");
