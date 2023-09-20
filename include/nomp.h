@@ -158,22 +158,9 @@ int nomp_run(int id, ...);
 
 int nomp_sync(void);
 
-/**
- * @ingroup nomp_user_types
- * @brief nomp log type can be an error, warning or information.
- */
-typedef enum {
-  NOMP_ERROR = 0,
-  NOMP_WARNING = 1,
-  NOMP_INFORMATION = 2,
-  NOMP_INVALID = 3
-} nomp_log_type;
+char *nomp_get_log_str(unsigned id);
 
-char *nomp_get_log_str(int id);
-
-int nomp_get_log_no(int log_id);
-
-nomp_log_type nomp_get_log_type(int log_id);
+int nomp_get_log_no(unsigned id);
 
 int nomp_finalize(void);
 

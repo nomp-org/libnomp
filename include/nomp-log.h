@@ -13,14 +13,27 @@ extern "C" {
 #endif
 
 /**
+ * @ingroup nomp_error_types
+ *
+ * @brief nomp log type. It can be an error, warning or information.
+ */
+typedef enum {
+  NOMP_ERROR = 0,
+  NOMP_WARNING = 1,
+  NOMP_INFORMATION = 2,
+  NOMP_INVALID = 3
+} nomp_log_type;
+
+/**
  * @defgroup nomp_log_utils Logging utilities
+ *
  * @brief Internal functions used for logging.
  */
 
 int nomp_log_set_verbose(const int verbose);
 
-int nomp_log_(const char *desc, int logno, nomp_log_type type,
-              const char *fname, unsigned line_no, ...);
+unsigned nomp_log_(const char *desc, int errorno, nomp_log_type type,
+                   const char *fname, unsigned line_no, ...);
 
 #define NOMP_CASE_IMPL(_1, _2, _3, _4, _5, _6, _7, _8, N, ...) N
 #define NOMP_CASE(...) NOMP_CASE_IMPL(__VA_ARGS__, 2, 2, 2, 2, 2, 2, 2, 1, 0)
@@ -39,9 +52,12 @@ int nomp_log_(const char *desc, int logno, nomp_log_type type,
  *
  * @def nomp_log
  *
+ * @brief Log an error, warning or an info message. Use this instead of
+ * using the @ref nomp_log_ function directly.
+ *
  * @param logno Log number or the error number.
- * @param type Log type.
- * @param ... Log message.
+ * @param type Log type one of the @ref nomp_log_type.
+ * @param ... Log message as a C-string with arguments.
  */
 #define nomp_log(logno, type, ...)                                             \
   nomp_log_(NOMP_FIRST(__VA_ARGS__), logno, type, __FILE__,                    \
@@ -51,6 +67,7 @@ void nomp_log_finalize(void);
 
 /**
  * @defgroup nomp_profiler_utils Profiling utilities
+ *
  * @brief Internal functions for profiling.
  */
 

@@ -112,7 +112,7 @@ struct nomp_backend_t {
 #define nomp_check(err)                                                        \
   {                                                                            \
     int err_ = (err);                                                          \
-    if (nomp_get_log_type(err_) == NOMP_ERROR)                                 \
+    if (err_ > 0)                                                              \
       return err_;                                                             \
   }
 
