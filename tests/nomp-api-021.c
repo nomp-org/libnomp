@@ -22,11 +22,11 @@ static int test_invalid_nomp_backend(int argc, const char **argv) {
   set_test_env(backend, "NOMP_BACKEND", "invalid");
 
   int err = nomp_init(argc, argv);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
+  nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
   err = nomp_finalize();
   nomp_test_assert(err == NOMP_FINALIZE_FAILURE);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_LOG_ID_IS_INVALID);
+  nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_LOG_ID_IS_INVALID);
 
   reset_env(backend, "NOMP_BACKEND");
 
@@ -39,11 +39,11 @@ static int test_invalid_platform_id(int argc, const char **argv) {
   set_test_env(platform, "NOMP_PLATFORM", "invalid");
 
   int err = nomp_init(argc, argv);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
+  nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
   err = nomp_finalize();
   nomp_test_assert(err == NOMP_FINALIZE_FAILURE);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_LOG_ID_IS_INVALID);
+  nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_LOG_ID_IS_INVALID);
 
   reset_env(platform, "NOMP_PLATFORM");
 
@@ -56,11 +56,11 @@ static int test_invalid_device_id(int argc, const char **argv) {
   set_test_env(device, "NOMP_DEVICE", "invalid");
 
   int err = nomp_init(argc, argv);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
+  nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
   err = nomp_finalize();
   nomp_test_assert(err == NOMP_FINALIZE_FAILURE);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_LOG_ID_IS_INVALID);
+  nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_LOG_ID_IS_INVALID);
 
   reset_env(device, "NOMP_DEVICE");
 
@@ -73,9 +73,9 @@ static int test_invalid_nomp_verbose(int argc, const char **argv) {
   set_test_env(verbose, "NOMP_VERBOSE", "4");
 
   int err = nomp_init(argc, argv);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
+  nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
-  char *desc = nomp_get_log_str(err);
+  char *desc = nomp_get_err_str(err);
   int eq = logcmp(
       desc, "\\[Error\\] .*libnomp\\/src\\/log.c:[0-9]* Invalid verbose level "
             "4 is provided. The value should be within the range 0-3.");
@@ -84,7 +84,7 @@ static int test_invalid_nomp_verbose(int argc, const char **argv) {
 
   err = nomp_finalize();
   nomp_test_assert(err == NOMP_FINALIZE_FAILURE);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_LOG_ID_IS_INVALID);
+  nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_LOG_ID_IS_INVALID);
 
   reset_env(verbose, "NOMP_VERBOSE");
 

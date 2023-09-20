@@ -4,7 +4,7 @@
 static int test_first_nomp_finalize(void) {
   int err = nomp_finalize();
   nomp_test_assert(err == NOMP_FINALIZE_FAILURE);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_LOG_ID_IS_INVALID);
+  nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_LOG_ID_IS_INVALID);
 
   return 0;
 }
@@ -14,9 +14,9 @@ static int test_nomp_init_twice(int argc, const char **argv) {
   nomp_test_check(nomp_init(argc, argv));
 
   int err = nomp_init(argc, argv);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_INITIALIZE_FAILURE);
+  nomp_test_assert(nomp_get_err_no(err) == NOMP_INITIALIZE_FAILURE);
 
-  char *desc = nomp_get_log_str(err);
+  char *desc = nomp_get_err_str(err);
   int eq = logcmp(desc, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* libnomp "
                         "is already initialized.");
   nomp_free(&desc);
@@ -34,7 +34,7 @@ static int test_nomp_finalize_twice(int argc, const char **argv) {
 
   int err = nomp_finalize();
   nomp_test_assert(err == NOMP_FINALIZE_FAILURE);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_LOG_ID_IS_INVALID);
+  nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_LOG_ID_IS_INVALID);
 
   return 0;
 }

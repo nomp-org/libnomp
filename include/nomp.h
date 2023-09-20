@@ -158,9 +158,9 @@ int nomp_run(int id, ...);
 
 int nomp_sync(void);
 
-char *nomp_get_log_str(unsigned id);
+char *nomp_get_err_str(unsigned id);
 
-int nomp_get_log_no(unsigned id);
+int nomp_get_err_no(unsigned id);
 
 int nomp_finalize(void);
 

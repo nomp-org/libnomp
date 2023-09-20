@@ -107,7 +107,7 @@ unsigned nomp_log_(const char *description, int errorno, nomp_log_type type,
  * @param[in] id id of the error log returned by @ref nomp_log.
  * @return char*
  */
-char *nomp_get_log_str(unsigned id) {
+char *nomp_get_err_str(unsigned id) {
   if (id == 0 || id > logs_n)
     return NULL;
 
@@ -125,7 +125,7 @@ char *nomp_get_log_str(unsigned id) {
  * @param[in] id id of the log returned by @ref nomp_log().
  * @return int
  */
-int nomp_get_log_no(unsigned id) {
+int nomp_get_err_no(unsigned id) {
   if (id == 0 || id > logs_n)
     return NOMP_USER_LOG_ID_IS_INVALID;
   return logs[id - 1].errorno;

@@ -19,9 +19,9 @@ static int test_invalid_file(void) {
   static int id = -1;
   int err = nomp_jit(&id, valid_knl, clauses, 2, "a", sizeof(int), NOMP_PTR,
                      "N", sizeof(int), NOMP_INT);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
+  nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
-  char *log = nomp_get_log_str(err);
+  char *log = nomp_get_err_str(err);
   int eq = logcmp(log, "\\[Error\\] .*src\\/aux.c:[0-9]* Unable to find path: "
                        "\"invalid-file.py\".");
   nomp_free(&log);
@@ -37,9 +37,9 @@ static int test_invalid_transform_function(void) {
   static int id = -1;
   int err = nomp_jit(&id, valid_knl, clauses, 2, "a", sizeof(int), NOMP_PTR,
                      "N", sizeof(int), NOMP_INT);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_PY_CALL_FAILURE);
+  nomp_test_assert(nomp_get_err_no(err) == NOMP_PY_CALL_FAILURE);
 
-  char *log = nomp_get_log_str(err);
+  char *log = nomp_get_err_str(err);
   int eq = logcmp(
       log, "\\[Error\\] .*src\\/loopy.c:[0-9]* Failed to call user transform "
            "function: \"invalid_func\" in file: \"nomp-api-100\".");
@@ -56,9 +56,9 @@ static int test_invalid_clause(void) {
   static int id = -1;
   int err = nomp_jit(&id, valid_knl, clauses, 2, "a", sizeof(int), NOMP_PTR,
                      "N", sizeof(int), NOMP_INT);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
+  nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
-  char *log = nomp_get_log_str(err);
+  char *log = nomp_get_err_str(err);
   int eq = logcmp(
       log, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* Clause "
            "\"invalid-clause\" passed into nomp_jit is not a valid clause.");
@@ -75,9 +75,9 @@ static int test_missing_filename(void) {
   static int id = -1;
   int err = nomp_jit(&id, valid_knl, clauses, 2, "a", sizeof(int), NOMP_PTR,
                      "N", sizeof(int), NOMP_INT);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
+  nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
-  char *log = nomp_get_log_str(err);
+  char *log = nomp_get_err_str(err);
   int eq =
       logcmp(log, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* \"transform\" "
                   "clause should be followed by a file name and a function "
@@ -95,9 +95,9 @@ static int test_missing_user_callback(void) {
   static int id = -1;
   int err = nomp_jit(&id, valid_knl, clauses, 2, "a", sizeof(int), NOMP_PTR,
                      "N", sizeof(int), NOMP_INT);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
+  nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
-  char *log = nomp_get_log_str(err);
+  char *log = nomp_get_err_str(err);
   int eq =
       logcmp(log, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* \"transform\" "
                   "clause should be followed by a file name and a function "
@@ -114,9 +114,9 @@ static int test_syntax_error_in_kernel(void) {
   const char *clauses0[4] = {"transform", "nomp-api-100", "transform", 0};
   int err = nomp_jit(&id, invalid_knl, clauses0, 2, "a", sizeof(int), NOMP_PTR,
                      "N", sizeof(int), NOMP_INT);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_LOOPY_CONVERSION_FAILURE);
+  nomp_test_assert(nomp_get_err_no(err) == NOMP_LOOPY_CONVERSION_FAILURE);
 
-  char *log = nomp_get_log_str(err);
+  char *log = nomp_get_err_str(err);
   int eq =
       logcmp(log, "\\[Error\\] .*libnomp\\/src\\/loopy.c:[0-9]* C to Loopy "
                   "conversion failed.");

@@ -30,8 +30,8 @@ static int nomp_api_105_invalid(void) {
   const char *clauses[4] = {"transform", "nomp-api-105", "invalid_func", 0};
   int err = nomp_api_105_aux(clauses);
 
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_PY_CALL_FAILURE);
-  char *log = nomp_get_log_str(err);
+  nomp_test_assert(nomp_get_err_no(err) == NOMP_PY_CALL_FAILURE);
+  char *log = nomp_get_err_str(err);
   int eq = logcmp(
       log, "\\[Error\\] .*src\\/loopy.c:[0-9]* Failed to call user transform "
            "function: \"invalid_func\" in file: \"nomp-api-105\".");

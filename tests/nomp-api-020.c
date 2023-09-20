@@ -39,11 +39,11 @@ static int test_missing_argument(const char *backend) {
                          "--nomp-platform"};
   int argc = 5;
   int err = nomp_init(argc, argv);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_INPUT_IS_INVALID);
+  nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
   err = nomp_finalize();
   nomp_test_assert(err == NOMP_FINALIZE_FAILURE);
-  nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_LOG_ID_IS_INVALID);
+  nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_LOG_ID_IS_INVALID);
 
   return 0;
 }
