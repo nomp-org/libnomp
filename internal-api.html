@@ -524,8 +524,8 @@
 <section id="logging-functions">
 <h2>Logging Functions<a class="headerlink" href="#logging-functions" title="Permalink to this heading"></a></h2>
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv420nomp_log_set_verboseKi">
-<span id="_CPPv320nomp_log_set_verboseKi"></span><span id="_CPPv220nomp_log_set_verboseKi"></span><span id="nomp_log_set_verbose__iC"></span><span class="target" id="group__nomp__log__utils_1ga5d4f23effb386458340644a3dec0038d"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_log_set_verbose</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">verbose_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420nomp_log_set_verboseKi" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv420nomp_log_set_verboseKj">
+<span id="_CPPv320nomp_log_set_verboseKj"></span><span id="_CPPv220nomp_log_set_verboseKj"></span><span id="nomp_log_set_verbose__unsignedC"></span><span class="target" id="group__nomp__log__utils_1gadd8d3051c34ee702d5372e33cb478aae"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_log_set_verbose</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">verbose_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420nomp_log_set_verboseKj" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Set the verbose level for the log functions. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -538,18 +538,16 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv49nomp_log_PKci13nomp_log_typePKcjz">
-<span id="_CPPv39nomp_log_PKci13nomp_log_typePKcjz"></span><span id="_CPPv29nomp_log_PKci13nomp_log_typePKcjz"></span><span id="nomp_log___cCP.i.nomp_log_type.cCP.unsigned.z"></span><span class="target" id="group__nomp__log__utils_1ga1e04dc6b8d279fa08a032ce3730324f1"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_log_</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">description</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">logno</span></span>, <a class="reference internal" href="user-api.html#_CPPv413nomp_log_type" title="nomp_log_type"><span class="n"><span class="pre">nomp_log_type</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">type</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">fname</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">line</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49nomp_log_PKci13nomp_log_typePKcjz" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv49nomp_log_PKci13nomp_log_typez">
+<span id="_CPPv39nomp_log_PKci13nomp_log_typez"></span><span id="_CPPv29nomp_log_PKci13nomp_log_typez"></span><span id="nomp_log___cCP.i.nomp_log_type.z"></span><span class="target" id="group__nomp__log__utils_1gaa60417d64c162b9643d206dfd798d57e"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_log_</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">description</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">errorno</span></span>, <span class="n"><span class="pre">nomp_log_type</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">type</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49nomp_log_PKci13nomp_log_typez" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Register a log with libnomp runtime. </p>
-<p>Register a log given a description of the log, log number and log type. Returns a unique log id in case of errors which can be used to query log later on success. In case of information or warnings, <a class="reference internal" href="#group__nomp__log__utils_1gaa5ed6f44b3acbb60abaed299dbba9bef"><span class="std std-ref">nomp_log()</span></a> returns 0 and details are printed to stdout based on the verbose level which is either set by &amp;#8212;nomp-verbose command line argument or NOMP_VERBOSE environment variable. On failure, <a class="reference internal" href="#group__nomp__log__utils_1ga1e04dc6b8d279fa08a032ce3730324f1"><span class="std std-ref">nomp_log_()</span></a> returns -1. Use <a class="reference internal" href="#group__nomp__log__utils_1gaa5ed6f44b3acbb60abaed299dbba9bef"><span class="std std-ref">nomp_log()</span></a> macro to by pass the arguments <code class="docutils literal notranslate"><span class="pre">fname</span></code> and <code class="docutils literal notranslate"><span class="pre">line_no</span></code>.</p>
+<p>Register a log given a description of the log, error number and log type. This function returns a unique id if the log type is an error and this can be used to query the error log. If the log type is an information or a warning, <a class="reference internal" href="#group__nomp__log__utils_1ga8338899cbb52c9598eb08f66a33fddfc"><span class="std std-ref">nomp_log()</span></a> returns 0 and <code class="docutils literal notranslate"><span class="pre">description</span></code> is printed to stdout based on the verbose level (which is set by either &amp;#8212;nomp-verbose command line argument or NOMP_VERBOSE environment variable) and not recorded by the libnomp runtime. Also, the <code class="docutils literal notranslate"><span class="pre">errorno</span></code> is ignored if the log type is not an error. On failure, <a class="reference internal" href="#group__nomp__log__utils_1gaa60417d64c162b9643d206dfd798d57e"><span class="std std-ref">nomp_log_()</span></a> returns -1. Use <a class="reference internal" href="#group__nomp__log__utils_1ga8338899cbb52c9598eb08f66a33fddfc"><span class="std std-ref">nomp_log()</span></a> macro without calling this function directly.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>description</strong> – <strong>[in]</strong> Detailed description of the log. </p></li>
-<li><p><strong>logno</strong> – <strong>[in]</strong> Log number which is defined in nomp.h </p></li>
-<li><p><strong>type</strong> – <strong>[in]</strong> Type of the log (one of <a class="reference internal" href="user-api.html#group__nomp__user__types_1gab9a322ab403d9d66a8ed27a6487aadba"><span class="std std-ref">nomp_log_type</span></a>) </p></li>
-<li><p><strong>fname</strong> – <strong>[in]</strong> File name in which the <a class="reference internal" href="#group__nomp__log__utils_1ga1e04dc6b8d279fa08a032ce3730324f1"><span class="std std-ref">nomp_log_()</span></a> is called. </p></li>
-<li><p><strong>line</strong> – <strong>[in]</strong> Line number where the <a class="reference internal" href="#group__nomp__log__utils_1ga1e04dc6b8d279fa08a032ce3730324f1"><span class="std std-ref">nomp_log_()</span></a> is called. </p></li>
+<li><p><strong>errorno</strong> – <strong>[in]</strong> Log number which is defined in nomp.h </p></li>
+<li><p><strong>type</strong> – <strong>[in]</strong> Type of the log (one of nomp_log_type) </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -571,13 +569,14 @@
 
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.nomp_log">
-<span class="target" id="group__nomp__log__utils_1gaa5ed6f44b3acbb60abaed299dbba9bef"></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_log</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">logno</span></span>, <span class="n"><span class="pre">type</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nomp_log" title="Permalink to this definition"></a><br /></dt>
-<dd><dl class="field-list simple">
+<span class="target" id="group__nomp__log__utils_1ga8338899cbb52c9598eb08f66a33fddfc"></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_log</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">errorno</span></span>, <span class="n"><span class="pre">type</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nomp_log" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Log an error, warning or an info message. Use this instead of using the <a class="reference internal" href="#group__nomp__log__utils_1gaa60417d64c162b9643d206dfd798d57e"><span class="std std-ref">nomp_log_</span></a> function directly. </p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>logno</strong> – Log number or the error number. </p></li>
-<li><p><strong>type</strong> – Log type. </p></li>
-<li><p><strong>...</strong> – Log message. </p></li>
+<li><p><strong>errorno</strong> – Error number (One of Error codes returned to the user.. used only when type is an error). </p></li>
+<li><p><strong>type</strong> – Log type one of the nomp_log_type. </p></li>
+<li><p><strong>...</strong> – Log message as a C-string followed by arguments. </p></li>
 </ul>
 </dd>
 </dl>
