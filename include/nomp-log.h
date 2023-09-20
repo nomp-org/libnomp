@@ -18,10 +18,9 @@ extern "C" {
  * @brief nomp log type. It can be an error, warning or information.
  */
 typedef enum {
-  NOMP_ERROR = 0,
-  NOMP_WARNING = 1,
-  NOMP_INFO = 2,
-  NOMP_INVALID = 3
+  NOMP_ERROR = 1,
+  NOMP_WARNING = 2,
+  NOMP_INFO = 3,
 } nomp_log_type;
 
 /**
@@ -30,10 +29,9 @@ typedef enum {
  * @brief Internal functions used for logging.
  */
 
-int nomp_log_set_verbose(const int verbose);
+int nomp_log_set_verbose(unsigned verbose);
 
-unsigned nomp_log_(const char *desc, int errorno, nomp_log_type type,
-                   const char *fname, unsigned line_no, ...);
+int nomp_log_(const char *desc, int errorno, nomp_log_type type, ...);
 
 #define NOMP_CASE_IMPL(_1, _2, _3, _4, _5, _6, _7, _8, N, ...) N
 #define NOMP_CASE(...) NOMP_CASE_IMPL(__VA_ARGS__, 2, 2, 2, 2, 2, 2, 2, 1, 0)
@@ -58,7 +56,7 @@ unsigned nomp_log_(const char *desc, int errorno, nomp_log_type type,
  * @param errorno Error number (One of @ref nomp_user_errors. used only when
  * type is an error).
  * @param type Log type one of the @ref nomp_log_type.
- * @param ... Log message as a C-string with arguments.
+ * @param ... Log message as a C-string followed by arguments.
  */
 #define nomp_log(errorno, type, ...)                                           \
   nomp_log_(NOMP_FIRST(__VA_ARGS__), errorno, type, __FILE__,                  \
