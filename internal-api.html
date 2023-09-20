@@ -46,14 +46,15 @@
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Nomp Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user-api.html">User API</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Internal API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#backend-init-functions">Backend init functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#python-helper-functions">Python helper functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#memory-management-functions">Memory management functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#kernel-compilation-functions">Kernel compilation functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#reductions-and-related-functions">Reductions and related functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#logging-functions">Logging functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#profiler-functions">Profiler functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#other-helper-functions">Other helper functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#helper-macros">Helper Macros</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#backend-init-functions">Backend Init Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#python-helper-functions">Python Helper Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#memory-management-functions-and-macros">Memory Management Functions and Macros</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#kernel-jit-functions">Kernel JIT Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reductions-and-related-functions">Reductions and Related Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#logging-functions">Logging Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#profiler-functions">Profiler Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#other-helper-functions">Other helper Functions</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="developer-docs.html">Developer Documentation</a></li>
@@ -87,8 +88,24 @@
 </div>
 <section id="internal-api">
 <h1>Internal API<a class="headerlink" href="#internal-api" title="Permalink to this heading"></a></h1>
+<section id="helper-macros">
+<h2>Helper Macros<a class="headerlink" href="#helper-macros" title="Permalink to this heading"></a></h2>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.nomp_check">
+<span class="target" id="group__nomp__internal__macros_1gabfb8762cd93e8286f92bc1adee227c94"></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_check</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">err</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nomp_check" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Check if nomp API return value is an error. In case of an error, non-zero error code is returned to the user. Otherwise, the return value is zero. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>err</strong> – <strong>[in]</strong> Return value from nomp API. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 <section id="backend-init-functions">
-<h2>Backend init functions<a class="headerlink" href="#backend-init-functions" title="Permalink to this heading"></a></h2>
+<h2>Backend Init Functions<a class="headerlink" href="#backend-init-functions" title="Permalink to this heading"></a></h2>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv49ispc_initP14nomp_backend_tKiKi">
 <span id="_CPPv39ispc_initP14nomp_backend_tKiKi"></span><span id="_CPPv29ispc_initP14nomp_backend_tKiKi"></span><span id="ispc_init__nomp_backend_tP.iC.iC"></span><span class="target" id="group__nomp__backend__init_1ga6cd90e2e576bb783a8de0a7b8361af75"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ispc_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">nomp_backend_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">bnd</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">platform_type</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">device_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49ispc_initP14nomp_backend_tKiKi" title="Permalink to this definition"></a><br /></dt>
@@ -148,7 +165,7 @@
 
 </section>
 <section id="python-helper-functions">
-<h2>Python helper functions<a class="headerlink" href="#python-helper-functions" title="Permalink to this heading"></a></h2>
+<h2>Python Helper Functions<a class="headerlink" href="#python-helper-functions" title="Permalink to this heading"></a></h2>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv413nomp_py_printPKcP8PyObject">
 <span id="_CPPv313nomp_py_printPKcP8PyObject"></span><span id="_CPPv213nomp_py_printPKcP8PyObject"></span><span id="nomp_py_print__cCP.PyObjectP"></span><span class="target" id="group__nomp__py__utils_1gac33651d2915d8db9be94316cae2a2b56"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_print</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">msg</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">obj</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413nomp_py_printPKcP8PyObject" title="Permalink to this definition"></a><br /></dt>
@@ -343,8 +360,8 @@
 </dd></dl>
 
 </section>
-<section id="memory-management-functions">
-<h2>Memory management functions<a class="headerlink" href="#memory-management-functions" title="Permalink to this heading"></a></h2>
+<section id="memory-management-functions-and-macros">
+<h2>Memory Management Functions and Macros<a class="headerlink" href="#memory-management-functions-and-macros" title="Permalink to this heading"></a></h2>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv413mem_if_mappedPv">
 <span id="_CPPv313mem_if_mappedPv"></span><span id="_CPPv213mem_if_mappedPv"></span><span id="mem_if_mapped__voidP"></span><span class="target" id="group__nomp__mem__utils_1ga52f4e1a84b9b10e9aa519d2f2a947311"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">nomp_mem_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">mem_if_mapped</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413mem_if_mappedPv" title="Permalink to this definition"></a><br /></dt>
@@ -412,8 +429,8 @@
 </dd></dl>
 
 </section>
-<section id="kernel-compilation-functions">
-<h2>Kernel compilation functions<a class="headerlink" href="#kernel-compilation-functions" title="Permalink to this heading"></a></h2>
+<section id="kernel-jit-functions">
+<h2>Kernel JIT Functions<a class="headerlink" href="#kernel-jit-functions" title="Permalink to this heading"></a></h2>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv416nomp_jit_compilePiPKcPKcPKcPKcPKcPKcPKc">
 <span id="_CPPv316nomp_jit_compilePiPKcPKcPKcPKcPKcPKcPKc"></span><span id="_CPPv216nomp_jit_compilePiPKcPKcPKcPKcPKcPKcPKc"></span><span id="nomp_jit_compile__iP.cCP.cCP.cCP.cCP.cCP.cCP.cCP"></span><span class="target" id="group__nomp__compile__utils_1ga3da282551713dd9bd1914c33fde9d394"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_jit_compile</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">source</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">cc</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">cflags</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">entry</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">wrkdir</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">srcf</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">libf</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416nomp_jit_compilePiPKcPKcPKcPKcPKcPKcPKc" title="Permalink to this definition"></a><br /></dt>
@@ -472,7 +489,7 @@
 
 </section>
 <section id="reductions-and-related-functions">
-<h2>Reductions and related functions<a class="headerlink" href="#reductions-and-related-functions" title="Permalink to this heading"></a></h2>
+<h2>Reductions and Related Functions<a class="headerlink" href="#reductions-and-related-functions" title="Permalink to this heading"></a></h2>
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_SUM">
 <span class="target" id="group__nomp__reduction__ops_1ga1f0f524f088a4c566088461b5b21b3e9"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_SUM</span></span></span><a class="headerlink" href="#c.NOMP_SUM" title="Permalink to this definition"></a><br /></dt>
@@ -505,7 +522,7 @@
 
 </section>
 <section id="logging-functions">
-<h2>Logging functions<a class="headerlink" href="#logging-functions" title="Permalink to this heading"></a></h2>
+<h2>Logging Functions<a class="headerlink" href="#logging-functions" title="Permalink to this heading"></a></h2>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv420nomp_log_set_verboseKi">
 <span id="_CPPv320nomp_log_set_verboseKi"></span><span id="_CPPv220nomp_log_set_verboseKi"></span><span id="nomp_log_set_verbose__iC"></span><span class="target" id="group__nomp__log__utils_1ga5d4f23effb386458340644a3dec0038d"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_log_set_verbose</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">verbose_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420nomp_log_set_verboseKi" title="Permalink to this definition"></a><br /></dt>
@@ -568,7 +585,7 @@
 
 </section>
 <section id="profiler-functions">
-<h2>Profiler functions<a class="headerlink" href="#profiler-functions" title="Permalink to this heading"></a></h2>
+<h2>Profiler Functions<a class="headerlink" href="#profiler-functions" title="Permalink to this heading"></a></h2>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv422nomp_profile_set_levelKi">
 <span id="_CPPv322nomp_profile_set_levelKi"></span><span id="_CPPv222nomp_profile_set_levelKi"></span><span id="nomp_profile_set_level__iC"></span><span class="target" id="group__nomp__profiler__utils_1ga9ff7d18226de2e99484261b8578a706b"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_profile_set_level</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">profile_level_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422nomp_profile_set_levelKi" title="Permalink to this definition"></a><br /></dt>
@@ -631,7 +648,7 @@
 
 </section>
 <section id="other-helper-functions">
-<h2>Other helper functions<a class="headerlink" href="#other-helper-functions" title="Permalink to this heading"></a></h2>
+<h2>Other helper Functions<a class="headerlink" href="#other-helper-functions" title="Permalink to this heading"></a></h2>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv412nomp_str_catjjz">
 <span id="_CPPv312nomp_str_catjjz"></span><span id="_CPPv212nomp_str_catjjz"></span><span id="nomp_str_cat__unsigned.unsigned.z"></span><span class="target" id="group__nomp__other__utils_1gaa41545f888f512ee21adfa93171fd875"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_str_cat</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max_len</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412nomp_str_catjjz" title="Permalink to this definition"></a><br /></dt>
