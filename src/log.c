@@ -18,7 +18,7 @@ static struct log *logs = NULL;
 static unsigned logs_n = 0;
 static unsigned logs_max = 0;
 static const char *LOG_TYPE_STRING[] = {"Error", "Warning", "Info"};
-static int verbose = 0;
+static unsigned verbose = 0;
 
 /**
  * @ingroup nomp_log_utils
@@ -27,13 +27,7 @@ static int verbose = 0;
  * @param[in] verbose_in Verbose level provided by the user.
  * @return int
  */
-int nomp_log_set_verbose(const int verbose_in) {
-  if (verbose_in < NOMP_ERROR || verbose_in >= NOMP_INVALID) {
-    return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                    "Invalid verbose level %u is provided. The value "
-                    "should be within the range 0-3.",
-                    verbose_in);
-  }
+int nomp_log_set_verbose(const unsigned verbose_in) {
   verbose = verbose_in;
   return 0;
 }
@@ -50,39 +44,32 @@ int nomp_log_set_verbose(const int verbose_in) {
  * on the verbose level (which is set by either --nomp-verbose command line
  * argument or NOMP_VERBOSE environment variable) and not recorded by the
  * libnomp runtime. Also, the \p errorno is ignored if the log type is not an
- * error. On failure, nomp_log_() returns -1. Use nomp_log() macro to by pass
- * the arguments \p fname and \p line_no.
+ * error. On failure, nomp_log_() returns -1. Use nomp_log() macro without
+ * calling this function directly.
  *
  * @param[in] description Detailed description of the log.
  * @param[in] errorno Log number which is defined in nomp.h
  * @param[in] type Type of the log (one of @ref nomp_log_type)
- * @param[in] fname File name in which the nomp_log_() is called.
- * @param[in] line Line number where the nomp_log_() is called.
  * @return int
  */
-unsigned nomp_log_(const char *description, int errorno, nomp_log_type type,
-                   const char *fname, unsigned line, ...) {
+int nomp_log_(const char *description, int errorno, nomp_log_type type, ...) {
+  const char *type_str = LOG_TYPE_STRING[type - 1];
+  size_t len = strlen(description) + strlen(type_str) + 10;
+  char *desc = nomp_calloc(char, len);
+  snprintf(desc, len, "[%s] %%s:%%u %s", type_str, description);
+
   char buf[BUFSIZ];
   va_list vargs;
-  va_start(vargs, line);
-  vsnprintf(buf, BUFSIZ, description, vargs);
+  va_start(vargs, type);
+  vsnprintf(buf, BUFSIZ, desc, vargs);
   va_end(vargs);
-
-  char *file = strndup(fname, PATH_MAX);
-  if (type < NOMP_ERROR || type >= NOMP_INVALID)
-    return -1;
-  const char *type_str = LOG_TYPE_STRING[type];
-
-  // 10 for UINT_MAX, 5 for `[] : ` characters and 1 for `\0`.
-  size_t len = strlen(buf) + strlen(file) + strlen(type_str) + 10 + 5 + 1;
-  char *desc = nomp_calloc(char, len);
-  snprintf(desc, len, "[%s] %s:%u %s", type_str, file, line, buf);
+  nomp_free(&desc);
 
   // Print the logs based on the verbose level.
-  if ((verbose > 0 && type == NOMP_ERROR) ||
-      (verbose > 1 && type == NOMP_WARNING) ||
-      (verbose > 2 && type == NOMP_INFO))
-    printf("%s\n", desc);
+  if ((verbose >= NOMP_ERROR && type == NOMP_ERROR) ||
+      (verbose >= NOMP_WARNING && type == NOMP_WARNING) ||
+      (verbose >= NOMP_INFO && type == NOMP_INFO))
+    printf("%s\n", buf);
 
   if (type == NOMP_ERROR) {
     if (logs_max <= logs_n) {
@@ -90,10 +77,9 @@ unsigned nomp_log_(const char *description, int errorno, nomp_log_type type,
       logs = nomp_realloc(logs, struct log, logs_max);
     }
 
-    logs[logs_n].description = strndup(desc, len);
+    logs[logs_n].description = strndup(buf, BUFSIZ);
     logs[logs_n].errorno = errorno, logs[logs_n].type = type, logs_n++;
   }
-  nomp_free(&desc), nomp_free(&file);
 
   return type == NOMP_ERROR ? logs_n : 0;
 }
