@@ -20,13 +20,13 @@ static int test_ternary_ops(void) {
 
 int main(int argc, const char *argv[]) {
   int err = nomp_init(argc, argv);
-  nomp_check(err);
+  nomp_test_chk(err);
 
   err |= SUBTEST(test_logical_ops);
   err |= SUBTEST(test_ternary_ops);
 
   err |= nomp_finalize();
-  nomp_check(err);
+  nomp_test_chk(err);
 
   return err;
 }

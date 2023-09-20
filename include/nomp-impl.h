@@ -26,7 +26,6 @@
 #include "nomp-log.h"
 #include "nomp-loopy.h"
 #include "nomp-mem.h"
-
 #include "nomp.h"
 
 struct nomp_mem_t {
@@ -93,13 +92,40 @@ struct nomp_backend_t {
   void *bptr;
 };
 
+/**
+ * @defgroup nomp_internal_macros Internal macros
+ * @brief Internal macros used in libnomp.
+ */
+
+/**
+ * @ingroup nomp_internal_macros
+ *
+ * @def nomp_check
+ *
+ * @brief Check if nomp API return value is an error. In case of an error,
+ * non-zero error code is returned to the user. Otherwise, the return value is
+ * zero.
+ *
+ * @param[in] err Return value from nomp API.
+ *
+ */
+#define nomp_check(err)                                                        \
+  {                                                                            \
+    int err_ = (err);                                                          \
+    if (nomp_get_log_type(err_) == NOMP_ERROR)                                 \
+      return err_;                                                             \
+  }
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
  * @defgroup nomp_backend_init Backend init functions
- * @brief Functions for initializing each backend.
+ *
+ * @brief Functions for initializing different backend as OpenCL, Cuda, etc.
+ * These has to be refactored to handle the case when the backend is not
+ * available.
  */
 
 int opencl_init(struct nomp_backend_t *backend, const int platform_id,

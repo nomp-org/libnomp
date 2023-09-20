@@ -34,7 +34,7 @@ static int test_matrix_vector_multiplication(void) {
 
 int main(int argc, const char *argv[]) {
   int err = nomp_init(argc, argv);
-  nomp_check(err);
+  nomp_test_chk(err);
 
   err |= SUBTEST(test_matrix_addition);
   err |= SUBTEST(test_matrix_transpose);
@@ -42,7 +42,7 @@ int main(int argc, const char *argv[]) {
   err |= SUBTEST(test_matrix_matrix_multiplication);
 
   err |= nomp_finalize();
-  nomp_check(err);
+  nomp_test_chk(err);
 
   return err;
 }

@@ -56,7 +56,7 @@ static int test_bitwise_complement(void) {
 
 int main(int argc, const char *argv[]) {
   int err = nomp_init(argc, argv);
-  nomp_check(err);
+  nomp_test_chk(err);
 
   err |= SUBTEST(test_bitwise_and);
   err |= SUBTEST(test_bitwise_or);
@@ -66,7 +66,7 @@ int main(int argc, const char *argv[]) {
   err |= SUBTEST(test_bitwise_complement);
 
   err |= nomp_finalize();
-  nomp_check(err);
+  nomp_test_chk(err);
 
   return err;
 }
