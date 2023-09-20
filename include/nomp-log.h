@@ -20,7 +20,7 @@ extern "C" {
 typedef enum {
   NOMP_ERROR = 0,
   NOMP_WARNING = 1,
-  NOMP_INFORMATION = 2,
+  NOMP_INFO = 2,
   NOMP_INVALID = 3
 } nomp_log_type;
 
