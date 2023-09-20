@@ -224,9 +224,6 @@ int nomp_init(int argc, const char **argv) {
   // Set verbose level.
   nomp_check(nomp_log_set_verbose(nomp.verbose));
 
-  // Maybe we shouldn't profile nomp_init(). But for now, we do.
-  nomp_profile("nomp_init", 1, 0);
-
   // Initialize the backend.
   nomp_check(init_backend(&nomp));
 
@@ -234,8 +231,6 @@ int nomp_init(int argc, const char **argv) {
   nomp_check(allocate_scratch_memory(&nomp));
 
   initialized = 1;
-
-  nomp_profile("nomp_init", 0, 0);
 
   return 0;
 }
@@ -315,7 +310,6 @@ static unsigned mem_if_exist(void *p, size_t idx0, size_t idx1, size_t usize) {
  */
 int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize,
                 nomp_map_direction_t op) {
-  nomp_profile("nomp_update", 1, 1);
   unsigned idx = mem_if_exist(ptr, idx0, idx1, usize);
   if (idx == mems_n) {
     // A new entry can't be created with NOMP_FREE or
@@ -345,7 +339,6 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize,
   else if (idx == mems_n)
     mems_n++;
 
-  nomp_profile("nomp_update", 0, 1);
   return 0;
 }
 
@@ -487,7 +480,6 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
   if (*id >= 0)
     return 0;
 
-  nomp_profile("nomp_jit", 1, 1);
   if (progs_n == progs_max) {
     progs_max += progs_max / 2 + 1;
     progs = nomp_realloc(progs, struct nomp_prog_t *, progs_max);
@@ -535,7 +527,6 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
   Py_XDECREF(knl);
 
   *id = progs_n++;
-  nomp_profile("nomp_jit", 0, 1);
 
   return 0;
 }
@@ -575,7 +566,6 @@ int nomp_run(int id, ...) {
                     "Kernel id %d passed to nomp_run is not valid.", id);
   }
 
-  nomp_profile("nomp_run setup time", 1, 1);
   struct nomp_prog_t *prg = progs[id];
   prg->eval_grid = 0;
 
@@ -612,18 +602,13 @@ int nomp_run(int id, ...) {
     }
   }
   va_end(vargs);
-  nomp_profile("nomp_run setup time", 0, 1);
 
-  nomp_profile("nomp_run grid evaluation", 1, 1);
   if (prg->eval_grid)
     nomp_check(nomp_symengine_eval_grid_size(prg));
-  nomp_profile("nomp_run grid evaluation", 0, 1);
 
-  nomp_profile("nomp_run kernel runtime", 1, 1);
   nomp_check(nomp.knl_run(&nomp, prg));
   if (prg->redn_idx >= 0)
     nomp_check(nomp_host_side_reduction(&nomp, prg, &nomp.scratch));
-  nomp_profile("nomp_run kernel runtime", 0, 1);
 
   return 0;
 }
