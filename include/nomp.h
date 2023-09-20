@@ -34,8 +34,10 @@ typedef enum {
 } nomp_map_direction_t;
 
 /**
- * @defgroup nomp_user_errors User errors
- * @brief Errors returned by libnomp user API calls.
+ * @defgroup nomp_user_errors Error codes returned to the user.
+ *
+ * @brief Error codes returned by libnomp user API calls to the
+ * user. These error codes are negative integers.
  */
 
 /**
@@ -155,27 +157,6 @@ int nomp_jit(int *id, const char *src, const char **clauses, int nargs, ...);
 int nomp_run(int id, ...);
 
 int nomp_sync(void);
-
-/**
- * @defgroup nomp_user_macros User macros
- * @brief User macros defined in `nomp.h`.
- */
-
-/**
- * @ingroup nomp_user_macros
- *
- * @def nomp_check
- *
- * @brief Check nomp API return values for errors.
- * @param[in] err Return value from nomp API.
- *
- */
-#define nomp_check(err)                                                        \
-  {                                                                            \
-    int err_ = (err);                                                          \
-    if (nomp_get_log_type(err_) == NOMP_ERROR)                                 \
-      return err_;                                                             \
-  }
 
 /**
  * @ingroup nomp_user_types

@@ -20,12 +20,6 @@ Functions
    :project: libnomp
    :content-only:
 
-Macros
-^^^^^^
-.. doxygengroup:: nomp_user_macros
-   :project: libnomp
-   :content-only:
-
 Errors
 ^^^^^^
 .. doxygengroup:: nomp_user_errors

@@ -66,8 +66,9 @@ inline static int subtest_(int err, const char *test_name) {
 
 #define nomp_test_chk(err)                                                     \
   {                                                                            \
-    if (nomp_get_log_type((err)) == NOMP_ERROR)                                \
-      return err;                                                              \
+    int err_ = (err);                                                          \
+    if (nomp_get_log_type((err_)) == NOMP_ERROR)                               \
+      return err_;                                                             \
   }
 
 inline static char *generate_knl(const char *fmt, unsigned nargs, ...) {

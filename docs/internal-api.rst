@@ -6,31 +6,37 @@
 Internal API
 ============
 
-Backend init functions
+Helper Macros
+^^^^^^^^^^^^^
+.. doxygengroup:: nomp_internal_macros
+   :project: libnomp
+   :content-only:
+
+Backend Init Functions
 ^^^^^^^^^^^^^^^^^^^^^^
 .. doxygengroup:: nomp_backend_init
    :project: libnomp
    :content-only:
 
-Python helper functions
+Python Helper Functions
 ^^^^^^^^^^^^^^^^^^^^^^^^
 .. doxygengroup:: nomp_py_utils
    :project: libnomp
    :content-only:
 
-Memory management functions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Memory Management Functions and Macros
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. doxygengroup:: nomp_mem_utils
    :project: libnomp
    :content-only:
 
-Kernel compilation functions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Kernel JIT Functions
+^^^^^^^^^^^^^^^^^^^^
 .. doxygengroup:: nomp_compile_utils
    :project: libnomp
    :content-only:
 
-Reductions and related functions
+Reductions and Related Functions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. doxygengroup:: nomp_reduction_ops
    :project: libnomp
@@ -40,19 +46,19 @@ Reductions and related functions
    :project: libnomp
    :content-only:
 
-Logging functions
+Logging Functions
 ^^^^^^^^^^^^^^^^^
 .. doxygengroup:: nomp_log_utils
    :project: libnomp
    :content-only:
 
-Profiler functions
+Profiler Functions
 ^^^^^^^^^^^^^^^^^^
 .. doxygengroup:: nomp_profiler_utils
    :project: libnomp
    :content-only:
 
-Other helper functions
+Other helper Functions
 ^^^^^^^^^^^^^^^^^^^^^^
 .. doxygengroup:: nomp_other_utils
    :project: libnomp

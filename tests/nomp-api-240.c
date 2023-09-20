@@ -22,13 +22,13 @@ static int test_continue(void) {
 
 int main(int argc, const char *argv[]) {
   int err = nomp_init(argc, argv);
-  nomp_check(err);
+  nomp_test_chk(err);
 
   err |= SUBTEST(test_break);
   err |= SUBTEST(test_continue);
 
   err |= nomp_finalize();
-  nomp_check(err);
+  nomp_test_chk(err);
 
   return err;
 }

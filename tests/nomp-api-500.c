@@ -36,7 +36,7 @@ static int test_multiple_reductions(void) {
 }
 
 int main(int argc, const char *argv[]) {
-  nomp_check(nomp_init(argc, argv));
+  nomp_test_chk(nomp_init(argc, argv));
 
   int err = 0;
   err |= SUBTEST(test_sum);
@@ -45,7 +45,7 @@ int main(int argc, const char *argv[]) {
   // FIXME: Fix the errors of the following kernels
   // err |= SUBTEST(test_sum_condition);
 
-  nomp_check(nomp_finalize());
+  nomp_test_chk(nomp_finalize());
 
   return err;
 }
