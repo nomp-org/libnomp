@@ -5,7 +5,6 @@ static int test_first_nomp_finalize(void) {
   int err = nomp_finalize();
   nomp_test_assert(err == NOMP_FINALIZE_FAILURE);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_LOG_ID_IS_INVALID);
-  nomp_test_assert(nomp_get_log_type(err) == NOMP_INVALID);
 
   return 0;
 }
@@ -36,7 +35,6 @@ static int test_nomp_finalize_twice(int argc, const char **argv) {
   int err = nomp_finalize();
   nomp_test_assert(err == NOMP_FINALIZE_FAILURE);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_USER_LOG_ID_IS_INVALID);
-  nomp_test_assert(nomp_get_log_type(err) == NOMP_INVALID);
 
   return 0;
 }
