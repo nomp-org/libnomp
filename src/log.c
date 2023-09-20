@@ -28,7 +28,7 @@ static int verbose = 0;
  * @return int
  */
 int nomp_log_set_verbose(const int verbose_in) {
-  if (verbose_in < 0 || verbose_in > 3) {
+  if (verbose_in < NOMP_ERROR || verbose_in >= NOMP_INVALID) {
     return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                     "Invalid verbose level %u is provided. The value "
                     "should be within the range 0-3.",
