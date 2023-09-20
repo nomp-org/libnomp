@@ -64,7 +64,7 @@ inline static int subtest_(int err, const char *test_name) {
       return 1;                                                                \
   }
 
-#define nomp_test_chk(err)                                                     \
+#define nomp_test_check(err)                                                   \
   {                                                                            \
     int err_ = (err);                                                          \
     if (nomp_get_log_type((err_)) == NOMP_ERROR)                               \

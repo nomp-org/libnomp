@@ -49,9 +49,9 @@ static int multiple_h2d_calls(unsigned s, unsigned e) {
 
   TEST_TYPE a[TEST_MAX_SIZE] = {0};
 
-  nomp_test_chk(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_TO));
-  nomp_test_chk(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_TO));
-  nomp_test_chk(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FREE));
+  nomp_test_check(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_TO));
+  nomp_test_check(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_TO));
+  nomp_test_check(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FREE));
 
   return 0;
 }
@@ -64,11 +64,11 @@ static int multiple_d2h_calls(unsigned s, unsigned e) {
 
   TEST_TYPE a[TEST_MAX_SIZE] = {0};
 
-  nomp_test_chk(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_TO));
+  nomp_test_check(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_TO));
 
-  nomp_test_chk(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FROM));
-  nomp_test_chk(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FROM));
-  nomp_test_chk(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FREE));
+  nomp_test_check(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FROM));
+  nomp_test_check(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FROM));
+  nomp_test_check(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FREE));
 
   return 0;
 }
@@ -82,11 +82,11 @@ static int d2h_after_h2d(unsigned s, unsigned e) {
 
   for (unsigned i = s; i < e; i++)
     a[i] = i;
-  nomp_test_chk(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_TO));
+  nomp_test_check(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_TO));
 
   for (unsigned i = s; i < e; i++)
     a[i] = 0;
-  nomp_test_chk(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FROM));
+  nomp_test_check(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FROM));
 
 #if defined(TEST_TOL)
   for (unsigned i = 0; i < s; i++)
@@ -104,7 +104,7 @@ static int d2h_after_h2d(unsigned s, unsigned e) {
     nomp_test_assert(a[i] == 0);
 #endif
 
-  nomp_test_chk(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FREE));
+  nomp_test_check(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FREE));
 
   return 0;
 }
@@ -115,9 +115,9 @@ static int free_after_h2d(unsigned s, unsigned e) {
   nomp_test_assert(e <= TEST_MAX_SIZE);
 
   TEST_TYPE a[TEST_MAX_SIZE] = {0};
-  nomp_test_chk(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_TO));
+  nomp_test_check(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_TO));
 
-  nomp_test_chk(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FREE));
+  nomp_test_check(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FREE));
 
   return 0;
 }
@@ -128,10 +128,10 @@ static int free_after_d2h(unsigned s, unsigned e) {
   nomp_test_assert(e <= TEST_MAX_SIZE);
 
   TEST_TYPE a[TEST_MAX_SIZE] = {0};
-  nomp_test_chk(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_TO));
+  nomp_test_check(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_TO));
 
-  nomp_test_chk(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FROM));
-  nomp_test_chk(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FREE));
+  nomp_test_check(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FROM));
+  nomp_test_check(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FREE));
 
   return 0;
 }
@@ -145,11 +145,11 @@ static int in_range_d2h(unsigned lb, unsigned ub, unsigned s, unsigned e) {
 
   for (unsigned i = lb; i < ub; i++)
     a[i] = i;
-  nomp_test_chk(nomp_update(a, lb, ub, sizeof(TEST_TYPE), NOMP_TO));
+  nomp_test_check(nomp_update(a, lb, ub, sizeof(TEST_TYPE), NOMP_TO));
 
   for (unsigned i = lb; i < ub; i++)
     a[i] = 0;
-  nomp_test_chk(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FROM));
+  nomp_test_check(nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FROM));
 
 #if defined(TEST_TOL)
   for (unsigned i = 0; i < s; i++)
@@ -167,7 +167,7 @@ static int in_range_d2h(unsigned lb, unsigned ub, unsigned s, unsigned e) {
     nomp_test_assert(a[i] == 0);
 #endif
 
-  nomp_test_chk(nomp_update(a, lb, ub, sizeof(TEST_TYPE), NOMP_FREE));
+  nomp_test_check(nomp_update(a, lb, ub, sizeof(TEST_TYPE), NOMP_FREE));
 
   return 0;
 }
@@ -178,16 +178,16 @@ static int in_range_h2d(unsigned lb, unsigned ub, unsigned s, unsigned e) {
   nomp_test_assert(ub - lb <= TEST_MAX_SIZE);
 
   TEST_TYPE a[TEST_MAX_SIZE] = {0};
-  nomp_test_chk(nomp_update(a, lb, ub, sizeof(TEST_TYPE), NOMP_TO));
+  nomp_test_check(nomp_update(a, lb, ub, sizeof(TEST_TYPE), NOMP_TO));
 
   for (unsigned i = lb; i < ub; i++)
     a[i] = i;
-  nomp_test_chk(nomp_update(a, lb, s, sizeof(TEST_TYPE), NOMP_TO));
-  nomp_test_chk(nomp_update(a, e, ub, sizeof(TEST_TYPE), NOMP_TO));
+  nomp_test_check(nomp_update(a, lb, s, sizeof(TEST_TYPE), NOMP_TO));
+  nomp_test_check(nomp_update(a, e, ub, sizeof(TEST_TYPE), NOMP_TO));
 
   for (unsigned i = lb; i < ub; i++)
     a[i] = 0;
-  nomp_test_chk(nomp_update(a, lb, ub, sizeof(TEST_TYPE), NOMP_FROM));
+  nomp_test_check(nomp_update(a, lb, ub, sizeof(TEST_TYPE), NOMP_FROM));
 
 #if defined(TEST_TOL)
   for (unsigned i = lb; i < s; i++)
@@ -205,7 +205,7 @@ static int in_range_h2d(unsigned lb, unsigned ub, unsigned s, unsigned e) {
     nomp_test_assert(a[i] == (TEST_TYPE)i);
 #endif
 
-  nomp_test_chk(nomp_update(a, lb, ub, sizeof(TEST_TYPE), NOMP_FREE));
+  nomp_test_check(nomp_update(a, lb, ub, sizeof(TEST_TYPE), NOMP_FREE));
 
   return 0;
 }
@@ -217,7 +217,7 @@ static int dynamic_data_type(unsigned n) {
   nomp_test_assert(n <= TEST_MAX_SIZE);
 
   char a[TEST_MAX_SIZE];
-  nomp_test_chk(nomp_update(a, 0, n, sizeof(char), NOMP_ALLOC));
+  nomp_test_check(nomp_update(a, 0, n, sizeof(char), NOMP_ALLOC));
 
   TEST_TYPE *b = (TEST_TYPE *)a;
   const unsigned new_size = n / sizeof(TEST_TYPE);
@@ -237,7 +237,7 @@ static int dynamic_data_type(unsigned n) {
     nomp_test_assert(b[i] == (TEST_TYPE)i);
 #endif
 
-  nomp_test_chk(nomp_update(a, 0, n, sizeof(char), NOMP_FREE));
+  nomp_test_check(nomp_update(a, 0, n, sizeof(char), NOMP_FREE));
 
   return 0;
 }

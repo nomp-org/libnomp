@@ -18,11 +18,11 @@ static int test_jit_compile_and_free(const char *wkdir) {
              *entry = "add_wrapper";
   const char *srcf = "source.c", *libf = "mylib.so";
   int id = -1;
-  nomp_test_chk(
+  nomp_test_check(
       nomp_jit_compile(&id, add_src, cc, cflags, entry, wkdir, srcf, libf));
   nomp_test_assert(id == 0);
 
-  nomp_test_chk(nomp_jit_free(&id));
+  nomp_test_check(nomp_jit_free(&id));
   nomp_test_assert(id == -1);
 
   return 0;
@@ -33,15 +33,15 @@ static int test_jit_run(const char *wkdir) {
              *entry = "add_wrapper";
   const char *srcf = "source.c", *libf = "mylib.so";
   int id = -1;
-  nomp_test_chk(
+  nomp_test_check(
       nomp_jit_compile(&id, add_src, cc, cflags, entry, wkdir, srcf, libf));
 
   int a = 3, b = 7, c = -1;
   void *p[3] = {(void *)&a, (void *)&b, (void *)&c};
-  nomp_test_chk(nomp_jit_run(id, p));
+  nomp_test_check(nomp_jit_run(id, p));
   nomp_test_assert(c == 10);
 
-  nomp_test_chk(nomp_jit_free(&id));
+  nomp_test_check(nomp_jit_free(&id));
 
   return 0;
 }

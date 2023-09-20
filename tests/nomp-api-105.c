@@ -20,13 +20,13 @@ static int test_invalid_clauses(void) {
 
 int main(int argc, const char *argv[]) {
   int err = nomp_init(argc, argv);
-  nomp_test_chk(err);
+  nomp_test_check(err);
 
   err |= SUBTEST(test_valid_clauses);
   err |= SUBTEST(test_invalid_clauses);
 
   err |= nomp_finalize();
-  nomp_test_chk(err);
+  nomp_test_check(err);
 
   return err;
 }

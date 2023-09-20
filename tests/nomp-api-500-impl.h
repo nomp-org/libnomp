@@ -5,11 +5,11 @@ static int nomp_api_500_sum_aux(const char *fmt, const char **clauses,
                                 TEST_TYPE *a, int n) {
   int id = -1;
   char *knl = generate_knl(fmt, 1, TOSTRING(TEST_TYPE));
-  nomp_test_chk(nomp_jit(&id, knl, clauses, 2, "a", sizeof(TEST_TYPE),
-                         TEST_NOMP_TYPE, "N", sizeof(int), NOMP_INT));
+  nomp_test_check(nomp_jit(&id, knl, clauses, 2, "a", sizeof(TEST_TYPE),
+                           TEST_NOMP_TYPE, "N", sizeof(int), NOMP_INT));
   nomp_free(&knl);
 
-  nomp_test_chk(nomp_run(id, a, &n));
+  nomp_test_check(nomp_run(id, a, &n));
 
   return 0;
 }
@@ -67,18 +67,18 @@ static int nomp_api_500_sum_var(unsigned N) {
   TOKEN_PASTE(nomp_api_500_sum_array_aux, TEST_SUFFIX)
 static int nomp_api_500_sum_array_aux(const char *fmt, const char **clauses,
                                       TEST_TYPE *a, int n, TEST_TYPE *sum) {
-  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO));
+  nomp_test_check(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO));
 
   int id = -1;
   char *knl = generate_knl(fmt, 2, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE));
-  nomp_test_chk(nomp_jit(&id, knl, clauses, 3, "a", sizeof(TEST_TYPE), NOMP_PTR,
-                         "N", sizeof(int), NOMP_INT, "sum", sizeof(TEST_TYPE),
-                         TEST_NOMP_TYPE));
+  nomp_test_check(nomp_jit(&id, knl, clauses, 3, "a", sizeof(TEST_TYPE),
+                           NOMP_PTR, "N", sizeof(int), NOMP_INT, "sum",
+                           sizeof(TEST_TYPE), TEST_NOMP_TYPE));
   nomp_free(&knl);
 
-  nomp_test_chk(nomp_run(id, a, &n, sum));
-  nomp_test_chk(nomp_sync());
-  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
+  nomp_test_check(nomp_run(id, a, &n, sum));
+  nomp_test_check(nomp_sync());
+  nomp_test_check(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
 
   return 0;
 }
@@ -148,22 +148,22 @@ static int nomp_api_500_condition(unsigned N) {
 static int nomp_api_500_dot_aux(const char *fmt, const char **clauses,
                                 TEST_TYPE *a, TEST_TYPE *b, int n,
                                 TEST_TYPE *total) {
-  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO));
-  nomp_test_chk(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO));
+  nomp_test_check(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO));
+  nomp_test_check(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO));
 
   int id = -1;
   char *knl = generate_knl(fmt, 3, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE),
                            TOSTRING(TEST_TYPE));
-  nomp_test_chk(nomp_jit(&id, knl, clauses, 4, "a", sizeof(TEST_TYPE *),
-                         NOMP_PTR, "b", sizeof(TEST_TYPE), NOMP_PTR, "N",
-                         sizeof(int), NOMP_INT, "total", sizeof(TEST_TYPE),
-                         TEST_NOMP_TYPE));
+  nomp_test_check(nomp_jit(&id, knl, clauses, 4, "a", sizeof(TEST_TYPE *),
+                           NOMP_PTR, "b", sizeof(TEST_TYPE), NOMP_PTR, "N",
+                           sizeof(int), NOMP_INT, "total", sizeof(TEST_TYPE),
+                           TEST_NOMP_TYPE));
   nomp_free(&knl);
 
-  nomp_test_chk(nomp_run(id, a, b, &n, total));
-  nomp_test_chk(nomp_sync());
-  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
-  nomp_test_chk(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
+  nomp_test_check(nomp_run(id, a, b, &n, total));
+  nomp_test_check(nomp_sync());
+  nomp_test_check(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
+  nomp_test_check(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
 
   return 0;
 }
@@ -200,18 +200,18 @@ static int nomp_api_500_dot(unsigned N) {
   TOKEN_PASTE(nomp_api_500_multiple_reductions_aux, TEST_SUFFIX)
 static int nomp_api_500_multiple_reductions_aux(const char *fmt, TEST_TYPE *a,
                                                 int n, TEST_TYPE *total) {
-  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO));
+  nomp_test_check(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO));
 
   int id = -1;
   const char *clauses[4] = {"reduce", "total", "+", NULL};
   char *knl = generate_knl(fmt, 2, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE));
-  nomp_test_chk(nomp_jit(&id, knl, clauses, 3, "a", sizeof(TEST_TYPE *),
-                         NOMP_PTR, "N", sizeof(int), NOMP_INT, "total",
-                         sizeof(TEST_TYPE), TEST_NOMP_TYPE));
+  nomp_test_check(nomp_jit(&id, knl, clauses, 3, "a", sizeof(TEST_TYPE *),
+                           NOMP_PTR, "N", sizeof(int), NOMP_INT, "total",
+                           sizeof(TEST_TYPE), TEST_NOMP_TYPE));
   nomp_free(&knl);
 
-  nomp_test_chk(nomp_run(id, a, &n, total));
-  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
+  nomp_test_check(nomp_run(id, a, &n, total));
+  nomp_test_check(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
 
   return 0;
 }

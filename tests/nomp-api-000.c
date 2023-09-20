@@ -12,7 +12,7 @@ static int test_first_nomp_finalize(void) {
 
 // Calling nomp_init() twice must return an error, but must not segfault.
 static int test_nomp_init_twice(int argc, const char **argv) {
-  nomp_test_chk(nomp_init(argc, argv));
+  nomp_test_check(nomp_init(argc, argv));
 
   int err = nomp_init(argc, argv);
   nomp_test_assert(nomp_get_log_no(err) == NOMP_INITIALIZE_FAILURE);
@@ -23,15 +23,15 @@ static int test_nomp_init_twice(int argc, const char **argv) {
   nomp_free(&desc);
   nomp_test_assert(eq);
 
-  nomp_test_chk(nomp_finalize());
+  nomp_test_check(nomp_finalize());
 
   return 0;
 }
 
 // Calling nomp_finalize() twice must return an error, but must not segfault.
 static int test_nomp_finalize_twice(int argc, const char **argv) {
-  nomp_test_chk(nomp_init(argc, argv));
-  nomp_test_chk(nomp_finalize());
+  nomp_test_check(nomp_init(argc, argv));
+  nomp_test_check(nomp_finalize());
 
   int err = nomp_finalize();
   nomp_test_assert(err == NOMP_FINALIZE_FAILURE);

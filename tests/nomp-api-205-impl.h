@@ -3,26 +3,26 @@
 #define nomp_api_205_aux TOKEN_PASTE(nomp_api_205_aux, TEST_SUFFIX)
 static int nomp_api_205_aux(const char *fmt, TEST_TYPE *a, TEST_TYPE *b,
                             TEST_TYPE *c, int n) {
-  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO));
-  nomp_test_chk(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO));
-  nomp_test_chk(nomp_update(c, 0, n, sizeof(TEST_TYPE), NOMP_TO));
+  nomp_test_check(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO));
+  nomp_test_check(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO));
+  nomp_test_check(nomp_update(c, 0, n, sizeof(TEST_TYPE), NOMP_TO));
 
   int id = -1;
   const char *clauses[4] = {"transform", "nomp-api-205", "transform", 0};
   char *knl = generate_knl(fmt, 3, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE),
                            TOSTRING(TEST_TYPE));
-  nomp_test_chk(nomp_jit(&id, knl, clauses, 4, "a", sizeof(TEST_TYPE), NOMP_PTR,
-                         "b", sizeof(TEST_TYPE), NOMP_PTR, "c",
-                         sizeof(TEST_TYPE), NOMP_PTR, "N", sizeof(int),
-                         NOMP_INT));
+  nomp_test_check(nomp_jit(&id, knl, clauses, 4, "a", sizeof(TEST_TYPE),
+                           NOMP_PTR, "b", sizeof(TEST_TYPE), NOMP_PTR, "c",
+                           sizeof(TEST_TYPE), NOMP_PTR, "N", sizeof(int),
+                           NOMP_INT));
   nomp_free(&knl);
 
-  nomp_test_chk(nomp_run(id, a, b, c, &n));
-  nomp_test_chk(nomp_sync());
-  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM));
-  nomp_test_chk(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
-  nomp_test_chk(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
-  nomp_test_chk(nomp_update(c, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
+  nomp_test_check(nomp_run(id, a, b, c, &n));
+  nomp_test_check(nomp_sync());
+  nomp_test_check(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FROM));
+  nomp_test_check(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
+  nomp_test_check(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
+  nomp_test_check(nomp_update(c, 0, n, sizeof(TEST_TYPE), NOMP_FREE));
 
   return 0;
 }
