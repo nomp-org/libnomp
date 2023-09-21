@@ -14,6 +14,7 @@ extern "C" {
 
 /**
  * @defgroup nomp_internal_types Internal types
+ *
  * @brief Data types used internally by the library.
  */
 
