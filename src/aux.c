@@ -141,23 +141,3 @@ int nomp_path_len(size_t *len, const char *path) {
 
   return 0;
 }
-
-/**
- * @ingroup nomp_other_utils
- *
- * @brief Check if the python script path exists.
- *
- * Check if there is a python script at the path \p path. Returns 0 if the
- * path exists, otherwise returns an error id which can be used to query the
- * error id and string using nomp_get_err_str() and nomp_get_err_id(). The \p
- * path should be provided without the ".py" extension.
- *
- * @param[in] path Path to the python script without the ".py" extension.
- * @return int
- */
-int nomp_check_py_script_path(const char *path) {
-  char *py = nomp_str_cat(2, PATH_MAX, path, ".py");
-  int err = nomp_path_len(NULL, (const char *)py);
-  nomp_free(&py);
-  return err;
-}

@@ -28,8 +28,6 @@ char *nomp_copy_env(const char *name, size_t size);
 
 int nomp_path_len(size_t *len, const char *path);
 
-int nomp_check_py_script_path(const char *path);
-
 #ifdef __cplusplus
 }
 #endif

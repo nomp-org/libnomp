@@ -12,10 +12,13 @@ extern "C" {
 
 /**
  * @defgroup nomp_py_utils Python helper functions
- * @brief Python helper functions for calling loopy.
+ *
+ * @brief Python helper functions for calling loopy and other python functions.
  */
 
 int nomp_py_append_to_sys_path(const char *path);
+
+int nomp_py_check_module(const char *module, const char *function);
 
 int nomp_py_c_to_loopy(PyObject **knl, const char *src, const char *backend);
 

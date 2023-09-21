@@ -13,7 +13,7 @@ def transform(knl, context):
     return knl
 
 
-def invalid_func(knl, context):
+def function_with_syntax_error(knl, context):
     (iname,) = knl.default_entrypoint.all_inames()
     i_inner, i_outer = f"{iname}_inner", f"{iname}_outer"
     knl = lp.split_iname(
