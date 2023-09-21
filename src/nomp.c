@@ -4,11 +4,6 @@
 static struct nomp_backend_t nomp;
 static int initialized = 0;
 
-#define NOMP_VERBOSE 1
-#define NOMP_PROFILE 0
-#define NOMP_DEVICE 0
-#define NOMP_PLATFORM 0
-
 static inline int check_cmd_line_aux(const unsigned i, const unsigned argc,
                                      const char *const argv[]) {
   if (i >= argc || argv[i] == NULL) {
