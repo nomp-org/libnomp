@@ -3,7 +3,7 @@
 
 #define set_test_env(VAR, ENVVAR, ENVVAL)                                      \
   {                                                                            \
-    VAR = nomp_copy_env(ENVVAR, NOMP_TEST_MAX_BUFSIZ);                         \
+    VAR = nomp_copy_env(ENVVAR, NOMP_TEST_MAX_BUFFER_SIZE);                    \
     setenv(ENVVAR, ENVVAL, 1);                                                 \
   }
 
@@ -105,8 +105,8 @@ int main(int argc, const char *argv[]) {
   // Copy everything except `--nomp-platform` to new command line args.
   unsigned argcn = 0;
   for (unsigned i = 0; i < (unsigned)argc; i++) {
-    if (strncmp(argv[i], "--nomp-platform", NOMP_TEST_MAX_BUFSIZ))
-      argvn[argcn] = strndup(argv[i], NOMP_TEST_MAX_BUFSIZ), argcn++;
+    if (strncmp(argv[i], "--nomp-platform", NOMP_TEST_MAX_BUFFER_SIZE))
+      argvn[argcn] = strndup(argv[i], NOMP_TEST_MAX_BUFFER_SIZE), argcn++;
   }
   err |= SUBTEST(test_valid_platform_id, argcn, (const char **)argvn);
   for (unsigned i = 0; i < argcn; i++)
@@ -115,8 +115,8 @@ int main(int argc, const char *argv[]) {
   // Copy everything except `--nomp-device` to new command line args.
   argcn = 0;
   for (unsigned i = 0; i < (unsigned)argc; i++) {
-    if (strncmp(argv[i], "--nomp-device", NOMP_TEST_MAX_BUFSIZ))
-      argvn[argcn] = strndup(argv[i], NOMP_TEST_MAX_BUFSIZ), argcn++;
+    if (strncmp(argv[i], "--nomp-device", NOMP_TEST_MAX_BUFFER_SIZE))
+      argvn[argcn] = strndup(argv[i], NOMP_TEST_MAX_BUFFER_SIZE), argcn++;
   }
   err |= SUBTEST(test_valid_device_id, argcn, (const char **)argvn);
   for (unsigned i = 0; i < argcn; i++)

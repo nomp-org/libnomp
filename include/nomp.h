@@ -122,21 +122,6 @@ typedef enum {
  * @brief libnomp OpenCL failure.
  */
 #define NOMP_OPENCL_FAILURE -516
-/**
- * @ingroup nomp_user_errors
- * @brief libnomp SYCL failure.
- */
-#define NOMP_SYCL_FAILURE -518
-/**
- * @ingroup nomp_user_errors
- * @brief libnomp ISPC failure.
- */
-#define NOMP_ISPC_FAILURE -520
-/**
- * @ingroup nomp_user_errors
- * @brief libnomp JIT failure.
- */
-#define NOMP_JIT_FAILURE -522
 
 #ifdef __cplusplus
 extern "C" {

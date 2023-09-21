@@ -190,17 +190,11 @@ extern "C" {
 int opencl_init(struct nomp_backend_t *backend, const int platform_id,
                 const int device_id);
 
-int sycl_init(struct nomp_backend_t *backend, const int platform_id,
-              const int device_id);
-
 int cuda_init(struct nomp_backend_t *backend, const int platform_id,
               const int device_id);
 
 int hip_init(struct nomp_backend_t *backend, const int platform_id,
              const int device_id);
-
-int ispc_init(struct nomp_backend_t *backend, const int platform_type,
-              const int device_id);
 
 #ifdef __cplusplus
 }

@@ -3,9 +3,7 @@ project(libnomp VERSION 0.0.1 DESCRIPTION "nomp runtime library" LANGUAGES C CXX
 
 option(ENABLE_OPENCL "Build OpenCL backend" OFF)
 option(ENABLE_CUDA "Build Cuda backend" OFF)
-option(ENABLE_ISPC "Build ISPC backend" OFF)
 option(ENABLE_HIP "Build HIP backend" OFF)
-option(ENABLE_SYCL "Build SYCL backend" OFF)
 option(ENABLE_DOCS "Enable Documentation" OFF)
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 
@@ -30,7 +28,7 @@ if (ENABLE_DOCS)
   add_subdirectory ("docs")
 endif()
 
-set(SOURCES src/nomp.c src/loopy.c src/symengine.c src/aux.c src/log.c src/jit.c
+set(SOURCES src/nomp.c src/loopy.c src/symengine.c src/aux.c src/log.c
   src/reduction.c)
 if (ENABLE_OPENCL)
   find_package(OpenCL REQUIRED)
@@ -55,19 +53,6 @@ if (ENABLE_HIP)
   else()
     message(FATAL_ERROR "ENABLE_HIP is ON but unable to find HIP runtime.")
   endif()
-endif()
-if (ENABLE_SYCL)
-  find_package(DPCPP)
-  if(DPCPP_FOUND)
-    list(APPEND SOURCES backends/sycl.cpp)
-  else()
-    message(FATAL_ERROR "ENABLE_SYCL is ON but unable to find SYCL runtime.")
-  endif()
-endif()
-if (ENABLE_ISPC)
-  find_package(OpenMP REQUIRED)
-  find_package(ispcrt REQUIRED)
-  list(APPEND SOURCES backends/ispc.c)
 endif()
 
 add_library(nomp SHARED ${SOURCES})
@@ -101,31 +86,8 @@ if (ENABLE_HIP)
   target_link_libraries(nomp PRIVATE nomp::HIP)
   target_compile_definitions(nomp PRIVATE HIP_ENABLED)
 endif()
-if (ENABLE_SYCL)
-  target_link_libraries(nomp PRIVATE nomp::SYCL)
-  target_compile_definitions(nomp PRIVATE SYCL_ENABLED)
-endif()
-if (ENABLE_ISPC)
-  target_link_libraries(nomp PRIVATE OpenMP::OpenMP_C ispcrt::ispcrt)
-  target_compile_definitions(nomp PRIVATE ISPC_ENABLED)
-endif()
 
-# Add AddressSanitizer if it is enabled and supported.
-set(HAS_ADDRESS_SANITIZER FALSE)
-if (ENABLE_ASAN)
-  include(CheckLinkerFlag)
-  check_linker_flag(C -fsanitize=address ASAN_SUPPORTED)
-  set(HAS_ADDRESS_SANITIZER ${ASAN_SUPPORTED})
-  if (NOT HAS_ADDRESS_SANITIZER)
-    message(FATAL_ERROR "AddressSanitizer is enabled but not supported.")
-  endif()
-endif()
-
-if (HAS_ADDRESS_SANITIZER)
-  target_compile_options(nomp PRIVATE -fsanitize=address)
-  target_link_options(nomp PRIVATE -fsanitize=address)
-endif()
-
+# Tests
 file(GLOB TESTS tests/nomp-*.c)
 foreach(test ${TESTS})
   string(REPLACE "${CMAKE_SOURCE_DIR}/tests/" "" temp ${test})
@@ -140,19 +102,30 @@ foreach(test ${TESTS})
     target_link_options(${test_exe} PRIVATE -fsanitize=address)
   endif()
   install (TARGETS ${test_exe} RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/tests)
-endforeach(test ${TESTS})
+endforeach()
+
+# Add AddressSanitizer if it is enabled and supported.
+set(HAS_ADDRESS_SANITIZER FALSE)
+if (ENABLE_ASAN)
+  include(CheckLinkerFlag)
+  check_linker_flag(C -fsanitize=address ASAN_SUPPORTED)
+  set(HAS_ADDRESS_SANITIZER ${ASAN_SUPPORTED})
+  if (NOT HAS_ADDRESS_SANITIZER)
+    message(FATAL_ERROR "AddressSanitizer is enabled but not supported.")
+  else()
+    target_compile_options(nomp PRIVATE -fsanitize=address)
+    target_link_options(nomp PRIVATE -fsanitize=address)
+  endif()
+endif()
 
 # Add clang-format as a custom target if available.
 find_program(CLANG_FORMAT NAMES clang-format)
 if (CLANG_FORMAT)
   add_custom_target(format
-    COMMAND
-      ${CLANG_FORMAT} -i ${CMAKE_CURRENT_SOURCE_DIR}/*/*.[ch]
-      ${CMAKE_CURRENT_SOURCE_DIR}/*/*.[ch]pp
+    COMMAND ${CLANG_FORMAT} -i ${CMAKE_CURRENT_SOURCE_DIR}/*/*.[ch]
     COMMENT "Running clang-format ...")
   add_custom_target(format-check
-    COMMAND ${CLANG_FORMAT} --dry-run --Werror -i
-      ${CMAKE_CURRENT_SOURCE_DIR}/*/*.[ch] ${CMAKE_CURRENT_SOURCE_DIR}/*/*.[ch]pp
+    COMMAND ${CLANG_FORMAT} --dry-run --Werror -i ${CMAKE_CURRENT_SOURCE_DIR}/*/*.[ch]
     COMMENT "Running clang-format check ...")
 endif()
 
