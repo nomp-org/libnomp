@@ -173,25 +173,30 @@ static inline int init_backend(struct nomp_backend_t *bnd) {
 
 /**
  * @ingroup nomp_user_api
+ *
  * @brief Initializes libnomp with the specified backend, platform, device, etc.
  *
  * @details Initializes nomp code generation for the specified backend (e.g.,
- * OpenCL, Cuda, etc) using command line arguments. Also platform id, device id,
- * verbose level, annotation script and annotation function can be specified as
- * well. Returns a negative value if an error occurs during the initialization,
- * otherwise returns 0. Calling this method twice (without nomp_finalize in
- * between) will return an error (but not segfault). Currently only supports
- * Cuda and OpenCL backends.
+ * OpenCL, Cuda, etc) using command line arguments. Have a look at the accepted
+ * arguments below for all available options. If no arguments are specified,
+ * default values configured at build time are used for all configurations
+ * exceptfor backend and the install directory. The backend name and the install
+ * directoryare mandatory arguments.
+ *
+ * This function Returns a non-zero value if an error occurs during the
+ * initialization, otherwise returns 0. Errors can be queried using
+ * nomp_get_err_no() and nomp_get_err_str(). Calling this method multiple times
+ * (without nomp_finalize in between) will return an error (but not segfault).
  *
  * <b>Accepted arguments:</b>
- * \arg `--nomp-backend <backend-name>` Specify backend type (Default: opencl).
- * \arg `--nomp-platform <platform-index>` Specify platform id (Default: 0).
- * \arg `--nomp-device <device-index>` Specify device id (Default: 0).
- * \arg `--nomp-verbose <verbose-level>` Specify verbose level (Default: 0).
- * \arg `--nomp-profile <profile-level>` Specify profile level (Default: 0).
  * \arg `--nomp-install-dir <install-dir>` Specify `libnomp` install directory.
- * \arg `--nomp-function <annotation-function>` Specify the annotation function
- * name.
+ * \arg `--nomp-backend <backend-name>` Specify backend name.
+ * \arg `--nomp-platform <platform-index>` Specify platform id.
+ * \arg `--nomp-device <device-index>` Specify device id.
+ * \arg `--nomp-verbose <verbose-level>` Specify verbose level.
+ * \arg `--nomp-profile <profile-level>` Specify profile level.
+ * \arg `--nomp-scripts-dir <scripts-dir>` Specify the directory containing
+ * annotation and transformation scripts.
  *
  * @param[in] argc The number of arguments to nomp_init().
  * @param[in] argv Arguments as strings, values followed by options.
