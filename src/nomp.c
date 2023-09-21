@@ -4,8 +4,13 @@
 static struct nomp_backend_t nomp;
 static int initialized = 0;
 
-static inline int check_cmd_line_aux(unsigned i, unsigned argc,
-                                     const char *argv[]) {
+#define NOMP_VERBOSE 1
+#define NOMP_PROFILE 0
+#define NOMP_DEVICE 0
+#define NOMP_PLATFORM 0
+
+static inline int check_cmd_line_aux(const unsigned i, const unsigned argc,
+                                     const char *const argv[]) {
   if (i >= argc || argv[i] == NULL) {
     return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                     "Missing argument value after: %s.", argv[i - 1]);
@@ -13,33 +18,38 @@ static inline int check_cmd_line_aux(unsigned i, unsigned argc,
   return 0;
 }
 
-static inline int check_cmd_line(struct nomp_backend_t *bnd, int argc,
+static inline int check_cmd_line(struct nomp_backend_t *bnd, unsigned argc,
                                  const char **argv) {
   if (argc <= 1 || argv == NULL)
     return 0;
 
-  unsigned i = 0;
-  while ((int)i < argc) {
-    if (!strncmp("--nomp", argv[i], 6)) {
-      nomp_check(check_cmd_line_aux(i + 1, argc, argv));
-      if (!strncmp("--nomp-backend", argv[i], NOMP_MAX_BUFSIZ)) {
-        strncpy(bnd->backend, argv[i + 1], NOMP_MAX_BUFSIZ);
-      } else if (!strncmp("--nomp-platform", argv[i], NOMP_MAX_BUFSIZ)) {
-        bnd->platform_id = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
-      } else if (!strncmp("--nomp-device", argv[i], NOMP_MAX_BUFSIZ)) {
-        bnd->device_id = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
-      } else if (!strncmp("--nomp-verbose", argv[i], NOMP_MAX_BUFSIZ)) {
-        bnd->verbose = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
-      } else if (!strncmp("--nomp-profile", argv[i], NOMP_MAX_BUFSIZ)) {
-        bnd->profile = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
-      } else if (!strncmp("--nomp-install-dir", argv[i], NOMP_MAX_BUFSIZ)) {
-        strncpy(bnd->install_dir, argv[i + 1], PATH_MAX);
-      } else if (!strncmp("--nomp-function", argv[i], NOMP_MAX_BUFSIZ)) {
-        nomp_check(nomp_py_set_annotate_func(&bnd->py_annotate,
-                                             (const char *)argv[i + 1]));
-      }
-      i++;
-    }
+  for (unsigned i = 0; i < argc; i++) {
+    if (strncmp("--nomp", argv[i], 6))
+      continue;
+
+    nomp_check(check_cmd_line_aux(i + 1, argc, argv));
+
+    if (!strncmp("--nomp-backend", argv[i], NOMP_MAX_BUFSIZ))
+      strncpy(bnd->backend, argv[i + 1], NOMP_MAX_BUFSIZ);
+
+    if (!strncmp("--nomp-platform", argv[i], NOMP_MAX_BUFSIZ))
+      bnd->platform_id = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
+
+    if (!strncmp("--nomp-device", argv[i], NOMP_MAX_BUFSIZ))
+      bnd->device_id = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
+
+    if (!strncmp("--nomp-verbose", argv[i], NOMP_MAX_BUFSIZ))
+      bnd->verbose = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
+
+    if (!strncmp("--nomp-profile", argv[i], NOMP_MAX_BUFSIZ))
+      bnd->profile = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
+
+    if (!strncmp("--nomp-install-dir", argv[i], NOMP_MAX_BUFSIZ))
+      strncpy(bnd->install_dir, argv[i + 1], PATH_MAX);
+
+    if (!strncmp("--nomp-function", argv[i], NOMP_MAX_BUFSIZ))
+      nomp_check(nomp_py_set_annotate_func(&bnd->py_annotate,
+                                           (const char *)argv[i + 1]));
     i++;
   }
 
@@ -76,9 +86,12 @@ static inline int init_configs(int argc, const char **argv,
                                struct nomp_backend_t *bnd) {
   // verbose, profile, device and platform id are all initialized to zero.
   // Everything else has to be set by user explicitly.
-  bnd->verbose = 1;
-  bnd->profile = bnd->device_id = bnd->platform_id = 0;
-  strcpy(bnd->backend, ""), strcpy(bnd->install_dir, "");
+  bnd->verbose = NOMP_VERBOSE;
+  bnd->profile = NOMP_PROFILE;
+  bnd->device_id = NOMP_DEVICE;
+  bnd->platform_id = NOMP_PLATFORM;
+  strcpy(bnd->backend, "");
+  strcpy(bnd->install_dir, "");
 
   nomp_check(check_cmd_line(bnd, argc, argv));
   nomp_check(check_env_vars(bnd));
