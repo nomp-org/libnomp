@@ -18,33 +18,33 @@ static inline int check_cmd_line(struct nomp_backend_t *bnd, unsigned argc,
   if (argc <= 1 || argv == NULL)
     return 0;
 
-  for (unsigned i = 0; i < argc; i++) {
-    if (strncmp("--nomp", argv[i], 6))
+  for (unsigned i = 0; i < argc;) {
+    if (strncmp("--nomp", argv[i++], 6))
       continue;
 
-    nomp_check(check_cmd_line_aux(i + 1, argc, argv));
+    nomp_check(check_cmd_line_aux(i, argc, argv));
 
-    if (!strncmp("--nomp-backend", argv[i], NOMP_MAX_BUFSIZ))
-      strncpy(bnd->backend, argv[i + 1], NOMP_MAX_BUFSIZ);
+    if (!strncmp("--nomp-backend", argv[i - 1], NOMP_MAX_BUFSIZ))
+      strncpy(bnd->backend, argv[i], NOMP_MAX_BUFSIZ);
 
-    if (!strncmp("--nomp-platform", argv[i], NOMP_MAX_BUFSIZ))
-      bnd->platform_id = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
+    if (!strncmp("--nomp-platform", argv[i - 1], NOMP_MAX_BUFSIZ))
+      bnd->platform_id = nomp_str_toui(argv[i], NOMP_MAX_BUFSIZ);
 
-    if (!strncmp("--nomp-device", argv[i], NOMP_MAX_BUFSIZ))
-      bnd->device_id = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
+    if (!strncmp("--nomp-device", argv[i - 1], NOMP_MAX_BUFSIZ))
+      bnd->device_id = nomp_str_toui(argv[i], NOMP_MAX_BUFSIZ);
 
-    if (!strncmp("--nomp-verbose", argv[i], NOMP_MAX_BUFSIZ))
-      bnd->verbose = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
+    if (!strncmp("--nomp-verbose", argv[i - 1], NOMP_MAX_BUFSIZ))
+      bnd->verbose = nomp_str_toui(argv[i], NOMP_MAX_BUFSIZ);
 
-    if (!strncmp("--nomp-profile", argv[i], NOMP_MAX_BUFSIZ))
-      bnd->profile = nomp_str_toui(argv[i + 1], NOMP_MAX_BUFSIZ);
+    if (!strncmp("--nomp-profile", argv[i - 1], NOMP_MAX_BUFSIZ))
+      bnd->profile = nomp_str_toui(argv[i], NOMP_MAX_BUFSIZ);
 
-    if (!strncmp("--nomp-install-dir", argv[i], NOMP_MAX_BUFSIZ))
-      strncpy(bnd->install_dir, argv[i + 1], PATH_MAX);
+    if (!strncmp("--nomp-install-dir", argv[i - 1], NOMP_MAX_BUFSIZ))
+      strncpy(bnd->install_dir, argv[i], PATH_MAX);
 
-    if (!strncmp("--nomp-function", argv[i], NOMP_MAX_BUFSIZ))
-      nomp_check(nomp_py_set_annotate_func(&bnd->py_annotate,
-                                           (const char *)argv[i + 1]));
+    if (!strncmp("--nomp-scripts-dir", argv[i - 1], NOMP_MAX_BUFSIZ))
+      strncpy(bnd->scripts_dir, argv[i], PATH_MAX);
+
     i++;
   }
 
@@ -101,13 +101,11 @@ static inline int init_configs(int argc, const char **argv,
     }                                                                          \
   }
 
-  check_if_valid(bnd->verbose < 0, "--nomp-verbose", "NOMP_VERBOSE");
-  check_if_valid(bnd->profile < 0, "--nomp-profile", "NOMP_PROFILE");
-  check_if_valid(bnd->platform_id < 0, "--nomp-platform", "NOMP_PLATFORM");
-  check_if_valid(bnd->device_id < 0, "--nomp-device", "NOMP_DEVICE");
   check_if_valid(strlen(bnd->backend) == 0, "--nomp-backend", "NOMP_BACKEND");
   check_if_valid(strlen(bnd->install_dir) == 0, "--nomp-install-dir",
                  "NOMP_INSTALL_DIR");
+  check_if_valid(strlen(bnd->scripts_dir) == 0, "--nomp-scripts-dir",
+                 "NOMP_SCRIPTS_DIR");
 
 #undef check_if_valid
 
