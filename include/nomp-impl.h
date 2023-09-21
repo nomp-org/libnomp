@@ -16,13 +16,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define NOMP_MAX_BUFSIZ 128
-#define NOMP_MAX_SRC_SIZE 16384
-#define NOMP_MAX_CFLAGS_SIZE 16384
-#define NOMP_MAX_KNL_ARGS 64
-#define NOMP_MAX_SCRATCH_SIZE (32768 * sizeof(double))
-
 #include "nomp-aux.h"
+#include "nomp-defs.h"
 #include "nomp-log.h"
 #include "nomp-loopy.h"
 #include "nomp-mem.h"
