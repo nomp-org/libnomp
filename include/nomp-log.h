@@ -13,15 +13,20 @@ extern "C" {
 #endif
 
 /**
- * @ingroup nomp_error_types
+ * @defgroup nomp_internal_types Internal types
+ * @brief Data types used internally by the library.
+ */
+
+/**
+ * @ingroup nomp_internal_types
  *
- * @brief nomp log type. It can be an error, warning or information.
+ * @brief Defines nomp log types. It can be an error, warning or information.
  */
 typedef enum {
-  NOMP_ERROR = 1,
-  NOMP_WARNING = 2,
-  NOMP_INFO = 3,
-} nomp_log_type;
+  NOMP_ERROR = 1,   /**< Error type. */
+  NOMP_WARNING = 2, /**< Warning type. */
+  NOMP_INFO = 3,    /**< Information type. */
+} nomp_log_type_t;
 
 /**
  * @defgroup nomp_log_utils Logging utilities
@@ -31,7 +36,7 @@ typedef enum {
 
 int nomp_log_set_verbose(unsigned verbose);
 
-int nomp_log_(const char *desc, int errorno, nomp_log_type type, ...);
+int nomp_log_(const char *desc, int errorno, nomp_log_type_t type, ...);
 
 #define NOMP_CASE_IMPL(_1, _2, _3, _4, _5, _6, _7, _8, N, ...) N
 #define NOMP_CASE(...) NOMP_CASE_IMPL(__VA_ARGS__, 2, 2, 2, 2, 2, 2, 2, 1, 0)
@@ -55,7 +60,7 @@ int nomp_log_(const char *desc, int errorno, nomp_log_type type, ...);
  *
  * @param errorno Error number (One of @ref nomp_user_errors. used only when
  * type is an error).
- * @param type Log type one of the @ref nomp_log_type.
+ * @param type Log type one of ::nomp_log_type_t.
  * @param ... Log message as a C-string followed by arguments.
  */
 #define nomp_log(errorno, type, ...)                                           \
