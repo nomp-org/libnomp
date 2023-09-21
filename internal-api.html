@@ -46,6 +46,7 @@
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Nomp Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user-api.html">User API</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Internal API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#data-types">Data Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#helper-macros">Helper Macros</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#backend-init-functions">Backend Init Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#python-helper-functions">Python Helper Functions</a></li>
@@ -88,6 +89,148 @@
 </div>
 <section id="internal-api">
 <h1>Internal API<a class="headerlink" href="#internal-api" title="Permalink to this heading"></a></h1>
+<section id="data-types">
+<h2>Data Types<a class="headerlink" href="#data-types" title="Permalink to this heading"></a></h2>
+<p>Below is a list of data types used internally by libnomp.</p>
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv415nomp_log_type_t">
+<span id="_CPPv315nomp_log_type_t"></span><span id="_CPPv215nomp_log_type_t"></span><span class="target" id="group__nomp__internal__types_1ga2c163c219eb9c294ee22fda2afc34175"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_log_type_t</span></span></span><a class="headerlink" href="#_CPPv415nomp_log_type_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Defines nomp log types. It can be an error, warning or information. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N15nomp_log_type_t10NOMP_ERRORE">
+<span id="_CPPv3N15nomp_log_type_t10NOMP_ERRORE"></span><span id="_CPPv2N15nomp_log_type_t10NOMP_ERRORE"></span><span class="target" id="group__nomp__internal__types_1gga2c163c219eb9c294ee22fda2afc34175aaa0c64194b170401c9ccaf27b15e7ade"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_ERROR</span></span></span><a class="headerlink" href="#_CPPv4N15nomp_log_type_t10NOMP_ERRORE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Error type. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N15nomp_log_type_t12NOMP_WARNINGE">
+<span id="_CPPv3N15nomp_log_type_t12NOMP_WARNINGE"></span><span id="_CPPv2N15nomp_log_type_t12NOMP_WARNINGE"></span><span class="target" id="group__nomp__internal__types_1gga2c163c219eb9c294ee22fda2afc34175ab315fb41d2eba7385d173df5465543c9"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_WARNING</span></span></span><a class="headerlink" href="#_CPPv4N15nomp_log_type_t12NOMP_WARNINGE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Warning type. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N15nomp_log_type_t9NOMP_INFOE">
+<span id="_CPPv3N15nomp_log_type_t9NOMP_INFOE"></span><span id="_CPPv2N15nomp_log_type_t9NOMP_INFOE"></span><span class="target" id="group__nomp__internal__types_1gga2c163c219eb9c294ee22fda2afc34175ab401d750d4432e8702d5c029c1a9f60f"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_INFO</span></span></span><a class="headerlink" href="#_CPPv4N15nomp_log_type_t9NOMP_INFOE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Information type. </p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv414nomp_backend_t">
+<span id="_CPPv314nomp_backend_t"></span><span id="_CPPv214nomp_backend_t"></span><span id="nomp_backend_t"></span><span class="target" id="structnomp__backend__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_backend_t</span></span></span><a class="headerlink" href="#_CPPv414nomp_backend_t" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;nomp-impl.h&gt;</em></div>
+<p>Structure to keep track of nomp runtime data and backend specific data. This structure is also used to dispatch backend specific functions. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14nomp_backend_t11platform_idE">
+<span id="_CPPv3N14nomp_backend_t11platform_idE"></span><span id="_CPPv2N14nomp_backend_t11platform_idE"></span><span id="nomp_backend_t::platform_id__i"></span><span class="target" id="structnomp__backend__t_1a1ac422fa1f83a9e23791ddfcca58163f"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">platform_id</span></span></span><a class="headerlink" href="#_CPPv4N14nomp_backend_t11platform_idE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>ID of the platform to be used for the backend. This is only used when the backend is OpenCL. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14nomp_backend_t9device_idE">
+<span id="_CPPv3N14nomp_backend_t9device_idE"></span><span id="_CPPv2N14nomp_backend_t9device_idE"></span><span id="nomp_backend_t::device_id__i"></span><span class="target" id="structnomp__backend__t_1a738f892b8c4ade13f7d2e1278f73f68b"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">device_id</span></span></span><a class="headerlink" href="#_CPPv4N14nomp_backend_t9device_idE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>ID of the dhvice to be used with the backend. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14nomp_backend_t7verboseE">
+<span id="_CPPv3N14nomp_backend_t7verboseE"></span><span id="_CPPv2N14nomp_backend_t7verboseE"></span><span id="nomp_backend_t::verbose__i"></span><span class="target" id="structnomp__backend__t_1a5ad1a7a3abdf09f02a40dbc06eb8ed93"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">verbose</span></span></span><a class="headerlink" href="#_CPPv4N14nomp_backend_t7verboseE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Verbose level to be used for displaying log messages. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14nomp_backend_t7profileE">
+<span id="_CPPv3N14nomp_backend_t7profileE"></span><span id="_CPPv2N14nomp_backend_t7profileE"></span><span id="nomp_backend_t::profile__i"></span><span class="target" id="structnomp__backend__t_1a3e0168109f2611669992ee7ff32148a1"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">profile</span></span></span><a class="headerlink" href="#_CPPv4N14nomp_backend_t7profileE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Turn profiling on or off. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14nomp_backend_t7backendE">
+<span id="_CPPv3N14nomp_backend_t7backendE"></span><span id="_CPPv2N14nomp_backend_t7backendE"></span><span id="nomp_backend_t::backend__cA"></span><span class="target" id="structnomp__backend__t_1a0f1216a6d32d2eaf56cccca906fde032"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">backend</span></span></span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">128</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#_CPPv4N14nomp_backend_t7backendE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Name of the backend to be used (OpenCL, Cuda, etc.). </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14nomp_backend_t11install_dirE">
+<span id="_CPPv3N14nomp_backend_t11install_dirE"></span><span id="_CPPv2N14nomp_backend_t11install_dirE"></span><span id="nomp_backend_t::install_dir__cA"></span><span class="target" id="structnomp__backend__t_1a9ac5b3ab76bb0ec8d57d6a9de3dedb28"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">install_dir</span></span></span><span class="p"><span class="pre">[</span></span><span class="n"><span class="pre">PATH_MAX</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#_CPPv4N14nomp_backend_t11install_dirE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Installed directory of the library. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14nomp_backend_t11scripts_dirE">
+<span id="_CPPv3N14nomp_backend_t11scripts_dirE"></span><span id="_CPPv2N14nomp_backend_t11scripts_dirE"></span><span id="nomp_backend_t::scripts_dir__cA"></span><span class="target" id="structnomp__backend__t_1a10a75f2518ca9b73e8d863496e56ee07"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">scripts_dir</span></span></span><span class="p"><span class="pre">[</span></span><span class="n"><span class="pre">PATH_MAX</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#_CPPv4N14nomp_backend_t11scripts_dirE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Directory where transform and annotations cripts are located. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14nomp_backend_t6updateE">
+<span id="_CPPv3N14nomp_backend_t6updateE"></span><span id="_CPPv2N14nomp_backend_t6updateE"></span><span class="target" id="structnomp__backend__t_1a85377ad1e943ee6af6c326073c5c15d4"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">update</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv414nomp_backend_t" title="nomp_backend_t"><span class="n"><span class="pre">nomp_backend_t</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">nomp_mem_t</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="user-api.html#_CPPv420nomp_map_direction_t" title="nomp_map_direction_t"><span class="n"><span class="pre">nomp_map_direction_t</span></span></a><span class="w"> </span><span class="n"><span class="pre">op</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">usize</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N14nomp_backend_t6updateE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Function pointer to the backend update function which can allocate, update and free backend memory. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14nomp_backend_t9knl_buildE">
+<span id="_CPPv3N14nomp_backend_t9knl_buildE"></span><span id="_CPPv2N14nomp_backend_t9knl_buildE"></span><span class="target" id="structnomp__backend__t_1a18b66989057fa5a59014a19c41e76ad4"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">knl_build</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv414nomp_backend_t" title="nomp_backend_t"><span class="n"><span class="pre">nomp_backend_t</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">nomp_prog_t</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N14nomp_backend_t9knl_buildE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Function pointer to the backend kernel build function. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14nomp_backend_t7knl_runE">
+<span id="_CPPv3N14nomp_backend_t7knl_runE"></span><span id="_CPPv2N14nomp_backend_t7knl_runE"></span><span class="target" id="structnomp__backend__t_1aaddb19f721c2eea8a2bccfa60a936e23"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">knl_run</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv414nomp_backend_t" title="nomp_backend_t"><span class="n"><span class="pre">nomp_backend_t</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">nomp_prog_t</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N14nomp_backend_t7knl_runE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Function pointer to the backend kernel run function. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14nomp_backend_t8knl_freeE">
+<span id="_CPPv3N14nomp_backend_t8knl_freeE"></span><span id="_CPPv2N14nomp_backend_t8knl_freeE"></span><span class="target" id="structnomp__backend__t_1aef43b466950f9a5401baa96ec6ba965d"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">knl_free</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">nomp_prog_t</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N14nomp_backend_t8knl_freeE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Function pointer to the backend kernel free function. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14nomp_backend_t4syncE">
+<span id="_CPPv3N14nomp_backend_t4syncE"></span><span id="_CPPv2N14nomp_backend_t4syncE"></span><span class="target" id="structnomp__backend__t_1a52f9ac0dd79fbabf5cfb54db49a3bb4d"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">sync</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv414nomp_backend_t" title="nomp_backend_t"><span class="n"><span class="pre">nomp_backend_t</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N14nomp_backend_t4syncE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Function pointer to the backend synchronization function. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14nomp_backend_t8finalizeE">
+<span id="_CPPv3N14nomp_backend_t8finalizeE"></span><span id="_CPPv2N14nomp_backend_t8finalizeE"></span><span class="target" id="structnomp__backend__t_1a98945e5b38c38447385409008cba6372"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">finalize</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv414nomp_backend_t" title="nomp_backend_t"><span class="n"><span class="pre">nomp_backend_t</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N14nomp_backend_t8finalizeE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Function pointer to the backend finalize function which releases allocated resources. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14nomp_backend_t7scratchE">
+<span id="_CPPv3N14nomp_backend_t7scratchE"></span><span id="_CPPv2N14nomp_backend_t7scratchE"></span><span id="nomp_backend_t::scratch__nomp_mem_t"></span><span class="target" id="structnomp__backend__t_1a0ce1be1fd7a45b380e0233b0387896f1"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">nomp_mem_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">scratch</span></span></span><a class="headerlink" href="#_CPPv4N14nomp_backend_t7scratchE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Scratch memory to be used as temporary memory for kernels (like reductions) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14nomp_backend_t11py_annotateE">
+<span id="_CPPv3N14nomp_backend_t11py_annotateE"></span><span id="_CPPv2N14nomp_backend_t11py_annotateE"></span><span id="nomp_backend_t::py_annotate__PyObjectP"></span><span class="target" id="structnomp__backend__t_1aa3e36a43420c4be7d5db8aaf207c742f"></span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">py_annotate</span></span></span><a class="headerlink" href="#_CPPv4N14nomp_backend_t11py_annotateE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Python function object which will be called to perform annotations. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14nomp_backend_t10py_contextE">
+<span id="_CPPv3N14nomp_backend_t10py_contextE"></span><span id="_CPPv2N14nomp_backend_t10py_contextE"></span><span id="nomp_backend_t::py_context__PyObjectP"></span><span class="target" id="structnomp__backend__t_1a270b1b573322dde59bc9459ab9b6bcb1"></span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">py_context</span></span></span><a class="headerlink" href="#_CPPv4N14nomp_backend_t10py_contextE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Context info is used to pass necessary infomation to kernel transformations and annotations. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14nomp_backend_t4bptrE">
+<span id="_CPPv3N14nomp_backend_t4bptrE"></span><span id="_CPPv2N14nomp_backend_t4bptrE"></span><span id="nomp_backend_t::bptr__voidP"></span><span class="target" id="structnomp__backend__t_1a4779f707d801b7b46ae4b80b26ac8d0b"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">bptr</span></span></span><a class="headerlink" href="#_CPPv4N14nomp_backend_t4bptrE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Pointer to keep track of backend specific data. This is allocated and released by the backend. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
 <section id="helper-macros">
 <h2>Helper Macros<a class="headerlink" href="#helper-macros" title="Permalink to this heading"></a></h2>
 <dl class="cpp macro">
@@ -108,7 +251,7 @@
 <h2>Backend Init Functions<a class="headerlink" href="#backend-init-functions" title="Permalink to this heading"></a></h2>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv49ispc_initP14nomp_backend_tKiKi">
-<span id="_CPPv39ispc_initP14nomp_backend_tKiKi"></span><span id="_CPPv29ispc_initP14nomp_backend_tKiKi"></span><span id="ispc_init__nomp_backend_tP.iC.iC"></span><span class="target" id="group__nomp__backend__init_1ga6cd90e2e576bb783a8de0a7b8361af75"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ispc_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">nomp_backend_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">bnd</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">platform_type</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">device_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49ispc_initP14nomp_backend_tKiKi" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv39ispc_initP14nomp_backend_tKiKi"></span><span id="_CPPv29ispc_initP14nomp_backend_tKiKi"></span><span id="ispc_init__nomp_backend_tP.iC.iC"></span><span class="target" id="group__nomp__backend__init_1ga6cd90e2e576bb783a8de0a7b8361af75"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ispc_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv414nomp_backend_t" title="nomp_backend_t"><span class="n"><span class="pre">nomp_backend_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">bnd</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">platform_type</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">device_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49ispc_initP14nomp_backend_tKiKi" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Initializes ISPC backend with the specified platform and device. </p>
 <p>Initializes ISPC backend using the given device id and platform type. Returns a negative value if an error occurred during the initialization, otherwise returns 0.</p>
 <dl class="field-list simple">
@@ -127,7 +270,7 @@
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv411opencl_initP14nomp_backend_tKiKi">
-<span id="_CPPv311opencl_initP14nomp_backend_tKiKi"></span><span id="_CPPv211opencl_initP14nomp_backend_tKiKi"></span><span id="opencl_init__nomp_backend_tP.iC.iC"></span><span class="target" id="group__nomp__backend__init_1ga3d6ad028e5bde1ede75eb26da54f8eb2"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">opencl_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">nomp_backend_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">bnd</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">platform_id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">device_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411opencl_initP14nomp_backend_tKiKi" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv311opencl_initP14nomp_backend_tKiKi"></span><span id="_CPPv211opencl_initP14nomp_backend_tKiKi"></span><span id="opencl_init__nomp_backend_tP.iC.iC"></span><span class="target" id="group__nomp__backend__init_1ga3d6ad028e5bde1ede75eb26da54f8eb2"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">opencl_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv414nomp_backend_t" title="nomp_backend_t"><span class="n"><span class="pre">nomp_backend_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">bnd</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">platform_id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">device_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411opencl_initP14nomp_backend_tKiKi" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Initializes OpenCL backend with the specified platform and device. </p>
 <p>Initializes OpenCL backend while creating a command queue using the given platform id and device id. Returns a negative value if an error occurred during the initialization, otherwise returns 0.</p>
 <dl class="field-list simple">
@@ -146,7 +289,7 @@
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv49sycl_initP14nomp_backend_tKiKi">
-<span id="_CPPv39sycl_initP14nomp_backend_tKiKi"></span><span id="_CPPv29sycl_initP14nomp_backend_tKiKi"></span><span id="sycl_init__nomp_backend_tP.iC.iC"></span><span class="target" id="group__nomp__backend__init_1ga551bd42a5dedda1b750b5a75a831803a"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sycl_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">nomp_backend_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">bnd</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">platform_id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">device_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49sycl_initP14nomp_backend_tKiKi" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv39sycl_initP14nomp_backend_tKiKi"></span><span id="_CPPv29sycl_initP14nomp_backend_tKiKi"></span><span id="sycl_init__nomp_backend_tP.iC.iC"></span><span class="target" id="group__nomp__backend__init_1ga551bd42a5dedda1b750b5a75a831803a"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sycl_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv414nomp_backend_t" title="nomp_backend_t"><span class="n"><span class="pre">nomp_backend_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">bnd</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">platform_id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">device_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49sycl_initP14nomp_backend_tKiKi" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Initializes SYCL backend with the specified platform and device. </p>
 <p>Initializes SYCL backend while creating a command queue using the given platform id and device id. Returns a positive value if an error occurred during the initialization, otherwise returns 0.</p>
 <dl class="field-list simple">
@@ -504,7 +647,7 @@
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv424nomp_host_side_reductionP14nomp_backend_tP11nomp_prog_tP10nomp_mem_t">
-<span id="_CPPv324nomp_host_side_reductionP14nomp_backend_tP11nomp_prog_tP10nomp_mem_t"></span><span id="_CPPv224nomp_host_side_reductionP14nomp_backend_tP11nomp_prog_tP10nomp_mem_t"></span><span id="nomp_host_side_reduction__nomp_backend_tP.nomp_prog_tP.nomp_mem_tP"></span><span class="target" id="group__nomp__reduction__utils_1ga827eca70bce314d686e792a4cabc81c3"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_host_side_reduction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">nomp_backend_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">backend</span></span>, <span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">nomp_prog_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">prg</span></span>, <span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">nomp_mem_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">m</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424nomp_host_side_reductionP14nomp_backend_tP11nomp_prog_tP10nomp_mem_t" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv324nomp_host_side_reductionP14nomp_backend_tP11nomp_prog_tP10nomp_mem_t"></span><span id="_CPPv224nomp_host_side_reductionP14nomp_backend_tP11nomp_prog_tP10nomp_mem_t"></span><span id="nomp_host_side_reduction__nomp_backend_tP.nomp_prog_tP.nomp_mem_tP"></span><span class="target" id="group__nomp__reduction__utils_1ga827eca70bce314d686e792a4cabc81c3"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_host_side_reduction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv414nomp_backend_t" title="nomp_backend_t"><span class="n"><span class="pre">nomp_backend_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">backend</span></span>, <span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">nomp_prog_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">prg</span></span>, <span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">nomp_mem_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">m</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424nomp_host_side_reductionP14nomp_backend_tP11nomp_prog_tP10nomp_mem_t" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Perform host side reduction. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -538,16 +681,16 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv49nomp_log_PKci13nomp_log_typez">
-<span id="_CPPv39nomp_log_PKci13nomp_log_typez"></span><span id="_CPPv29nomp_log_PKci13nomp_log_typez"></span><span id="nomp_log___cCP.i.nomp_log_type.z"></span><span class="target" id="group__nomp__log__utils_1gaa60417d64c162b9643d206dfd798d57e"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_log_</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">description</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">errorno</span></span>, <span class="n"><span class="pre">nomp_log_type</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">type</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49nomp_log_PKci13nomp_log_typez" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv49nomp_log_PKci15nomp_log_type_tz">
+<span id="_CPPv39nomp_log_PKci15nomp_log_type_tz"></span><span id="_CPPv29nomp_log_PKci15nomp_log_type_tz"></span><span id="nomp_log___cCP.i.nomp_log_type_t.z"></span><span class="target" id="group__nomp__log__utils_1gada344b3ba79059a101c91c5cf88c3174"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_log_</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">description</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">errorno</span></span>, <a class="reference internal" href="#_CPPv415nomp_log_type_t" title="nomp_log_type_t"><span class="n"><span class="pre">nomp_log_type_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">type</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49nomp_log_PKci15nomp_log_type_tz" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Register a log with libnomp runtime. </p>
-<p>Register a log given a description of the log, error number and log type. This function returns a unique id if the log type is an error and this can be used to query the error log. If the log type is an information or a warning, <a class="reference internal" href="#group__nomp__log__utils_1ga8338899cbb52c9598eb08f66a33fddfc"><span class="std std-ref">nomp_log()</span></a> returns 0 and <code class="docutils literal notranslate"><span class="pre">description</span></code> is printed to stdout based on the verbose level (which is set by either &amp;#8212;nomp-verbose command line argument or NOMP_VERBOSE environment variable) and not recorded by the libnomp runtime. Also, the <code class="docutils literal notranslate"><span class="pre">errorno</span></code> is ignored if the log type is not an error. On failure, <a class="reference internal" href="#group__nomp__log__utils_1gaa60417d64c162b9643d206dfd798d57e"><span class="std std-ref">nomp_log_()</span></a> returns -1. Use <a class="reference internal" href="#group__nomp__log__utils_1ga8338899cbb52c9598eb08f66a33fddfc"><span class="std std-ref">nomp_log()</span></a> macro without calling this function directly.</p>
+<p>Register a log given a description of the log, error number and log type. This function returns a unique id if the log type is an error and this can be used to query the error log. If the log type is an information or a warning, <a class="reference internal" href="#group__nomp__log__utils_1ga8338899cbb52c9598eb08f66a33fddfc"><span class="std std-ref">nomp_log()</span></a> returns 0 and <code class="docutils literal notranslate"><span class="pre">description</span></code> is printed to stdout based on the verbose level (which is set by either &amp;#8212;nomp-verbose command line argument or NOMP_VERBOSE environment variable) and not recorded by the libnomp runtime. Also, the <code class="docutils literal notranslate"><span class="pre">errorno</span></code> is ignored if the log type is not an error. On failure, <a class="reference internal" href="#group__nomp__log__utils_1gada344b3ba79059a101c91c5cf88c3174"><span class="std std-ref">nomp_log_()</span></a> returns -1. Use <a class="reference internal" href="#group__nomp__log__utils_1ga8338899cbb52c9598eb08f66a33fddfc"><span class="std std-ref">nomp_log()</span></a> macro without calling this function directly.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>description</strong> – <strong>[in]</strong> Detailed description of the log. </p></li>
 <li><p><strong>errorno</strong> – <strong>[in]</strong> Log number which is defined in nomp.h </p></li>
-<li><p><strong>type</strong> – <strong>[in]</strong> Type of the log (one of nomp_log_type) </p></li>
+<li><p><strong>type</strong> – <strong>[in]</strong> Type of the log (one of <a class="reference internal" href="#group__nomp__internal__types_1ga2c163c219eb9c294ee22fda2afc34175"><span class="std std-ref">nomp_log_type_t</span></a>) </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -570,12 +713,12 @@
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.nomp_log">
 <span class="target" id="group__nomp__log__utils_1ga8338899cbb52c9598eb08f66a33fddfc"></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_log</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">errorno</span></span>, <span class="n"><span class="pre">type</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nomp_log" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Log an error, warning or an info message. Use this instead of using the <a class="reference internal" href="#group__nomp__log__utils_1gaa60417d64c162b9643d206dfd798d57e"><span class="std std-ref">nomp_log_</span></a> function directly. </p>
+<dd><p>Log an error, warning or an info message. Use this instead of using the <a class="reference internal" href="#group__nomp__log__utils_1gada344b3ba79059a101c91c5cf88c3174"><span class="std std-ref">nomp_log_</span></a> function directly. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>errorno</strong> – Error number (One of Error codes returned to the user.. used only when type is an error). </p></li>
-<li><p><strong>type</strong> – Log type one of the nomp_log_type. </p></li>
+<li><p><strong>type</strong> – Log type one of <a class="reference internal" href="#group__nomp__internal__types_1ga2c163c219eb9c294ee22fda2afc34175"><span class="std std-ref">nomp_log_type_t</span></a>. </p></li>
 <li><p><strong>...</strong> – Log message as a C-string followed by arguments. </p></li>
 </ul>
 </dd>
@@ -652,7 +795,7 @@
 <dt class="sig sig-object cpp" id="_CPPv412nomp_str_catjjz">
 <span id="_CPPv312nomp_str_catjjz"></span><span id="_CPPv212nomp_str_catjjz"></span><span id="nomp_str_cat__unsigned.unsigned.z"></span><span class="target" id="group__nomp__other__utils_1gaa41545f888f512ee21adfa93171fd875"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_str_cat</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max_len</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412nomp_str_catjjz" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Concatenates <code class="docutils literal notranslate"><span class="pre">n</span></code> strings. </p>
-<p>Concatenates <code class="docutils literal notranslate"><span class="pre">n</span></code> strings and returns a pointer to the resulting string. Each string should be at most <code class="docutils literal notranslate"><span class="pre">max_len</span></code> length long. Returned pointer need to be freed using <a class="reference internal" href="#group__nomp__mem__utils_1ga7f94b25dae56929daada2a73b36f6934"><span class="std std-ref">nomp_free()</span></a>.</p>
+<p>Concatenates <code class="docutils literal notranslate"><span class="pre">n</span></code> strings and returns a pointer to the resulting string. Each string should be at most <code class="docutils literal notranslate"><span class="pre">max_len</span></code> length long. User has to free memory allocated for the resulting string using <a class="reference internal" href="#group__nomp__mem__utils_1ga7f94b25dae56929daada2a73b36f6934"><span class="std std-ref">nomp_free()</span></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -670,8 +813,8 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv413nomp_str_touiPKc6size_t">
 <span id="_CPPv313nomp_str_touiPKc6size_t"></span><span id="_CPPv213nomp_str_touiPKc6size_t"></span><span id="nomp_str_toui__cCP.s"></span><span class="target" id="group__nomp__other__utils_1gaa4339127cdf37003e45846181dc6da6b"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_str_toui</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">str</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413nomp_str_touiPKc6size_t" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Convert a string to unsigned long value if possible. </p>
-<p>Convert input string <code class="docutils literal notranslate"><span class="pre">str</span></code> to an unsigned int value. Returns converted unsigned int value if successful, otherwise return -1. <code class="docutils literal notranslate"><span class="pre">size</span></code> denotes the maximum length of the string <code class="docutils literal notranslate"><span class="pre">str</span></code>.</p>
+<dd><p>Try to convert input string <code class="docutils literal notranslate"><span class="pre">str</span></code> to an non-negative integer value. </p>
+<p>Convert input string <code class="docutils literal notranslate"><span class="pre">str</span></code> to an non-negative int value. Returns converted non-negative int value if successful, otherwise return -1. <code class="docutils literal notranslate"><span class="pre">size</span></code> denotes the maximum length of the string <code class="docutils literal notranslate"><span class="pre">str</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -686,10 +829,46 @@
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv48nomp_maxjz">
+<span id="_CPPv38nomp_maxjz"></span><span id="_CPPv28nomp_maxjz"></span><span id="nomp_max__unsigned.z"></span><span class="target" id="group__nomp__other__utils_1gaefe9b0c641da88552b085c8d53a78c32"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_max</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48nomp_maxjz" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the maximum among all integers passed. </p>
+<p>Returns the maximum between <code class="docutils literal notranslate"><span class="pre">n</span></code> integers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> – <strong>[in]</strong> Total number of integers. </p></li>
+<li><p><strong>...</strong> – <strong>[in]</strong> List of integers. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413nomp_copy_envPKc6size_t">
+<span id="_CPPv313nomp_copy_envPKc6size_t"></span><span id="_CPPv213nomp_copy_envPKc6size_t"></span><span id="nomp_copy_env__cCP.s"></span><span class="target" id="group__nomp__other__utils_1ga0e718e8165a885874754ce1cb827275d"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_copy_env</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413nomp_copy_envPKc6size_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Get a copy of the environment variable value if it exists. </p>
+<p>Get a copy of the value of the environment variable <code class="docutils literal notranslate"><span class="pre">name</span></code> as a string if it is defined. Return NULL if the environment variable is not set. <code class="docutils literal notranslate"><span class="pre">size</span></code> is the maximum length of the string. User must free the memory allocated for the resulting string using <a class="reference internal" href="#group__nomp__mem__utils_1ga7f94b25dae56929daada2a73b36f6934"><span class="std std-ref">nomp_free()</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – <strong>[in]</strong> Name of the environment variable. </p></li>
+<li><p><strong>size</strong> – <strong>[in]</strong> Maximum length of the environment variable value. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>char * </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv413nomp_path_lenP6size_tPKc">
 <span id="_CPPv313nomp_path_lenP6size_tPKc"></span><span id="_CPPv213nomp_path_lenP6size_tPKc"></span><span id="nomp_path_len__sP.cCP"></span><span class="target" id="group__nomp__other__utils_1gac1033679d119836202049eec6ba8248a"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_path_len</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">len</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">path</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413nomp_path_lenP6size_tPKc" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Returns the length of a posix complaint path. </p>
-<p>If <code class="docutils literal notranslate"><span class="pre">len</span></code> is not NULL, it is set to the length of the path if the path length resoultion was successful. Otherwise, it is set to zero.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">len</span></code> is not NULL, it is set to the length of the <code class="docutils literal notranslate"><span class="pre">path</span></code> if the <code class="docutils literal notranslate"><span class="pre">path</span></code> length resolution was successful. Otherwise, it is set to zero. On success, the function returns zero. Otherwise, it returns an error id which can be used to query the error id and string using <a class="reference internal" href="user-api.html#group__nomp__user__api_1ga173b912ade6fac15da8d901b9dd8a8eb"><span class="std std-ref">nomp_get_err_str()</span></a> and nomp_get_err_id().</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -704,52 +883,16 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv48nomp_maxjz">
-<span id="_CPPv38nomp_maxjz"></span><span id="_CPPv28nomp_maxjz"></span><span id="nomp_max__unsigned.z"></span><span class="target" id="group__nomp__other__utils_1gaefe9b0c641da88552b085c8d53a78c32"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_max</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48nomp_maxjz" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Returns maximum among all integers passed. </p>
-<p>Returns the maximum between two or more integers.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>n</strong> – <strong>[in]</strong> Total number of integers. </p></li>
-<li><p><strong>...</strong> – <strong>[in]</strong> List of integers to find the maximum of as a variable argument list. </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>int </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv425nomp_check_py_script_pathPKc">
 <span id="_CPPv325nomp_check_py_script_pathPKc"></span><span id="_CPPv225nomp_check_py_script_pathPKc"></span><span id="nomp_check_py_script_path__cCP"></span><span class="target" id="group__nomp__other__utils_1ga55caaef28103f787bb6a480ed2cef09f"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_check_py_script_path</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">path</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425nomp_check_py_script_pathPKc" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Check if the python script path exists. </p>
-<p><code class="docutils literal notranslate"><span class="pre">path</span></code> shouldn’t contain the “.py” extension.</p>
+<p>Check if there is a python script at the path <code class="docutils literal notranslate"><span class="pre">path</span></code>. Returns 0 if the path exists, otherwise returns an error id which can be used to query the error id and string using <a class="reference internal" href="user-api.html#group__nomp__user__api_1ga173b912ade6fac15da8d901b9dd8a8eb"><span class="std std-ref">nomp_get_err_str()</span></a> and nomp_get_err_id(). The <code class="docutils literal notranslate"><span class="pre">path</span></code> should be provided without the “.py” extension.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>path</strong> – <strong>[in]</strong> Total number of integers. </p>
+<dd class="field-odd"><p><strong>path</strong> – <strong>[in]</strong> Path to the python script without the “.py” extension. </p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>int </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv413nomp_copy_envPKc6size_t">
-<span id="_CPPv313nomp_copy_envPKc6size_t"></span><span id="_CPPv213nomp_copy_envPKc6size_t"></span><span id="nomp_copy_env__cCP.s"></span><span class="target" id="group__nomp__other__utils_1ga0e718e8165a885874754ce1cb827275d"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_copy_env</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413nomp_copy_envPKc6size_t" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Get a copy of the environment variable <code class="docutils literal notranslate"><span class="pre">name</span></code> if exists. </p>
-<p>Return NULL if the environment variable is not set.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> – <strong>[in]</strong> Name of the environment variable. </p></li>
-<li><p><strong>size</strong> – <strong>[in]</strong> Maximum lenght of the environment variable value. </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>char * </p>
 </dd>
 </dl>
 </dd></dl>
