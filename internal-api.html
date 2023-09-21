@@ -785,13 +785,16 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv425nomp_check_py_script_pathPKc">
-<span id="_CPPv325nomp_check_py_script_pathPKc"></span><span id="_CPPv225nomp_check_py_script_pathPKc"></span><span id="nomp_check_py_script_path__cCP"></span><span class="target" id="group__nomp__other__utils_1ga55caaef28103f787bb6a480ed2cef09f"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_check_py_script_path</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">path</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425nomp_check_py_script_pathPKc" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Check if the python script path exists. </p>
-<p>Check if there is a python script at the path <code class="docutils literal notranslate"><span class="pre">path</span></code>. Returns 0 if the path exists, otherwise returns an error id which can be used to query the error id and string using <a class="reference internal" href="user-api.html#group__nomp__user__api_1ga173b912ade6fac15da8d901b9dd8a8eb"><span class="std std-ref">nomp_get_err_str()</span></a> and nomp_get_err_id(). The <code class="docutils literal notranslate"><span class="pre">path</span></code> should be provided without the “.py” extension.</p>
+<dt class="sig sig-object cpp" id="_CPPv420nomp_py_check_modulePKcPKc">
+<span id="_CPPv320nomp_py_check_modulePKcPKc"></span><span id="_CPPv220nomp_py_check_modulePKcPKc"></span><span id="nomp_py_check_module__cCP.cCP"></span><span class="target" id="group__nomp__other__utils_1ga4c7ed394e3263478ff281f820dea26a6"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_check_module</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">module</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">function</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420nomp_py_check_modulePKcPKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Check if the given python module and function exist. </p>
+<p>Check if there is python function <code class="docutils literal notranslate"><span class="pre">function</span></code> exist in the python module <code class="docutils literal notranslate"><span class="pre">module</span></code>. Returns 0 if both module and function exist, otherwise returns an error id which can beused to query the error id and string using <a class="reference internal" href="user-api.html#group__nomp__user__api_1ga173b912ade6fac15da8d901b9dd8a8eb"><span class="std std-ref">nomp_get_err_str()</span></a> and nomp_get_err_id(). The <code class="docutils literal notranslate"><span class="pre">module</span></code> should be provided without the “.py” extension.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>path</strong> – <strong>[in]</strong> Path to the python script without the “.py” extension. </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module</strong> – <strong>[in]</strong> Python module name without the “.py” extension. </p></li>
+<li><p><strong>function</strong> – <strong>[in]</strong> Python function name. </p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>int </p>
