@@ -93,7 +93,7 @@ static int sycl_knl_run(struct nomp_backend_t *bnd, struct nomp_prog_t *prg) {
   struct sycl_backend *sycl = (struct sycl_backend *)bnd->bptr;
   struct sycl_prog *sycl_prg = (struct sycl_prog *)prg->bptr;
 
-  void *arg_list[NOMP_MAX_KNL_ARGS];
+  void *arg_list[NOMP_MAX_KNL_ARGS_SIZE];
   for (unsigned i = 0; i < prg->nargs; i++)
     arg_list[i] = prg->args[i].ptr;
   arg_list[prg->nargs] = (void *)&sycl->queue;
@@ -125,7 +125,7 @@ static int check_env(struct sycl_backend *sycl) {
   char *tmp = NULL;
   if (tmp = getenv("NOMP_SYCL_CC")) {
     // FIXME: This should be something like pathlen().
-    sycl->compiler = strndup(tmp, NOMP_MAX_BUFSIZ);
+    sycl->compiler = strndup(tmp, NOMP_MAX_BUFFER_SIZE);
   } else {
     return nomp_log(NOMP_SYCL_FAILURE, NOMP_ERROR,
                     "SYCL compiler NOMP_SYCL_CC must be set.");

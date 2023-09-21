@@ -158,7 +158,7 @@ int nomp_profile_set_level(const int profile_level_in) {
 
 static unsigned find_time_log(const char *entry) {
   for (unsigned i = 0; i < time_logs_n; i++) {
-    if (strncmp(time_logs[i].entry, entry, NOMP_MAX_BUFSIZ) == 0)
+    if (strncmp(time_logs[i].entry, entry, NOMP_MAX_BUFFER_SIZE) == 0)
       return i;
   }
   return time_logs_n;
@@ -204,7 +204,7 @@ void nomp_profile(const char *name, const int toggle, const int sync) {
       }
 
       // Creates a new time_log
-      time_logs[id].entry = strndup(name, NOMP_MAX_BUFSIZ);
+      time_logs[id].entry = strndup(name, NOMP_MAX_BUFFER_SIZE);
       time_logs[id].total_calls = 0;
       time_logs[id].total_time = 0;
       time_logs[id].last_tick = current_tick;

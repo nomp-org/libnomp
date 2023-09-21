@@ -24,25 +24,25 @@ static inline int check_cmd_line(struct nomp_backend_t *bnd, unsigned argc,
 
     nomp_check(check_cmd_line_aux(i, argc, argv));
 
-    if (!strncmp("--nomp-backend", argv[i - 1], NOMP_MAX_BUFSIZ))
-      strncpy(bnd->backend, argv[i], NOMP_MAX_BUFSIZ);
+    if (!strncmp("--nomp-backend", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
+      strncpy(bnd->backend, argv[i], NOMP_MAX_BUFFER_SIZE);
 
-    if (!strncmp("--nomp-platform", argv[i - 1], NOMP_MAX_BUFSIZ))
-      bnd->platform_id = nomp_str_toui(argv[i], NOMP_MAX_BUFSIZ);
+    if (!strncmp("--nomp-platform", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
+      bnd->platform_id = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE);
 
-    if (!strncmp("--nomp-device", argv[i - 1], NOMP_MAX_BUFSIZ))
-      bnd->device_id = nomp_str_toui(argv[i], NOMP_MAX_BUFSIZ);
+    if (!strncmp("--nomp-device", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
+      bnd->device_id = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE);
 
-    if (!strncmp("--nomp-verbose", argv[i - 1], NOMP_MAX_BUFSIZ))
-      bnd->verbose = nomp_str_toui(argv[i], NOMP_MAX_BUFSIZ);
+    if (!strncmp("--nomp-verbose", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
+      bnd->verbose = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE);
 
-    if (!strncmp("--nomp-profile", argv[i - 1], NOMP_MAX_BUFSIZ))
-      bnd->profile = nomp_str_toui(argv[i], NOMP_MAX_BUFSIZ);
+    if (!strncmp("--nomp-profile", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
+      bnd->profile = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE);
 
-    if (!strncmp("--nomp-install-dir", argv[i - 1], NOMP_MAX_BUFSIZ))
+    if (!strncmp("--nomp-install-dir", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
       strncpy(bnd->install_dir, argv[i], PATH_MAX);
 
-    if (!strncmp("--nomp-scripts-dir", argv[i - 1], NOMP_MAX_BUFSIZ))
+    if (!strncmp("--nomp-scripts-dir", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
       strncpy(bnd->scripts_dir, argv[i], PATH_MAX);
 
     i++;
@@ -54,22 +54,22 @@ static inline int check_cmd_line(struct nomp_backend_t *bnd, unsigned argc,
 static inline int check_env_vars(struct nomp_backend_t *bnd) {
   char *tmp = getenv("NOMP_PLATFORM");
   if (tmp)
-    bnd->platform_id = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
+    bnd->platform_id = nomp_str_toui(tmp, NOMP_MAX_BUFFER_SIZE);
 
   if ((tmp = getenv("NOMP_DEVICE")))
-    bnd->device_id = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
+    bnd->device_id = nomp_str_toui(tmp, NOMP_MAX_BUFFER_SIZE);
 
   if ((tmp = getenv("NOMP_VERBOSE")))
-    bnd->verbose = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
+    bnd->verbose = nomp_str_toui(tmp, NOMP_MAX_BUFFER_SIZE);
 
   if ((tmp = getenv("NOMP_PROFILE")))
-    bnd->profile = nomp_str_toui(tmp, NOMP_MAX_BUFSIZ);
+    bnd->profile = nomp_str_toui(tmp, NOMP_MAX_BUFFER_SIZE);
 
   if ((tmp = getenv("NOMP_ANNOTATE_FUNCTION")))
     nomp_check(nomp_py_set_annotate_func(&bnd->py_annotate, tmp));
 
   if ((tmp = getenv("NOMP_BACKEND")))
-    strncpy(bnd->backend, tmp, NOMP_MAX_BUFSIZ);
+    strncpy(bnd->backend, tmp, NOMP_MAX_BUFFER_SIZE);
 
   if ((tmp = getenv("NOMP_INSTALL_DIR")))
     strncpy(bnd->install_dir, tmp, PATH_MAX);
@@ -81,12 +81,13 @@ static inline int init_configs(int argc, const char **argv,
                                struct nomp_backend_t *bnd) {
   // verbose, profile, device and platform id are all initialized to zero.
   // Everything else has to be set by user explicitly.
-  bnd->verbose = NOMP_VERBOSE;
-  bnd->profile = NOMP_PROFILE;
-  bnd->device_id = NOMP_DEVICE;
-  bnd->platform_id = NOMP_PLATFORM;
+  bnd->verbose = NOMP_DEFAULT_VERBOSE;
+  bnd->profile = NOMP_DEFAULT_PROFILE;
+  bnd->device_id = NOMP_DEFAULT_DEVICE;
+  bnd->platform_id = NOMP_DEFAULT_PLATFORM;
   strcpy(bnd->backend, "");
   strcpy(bnd->install_dir, "");
+  strcpy(bnd->scripts_dir, "");
 
   nomp_check(check_cmd_line(bnd, argc, argv));
   nomp_check(check_env_vars(bnd));
@@ -133,7 +134,7 @@ static inline int deallocate_scratch_memory(struct nomp_backend_t *bnd) {
 }
 
 static inline int init_backend(struct nomp_backend_t *bnd) {
-  size_t n = strnlen(bnd->backend, NOMP_MAX_BUFSIZ);
+  size_t n = strnlen(bnd->backend, NOMP_MAX_BUFFER_SIZE);
   for (unsigned i = 0; i < n; i++)
     bnd->backend[i] = tolower(bnd->backend[i]);
 
@@ -142,23 +143,23 @@ static inline int init_backend(struct nomp_backend_t *bnd) {
   PyDict_SetItemString(bnd->py_context, "backend::name", obj);
   Py_XDECREF(obj);
 
-  if (strncmp(bnd->backend, "opencl", NOMP_MAX_BUFSIZ) == 0) {
+  if (strncmp(bnd->backend, "opencl", NOMP_MAX_BUFFER_SIZE) == 0) {
 #if defined(OPENCL_ENABLED)
     nomp_check(opencl_init(&nomp, bnd->platform_id, bnd->device_id));
 #endif
-  } else if (strncmp(bnd->backend, "cuda", NOMP_MAX_BUFSIZ) == 0) {
+  } else if (strncmp(bnd->backend, "cuda", NOMP_MAX_BUFFER_SIZE) == 0) {
 #if defined(CUDA_ENABLED)
     nomp_check(cuda_init(&nomp, bnd->platform_id, bnd->device_id));
 #endif
-  } else if (strncmp(bnd->backend, "hip", NOMP_MAX_BUFSIZ) == 0) {
+  } else if (strncmp(bnd->backend, "hip", NOMP_MAX_BUFFER_SIZE) == 0) {
 #if defined(HIP_ENABLED)
     nomp_check(hip_init(&nomp, bnd->platform_id, bnd->device_id));
 #endif
-  } else if (strncmp(bnd->backend, "sycl", NOMP_MAX_BUFSIZ) == 0) {
+  } else if (strncmp(bnd->backend, "sycl", NOMP_MAX_BUFFER_SIZE) == 0) {
 #if defined(SYCL_ENABLED)
     nomp_check(sycl_init(&nomp, bnd->platform_id, bnd->device_id));
 #endif
-  } else if (strncmp(bnd->backend, "ispc", NOMP_MAX_BUFSIZ) == 0) {
+  } else if (strncmp(bnd->backend, "ispc", NOMP_MAX_BUFFER_SIZE) == 0) {
 #if defined(ISPC_ENABLED)
     nomp_check(ispc_init(&nomp, bnd->platform_id, bnd->device_id));
 #endif
@@ -366,7 +367,7 @@ static int parse_clauses(struct nomp_meta_t *meta, struct nomp_prog_t *prg,
   meta->dict = PyDict_New(), meta->file = meta->func = NULL;
   unsigned i = 0;
   while (clauses[i]) {
-    if (strncmp(clauses[i], "transform", NOMP_MAX_BUFSIZ) == 0) {
+    if (strncmp(clauses[i], "transform", NOMP_MAX_BUFFER_SIZE) == 0) {
       if (clauses[i + 1] == NULL || clauses[i + 2] == NULL) {
         return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                         "\"transform\" clause should be followed "
@@ -376,9 +377,9 @@ static int parse_clauses(struct nomp_meta_t *meta, struct nomp_prog_t *prg,
       }
       nomp_check(nomp_check_py_script_path((const char *)clauses[i + 1]));
       meta->file = strndup(clauses[i + 1], PATH_MAX);
-      meta->func = strndup(clauses[i + 2], NOMP_MAX_BUFSIZ);
+      meta->func = strndup(clauses[i + 2], NOMP_MAX_BUFFER_SIZE);
       i += 3;
-    } else if (strncmp(clauses[i], "annotate", NOMP_MAX_BUFSIZ) == 0) {
+    } else if (strncmp(clauses[i], "annotate", NOMP_MAX_BUFFER_SIZE) == 0) {
       if (clauses[i + 1] == NULL || clauses[i + 2] == NULL) {
         return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                         "\"annotate\" clause should be followed by "
@@ -388,13 +389,13 @@ static int parse_clauses(struct nomp_meta_t *meta, struct nomp_prog_t *prg,
       }
       const char *key = clauses[i + 1], *val = clauses[i + 2];
       PyObject *pkey =
-          PyUnicode_FromStringAndSize(key, strnlen(key, NOMP_MAX_BUFSIZ));
+          PyUnicode_FromStringAndSize(key, strnlen(key, NOMP_MAX_BUFFER_SIZE));
       PyObject *pval =
-          PyUnicode_FromStringAndSize(val, strnlen(val, NOMP_MAX_BUFSIZ));
+          PyUnicode_FromStringAndSize(val, strnlen(val, NOMP_MAX_BUFFER_SIZE));
       PyDict_SetItem(meta->dict, pkey, pval);
       Py_XDECREF(pkey), Py_XDECREF(pval);
       i += 3;
-    } else if (strncmp(clauses[i], "reduce", NOMP_MAX_BUFSIZ) == 0) {
+    } else if (strncmp(clauses[i], "reduce", NOMP_MAX_BUFFER_SIZE) == 0) {
       if (clauses[i + 1] == NULL || clauses[i + 2] == NULL) {
         return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                         "\"reduce\" clause should be followed by a "
@@ -403,7 +404,8 @@ static int parse_clauses(struct nomp_meta_t *meta, struct nomp_prog_t *prg,
                         "provided.");
       }
       for (unsigned j = 0; j < prg->nargs; j++) {
-        if (strncmp(prg->args[j].name, clauses[i + 1], NOMP_MAX_BUFSIZ) == 0) {
+        if (strncmp(prg->args[j].name, clauses[i + 1], NOMP_MAX_BUFFER_SIZE) ==
+            0) {
           prg->redn_type = prg->args[j].type, prg->args[j].type = NOMP_PTR;
           prg->redn_size = prg->args[j].size, prg->redn_idx = j;
           break;
@@ -414,7 +416,7 @@ static int parse_clauses(struct nomp_meta_t *meta, struct nomp_prog_t *prg,
       else if (strncmp(clauses[i + 2], "*", 2) == 0)
         prg->redn_op = NOMP_PROD;
       i += 3;
-    } else if (strncmp(clauses[i], "pin", NOMP_MAX_BUFSIZ) == 0) {
+    } else if (strncmp(clauses[i], "pin", NOMP_MAX_BUFFER_SIZE) == 0) {
       // Check if we have to use pinned memory on the
       // device.
       return nomp_log(NOMP_NOT_IMPLEMENTED_ERROR, NOMP_ERROR,
@@ -440,7 +442,8 @@ static inline struct nomp_prog_t *init_args(int progs_n, int nargs,
   prg->sym_global = vecbasic_new(), prg->sym_local = vecbasic_new();
 
   for (unsigned i = 0; i < prg->nargs; i++) {
-    strncpy(prg->args[i].name, va_arg(args, const char *), NOMP_MAX_BUFSIZ);
+    strncpy(prg->args[i].name, va_arg(args, const char *),
+            NOMP_MAX_BUFFER_SIZE);
     prg->args[i].size = va_arg(args, size_t);
     prg->args[i].type = va_arg(args, int);
   }

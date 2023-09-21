@@ -4,7 +4,7 @@ char *nomp_str_cat(unsigned n, unsigned max_len, ...) {
   va_list vargs;
   va_start(vargs, max_len);
 
-  unsigned max = NOMP_MAX_BUFSIZ, len = 0;
+  unsigned max = NOMP_MAX_BUFFER_SIZE, len = 0;
   char *out = nomp_calloc(char, max);
   for (unsigned i = 0; i < n; i++) {
     const char *s = va_arg(vargs, const char *);

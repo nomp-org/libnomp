@@ -70,8 +70,8 @@ struct backend_prog_t {
 #define backend_compile TOKEN_PASTE(DRIVER, _compile)
 static backendrtcResult backend_compile(backendrtcProgram prog,
                                         struct backend_t *bnd) {
-  char arch[NOMP_MAX_BUFSIZ];
-  snprintf(arch, NOMP_MAX_BUFSIZ, "-arch=compute_%d%d", bnd->prop.major,
+  char arch[NOMP_MAX_BUFFER_SIZE];
+  snprintf(arch, NOMP_MAX_BUFFER_SIZE, "-arch=compute_%d%d", bnd->prop.major,
            bnd->prop.minor);
   const char *opts[2] = {arch, NULL};
   return backendrtcCompileProgram(prog, 1, opts);
@@ -155,7 +155,7 @@ static int backend_knl_build(struct nomp_backend_t *bnd,
 static int backend_knl_run(struct nomp_backend_t *bnd,
                            struct nomp_prog_t *prg) {
   struct nomp_arg_t *args = prg->args;
-  void *vargs[NOMP_MAX_KNL_ARGS];
+  void *vargs[NOMP_MAX_KNL_ARGS_SIZE];
   for (int i = 0; i < prg->nargs; i++) {
     if (args[i].type == NOMP_PTR)
       vargs[i] = &args[i].ptr;
