@@ -11,7 +11,7 @@ const char *ERR_STR_USER_DEVICE_IS_INVALID =
 struct log {
   char *description;
   int errorno;
-  nomp_log_type type;
+  nomp_log_type_t type;
 };
 
 static struct log *logs = NULL;
@@ -49,10 +49,10 @@ int nomp_log_set_verbose(const unsigned verbose_in) {
  *
  * @param[in] description Detailed description of the log.
  * @param[in] errorno Log number which is defined in nomp.h
- * @param[in] type Type of the log (one of @ref nomp_log_type)
+ * @param[in] type Type of the log (one of ::nomp_log_type_t)
  * @return int
  */
-int nomp_log_(const char *description, int errorno, nomp_log_type type, ...) {
+int nomp_log_(const char *description, int errorno, nomp_log_type_t type, ...) {
   const char *type_str = LOG_TYPE_STRING[type - 1];
   size_t len = strlen(description) + strlen(type_str) + 10;
   char *desc = nomp_calloc(char, len);

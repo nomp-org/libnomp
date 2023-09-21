@@ -8,7 +8,8 @@ User API
 
 Data Types
 ^^^^^^^^^^
-Defines argument type.
+
+Below is a list of data types that are used in the user API.
 
 .. doxygengroup:: nomp_user_types
    :project: libnomp
