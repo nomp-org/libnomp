@@ -160,14 +160,6 @@ static inline int init_backend(struct nomp_backend_t *bnd) {
 #if defined(HIP_ENABLED)
     nomp_check(hip_init(&nomp, bnd->platform_id, bnd->device_id));
 #endif
-  } else if (strncmp(bnd->backend, "sycl", NOMP_MAX_BUFFER_SIZE) == 0) {
-#if defined(SYCL_ENABLED)
-    nomp_check(sycl_init(&nomp, bnd->platform_id, bnd->device_id));
-#endif
-  } else if (strncmp(bnd->backend, "ispc", NOMP_MAX_BUFFER_SIZE) == 0) {
-#if defined(ISPC_ENABLED)
-    nomp_check(ispc_init(&nomp, bnd->platform_id, bnd->device_id));
-#endif
   } else {
     return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                     "Invalid backend: %s.", bnd->backend);

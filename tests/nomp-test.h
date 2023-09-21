@@ -1,11 +1,8 @@
 #if !defined(_NOMP_TEST_H_)
 #define _NOMP_TEST_H_
 
-#define NOMP_TEST_MAX_BUFSIZ 4096
+#define NOMP_TEST_MAX_BUFFER_SIZE 4096
 
-#include "nomp-aux.h"
-#include "nomp-mem.h"
-#include "nomp.h"
 #include <assert.h>
 #include <math.h>
 #include <regex.h>
@@ -13,6 +10,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "nomp-aux.h"
+#include "nomp-mem.h"
+#include "nomp.h"
 
 #define TOKEN_PASTE_(a, b) a##b
 #define TOKEN_PASTE(a, b) TOKEN_PASTE_(a, b)

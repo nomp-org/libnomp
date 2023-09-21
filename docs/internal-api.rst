@@ -40,12 +40,6 @@ Memory Management Functions and Macros
    :project: libnomp
    :content-only:
 
-Kernel JIT Functions
-^^^^^^^^^^^^^^^^^^^^
-.. doxygengroup:: nomp_compile_utils
-   :project: libnomp
-   :content-only:
-
 Reductions and Related Functions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. doxygengroup:: nomp_reduction_ops
