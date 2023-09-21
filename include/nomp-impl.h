@@ -61,29 +61,93 @@ struct nomp_prog_t {
   void *redn_ptr;
 };
 
+/**
+ * @ingroup nomp_internal_types
+ *
+ * @brief Structure to keep track of nomp runtime data and backend specific
+ * data. This structure is also used to dispatch backend specific functions.
+ */
 struct nomp_backend_t {
-  // User configurations of the backend.
-  int platform_id, device_id, verbose, profile;
-  char backend[NOMP_MAX_BUFSIZ], install_dir[PATH_MAX];
-  // Pointers to backend functions used for backend dispatch.
+  /**
+   * ID of the platform to be used for the backend. This is only used when the
+   * backend is OpenCL.
+   */
+  int platform_id;
+  /**
+   * ID of the dhvice to be used with the backend.
+   */
+  int device_id;
+  /**
+   * Verbose level to be used for displaying log messages.
+   */
+  int verbose;
+  /**
+   * Turn profiling on or off.
+   */
+  int profile;
+  /**
+   * Name of the backend to be used (OpenCL, Cuda, etc.).
+   */
+  char backend[NOMP_MAX_BUFSIZ];
+  /**
+   * Installed directory of the library.
+   */
+  char install_dir[PATH_MAX];
+  /**
+   * Directory where transform and annotations cripts are located.
+   */
+  char scripts_dir[PATH_MAX];
+
+  /**
+   * Function pointer to the backend update function which can allocate,
+   * update and free backend memory.
+   */
   int (*update)(struct nomp_backend_t *, struct nomp_mem_t *,
                 const nomp_map_direction_t op, size_t start, size_t end,
                 size_t usize);
+  /**
+   * Function pointer to the backend kernel build function.
+   */
   int (*knl_build)(struct nomp_backend_t *, struct nomp_prog_t *, const char *,
                    const char *);
+  /**
+   * Function pointer to the backend kernel run function.
+   */
   int (*knl_run)(struct nomp_backend_t *, struct nomp_prog_t *);
+  /**
+   * Function pointer to the backend kernel free function.
+   */
   int (*knl_free)(struct nomp_prog_t *);
+  /**
+   * Function pointer to the backend synchronization function.
+   */
   int (*sync)(struct nomp_backend_t *);
+  /**
+   * Function pointer to the backend finalize function which releases allocated
+   * resources.
+   */
   int (*finalize)(struct nomp_backend_t *);
-  // Scratch memory to be used as temporary memory for kernels (like
-  // reductions).
+
+  /**
+   * Scratch memory to be used as temporary memory for kernels (like reductions)
+   */
   struct nomp_mem_t scratch;
-  // Python function object which will be called to perform annotations.
+
+  /**
+   * Python function object which will be called to perform annotations.
+   */
   PyObject *py_annotate;
-  // Context info is used to pass necessary infomation to kernel
-  // transformations and annotations.
+
+  /**
+   * Context info is used to pass necessary infomation to kernel transformations
+   * and annotations.
+   */
   PyObject *py_context;
-  // Pointer to keep track of backend specific data.
+
+  /**
+   * Pointer to keep track of backend specific data. This is allocated and
+   * released by the backend.
+   */
   void *bptr;
 };
 
