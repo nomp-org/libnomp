@@ -97,7 +97,7 @@ static int ispc_knl_run(struct nomp_backend_t *bnd, struct nomp_prog_t *prg) {
   struct nomp_arg_t *args = prg->args;
   size_t *global = prg->global;
 
-  void *vargs[NOMP_MAX_KNL_ARGS];
+  void *vargs[NOMP_MAX_KNL_ARGS_SIZE];
   for (int i = 0; i < nargs; i++) {
     if (args[i].type == NOMP_PTR)
       vargs[i] = ispcrtDevicePtr((ISPCRTMemoryView)(args[i].ptr));
@@ -166,7 +166,7 @@ static int ispc_chk_env(struct ispc_backend *ispc) {
 
   tmp = getenv("NOMP_CFLAGS");
   if (tmp) {
-    ispc->cc_flags = strndup(tmp, NOMP_MAX_BUFSIZ + 1);
+    ispc->cc_flags = strndup(tmp, NOMP_MAX_BUFFER_SIZE + 1);
   } else {
     return nomp_log(NOMP_ISPC_FAILURE, NOMP_ERROR,
                     "Environment variable NOMP_CFLAGS is not set. Please "
@@ -175,7 +175,7 @@ static int ispc_chk_env(struct ispc_backend *ispc) {
 
   tmp = getenv("NOMP_ISPC_CFLAGS");
   if (tmp) {
-    ispc->ispc_flags = strndup(tmp, NOMP_MAX_BUFSIZ + 1);
+    ispc->ispc_flags = strndup(tmp, NOMP_MAX_BUFFER_SIZE + 1);
   } else {
     return nomp_log(NOMP_ISPC_FAILURE, NOMP_ERROR,
                     "Environment variable NOMP_ISPC_CFLAGS is not set. "

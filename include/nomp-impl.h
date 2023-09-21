@@ -33,7 +33,7 @@ struct nomp_mem_t {
 #define NOMP_MEM_BYTES(start, end, usize) (((end) - (start)) * (usize))
 
 struct nomp_arg_t {
-  char name[NOMP_MAX_BUFSIZ];
+  char name[NOMP_MAX_BUFFER_SIZE];
   size_t size;
   unsigned type;
   void *ptr;
@@ -88,7 +88,7 @@ struct nomp_backend_t {
   /**
    * Name of the backend to be used (OpenCL, Cuda, etc.).
    */
-  char backend[NOMP_MAX_BUFSIZ];
+  char backend[NOMP_MAX_BUFFER_SIZE];
   /**
    * Installed directory of the library.
    */
