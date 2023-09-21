@@ -24,6 +24,9 @@ static inline int check_cmd_line(struct nomp_backend_t *bnd, unsigned argc,
 
     nomp_check(check_cmd_line_aux(i, argc, argv));
 
+    if (!strncmp("--nomp-install-dir", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
+      strncpy(bnd->install_dir, argv[i], PATH_MAX);
+
     if (!strncmp("--nomp-backend", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
       strncpy(bnd->backend, argv[i], NOMP_MAX_BUFFER_SIZE);
 
@@ -39,9 +42,6 @@ static inline int check_cmd_line(struct nomp_backend_t *bnd, unsigned argc,
     if (!strncmp("--nomp-profile", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
       bnd->profile = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE);
 
-    if (!strncmp("--nomp-install-dir", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
-      strncpy(bnd->install_dir, argv[i], PATH_MAX);
-
     if (!strncmp("--nomp-scripts-dir", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
       strncpy(bnd->scripts_dir, argv[i], PATH_MAX);
 
@@ -52,8 +52,15 @@ static inline int check_cmd_line(struct nomp_backend_t *bnd, unsigned argc,
 }
 
 static inline int check_env_vars(struct nomp_backend_t *bnd) {
-  char *tmp = getenv("NOMP_PLATFORM");
-  if (tmp)
+  char *tmp = NULL;
+
+  if ((tmp = getenv("NOMP_INSTALL_DIR")))
+    strncpy(bnd->install_dir, tmp, PATH_MAX);
+
+  if ((tmp = getenv("NOMP_BACKEND")))
+    strncpy(bnd->backend, tmp, NOMP_MAX_BUFFER_SIZE);
+
+  if ((tmp = getenv("NOMP_PLATFORM")))
     bnd->platform_id = nomp_str_toui(tmp, NOMP_MAX_BUFFER_SIZE);
 
   if ((tmp = getenv("NOMP_DEVICE")))
@@ -65,14 +72,8 @@ static inline int check_env_vars(struct nomp_backend_t *bnd) {
   if ((tmp = getenv("NOMP_PROFILE")))
     bnd->profile = nomp_str_toui(tmp, NOMP_MAX_BUFFER_SIZE);
 
-  if ((tmp = getenv("NOMP_ANNOTATE_FUNCTION")))
-    nomp_check(nomp_py_set_annotate_func(&bnd->py_annotate, tmp));
-
-  if ((tmp = getenv("NOMP_BACKEND")))
-    strncpy(bnd->backend, tmp, NOMP_MAX_BUFFER_SIZE);
-
-  if ((tmp = getenv("NOMP_INSTALL_DIR")))
-    strncpy(bnd->install_dir, tmp, PATH_MAX);
+  if ((tmp = getenv("NOMP_SCRIPTS_DIR")))
+    strncpy(bnd->scripts_dir, tmp, PATH_MAX);
 
   return 0;
 }
@@ -102,19 +103,23 @@ static inline int init_configs(int argc, const char **argv,
     }                                                                          \
   }
 
-  check_if_valid(strlen(bnd->backend) == 0, "--nomp-backend", "NOMP_BACKEND");
   check_if_valid(strlen(bnd->install_dir) == 0, "--nomp-install-dir",
                  "NOMP_INSTALL_DIR");
-  check_if_valid(strlen(bnd->scripts_dir) == 0, "--nomp-scripts-dir",
-                 "NOMP_SCRIPTS_DIR");
+  check_if_valid(strlen(bnd->backend) == 0, "--nomp-backend", "NOMP_BACKEND");
 
 #undef check_if_valid
 
   // Append nomp python directory to sys.path.
-  char abs_dir[PATH_MAX + 32];
-  strncpy(abs_dir, bnd->install_dir, PATH_MAX);
-  strncat(abs_dir, "/python", 32);
-  nomp_check(nomp_py_append_to_sys_path(abs_dir));
+  char *py_dir = nomp_str_cat(2, PATH_MAX, bnd->install_dir, "/python");
+  nomp_check(nomp_py_append_to_sys_path(py_dir));
+  nomp_free(&py_dir);
+
+  // Append current working directory to sys.path.
+  nomp_check(nomp_py_append_to_sys_path("."));
+
+  // Append nomp script directory to sys.path.
+  nomp_check(nomp_py_append_to_sys_path(bnd->scripts_dir));
+
   return 0;
 }
 
@@ -224,8 +229,6 @@ int nomp_init(int argc, const char **argv) {
     // https://docs.python.org/3/c-api/init_config.html#init-config
     // But for now, we do the simplest thing possible.
     Py_InitializeEx(0);
-    // Append current working directory to sys.path.
-    nomp_check(nomp_py_append_to_sys_path("."));
   }
 
   nomp_check(init_configs(argc, argv, &nomp));
