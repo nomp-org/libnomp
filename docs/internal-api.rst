@@ -14,6 +14,7 @@ Below is a list of data types used internally by libnomp.
 .. doxygengroup:: nomp_internal_types
    :project: libnomp
    :content-only:
+   :members:
 
 Helper Macros
 ^^^^^^^^^^^^^
