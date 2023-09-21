@@ -8,11 +8,7 @@ import loopy as lp
 import numpy as np
 import pymbolic.primitives as prim
 from clang import cindex
-from kernel_wrappers import (
-    BaseKernelWrapper,
-    ISPCKernelWrapper,
-    SyclKernelWrapper,
-)
+from kernel_wrappers import BaseKernelWrapper
 from loopy.isl_helpers import make_slab
 from loopy.kernel.data import AddressSpace
 from loopy.symbolic import aff_from_expr
@@ -69,13 +65,7 @@ _CLANG_TYPE_TO_C_TYPE = {
 _BACKEND_TO_TARGET = {
     "opencl": lp.OpenCLTarget(),
     "cuda": lp.CudaTarget(),
-    "ispc": lp.ISPCTarget(),
     "hip": lp.CudaTarget(),
-    "sycl": lp.SYCLTarget(),
-}
-_BACKEND_TO_WRAPPER = {
-    "ispc": ISPCKernelWrapper(prefix="nomp_ispc"),
-    "sycl": SyclKernelWrapper(prefix="nomp_sycl", includes="CL/sycl.hpp"),
 }
 _ARRAY_TYPES = [cindex.TypeKind.CONSTANTARRAY, cindex.TypeKind.INCOMPLETEARRAY]
 _ARRAY_TYPES_W_PTR = _ARRAY_TYPES + [cindex.TypeKind.POINTER]
@@ -838,8 +828,7 @@ def c_to_loopy(c_str: str, backend: str) -> lp.translation_unit.TranslationUnit:
 
 def get_wrapper(backend: str) -> BaseKernelWrapper:
     """Returns the wrapper for a given backend."""
-    wrapper = _BACKEND_TO_WRAPPER.get(backend)
-    return wrapper if wrapper is not None else BaseKernelWrapper()
+    return BaseKernelWrapper()
 
 
 def get_knl_src(knl: lp.translation_unit.TranslationUnit, backend: str) -> str:
