@@ -33,23 +33,21 @@ void nomp_py_print(const char *msg, PyObject *obj) {
  * @return int
  */
 int nomp_py_append_to_sys_path(const char *path) {
-  int err = 1;
-  PyObject *sys = PyImport_ImportModule("sys");
-  if (sys) {
-    PyObject *ppath = PyObject_GetAttrString(sys, "path");
-    if (ppath) {
-      PyObject *pstr = PyUnicode_FromString(path);
-      err = PyList_Append(ppath, pstr);
-      Py_DECREF(ppath), Py_XDECREF(pstr);
-    }
-    Py_DECREF(sys);
-  }
-  if (err) {
-    return nomp_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,
-                    "Appending path \"%s\" to the sys.path failed.", path);
-  }
+  PyObject *py_sys = PyImport_ImportModule("sys");
+  if (!py_sys)
+    goto err;
+  PyObject *py_path = PyObject_GetAttrString(py_sys, "path");
+  if (!py_path)
+    goto err;
+  PyObject *py_str = PyUnicode_FromString(path);
+  if (PyList_Append(py_path, py_str))
+    goto err;
+  Py_DECREF(py_path), Py_XDECREF(py_str), Py_DECREF(py_sys);
 
   return 0;
+err:
+  return nomp_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,
+                  "Appending path \"%s\" to the sys.path failed.", path);
 }
 
 /**
