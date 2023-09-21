@@ -51,7 +51,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#backend-init-functions">Backend Init Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#python-helper-functions">Python Helper Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#memory-management-functions-and-macros">Memory Management Functions and Macros</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#kernel-jit-functions">Kernel JIT Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#reductions-and-related-functions">Reductions and Related Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#logging-functions">Logging Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#profiler-functions">Profiler Functions</a></li>
@@ -250,48 +249,10 @@
 <section id="backend-init-functions">
 <h2>Backend Init Functions<a class="headerlink" href="#backend-init-functions" title="Permalink to this heading"></a></h2>
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv49ispc_initP14nomp_backend_tKiKi">
-<span id="_CPPv39ispc_initP14nomp_backend_tKiKi"></span><span id="_CPPv29ispc_initP14nomp_backend_tKiKi"></span><span id="ispc_init__nomp_backend_tP.iC.iC"></span><span class="target" id="group__nomp__backend__init_1ga6cd90e2e576bb783a8de0a7b8361af75"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ispc_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv414nomp_backend_t" title="nomp_backend_t"><span class="n"><span class="pre">nomp_backend_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">bnd</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">platform_type</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">device_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49ispc_initP14nomp_backend_tKiKi" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Initializes ISPC backend with the specified platform and device. </p>
-<p>Initializes ISPC backend using the given device id and platform type. Returns a negative value if an error occurred during the initialization, otherwise returns 0.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>bnd</strong> – <strong>[in]</strong> Target backend for code generation. </p></li>
-<li><p><strong>platform_type</strong> – <strong>[in]</strong> Target platform type. </p></li>
-<li><p><strong>device_id</strong> – <strong>[in]</strong> Target device id. </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>int </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv411opencl_initP14nomp_backend_tKiKi">
 <span id="_CPPv311opencl_initP14nomp_backend_tKiKi"></span><span id="_CPPv211opencl_initP14nomp_backend_tKiKi"></span><span id="opencl_init__nomp_backend_tP.iC.iC"></span><span class="target" id="group__nomp__backend__init_1ga3d6ad028e5bde1ede75eb26da54f8eb2"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">opencl_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv414nomp_backend_t" title="nomp_backend_t"><span class="n"><span class="pre">nomp_backend_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">bnd</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">platform_id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">device_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411opencl_initP14nomp_backend_tKiKi" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Initializes OpenCL backend with the specified platform and device. </p>
 <p>Initializes OpenCL backend while creating a command queue using the given platform id and device id. Returns a negative value if an error occurred during the initialization, otherwise returns 0.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>bnd</strong> – <strong>[in]</strong> Target backend for code generation. </p></li>
-<li><p><strong>platform_id</strong> – <strong>[in]</strong> Target platform id. </p></li>
-<li><p><strong>device_id</strong> – <strong>[in]</strong> Target device id. </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>int </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv49sycl_initP14nomp_backend_tKiKi">
-<span id="_CPPv39sycl_initP14nomp_backend_tKiKi"></span><span id="_CPPv29sycl_initP14nomp_backend_tKiKi"></span><span id="sycl_init__nomp_backend_tP.iC.iC"></span><span class="target" id="group__nomp__backend__init_1ga551bd42a5dedda1b750b5a75a831803a"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sycl_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv414nomp_backend_t" title="nomp_backend_t"><span class="n"><span class="pre">nomp_backend_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">bnd</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">platform_id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">device_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49sycl_initP14nomp_backend_tKiKi" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Initializes SYCL backend with the specified platform and device. </p>
-<p>Initializes SYCL backend while creating a command queue using the given platform id and device id. Returns a positive value if an error occurred during the initialization, otherwise returns 0.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -567,65 +528,6 @@
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Pointer of type T </p>
-</dd>
-</dl>
-</dd></dl>
-
-</section>
-<section id="kernel-jit-functions">
-<h2>Kernel JIT Functions<a class="headerlink" href="#kernel-jit-functions" title="Permalink to this heading"></a></h2>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv416nomp_jit_compilePiPKcPKcPKcPKcPKcPKcPKc">
-<span id="_CPPv316nomp_jit_compilePiPKcPKcPKcPKcPKcPKcPKc"></span><span id="_CPPv216nomp_jit_compilePiPKcPKcPKcPKcPKcPKcPKc"></span><span id="nomp_jit_compile__iP.cCP.cCP.cCP.cCP.cCP.cCP.cCP"></span><span class="target" id="group__nomp__compile__utils_1ga3da282551713dd9bd1914c33fde9d394"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_jit_compile</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">source</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">cc</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">cflags</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">entry</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">wrkdir</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">srcf</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">libf</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416nomp_jit_compilePiPKcPKcPKcPKcPKcPKcPKc" title="Permalink to this definition"></a><br /></dt>
-<dd><p>JIT compile a source string at runtime. </p>
-<p>JIT Compile a source string at runtime using a specified compiler, flags and a working directory. <code class="docutils literal notranslate"><span class="pre">id</span></code> is set to dynamically loaded <code class="docutils literal notranslate"><span class="pre">entry</span></code> point in the JIT compiled program. <code class="docutils literal notranslate"><span class="pre">id</span></code> should be set to -1 on input and is set to a non-negative value upon successful exit. On success, <a class="reference internal" href="#group__nomp__compile__utils_1ga3da282551713dd9bd1914c33fde9d394"><span class="std std-ref">nomp_jit_compile()</span></a> returns 0 and a positive value otherwise.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> – <strong>[out]</strong> Handle to the <code class="docutils literal notranslate"><span class="pre">entry</span></code> in the compiled binary file. </p></li>
-<li><p><strong>source</strong> – <strong>[in]</strong> Source to be compiled at runtime. </p></li>
-<li><p><strong>cc</strong> – <strong>[in]</strong> Full path to the compiler. </p></li>
-<li><p><strong>cflags</strong> – <strong>[in]</strong> Compile flags to be used during compilation. </p></li>
-<li><p><strong>entry</strong> – <strong>[in]</strong> Entry point (usually the name of function to be called) to the source. </p></li>
-<li><p><strong>wrkdir</strong> – <strong>[in]</strong> Working directory to generate outputs and store temporaries. </p></li>
-<li><p><strong>srcf</strong> – <strong>[in]</strong> File name to store source text. </p></li>
-<li><p><strong>libf</strong> – <strong>[in]</strong> Output file name.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>int </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv412nomp_jit_runiA_Pv">
-<span id="_CPPv312nomp_jit_runiA_Pv"></span><span id="_CPPv212nomp_jit_runiA_Pv"></span><span id="nomp_jit_run__i.voidPA"></span><span class="target" id="group__nomp__compile__utils_1gac18140ad38f4d100912b9a6b7b42b23e"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_jit_run</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">p</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412nomp_jit_runiA_Pv" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Run a JIT compiled program. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> – <strong>[in]</strong> Handle of the JIT compiled program. </p></li>
-<li><p><strong>p</strong> – <strong>[in]</strong> Array of pointers to the function arguments.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>int </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv413nomp_jit_freePi">
-<span id="_CPPv313nomp_jit_freePi"></span><span id="_CPPv213nomp_jit_freePi"></span><span id="nomp_jit_free__iP"></span><span class="target" id="group__nomp__compile__utils_1gad927d252f891a85d96fd1ab686625136"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_jit_free</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413nomp_jit_freePi" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Free a jit compiled program. </p>
-<p>Free a jit compiled program. On successful exit, <code class="docutils literal notranslate"><span class="pre">id</span></code> is set to -1.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>id</strong> – <strong>[in]</strong> Handle of the JIT compiled program.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>int </p>
 </dd>
 </dl>
 </dd></dl>
