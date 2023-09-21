@@ -51,26 +51,35 @@ static inline int nomp_check_cmd_line(struct nomp_backend_t *bnd, unsigned argc,
 
     nomp_check(nomp_check_cmd_line_aux(i, argc, argv));
 
+    int valid = 0;
+
     if (!strncmp("--nomp-install-dir", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
-      strncpy(bnd->install_dir, argv[i], PATH_MAX);
+      strncpy(bnd->install_dir, argv[i], PATH_MAX), valid = 1;
 
     if (!strncmp("--nomp-backend", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
-      strncpy(bnd->backend, argv[i], NOMP_MAX_BUFFER_SIZE);
+      strncpy(bnd->backend, argv[i], NOMP_MAX_BUFFER_SIZE), valid = 1;
 
-    if (!strncmp("--nomp-platform", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
+    if (!strncmp("--nomp-platform", argv[i - 1], NOMP_MAX_BUFFER_SIZE)) {
       bnd->platform_id = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE);
+      valid = 1;
+    }
 
     if (!strncmp("--nomp-device", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
-      bnd->device_id = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE);
+      bnd->device_id = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE), valid = 1;
 
     if (!strncmp("--nomp-verbose", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
-      bnd->verbose = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE);
+      bnd->verbose = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE), valid = 1;
 
     if (!strncmp("--nomp-profile", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
-      bnd->profile = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE);
+      bnd->profile = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE), valid = 1;
 
     if (!strncmp("--nomp-scripts-dir", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
-      strncpy(bnd->scripts_dir, argv[i], PATH_MAX);
+      strncpy(bnd->scripts_dir, argv[i], PATH_MAX), valid = 1;
+
+    if (!valid) {
+      nomp_log(0, NOMP_WARNING, "Unknown command line argument: %s.",
+               argv[i - 1]);
+    }
 
     i++;
   }
@@ -208,8 +217,8 @@ static inline int init_backend(struct nomp_backend_t *bnd) {
  * @endcode
  */
 int nomp_init(int argc, const char **argv) {
-  // Set verbose to 1 so that only errors are printed to stdout.
-  nomp_log_set_verbose(1);
+  // This will be overridden by the user specified verbose level later.
+  nomp_log_set_verbose(NOMP_DEFAULT_VERBOSE);
 
   if (initialized) {
     return nomp_log(NOMP_INITIALIZE_FAILURE, NOMP_ERROR,
