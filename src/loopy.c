@@ -3,7 +3,6 @@
 
 static const char *module_loopy_api = "loopy_api";
 static const char *module_reduction = "reduction";
-
 static const char *c_to_loopy = "c_to_loopy";
 static const char *get_knl_src = "get_knl_src";
 static const char *get_knl_name = "get_knl_name";
@@ -11,6 +10,7 @@ static const char *realize_reduction = "realize_reduction";
 
 /**
  * @ingroup nomp_py_utils
+ *
  * @brief Get the string representation of python object.
  *
  * @param msg Debug message before printing the object.
@@ -48,6 +48,43 @@ int nomp_py_append_to_sys_path(const char *path) {
 err:
   return nomp_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,
                   "Appending path \"%s\" to the sys.path failed.", path);
+}
+
+/**
+ * @ingroup nomp_other_utils
+ *
+ * @brief Check if the given python module and function exist.
+ *
+ * Check if there is python function \p function exist in the python module
+ * \p module.  Returns 0 if both module and function exist, otherwise returns
+ * an error id which can beused to query the error id and string using
+ * nomp_get_err_str() and nomp_get_err_id(). The \p module should be provided
+ * without the ".py" extension.
+ *
+ * @param[in] module Python module name without the ".py" extension.
+ * @param[in] function Python function name.
+ * @return int
+ */
+int nomp_py_check_module(const char *module, const char *function) {
+  PyObject *py_str_module = PyUnicode_FromString(module);
+  if (!py_str_module) {
+    return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                    "Can't convert string \"%s\" to a python string.", module);
+  }
+  PyObject *py_module = PyImport_Import(py_str_module);
+  if (!py_module) {
+    return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                    "Python module \"%s\" not found.", module);
+  }
+  PyObject *py_function = PyObject_GetAttrString(py_module, function);
+  if (!py_function) {
+    return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                    "Python function \"%s\" not found in module \"%s\".",
+                    function, module);
+  }
+
+  Py_DECREF(py_function), Py_DECREF(py_module), Py_DECREF(py_str_module);
+  return 0;
 }
 
 /**
@@ -141,7 +178,7 @@ int nomp_py_set_annotate_func(PyObject **annotate_func, const char *path_) {
     return 0;
   }
 
-  nomp_check(nomp_check_py_script_path(file));
+  // nomp_check(nomp_py_check_module(file));
 
   int err = 1;
   PyObject *pfile = PyUnicode_FromString(file);

@@ -375,7 +375,8 @@ static int parse_clauses(struct nomp_meta_t *meta, struct nomp_prog_t *prg,
                         "function name. At least one of them is "
                         "not provided.");
       }
-      nomp_check(nomp_check_py_script_path((const char *)clauses[i + 1]));
+      nomp_check(nomp_py_check_module((const char *)clauses[i + 1],
+                                      (const char *)clauses[i + 2]));
       meta->file = strndup(clauses[i + 1], PATH_MAX);
       meta->func = strndup(clauses[i + 2], NOMP_MAX_BUFFER_SIZE);
       i += 3;
