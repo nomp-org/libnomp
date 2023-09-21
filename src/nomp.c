@@ -4,8 +4,35 @@
 static struct nomp_backend_t nomp;
 static int initialized = 0;
 
-static inline int check_cmd_line_aux(const unsigned i, const unsigned argc,
-                                     const char *const argv[]) {
+static inline int check_env_vars(struct nomp_backend_t *bnd) {
+  char *tmp = NULL;
+
+  if ((tmp = getenv("NOMP_INSTALL_DIR")))
+    strncpy(bnd->install_dir, tmp, PATH_MAX);
+
+  if ((tmp = getenv("NOMP_BACKEND")))
+    strncpy(bnd->backend, tmp, NOMP_MAX_BUFFER_SIZE);
+
+  if ((tmp = getenv("NOMP_PLATFORM")))
+    bnd->platform_id = nomp_str_toui(tmp, NOMP_MAX_BUFFER_SIZE);
+
+  if ((tmp = getenv("NOMP_DEVICE")))
+    bnd->device_id = nomp_str_toui(tmp, NOMP_MAX_BUFFER_SIZE);
+
+  if ((tmp = getenv("NOMP_VERBOSE")))
+    bnd->verbose = nomp_str_toui(tmp, NOMP_MAX_BUFFER_SIZE);
+
+  if ((tmp = getenv("NOMP_PROFILE")))
+    bnd->profile = nomp_str_toui(tmp, NOMP_MAX_BUFFER_SIZE);
+
+  if ((tmp = getenv("NOMP_SCRIPTS_DIR")))
+    strncpy(bnd->scripts_dir, tmp, PATH_MAX);
+
+  return 0;
+}
+
+static inline int nomp_check_cmd_line_aux(const unsigned i, const unsigned argc,
+                                          const char *const argv[]) {
   if (i >= argc || argv[i] == NULL) {
     return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                     "Missing argument value after: %s.", argv[i - 1]);
@@ -13,8 +40,8 @@ static inline int check_cmd_line_aux(const unsigned i, const unsigned argc,
   return 0;
 }
 
-static inline int check_cmd_line(struct nomp_backend_t *bnd, unsigned argc,
-                                 const char **argv) {
+static inline int nomp_check_cmd_line(struct nomp_backend_t *bnd, unsigned argc,
+                                      const char **argv) {
   if (argc <= 1 || argv == NULL)
     return 0;
 
@@ -22,7 +49,7 @@ static inline int check_cmd_line(struct nomp_backend_t *bnd, unsigned argc,
     if (strncmp("--nomp", argv[i++], 6))
       continue;
 
-    nomp_check(check_cmd_line_aux(i, argc, argv));
+    nomp_check(nomp_check_cmd_line_aux(i, argc, argv));
 
     if (!strncmp("--nomp-install-dir", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
       strncpy(bnd->install_dir, argv[i], PATH_MAX);
@@ -51,35 +78,8 @@ static inline int check_cmd_line(struct nomp_backend_t *bnd, unsigned argc,
   return 0;
 }
 
-static inline int check_env_vars(struct nomp_backend_t *bnd) {
-  char *tmp = NULL;
-
-  if ((tmp = getenv("NOMP_INSTALL_DIR")))
-    strncpy(bnd->install_dir, tmp, PATH_MAX);
-
-  if ((tmp = getenv("NOMP_BACKEND")))
-    strncpy(bnd->backend, tmp, NOMP_MAX_BUFFER_SIZE);
-
-  if ((tmp = getenv("NOMP_PLATFORM")))
-    bnd->platform_id = nomp_str_toui(tmp, NOMP_MAX_BUFFER_SIZE);
-
-  if ((tmp = getenv("NOMP_DEVICE")))
-    bnd->device_id = nomp_str_toui(tmp, NOMP_MAX_BUFFER_SIZE);
-
-  if ((tmp = getenv("NOMP_VERBOSE")))
-    bnd->verbose = nomp_str_toui(tmp, NOMP_MAX_BUFFER_SIZE);
-
-  if ((tmp = getenv("NOMP_PROFILE")))
-    bnd->profile = nomp_str_toui(tmp, NOMP_MAX_BUFFER_SIZE);
-
-  if ((tmp = getenv("NOMP_SCRIPTS_DIR")))
-    strncpy(bnd->scripts_dir, tmp, PATH_MAX);
-
-  return 0;
-}
-
-static inline int init_configs(int argc, const char **argv,
-                               struct nomp_backend_t *bnd) {
+static inline int nomp_set_configs(int argc, const char **argv,
+                                   struct nomp_backend_t *bnd) {
   // verbose, profile, device and platform id are all initialized to zero.
   // Everything else has to be set by user explicitly.
   bnd->verbose = NOMP_DEFAULT_VERBOSE;
@@ -90,8 +90,8 @@ static inline int init_configs(int argc, const char **argv,
   strcpy(bnd->install_dir, "");
   strcpy(bnd->scripts_dir, "");
 
-  nomp_check(check_cmd_line(bnd, argc, argv));
-  nomp_check(check_env_vars(bnd));
+  nomp_check(nomp_check_cmd_line(bnd, argc, argv));
+  check_env_vars(bnd);
 
 #define check_if_valid(COND, CMDARG, ENVVAR)                                   \
   {                                                                            \
@@ -223,7 +223,7 @@ int nomp_init(int argc, const char **argv) {
     Py_InitializeEx(0);
   }
 
-  nomp_check(init_configs(argc, argv, &nomp));
+  nomp_check(nomp_set_configs(argc, argv, &nomp));
 
   // Set profile level.
   nomp_check(nomp_profile_set_level(nomp.profile));
