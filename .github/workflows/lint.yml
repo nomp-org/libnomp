@@ -48,26 +48,26 @@ jobs:
       - name: Run clang-format check
         run: |
           ./lncfg --install-prefix ${INSTALLDIR} --prefix-path ${CONDA_PREFIX}
-          ./lnbuild --format-check yes --install no --update no
+          ./lnbuild --format-check
       - name: Run clang-tidy check
         run: |
           ./lncfg --install-prefix ${INSTALLDIR} --prefix-path ${CONDA_PREFIX}
           # FIXME: Skipping the clang-tidy checks for now.
-          # ./lnbuild --tidy yes --install no --update no
+          # ./lnbuild --tidy-check
       - name: Run pylint check
         run: |
           ./lncfg --install-prefix ${INSTALLDIR} --prefix-path ${CONDA_PREFIX}
           # FIXME: Skipping the pylint checks for now.
-          # ./lnbuild --pylint yes --install no --update no
+          # ./lnbuild --pylint-check
       - name: Run black check
         run: |
           ./lncfg --install-prefix ${INSTALLDIR} --prefix-path ${CONDA_PREFIX}
-          ./lnbuild --black-check yes  --install no --update no
+          ./lnbuild --black-check
       - name: Run isort check
         run: |
           ./lncfg --install-prefix ${INSTALLDIR} --prefix-path ${CONDA_PREFIX}
-          ./lnbuild --isort-check yes  --install no --update no
+          ./lnbuild --isort-check
       - name: Run flake8 check
         run: |
           ./lncfg --install-prefix ${INSTALLDIR} --prefix-path ${CONDA_PREFIX}
-          ./lnbuild --flake8 yes  --install no --update no
+          ./lnbuild --flake8-check

@@ -68,7 +68,7 @@ jobs:
         run: |
           ./lncfg --install-prefix ${INSTALLDIR} --prefix-path ${CONDA_PREFIX} \
             --enable-opencl --opencl-lib ${CONDA_PREFIX}/lib/libOpenCL.so
-          ./lnbuild --install yes --update no
+          ./lnbuild --install --update-shell
       - name: Run libnomp tests
         id: run_libnomp
         run: |
