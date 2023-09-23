@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 project(libnomp VERSION 0.0.1 DESCRIPTION "nomp runtime library" LANGUAGES C CXX)
 
 option(ENABLE_OPENCL "Build OpenCL backend" OFF)
-option(ENABLE_CUDA "Build Cuda backend" OFF)
+option(ENABLE_CUDA "Build CUDA backend" OFF)
 option(ENABLE_HIP "Build HIP backend" OFF)
 option(ENABLE_DOCS "Enable Documentation" OFF)
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)

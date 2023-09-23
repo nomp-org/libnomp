@@ -38,7 +38,7 @@ function print_help() {
     "${cyan}--install-prefix:${reset} Install directory (Default: ${NOMP_INSTALL_DIR}).\n" \
     "${cyan}--prefix-path:${reset} Semicolon separated list of prefix paths for CMake.\n" \
     "${cyan}--enable-hip:${reset} Build with HIP backend (Default: ${NOMP_ENABLE_HIP}).\n" \
-    "${cyan}--enable-cuda:${reset} Build with Cuda backend (Default: ${NOMP_ENABLE_CUDA}).\n" \
+    "${cyan}--enable-cuda:${reset} Build with CUDA backend (Default: ${NOMP_ENABLE_CUDA}).\n" \
     "${cyan}--enable-opencl:${reset} Build with OpenCL backend (Default: ${NOMP_ENABLE_OPENCL}).\n" \
     "${cyan}--opencl-lib:${reset} OpenCL library path.\n" \
     "${cyan}--opencl-headers:${reset} OpenCL header path.\n" \
