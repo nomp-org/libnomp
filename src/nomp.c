@@ -115,6 +115,10 @@ static inline int nomp_set_configs(int argc, const char **argv,
   check_if_valid(strlen(bnd->install_dir) == 0, "--nomp-install-dir",
                  "NOMP_INSTALL_DIR");
   check_if_valid(strlen(bnd->backend) == 0, "--nomp-backend", "NOMP_BACKEND");
+  check_if_valid(bnd->verbose < 0, "--nomp-verbose", "NOMP_VERBOSE");
+  check_if_valid(bnd->profile < 0, "--nomp-profile", "NOMP_PROFILE");
+  check_if_valid(bnd->device_id < 0, "--nomp-device", "NOMP_DEVICE");
+  check_if_valid(bnd->platform_id < 0, "--nomp-platform", "NOMP_PLATFORM");
 
 #undef check_if_valid
 
