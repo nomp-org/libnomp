@@ -33,7 +33,7 @@ struct nomp_mem_t {
 #define NOMP_MEM_BYTES(start, end, usize) (((end) - (start)) * (usize))
 
 struct nomp_arg_t {
-  char name[NOMP_MAX_BUFFER_SIZE];
+  char name[NOMP_MAX_BUFFER_SIZE + 1];
   size_t size;
   unsigned type;
   void *ptr;
@@ -88,15 +88,15 @@ struct nomp_backend_t {
   /**
    * Name of the backend to be used (OpenCL, CUDA, etc.).
    */
-  char backend[NOMP_MAX_BUFFER_SIZE];
+  char backend[NOMP_MAX_BUFFER_SIZE + 1];
   /**
    * Installed directory of the library.
    */
-  char install_dir[PATH_MAX];
+  char install_dir[PATH_MAX + 1];
   /**
    * Directory where transform and annotations cripts are located.
    */
-  char scripts_dir[PATH_MAX];
+  char scripts_dir[PATH_MAX + 1];
 
   /**
    * Function pointer to the backend update function which can allocate,

@@ -188,7 +188,7 @@ static int nomp_api_500_dot(unsigned N) {
 #if defined(TEST_TOL)
   nomp_test_assert(fabs(total - N * (2 * N - 1) * (N - 1) / 6) < TEST_TOL);
 #else
-  nomp_test_assert(total == N * (2 * N - 1) * (N - 1) / 6);
+  nomp_test_assert(total == (TEST_TYPE)(N * (2 * N - 1) * (N - 1) / 6));
 #endif
 
   return 0;
@@ -239,7 +239,7 @@ static int nomp_api_500_multiple_reductions(unsigned N, unsigned iterations) {
 #if defined(TEST_TOL)
     nomp_test_assert(fabs(total - (N - 1) * N * i / 2) < TEST_TOL);
 #else
-    nomp_test_assert(total == (N - 1) * N * i / 2);
+    nomp_test_assert(total == (TEST_TYPE)((N - 1) * N * i / 2));
 #endif
   }
 

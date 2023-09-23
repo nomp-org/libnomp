@@ -156,7 +156,7 @@ static int backend_knl_run(struct nomp_backend_t *bnd,
                            struct nomp_prog_t *prg) {
   struct nomp_arg_t *args = prg->args;
   void *vargs[NOMP_MAX_KNL_ARGS_SIZE];
-  for (int i = 0; i < prg->nargs; i++) {
+  for (unsigned i = 0; i < prg->nargs; i++) {
     if (args[i].type == NOMP_PTR)
       vargs[i] = &args[i].ptr;
     else
