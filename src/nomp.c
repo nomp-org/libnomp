@@ -186,8 +186,8 @@ static inline int init_backend(struct nomp_backend_t *bnd) {
  * OpenCL, CUDA, etc) using command line arguments. Have a look at the accepted
  * arguments below for all available options. If no arguments are specified,
  * default values configured at build time are used for all configurations
- * exceptfor backend and the install directory. The backend name and the install
- * directoryare mandatory arguments.
+ * except for backend and the install directory. The backend name and the
+ * install directory are mandatory arguments.
  *
  * This function Returns a non-zero value if an error occurs during the
  * initialization, otherwise returns 0. Errors can be queried using
@@ -462,7 +462,7 @@ static inline struct nomp_prog_t *init_args(int progs_n, int nargs,
 
 /**
  * @ingroup nomp_user_api
- * @brief Generate and compile a kernel for the targe backend (OpenCL, etc.)
+ * @brief Generate and compile a kernel for the target backend (OpenCL, etc.)
  * from C source.
  *
  * @details Target backend is the one provided during the initialization of
