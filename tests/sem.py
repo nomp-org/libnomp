@@ -17,7 +17,7 @@ def annotate(
         if key == "dof_loop":
             loop = annotations[key]
             if loop in inames:
-                split_size = 8 if (backend == "ispc") else 32
+                split_size = 32
                 lp.split_iname(knl, loop, split_size, inner_tag=f"l.{dof_axis}")
                 dof_axis += 1
         elif key == "element_loop":

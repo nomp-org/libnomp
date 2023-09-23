@@ -183,7 +183,7 @@ static inline int init_backend(struct nomp_backend_t *bnd) {
  * @brief Initializes libnomp with the specified backend, platform, device, etc.
  *
  * @details Initializes nomp code generation for the specified backend (e.g.,
- * OpenCL, Cuda, etc) using command line arguments. Have a look at the accepted
+ * OpenCL, CUDA, etc) using command line arguments. Have a look at the accepted
  * arguments below for all available options. If no arguments are specified,
  * default values configured at build time are used for all configurations
  * exceptfor backend and the install directory. The backend name and the install
