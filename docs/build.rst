@@ -47,8 +47,6 @@ the following backends:
 #. OpenCL
 #. CUDA
 #. HIP
-#. DPC++
-#. ISPC
 
 For example, to build `libnomp` with OpenCL backend enabled, use the following
 commands:

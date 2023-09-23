@@ -14,7 +14,7 @@ is the `clang`_ based compiler frontend which pre-process and compile C
 source files. `libnomp` is the `loopy`_ based runtime which can generate and
 tune accelerator code (i.e., kernels) from C source at runtime and then
 perform low level dispatch to accelerators using other high performing
-programming models (or backends) like OpenCL, CUDA, HIP, DPC++, etc.
+programming models (or backends) like OpenCL, and CUDA.
 
 `nomp` uses pragmas to annotate C source with meta information about which
 sections of C source must be executed on accelerators. Also, pragmas can be
