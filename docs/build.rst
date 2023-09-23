@@ -57,25 +57,24 @@ commands:
    ./lncfg --enable-opencl --install-prefix ${HOME}/.nomp
    ./lnbuild
 
-If the installation is successful, `lnbuild` will prompt you to update the shell
-configuration file (e.g., `.bashrc`) to set `NOMP_INSTALL_DIR` and append `PATH`
-variable with `NOMP_INSTALL_DIR/bin`. `NOMP_INSTALL_DIR` environment variable must
-be set to `libnomp` install directory or should be passed as a command line
-argument using `--nomp-install-dir` in order to use `libnomp`. Setting the
-environment variable and adding `NOMP_INSTALL_DIR/bin` to `PATH` variable will
-enable you to use `lnrun` script without using its full path to open documentation,
-run tests, debug tests, etc. You can avoid this prompt by either providing
-`--update yes` or `--update no` to the `lnbuild` script. You have to open a new shell
-in order for changes to take affect in case you update the shell configuration file.
+It is recommended to update the shell configuration file (e.g., `.bashrc`) to set
+environment variable `NOMP_INSTALL_DIR` and append `PATH` variable with
+`NOMP_INSTALL_DIR/bin`. `NOMP_INSTALL_DIR` environment variable must be set to
+`libnomp` install directory or it should be passed as a command line argument
+using `--nomp-install-dir` during initialization of `libnomp`. Setting the environment
+variable and adding `NOMP_INSTALL_DIR/bin` to `PATH` will enable you to use `lnrun`
+script without using its full path to open documentation, run tests, debug tests, etc.
+You can update the shell configuration file automatically by passing `--update-shell`
+to `lnbuild` script. You have to open a new shell in order for changes to take affect
+in case you update the shell configuration file.
 
 .. code-block:: bash
 
    cd libnomp
    ./lncfg --enable-opencl --install-prefix ${HOME}/.nomp
-   ./lnbuild --update yes
+   ./lnbuild --update-shell
 
-You can manually set the `NOMP_INSTALL_DIR` variable as well. Use `lnbuild --help`
-to see all the availble options supported by `lnbuild` script.
+Use `lnbuild --help` to see all the available options supported by `lnbuild` script.
 
 .. code-block:: bash
 
