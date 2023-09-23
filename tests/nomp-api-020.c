@@ -49,7 +49,7 @@ static int test_missing_argument(const char *backend) {
 }
 
 int main(int argc, const char *argv[]) {
-  char backend[NOMP_TEST_MAX_BUFFER_SIZE];
+  char backend[NOMP_TEST_MAX_BUFFER_SIZE + 1];
   for (unsigned i = 0; i < (unsigned)argc; i++) {
     if (strncmp(argv[i], "--nomp-backend", NOMP_TEST_MAX_BUFFER_SIZE) == 0) {
       assert(i + 1 < (unsigned)argc);
