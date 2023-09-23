@@ -68,8 +68,10 @@ int nomp_log_(const char *description, int errorno, nomp_log_type_t type, ...) {
   // Print the logs based on the verbose level.
   if ((verbose >= NOMP_ERROR && type == NOMP_ERROR) ||
       (verbose >= NOMP_WARNING && type == NOMP_WARNING) ||
-      (verbose >= NOMP_INFO && type == NOMP_INFO))
-    printf("%s\n", buf);
+      (verbose >= NOMP_INFO && type == NOMP_INFO)) {
+    fprintf(stderr, "%s\n", buf);
+    fflush(stderr);
+  }
 
   if (type == NOMP_ERROR) {
     if (logs_max <= logs_n) {

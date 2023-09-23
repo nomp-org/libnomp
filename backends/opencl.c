@@ -111,6 +111,7 @@ static int opencl_knl_run(struct nomp_backend_t *bnd, struct nomp_prog_t *prg) {
   check(clEnqueueNDRangeKernel(ocl->queue, ocl_prg->knl, prg->ndim, NULL,
                                prg->gws, prg->local, 0, NULL, NULL),
         "clEnqueueNDRangeKernel");
+  check(clFinish(ocl->queue), "clFinish");
 
   return 0;
 }
