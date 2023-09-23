@@ -116,8 +116,6 @@ the following backends:</p>
 <li><p>OpenCL</p></li>
 <li><p>CUDA</p></li>
 <li><p>HIP</p></li>
-<li><p>DPC++</p></li>
-<li><p>ISPC</p></li>
 </ol>
 <p>For example, to build <cite>libnomp</cite> with OpenCL backend enabled, use the following
 commands:</p>
@@ -126,23 +124,22 @@ commands:</p>
 ./lnbuild
 </pre></div>
 </div>
-<p>If the installation is successful, <cite>lnbuild</cite> will prompt you to update the shell
-configuration file (e.g., <cite>.bashrc</cite>) to set <cite>NOMP_INSTALL_DIR</cite> and append <cite>PATH</cite>
-variable with <cite>NOMP_INSTALL_DIR/bin</cite>. <cite>NOMP_INSTALL_DIR</cite> environment variable must
-be set to <cite>libnomp</cite> install directory or should be passed as a command line
-argument using <cite>–nomp-install-dir</cite> in order to use <cite>libnomp</cite>. Setting the
-environment variable and adding <cite>NOMP_INSTALL_DIR/bin</cite> to <cite>PATH</cite> variable will
-enable you to use <cite>lnrun</cite> script without using its full path to open documentation,
-run tests, debug tests, etc. You can avoid this prompt by either providing
-<cite>–update yes</cite> or <cite>–update no</cite> to the <cite>lnbuild</cite> script. You have to open a new shell
-in order for changes to take affect in case you update the shell configuration file.</p>
+<p>It is recommended to update the shell configuration file (e.g., <cite>.bashrc</cite>) to set
+environment variable <cite>NOMP_INSTALL_DIR</cite> and append <cite>PATH</cite> variable with
+<cite>NOMP_INSTALL_DIR/bin</cite>. <cite>NOMP_INSTALL_DIR</cite> environment variable must be set to
+<cite>libnomp</cite> install directory or it should be passed as a command line argument
+using <cite>–nomp-install-dir</cite> during initialization of <cite>libnomp</cite>. Setting the environment
+variable and adding <cite>NOMP_INSTALL_DIR/bin</cite> to <cite>PATH</cite> will enable you to use <cite>lnrun</cite>
+script without using its full path to open documentation, run tests, debug tests, etc.
+You can update the shell configuration file automatically by passing <cite>–update-shell</cite>
+to <cite>lnbuild</cite> script. You have to open a new shell in order for changes to take affect
+in case you update the shell configuration file.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>libnomp
 ./lncfg<span class="w"> </span>--enable-opencl<span class="w"> </span>--install-prefix<span class="w"> </span><span class="si">${</span><span class="nv">HOME</span><span class="si">}</span>/.nomp
-./lnbuild<span class="w"> </span>--update<span class="w"> </span>yes
+./lnbuild<span class="w"> </span>--update-shell
 </pre></div>
 </div>
-<p>You can manually set the <cite>NOMP_INSTALL_DIR</cite> variable as well. Use <cite>lnbuild –help</cite>
-to see all the availble options supported by <cite>lnbuild</cite> script.</p>
+<p>Use <cite>lnbuild –help</cite> to see all the available options supported by <cite>lnbuild</cite> script.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">NOMP_INSTALL_DIR</span><span class="o">=</span><span class="si">${</span><span class="nv">HOME</span><span class="si">}</span>/.nomp
 </pre></div>
 </div>
