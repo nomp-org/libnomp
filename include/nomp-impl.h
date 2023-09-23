@@ -86,7 +86,7 @@ struct nomp_backend_t {
    */
   int profile;
   /**
-   * Name of the backend to be used (OpenCL, Cuda, etc.).
+   * Name of the backend to be used (OpenCL, CUDA, etc.).
    */
   char backend[NOMP_MAX_BUFFER_SIZE];
   /**
@@ -182,7 +182,7 @@ extern "C" {
 /**
  * @defgroup nomp_backend_init Backend init functions
  *
- * @brief Functions for initializing different backend as OpenCL, Cuda, etc.
+ * @brief Functions for initializing different backend as OpenCL, CUDA, etc.
  * These has to be refactored to handle the case when the backend is not
  * available.
  */

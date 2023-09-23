@@ -109,7 +109,7 @@ typedef enum {
 #define NOMP_LOOPY_GRIDSIZE_FAILURE -392
 /**
  * @ingroup nomp_user_errors
- * @brief libnomp Cuda operation failed.
+ * @brief libnomp CUDA operation failed.
  */
 #define NOMP_CUDA_FAILURE -512
 /**
