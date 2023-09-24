@@ -126,17 +126,6 @@ static inline int nomp_set_configs(int argc, const char **argv,
 
 #undef check_if_valid
 
-  // Append nomp python directory to sys.path.
-  char *py_dir = nomp_str_cat(2, PATH_MAX, cfg->install_dir, "/python");
-  nomp_check(nomp_py_append_to_sys_path(py_dir));
-  nomp_free(&py_dir);
-
-  // Append current working directory to sys.path.
-  nomp_check(nomp_py_append_to_sys_path("."));
-
-  // Append nomp script directory to sys.path.
-  nomp_check(nomp_py_append_to_sys_path(cfg->scripts_dir));
-
   return 0;
 }
 
@@ -230,17 +219,10 @@ int nomp_init(int argc, const char **argv) {
                     "libnomp is already initialized.");
   }
 
-  if (!Py_IsInitialized()) {
-    // May be we need the isolated configuration listed here:
-    // https://docs.python.org/3/c-api/init_config.html#init-config
-    // But for now, we do the simplest thing possible.
-    Py_InitializeEx(0);
-  }
-
   struct nomp_config_t cfg;
   nomp_check(nomp_set_configs(argc, argv, &cfg));
 
-  nomp_check(nomp_py_init(cfg.backend));
+  nomp_check(nomp_py_init(&cfg));
 
   // Set profile level.
   nomp_check(nomp_profile_set_level(cfg.profile));

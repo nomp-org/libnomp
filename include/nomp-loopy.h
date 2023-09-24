@@ -5,6 +5,7 @@
 #include <Python.h>
 
 struct nomp_prog_t;
+struct nomp_config_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,7 +17,7 @@ extern "C" {
  * @brief Python helper functions for calling loopy and other python functions.
  */
 
-int nomp_py_init(const char *backend_);
+int nomp_py_init(const struct nomp_config_t *cfg);
 
 int nomp_py_append_to_sys_path(const char *path);
 
