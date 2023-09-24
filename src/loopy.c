@@ -31,11 +31,30 @@ void nomp_py_print(const char *msg, PyObject *obj) {
  *
  * @brief Initialize the nomp python interface.
  *
- * @param[in] backend_ Backend name.
+ * @param[in] cfg Nomp configuration struct of type ::nomp_config_t.
  * @return int
  */
-int nomp_py_init(const char *backend_) {
-  strncpy(backend, backend_, NOMP_MAX_BUFFER_SIZE);
+int nomp_py_init(const struct nomp_config_t *const cfg) {
+  strncpy(backend, cfg->backend, NOMP_MAX_BUFFER_SIZE);
+
+  if (!Py_IsInitialized()) {
+    // May be we need the isolated configuration listed here:
+    // https://docs.python.org/3/c-api/init_config.html#init-config
+    // But for now, we do the simplest thing possible.
+    Py_InitializeEx(0);
+  }
+
+  // Append current working directory to sys.path.
+  nomp_check(nomp_py_append_to_sys_path("."));
+
+  // Append nomp python directory to sys.path.
+  char *py_dir = nomp_str_cat(2, PATH_MAX, cfg->install_dir, "/python");
+  nomp_check(nomp_py_append_to_sys_path(py_dir));
+  nomp_free(&py_dir);
+
+  // Append nomp script directory to sys.path.
+  nomp_check(nomp_py_append_to_sys_path(cfg->scripts_dir));
+
   return 0;
 }
 
