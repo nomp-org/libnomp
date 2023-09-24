@@ -4,29 +4,29 @@
 static struct nomp_backend_t nomp;
 static int initialized = 0;
 
-static inline int check_env_vars(struct nomp_backend_t *bnd) {
+static inline int check_env_vars(struct nomp_config_t *const cfg) {
   char *tmp = NULL;
 
   if ((tmp = getenv("NOMP_INSTALL_DIR")))
-    strncpy(bnd->install_dir, tmp, PATH_MAX);
+    strncpy(cfg->install_dir, tmp, PATH_MAX);
 
   if ((tmp = getenv("NOMP_BACKEND")))
-    strncpy(bnd->backend, tmp, NOMP_MAX_BUFFER_SIZE);
+    strncpy(cfg->backend, tmp, NOMP_MAX_BUFFER_SIZE);
 
   if ((tmp = getenv("NOMP_PLATFORM")))
-    bnd->platform_id = nomp_str_toui(tmp, NOMP_MAX_BUFFER_SIZE);
+    cfg->platform_id = nomp_str_toui(tmp, NOMP_MAX_BUFFER_SIZE);
 
   if ((tmp = getenv("NOMP_DEVICE")))
-    bnd->device_id = nomp_str_toui(tmp, NOMP_MAX_BUFFER_SIZE);
+    cfg->device_id = nomp_str_toui(tmp, NOMP_MAX_BUFFER_SIZE);
 
   if ((tmp = getenv("NOMP_VERBOSE")))
-    bnd->verbose = nomp_str_toui(tmp, NOMP_MAX_BUFFER_SIZE);
+    cfg->verbose = nomp_str_toui(tmp, NOMP_MAX_BUFFER_SIZE);
 
   if ((tmp = getenv("NOMP_PROFILE")))
-    bnd->profile = nomp_str_toui(tmp, NOMP_MAX_BUFFER_SIZE);
+    cfg->profile = nomp_str_toui(tmp, NOMP_MAX_BUFFER_SIZE);
 
   if ((tmp = getenv("NOMP_SCRIPTS_DIR")))
-    strncpy(bnd->scripts_dir, tmp, PATH_MAX);
+    strncpy(cfg->scripts_dir, tmp, PATH_MAX);
 
   return 0;
 }
@@ -40,8 +40,8 @@ static inline int nomp_check_cmd_line_aux(const unsigned i, const unsigned argc,
   return 0;
 }
 
-static inline int nomp_check_cmd_line(struct nomp_backend_t *bnd, unsigned argc,
-                                      const char **argv) {
+static inline int nomp_check_cmd_line(struct nomp_config_t *const cfg,
+                                      unsigned argc, const char **argv) {
   if (argc <= 1 || argv == NULL)
     return 0;
 
@@ -54,27 +54,27 @@ static inline int nomp_check_cmd_line(struct nomp_backend_t *bnd, unsigned argc,
     int valid = 0;
 
     if (!strncmp("--nomp-install-dir", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
-      strncpy(bnd->install_dir, argv[i], PATH_MAX), valid = 1;
+      strncpy(cfg->install_dir, argv[i], PATH_MAX), valid = 1;
 
     if (!strncmp("--nomp-backend", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
-      strncpy(bnd->backend, argv[i], NOMP_MAX_BUFFER_SIZE), valid = 1;
+      strncpy(cfg->backend, argv[i], NOMP_MAX_BUFFER_SIZE), valid = 1;
 
     if (!strncmp("--nomp-platform", argv[i - 1], NOMP_MAX_BUFFER_SIZE)) {
-      bnd->platform_id = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE);
+      cfg->platform_id = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE);
       valid = 1;
     }
 
     if (!strncmp("--nomp-device", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
-      bnd->device_id = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE), valid = 1;
+      cfg->device_id = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE), valid = 1;
 
     if (!strncmp("--nomp-verbose", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
-      bnd->verbose = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE), valid = 1;
+      cfg->verbose = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE), valid = 1;
 
     if (!strncmp("--nomp-profile", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
-      bnd->profile = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE), valid = 1;
+      cfg->profile = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE), valid = 1;
 
     if (!strncmp("--nomp-scripts-dir", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
-      strncpy(bnd->scripts_dir, argv[i], PATH_MAX), valid = 1;
+      strncpy(cfg->scripts_dir, argv[i], PATH_MAX), valid = 1;
 
     if (!valid) {
       nomp_log(0, NOMP_WARNING, "Unknown command line argument: %s.",
@@ -88,19 +88,23 @@ static inline int nomp_check_cmd_line(struct nomp_backend_t *bnd, unsigned argc,
 }
 
 static inline int nomp_set_configs(int argc, const char **argv,
-                                   struct nomp_backend_t *bnd) {
+                                   struct nomp_config_t *const cfg) {
   // verbose, profile, device and platform id are all initialized to zero.
   // Everything else has to be set by user explicitly.
-  bnd->verbose = NOMP_DEFAULT_VERBOSE;
-  bnd->profile = NOMP_DEFAULT_PROFILE;
-  bnd->device_id = NOMP_DEFAULT_DEVICE;
-  bnd->platform_id = NOMP_DEFAULT_PLATFORM;
-  strcpy(bnd->backend, "");
-  strcpy(bnd->install_dir, "");
-  strcpy(bnd->scripts_dir, "");
+  cfg->verbose = NOMP_DEFAULT_VERBOSE;
+  cfg->profile = NOMP_DEFAULT_PROFILE;
+  cfg->device_id = NOMP_DEFAULT_DEVICE;
+  cfg->platform_id = NOMP_DEFAULT_PLATFORM;
+  strcpy(cfg->backend, "");
+  strcpy(cfg->install_dir, "");
+  strcpy(cfg->scripts_dir, "");
 
-  nomp_check(nomp_check_cmd_line(bnd, argc, argv));
-  check_env_vars(bnd);
+  nomp_check(nomp_check_cmd_line(cfg, argc, argv));
+  check_env_vars(cfg);
+
+  size_t n = strnlen(cfg->backend, NOMP_MAX_BUFFER_SIZE);
+  for (unsigned i = 0; i < n; i++)
+    cfg->backend[i] = tolower(cfg->backend[i]);
 
 #define check_if_valid(COND, CMDARG, ENVVAR)                                   \
   {                                                                            \
@@ -112,18 +116,18 @@ static inline int nomp_set_configs(int argc, const char **argv,
     }                                                                          \
   }
 
-  check_if_valid(strlen(bnd->install_dir) == 0, "--nomp-install-dir",
+  check_if_valid(strlen(cfg->install_dir) == 0, "--nomp-install-dir",
                  "NOMP_INSTALL_DIR");
-  check_if_valid(strlen(bnd->backend) == 0, "--nomp-backend", "NOMP_BACKEND");
-  check_if_valid(bnd->verbose < 0, "--nomp-verbose", "NOMP_VERBOSE");
-  check_if_valid(bnd->profile < 0, "--nomp-profile", "NOMP_PROFILE");
-  check_if_valid(bnd->device_id < 0, "--nomp-device", "NOMP_DEVICE");
-  check_if_valid(bnd->platform_id < 0, "--nomp-platform", "NOMP_PLATFORM");
+  check_if_valid(strlen(cfg->backend) == 0, "--nomp-backend", "NOMP_BACKEND");
+  check_if_valid(cfg->verbose < 0, "--nomp-verbose", "NOMP_VERBOSE");
+  check_if_valid(cfg->profile < 0, "--nomp-profile", "NOMP_PROFILE");
+  check_if_valid(cfg->device_id < 0, "--nomp-device", "NOMP_DEVICE");
+  check_if_valid(cfg->platform_id < 0, "--nomp-platform", "NOMP_PLATFORM");
 
 #undef check_if_valid
 
   // Append nomp python directory to sys.path.
-  char *py_dir = nomp_str_cat(2, PATH_MAX, bnd->install_dir, "/python");
+  char *py_dir = nomp_str_cat(2, PATH_MAX, cfg->install_dir, "/python");
   nomp_check(nomp_py_append_to_sys_path(py_dir));
   nomp_free(&py_dir);
 
@@ -131,7 +135,7 @@ static inline int nomp_set_configs(int argc, const char **argv,
   nomp_check(nomp_py_append_to_sys_path("."));
 
   // Append nomp script directory to sys.path.
-  nomp_check(nomp_py_append_to_sys_path(bnd->scripts_dir));
+  nomp_check(nomp_py_append_to_sys_path(cfg->scripts_dir));
 
   return 0;
 }
@@ -151,31 +155,28 @@ static inline int deallocate_scratch_memory(struct nomp_backend_t *bnd) {
   return 0;
 }
 
-static inline int init_backend(struct nomp_backend_t *bnd) {
-  size_t n = strnlen(bnd->backend, NOMP_MAX_BUFFER_SIZE);
-  for (unsigned i = 0; i < n; i++)
-    bnd->backend[i] = tolower(bnd->backend[i]);
-
+static inline int init_backend(struct nomp_backend_t *const bnd,
+                               const struct nomp_config_t *const cfg) {
   bnd->py_context = PyDict_New();
-  PyObject *obj = PyUnicode_FromString(bnd->backend);
+  PyObject *obj = PyUnicode_FromString(cfg->backend);
   PyDict_SetItemString(bnd->py_context, "backend::name", obj);
   Py_XDECREF(obj);
 
-  if (strncmp(bnd->backend, "opencl", NOMP_MAX_BUFFER_SIZE) == 0) {
+  if (strncmp(cfg->backend, "opencl", NOMP_MAX_BUFFER_SIZE) == 0) {
 #if defined(OPENCL_ENABLED)
-    nomp_check(opencl_init(&nomp, bnd->platform_id, bnd->device_id));
+    nomp_check(opencl_init(bnd, cfg->platform_id, cfg->device_id));
 #endif
-  } else if (strncmp(bnd->backend, "cuda", NOMP_MAX_BUFFER_SIZE) == 0) {
+  } else if (strncmp(cfg->backend, "cuda", NOMP_MAX_BUFFER_SIZE) == 0) {
 #if defined(CUDA_ENABLED)
-    nomp_check(cuda_init(&nomp, bnd->platform_id, bnd->device_id));
+    nomp_check(cuda_init(bnd, cfg->platform_id, cfg->device_id));
 #endif
-  } else if (strncmp(bnd->backend, "hip", NOMP_MAX_BUFFER_SIZE) == 0) {
+  } else if (strncmp(cfg->backend, "hip", NOMP_MAX_BUFFER_SIZE) == 0) {
 #if defined(HIP_ENABLED)
-    nomp_check(hip_init(&nomp, bnd->platform_id, bnd->device_id));
+    nomp_check(hip_init(bnd, cfg->platform_id, cfg->device_id));
 #endif
   } else {
     return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                    "Invalid backend: %s.", bnd->backend);
+                    "Invalid backend: %s.", cfg->backend);
   }
 
   return 0;
@@ -236,16 +237,19 @@ int nomp_init(int argc, const char **argv) {
     Py_InitializeEx(0);
   }
 
-  nomp_check(nomp_set_configs(argc, argv, &nomp));
+  struct nomp_config_t cfg;
+  nomp_check(nomp_set_configs(argc, argv, &cfg));
+
+  nomp_check(nomp_py_init(cfg.backend));
 
   // Set profile level.
-  nomp_check(nomp_profile_set_level(nomp.profile));
+  nomp_check(nomp_profile_set_level(cfg.profile));
 
   // Set verbose level.
-  nomp_check(nomp_log_set_verbose(nomp.verbose));
+  nomp_check(nomp_log_set_verbose(cfg.verbose));
 
   // Initialize the backend.
-  nomp_check(init_backend(&nomp));
+  nomp_check(init_backend(&nomp, &cfg));
 
   // Allocate scratch memory.
   nomp_check(allocate_scratch_memory(&nomp));
@@ -523,7 +527,7 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
 
   // Create loopy kernel from C source.
   PyObject *knl = NULL;
-  nomp_check(nomp_py_c_to_loopy(&knl, csrc, nomp.backend));
+  nomp_check(nomp_py_c_to_loopy(&knl, csrc));
 
   // Handle annotate clauses if they exist.
   nomp_check(nomp_py_apply_annotations(&knl, nomp.py_annotate, m.dict,
@@ -542,7 +546,7 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
   // Get OpenCL, CUDA, etc. source and name from the loopy kernel and build
   // the program.
   char *name, *src;
-  nomp_check(nomp_py_get_knl_name_and_src(&name, &src, knl, nomp.backend));
+  nomp_check(nomp_py_get_knl_name_and_src(&name, &src, knl));
   nomp_check(nomp.knl_build(&nomp, prg, src, name));
   nomp_free(&src), nomp_free(&name);
 

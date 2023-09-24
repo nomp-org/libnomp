@@ -16,11 +16,13 @@ extern "C" {
  * @brief Python helper functions for calling loopy and other python functions.
  */
 
+int nomp_py_init(const char *backend_);
+
 int nomp_py_append_to_sys_path(const char *path);
 
 int nomp_py_check_module(const char *module, const char *function);
 
-int nomp_py_c_to_loopy(PyObject **knl, const char *src, const char *backend);
+int nomp_py_c_to_loopy(PyObject **knl, const char *src);
 
 int nomp_py_realize_reduction(PyObject **knl, const char *var,
                               const PyObject *context);
@@ -33,8 +35,7 @@ int nomp_py_apply_annotations(PyObject **knl, PyObject *func,
 int nomp_py_apply_transform(PyObject **knl, const char *file, const char *func,
                             const PyObject *context);
 
-int nomp_py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
-                                 const char *backend);
+int nomp_py_get_knl_name_and_src(char **name, char **src, const PyObject *knl);
 
 int nomp_py_get_grid_size(struct nomp_prog_t *prg, PyObject *knl);
 

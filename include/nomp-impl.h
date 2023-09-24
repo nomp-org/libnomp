@@ -23,6 +23,11 @@
 #include "nomp-mem.h"
 #include "nomp.h"
 
+/**
+ * @defgroup nomp_internal_types Internal types
+ * @brief Internal types used in libnomp.
+ */
+
 struct nomp_mem_t {
   size_t idx0, idx1, usize;
   void *hptr, *bptr;
@@ -64,10 +69,9 @@ struct nomp_prog_t {
 /**
  * @ingroup nomp_internal_types
  *
- * @brief Structure to keep track of nomp runtime data and backend specific
- * data. This structure is also used to dispatch backend specific functions.
+ * @brief Structure to keep track of nomp runtime configuration.
  */
-struct nomp_backend_t {
+struct nomp_config_t {
   /**
    * ID of the platform to be used for the backend. This is only used when the
    * backend is OpenCL.
@@ -97,7 +101,15 @@ struct nomp_backend_t {
    * Directory where transform and annotations cripts are located.
    */
   char scripts_dir[PATH_MAX + 1];
+};
 
+/**
+ * @ingroup nomp_internal_types
+ *
+ * @brief Structure to keep track of nomp runtime data and backend specific
+ * data. This structure is also used to dispatch backend specific functions.
+ */
+struct nomp_backend_t {
   /**
    * Function pointer to the backend update function which can allocate,
    * update and free backend memory.
