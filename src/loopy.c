@@ -7,6 +7,7 @@ static const char *c_to_loopy = "c_to_loopy";
 static const char *get_knl_src = "get_knl_src";
 static const char *get_knl_name = "get_knl_name";
 static const char *realize_reduction = "realize_reduction";
+static char backend[NOMP_MAX_BUFFER_SIZE + 1];
 
 /**
  * @ingroup nomp_py_utils
@@ -23,6 +24,19 @@ void nomp_py_print(const char *msg, PyObject *obj) {
   const char *str = PyBytes_AS_STRING(py_str);
   printf("%s: %s\n", msg, str);
   Py_XDECREF(repr), Py_XDECREF(py_str);
+}
+
+/**
+ * @ingroup nomp_py_utils
+ *
+ * @brief Initialize the nomp python interface.
+ *
+ * @param[in] backend_ Backend name.
+ * @return int
+ */
+int nomp_py_init(const char *backend_) {
+  strncpy(backend, backend_, NOMP_MAX_BUFFER_SIZE);
+  return 0;
 }
 
 /**
@@ -130,10 +144,9 @@ int nomp_py_realize_reduction(PyObject **knl, const char *var,
  *
  * @param[out] knl Loopy kernel object.
  * @param[in] src C kernel source.
- * @param[in] backend Backend name.
  * @return int
  */
-int nomp_py_c_to_loopy(PyObject **knl, const char *src, const char *backend) {
+int nomp_py_c_to_loopy(PyObject **knl, const char *src) {
   int err = 1;
   PyObject *lpy_api = PyUnicode_FromString(module_loopy_api);
   if (lpy_api) {
@@ -288,11 +301,9 @@ int nomp_py_apply_transform(PyObject **knl, const char *file, const char *func,
  * @param[out] name Kernel name as a C-string.
  * @param[out] src Kernel source as a C-string.
  * @param[in] knl Loopy kernel object.
- * @param[in] backend Backend name.
  * @return int
  */
-int nomp_py_get_knl_name_and_src(char **name, char **src, const PyObject *knl,
-                                 const char *backend) {
+int nomp_py_get_knl_name_and_src(char **name, char **src, const PyObject *knl) {
   int err = 1;
   PyObject *lpy_api = PyUnicode_FromString(module_loopy_api);
   if (lpy_api) {
