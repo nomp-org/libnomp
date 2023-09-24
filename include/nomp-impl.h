@@ -76,11 +76,11 @@ struct nomp_config_t {
    * ID of the platform to be used for the backend. This is only used when the
    * backend is OpenCL.
    */
-  int platform_id;
+  int platform;
   /**
    * ID of the dhvice to be used with the backend.
    */
-  int device_id;
+  int device;
   /**
    * Verbose level to be used for displaying log messages.
    */
@@ -199,14 +199,14 @@ extern "C" {
  * available.
  */
 
-int opencl_init(struct nomp_backend_t *backend, const int platform_id,
-                const int device_id);
+int opencl_init(struct nomp_backend_t *backend, const int platform,
+                const int device);
 
-int cuda_init(struct nomp_backend_t *backend, const int platform_id,
-              const int device_id);
+int cuda_init(struct nomp_backend_t *backend, const int platform,
+              const int device);
 
-int hip_init(struct nomp_backend_t *backend, const int platform_id,
-             const int device_id);
+int hip_init(struct nomp_backend_t *backend, const int platform,
+             const int device);
 
 #ifdef __cplusplus
 }

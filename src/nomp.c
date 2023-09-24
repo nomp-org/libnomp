@@ -14,10 +14,10 @@ static inline int check_env_vars(struct nomp_config_t *const cfg) {
     strncpy(cfg->backend, tmp, NOMP_MAX_BUFFER_SIZE);
 
   if ((tmp = getenv("NOMP_PLATFORM")))
-    cfg->platform_id = nomp_str_toui(tmp, NOMP_MAX_BUFFER_SIZE);
+    cfg->platform = nomp_str_toui(tmp, NOMP_MAX_BUFFER_SIZE);
 
   if ((tmp = getenv("NOMP_DEVICE")))
-    cfg->device_id = nomp_str_toui(tmp, NOMP_MAX_BUFFER_SIZE);
+    cfg->device = nomp_str_toui(tmp, NOMP_MAX_BUFFER_SIZE);
 
   if ((tmp = getenv("NOMP_VERBOSE")))
     cfg->verbose = nomp_str_toui(tmp, NOMP_MAX_BUFFER_SIZE);
@@ -60,12 +60,12 @@ static inline int nomp_check_cmd_line(struct nomp_config_t *const cfg,
       strncpy(cfg->backend, argv[i], NOMP_MAX_BUFFER_SIZE), valid = 1;
 
     if (!strncmp("--nomp-platform", argv[i - 1], NOMP_MAX_BUFFER_SIZE)) {
-      cfg->platform_id = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE);
+      cfg->platform = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE);
       valid = 1;
     }
 
     if (!strncmp("--nomp-device", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
-      cfg->device_id = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE), valid = 1;
+      cfg->device = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE), valid = 1;
 
     if (!strncmp("--nomp-verbose", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
       cfg->verbose = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE), valid = 1;
@@ -93,8 +93,8 @@ static inline int nomp_set_configs(int argc, const char **argv,
   // Everything else has to be set by user explicitly.
   cfg->verbose = NOMP_DEFAULT_VERBOSE;
   cfg->profile = NOMP_DEFAULT_PROFILE;
-  cfg->device_id = NOMP_DEFAULT_DEVICE;
-  cfg->platform_id = NOMP_DEFAULT_PLATFORM;
+  cfg->device = NOMP_DEFAULT_DEVICE;
+  cfg->platform = NOMP_DEFAULT_PLATFORM;
   strcpy(cfg->backend, "");
   strcpy(cfg->install_dir, "");
   strcpy(cfg->scripts_dir, "");
@@ -121,8 +121,8 @@ static inline int nomp_set_configs(int argc, const char **argv,
   check_if_valid(strlen(cfg->backend) == 0, "--nomp-backend", "NOMP_BACKEND");
   check_if_valid(cfg->verbose < 0, "--nomp-verbose", "NOMP_VERBOSE");
   check_if_valid(cfg->profile < 0, "--nomp-profile", "NOMP_PROFILE");
-  check_if_valid(cfg->device_id < 0, "--nomp-device", "NOMP_DEVICE");
-  check_if_valid(cfg->platform_id < 0, "--nomp-platform", "NOMP_PLATFORM");
+  check_if_valid(cfg->device < 0, "--nomp-device", "NOMP_DEVICE");
+  check_if_valid(cfg->platform < 0, "--nomp-platform", "NOMP_PLATFORM");
 
 #undef check_if_valid
 
@@ -164,15 +164,15 @@ static inline int init_backend(struct nomp_backend_t *const bnd,
 
   if (strncmp(cfg->backend, "opencl", NOMP_MAX_BUFFER_SIZE) == 0) {
 #if defined(OPENCL_ENABLED)
-    nomp_check(opencl_init(bnd, cfg->platform_id, cfg->device_id));
+    nomp_check(opencl_init(bnd, cfg->platform, cfg->device));
 #endif
   } else if (strncmp(cfg->backend, "cuda", NOMP_MAX_BUFFER_SIZE) == 0) {
 #if defined(CUDA_ENABLED)
-    nomp_check(cuda_init(bnd, cfg->platform_id, cfg->device_id));
+    nomp_check(cuda_init(bnd, cfg->platform, cfg->device));
 #endif
   } else if (strncmp(cfg->backend, "hip", NOMP_MAX_BUFFER_SIZE) == 0) {
 #if defined(HIP_ENABLED)
-    nomp_check(hip_init(bnd, cfg->platform_id, cfg->device_id));
+    nomp_check(hip_init(bnd, cfg->platform, cfg->device));
 #endif
   } else {
     return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
