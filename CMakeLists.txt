@@ -70,7 +70,25 @@ target_link_libraries(nomp PRIVATE Python3::Python)
 find_package(OpenSSL REQUIRED)
 target_link_libraries(nomp PRIVATE OpenSSL::SSL)
 
-find_package(SymEngine REQUIRED HINTS $ENV{CONDA_PREFIX})
+# Fetch, configure and build SymEngine as a workaround for a
+# bug in the SymEngine conda package.
+include(ExternalProject)
+set(SYMENGINE_INCLUDE_DIRS ${CMAKE_INSTALL_PREFIX}/include)
+set(SYMENGINE_LIBRARIES ${CMAKE_INSTALL_PREFIX}/lib/libsymengine${CMAKE_SHARED_LIBRARY_SUFFIX})
+ExternalProject_Add(symengine
+  GIT_REPOSITORY https://github.com/thilinarmtb/symengine.git
+  GIT_TAG fix-warnings
+  GIT_SHALLOW TRUE
+  GIT_PROGRESS TRUE
+  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+    -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+    -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+    -DCMAKE_BUILD_TYPE=Release
+    -DBUILD_SHARED_LIBS=ON
+    -DBUILD_BENCHMARKS=OFF
+    -DBUILD_TESTS=OFF
+  BUILD_COMMAND make -j4)
+add_dependencies(nomp symengine)
 target_include_directories(nomp PRIVATE ${SYMENGINE_INCLUDE_DIRS})
 target_link_libraries(nomp PRIVATE ${SYMENGINE_LIBRARIES})
 

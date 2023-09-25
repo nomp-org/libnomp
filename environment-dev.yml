@@ -4,13 +4,13 @@ channels:
   - anaconda
 dependencies:
   - cmake=3.24
-  - symengine=0.10.1
-  - clang-format=16
-  - clang-tools=16
-  - clangdev=16.0 # We need this since clang-tools don't install clang headers.
-  - doxygen
   - python=3.10
+  - gmp
   - pip
   - pip:
     - -r requirements.txt
     - -r requirements-dev.txt
+  - clang-format=16
+  - clang-tools=16
+  - clangdev=16.0 # We need this since clang-tools don't install clang headers.
+  - doxygen
