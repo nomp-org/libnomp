@@ -147,24 +147,30 @@ static int opencl_finalize(struct nomp_backend_t *bnd) {
 }
 
 static int opencl_device_query(struct nomp_backend_t *bnd, cl_device_id id) {
-#define set_string_aux(KEY, VAL)                                               \
+#define set_string(KEY, VAL)                                                   \
   {                                                                            \
     PyObject *obj = PyUnicode_FromString(VAL);                                 \
     PyDict_SetItemString(bnd->py_context, KEY, obj);                           \
     Py_XDECREF(obj);                                                           \
   }
 
-#define set_string_info(PARAM, KEY)                                            \
+#define set_int(KEY, VAL)                                                      \
   {                                                                            \
-    char string[BUFSIZ];                                                       \
-    check(clGetDeviceInfo(id, PARAM, sizeof(string), string, NULL),            \
-          "clGetDeviceInfo");                                                  \
-    set_string_aux(KEY, string);                                               \
+    PyObject *obj = PyLong_FromSize_t(VAL);                                    \
+    PyDict_SetItemString(bnd->py_context, KEY, obj);                           \
+    Py_XDECREF(obj);                                                           \
   }
 
-  set_string_info(CL_DEVICE_NAME, "device::name");
-  set_string_info(CL_DEVICE_VENDOR, "device::vendor");
-  set_string_info(CL_DRIVER_VERSION, "device::driver");
+  char val[BUFSIZ];
+  check(clGetDeviceInfo(id, CL_DEVICE_NAME, sizeof(val), val, NULL),
+        "clGetDeviceInfo");
+  set_string("device::name", val);
+  check(clGetDeviceInfo(id, CL_DEVICE_VENDOR, sizeof(val), val, NULL),
+        "clGetDeviceInfo");
+  set_string("device::vendor", val);
+  check(clGetDeviceInfo(id, CL_DEVICE_VERSION, sizeof(val), val, NULL),
+        "clGetDeviceInfo");
+  set_string("device::driver", val);
 
   cl_device_type type;
   check(clGetDeviceInfo(id, CL_DEVICE_TYPE, sizeof(type), &type, NULL),
@@ -181,8 +187,14 @@ static int opencl_device_query(struct nomp_backend_t *bnd, cl_device_id id) {
   PyDict_SetItemString(bnd->py_context, "device::type", obj);
   Py_XDECREF(obj);
 
-#undef set_string_info
-#undef set_string_aux
+  size_t max_threads_per_block;
+  check(clGetDeviceInfo(id, CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(size_t),
+                        &max_threads_per_block, NULL),
+        "clGetDeviceInfo");
+  set_int("device::max_threads_per_block", max_threads_per_block);
+
+#undef set_string
+#undef set_int
 
   return 0;
 }
@@ -204,7 +216,7 @@ int opencl_init(struct nomp_backend_t *bnd, const int platform_id,
                 const int device_id) {
   cl_uint num_platforms;
   check(clGetPlatformIDs(0, NULL, &num_platforms), "clGetPlatformIDs");
-  if (platform_id < 0 | platform_id >= (int)num_platforms) {
+  if (platform_id < 0 || platform_id >= (int)num_platforms) {
     return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                     "Platform id %d provided to libnomp is not valid.",
                     platform_id);
