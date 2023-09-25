@@ -199,14 +199,11 @@ extern "C" {
  * available.
  */
 
-int opencl_init(struct nomp_backend_t *backend, const int platform,
-                const int device);
+int opencl_init(struct nomp_backend_t *backend, int platform, int device);
 
-int cuda_init(struct nomp_backend_t *backend, const int platform,
-              const int device);
+int cuda_init(struct nomp_backend_t *backend, int platform, int device);
 
-int hip_init(struct nomp_backend_t *backend, const int platform,
-             const int device);
+int hip_init(struct nomp_backend_t *backend, int platform, int device);
 
 #ifdef __cplusplus
 }
