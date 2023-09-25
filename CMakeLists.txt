@@ -73,8 +73,9 @@ target_link_libraries(nomp PRIVATE OpenSSL::SSL)
 # Fetch, configure and build SymEngine as a workaround for a
 # bug in the SymEngine conda package.
 include(ExternalProject)
-set(SYMENGINE_INCLUDE_DIRS ${CMAKE_INSTALL_PREFIX}/include)
-set(SYMENGINE_LIBRARIES ${CMAKE_INSTALL_PREFIX}/lib/libsymengine${CMAKE_SHARED_LIBRARY_SUFFIX})
+include(GNUInstallDirs)
+set(SYMENGINE_INCLUDE_DIRS ${CMAKE_INSTALL_FULL_INCLUDEDIR})
+set(SYMENGINE_LIBRARIES ${CMAKE_INSTALL_FULL_LIBDIR}/libsymengine${CMAKE_SHARED_LIBRARY_SUFFIX})
 ExternalProject_Add(symengine
   GIT_REPOSITORY https://github.com/thilinarmtb/symengine.git
   GIT_TAG fix-warnings
