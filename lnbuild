@@ -45,15 +45,15 @@ if [[ ! -f "${NOMP_SHELL_CONFIG_FILE}" ]]; then
 fi
 
 function print_help() {
-  echo -e "Usage: ${0} [--help] [--no] [--yes]\n" \
-    "${cyan}--help:${reset} Print help for `lnbuild` script.\n" \
+  echo -e "Usage: ${0} [options]\n" \
+    "${cyan}--help:${reset} Print help for lnbuild script.\n" \
     "${cyan}--install ${reset} Install libnomp.\n" \
-    "${cyan}--format ${reset} Format C code using `clang-format`.\n" \
+    "${cyan}--format ${reset} Format C code using clang-format.\n" \
     "${cyan}--format-check ${reset} Check if C code is formatted correctly.\n" \
-    "${cyan}--tidy-check ${reset} Run `clang-tidy` to perform static analysis on C source.\n" \
-    "${cyan}--black ${reset} Format python code using `black`.\n" \
+    "${cyan}--tidy-check ${reset} Run clang-tidy to perform static analysis on C source.\n" \
+    "${cyan}--black ${reset} Format python code using black.\n" \
     "${cyan}--black-check ${reset} Check if python code is formatted correctly.\n" \
-    "${cyan}--isort ${reset} Run `isort` to format python imports.\n" \
+    "${cyan}--isort ${reset} Run isort to format python imports.\n" \
     "${cyan}--isort-check ${reset} Check if python imports are formatted correctly.\n" \
     "${cyan}--flake8-check ${reset} Run flake8 tests on python source.\n" \
     "${cyan}--pylint-check ${reset} Run pylint to perform static analysis on python source.\n" \

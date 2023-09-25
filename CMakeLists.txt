@@ -156,10 +156,10 @@ endif()
 find_program(CLANG_FORMAT NAMES clang-format)
 if (CLANG_FORMAT)
   add_custom_target(format
-    COMMAND ${CLANG_FORMAT} -i ${CMAKE_CURRENT_SOURCE_DIR}/*/*.[ch]
+    COMMAND ${CLANG_FORMAT} -i ${CMAKE_SOURCE_DIR}/*/*.[ch]
     COMMENT "Running clang-format ...")
   add_custom_target(format-check
-    COMMAND ${CLANG_FORMAT} --dry-run --Werror -i ${CMAKE_CURRENT_SOURCE_DIR}/*/*.[ch]
+    COMMAND ${CLANG_FORMAT} --dry-run --Werror -i ${CMAKE_SOURCE_DIR}/*/*.[ch]
     COMMENT "Running clang-format check ...")
 endif()
 
@@ -167,8 +167,7 @@ endif()
 find_program(CLANG_TIDY NAMES clang-tidy)
 if (CLANG_TIDY)
   add_custom_target(tidy
-    COMMAND ${CLANG_TIDY} -p ${CMAKE_BINARY_DIR}
-      ${CMAKE_CURRENT_SOURCE_DIR}/*/*.[ch] ${CMAKE_CURRENT_SOURCE_DIR}/*/*.[ch]pp
+    COMMAND ${CLANG_TIDY} -p ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/*/*.[ch]
     COMMENT "Running clang-tidy ...")
 endif()
 
