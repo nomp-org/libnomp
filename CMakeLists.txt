@@ -1,16 +1,30 @@
 cmake_minimum_required(VERSION 3.22)
 project(libnomp VERSION 0.0.1 DESCRIPTION "nomp runtime library" LANGUAGES C CXX)
 
+# Nomp options.
 option(ENABLE_OPENCL "Build OpenCL backend" OFF)
 option(ENABLE_CUDA "Build CUDA backend" OFF)
 option(ENABLE_HIP "Build HIP backend" OFF)
 option(ENABLE_DOCS "Enable Documentation" OFF)
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 
+# Nomp compile time constants which goes in `nomp-defs.h`.
+set(NOMP_MAX_BUFFER_SIZE 128)
+set(NOMP_MAX_SOURCE_SIZE 16384)
+set(NOMP_MAX_CFLAGS_SIZE 16384)
+set(NOMP_MAX_KERNEL_ARGS_SIZE 64)
+set(NOMP_MAX_SCRATCH_SIZE 65536)
+set(NOMP_DEFAULT_VERBOSE 2)
+set(NOMP_DEFAULT_PROFILE 0)
+set(NOMP_DEFAULT_DEVICE 0)
+set(NOMP_DEFAULT_PLATFORM 0)
+configure_file(include/nomp-defs.h.in include/nomp-defs.h @ONLY)
+
+# C standard options.
 set(CMAKE_C_STANDARD 99)
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD_REQUIRED ON)
+
+# Set cmake module path.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 
 # https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling
@@ -60,7 +74,7 @@ set_target_properties(nomp PROPERTIES
   VERSION ${PROJECT_VERSION}
   SOVERSION 1
   PUBLIC_HEADER include/nomp.h)
-target_include_directories(nomp PRIVATE include)
+target_include_directories(nomp PRIVATE include ${CMAKE_BINARY_DIR}/include)
 target_compile_options(nomp PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
   $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic>)
 
