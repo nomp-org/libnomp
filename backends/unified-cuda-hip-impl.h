@@ -57,7 +57,7 @@
 
 #define backend_t TOKEN_PASTE(DRIVER, _backend_t)
 struct backend_t {
-  int device_id;
+  int device;
   backendDeviceProp_t prop;
 };
 
@@ -193,70 +193,74 @@ static int backend_finalize(struct nomp_backend_t *bnd) {
 }
 
 #define backend_device_query TOKEN_PASTE(DRIVER, _device_query)
-static int backend_device_query(struct nomp_backend_t *bnd, int device_id) {
+static int backend_device_query(struct nomp_backend_t *bnd, int device) {
   backendDeviceProp_t prop;
-  check_driver(backendGetDeviceProperties(&prop, device_id));
+  check_driver(backendGetDeviceProperties(&prop, device));
 
-#define set_string_aux(KEY, VAL)                                               \
+#define set_string(KEY, VAL)                                                   \
   {                                                                            \
     PyObject *obj = PyUnicode_FromString(VAL);                                 \
     PyDict_SetItemString(bnd->py_context, KEY, obj);                           \
     Py_XDECREF(obj);                                                           \
   }
 
-  set_string_aux("device::name", prop.name);
-
-#if defined(NOMP_HIP)
-  set_string_aux("device::vendor", "AMD");
-#elif defined(NOMP_CUDA)
-  set_string_aux("device::vendor", "NVIDIA");
-#endif
-
-#define set_int_aux(KEY, VAL)                                                  \
+#define set_int(KEY, VAL)                                                      \
   {                                                                            \
     PyObject *obj = PyLong_FromSize_t(VAL);                                    \
     PyDict_SetItemString(bnd->py_context, KEY, obj);                           \
     Py_XDECREF(obj);                                                           \
   }
 
+  set_string("device::name", prop.name);
+
+#if defined(NOMP_HIP)
+  set_string("device::vendor", "AMD");
+#elif defined(NOMP_CUDA)
+  set_string("device::vendor", "NVIDIA");
+#endif
+
   int driver_version;
   check_driver(backendDriverGetVersion(&driver_version));
-  set_int_aux("device::driver", driver_version);
+  set_int("device::driver", driver_version);
 
-  set_string_aux("device::type", "gpu");
+  set_string("device::type", "gpu");
 
-#undef set_int_aux
-#undef set_string_aux
+  set_int("device::max_threads_per_block", prop.maxThreadsPerBlock);
+
+  nomp_log(0, NOMP_INFO, "maxThreadsPerBlock = %d\n", prop.maxThreadsPerBlock);
+
+#undef set_int
+#undef set_string
 
   return 0;
 }
 
 #define backend_init TOKEN_PASTE(DRIVER, _init)
-int backend_init(struct nomp_backend_t *bnd, const int platform_id,
-                 const int device_id) {
+int backend_init(struct nomp_backend_t *const backend, const int platform,
+                 const int device) {
   int num_devices;
   check_driver(backendGetDeviceCount(&num_devices));
-  if (device_id < 0 || device_id >= num_devices) {
+  if (device < 0 || device >= num_devices) {
     return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                    ERR_STR_USER_DEVICE_IS_INVALID, device_id);
+                    ERR_STR_USER_DEVICE_IS_INVALID, device);
   }
 
-  check_driver(backendSetDevice(device_id));
+  check_driver(backendSetDevice(device));
   check_driver(backendFree(0));
 
-  nomp_check(backend_device_query(bnd, device_id));
+  nomp_check(backend_device_query(backend, device));
 
-  struct backend_t *backend = nomp_calloc(struct backend_t, 1);
-  backend->device_id = device_id;
-  check_driver(backendGetDeviceProperties(&backend->prop, device_id));
+  struct backend_t *bptr = nomp_calloc(struct backend_t, 1);
+  bptr->device = device;
+  check_driver(backendGetDeviceProperties(&bptr->prop, device));
 
-  bnd->bptr = (void *)backend;
-  bnd->update = backend_update;
-  bnd->knl_build = backend_knl_build;
-  bnd->knl_run = backend_knl_run;
-  bnd->knl_free = backend_knl_free;
-  bnd->sync = backend_sync;
-  bnd->finalize = backend_finalize;
+  backend->bptr = (void *)bptr;
+  backend->update = backend_update;
+  backend->knl_build = backend_knl_build;
+  backend->knl_run = backend_knl_run;
+  backend->knl_free = backend_knl_free;
+  backend->sync = backend_sync;
+  backend->finalize = backend_finalize;
 
   return 0;
 }
