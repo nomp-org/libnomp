@@ -9,8 +9,6 @@ from loopy.symbolic import Reduction
 from loopy.transform.data import reduction_arg_to_subst_rule
 from loopy_api import LOOPY_INSN_PREFIX, LOOPY_LANG_VERSION
 
-_TARGET_BLOCK_SIZE = {"cuda": 32, "opencl": 32, "hip": 32}
-
 
 class InameCollector(pymbolic.mapper.WalkMapper):
     """Get all the inames in a pymbolic expression."""
@@ -54,7 +52,7 @@ def realize_reduction(
     tunit = lp.split_iname(
         tunit,
         iname,
-        _TARGET_BLOCK_SIZE[context["backend::name"]],
+        min(512, context["device::max_threads_per_block"]),
         inner_iname=i_inner,
         outer_iname=i_outer,
     )
