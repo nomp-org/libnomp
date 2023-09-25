@@ -57,8 +57,7 @@ jobs:
       - name: Run pylint check
         run: |
           ./lncfg --install-prefix ${INSTALLDIR} --prefix-path ${CONDA_PREFIX}
-          # FIXME: Skipping the pylint checks for now.
-          # ./lnbuild --pylint-check
+          ./lnbuild --pylint-check
       - name: Run black check
         run: |
           ./lncfg --install-prefix ${INSTALLDIR} --prefix-path ${CONDA_PREFIX}
