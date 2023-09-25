@@ -4,8 +4,8 @@ channels:
   - anaconda
 dependencies:
   - cmake=3.24
-  - symengine=0.10.1
   - python=3.10
+  - gmp
   - pip
   - pip:
     - -r requirements.txt
