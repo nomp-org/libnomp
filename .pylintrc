@@ -1,0 +1,6 @@
+[MASTER]
+ignore = build, docs
+fail-under = 9.8
+
+[FORMAT]
+max-line-length = 80

@@ -6,12 +6,6 @@ import loopy as lp
 from loopy.target.c.compyte.dtypes import DTypeRegistry
 
 
-def combine(structs: list) -> str:
-    """Combine list to single string"""
-    content = list(map(str, structs))
-    return "\n\n".join(content).strip()
-
-
 class BaseKernelWrapper:
     """Base loopy kernel wrapper"""
 
