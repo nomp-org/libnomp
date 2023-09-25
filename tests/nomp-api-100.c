@@ -22,7 +22,7 @@ static int test_missing_transform_file(void) {
   nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
   char *log = nomp_get_err_str(err);
-  int eq = logcmp(log, "\\[Error\\] .*src\\/loopy.c:[0-9]* Python module "
+  int eq = logcmp(log, "\\[Error\\] .*src\\/.*.c:[0-9]* Python module "
                        "\"missing-file\" not found.");
   nomp_free(&log);
   nomp_test_assert(eq);
@@ -41,7 +41,7 @@ static int test_missing_transform_function(void) {
 
   char *log = nomp_get_err_str(err);
   int eq =
-      logcmp(log, "\\[Error\\] .*src\\/loopy.c:[0-9]* Python function "
+      logcmp(log, "\\[Error\\] .*src\\/.*.c:[0-9]* Python function "
                   "\"missing_func\" not found in module \"nomp-api-100\".");
   nomp_free(&log);
   nomp_test_assert(eq);
@@ -60,7 +60,7 @@ static int test_invalid_clause(void) {
 
   char *log = nomp_get_err_str(err);
   int eq = logcmp(
-      log, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* Clause "
+      log, "\\[Error\\] .*src\\/.*.c:[0-9]* Clause "
            "\"invalid-clause\" passed into nomp_jit is not a valid clause.");
   nomp_free(&log);
   nomp_test_assert(eq);
@@ -78,10 +78,8 @@ static int test_empty_filename(void) {
   nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
   char *log = nomp_get_err_str(err);
-  int eq =
-      logcmp(log, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* \"transform\" "
-                  "clause should be followed by a file name and a function "
-                  "name. At least one of them is not provided.");
+  int eq = logcmp(log, "\\[Error\\] .*src\\/.*.c:[0-9]* Module "
+                       "name and/or function name not provided.");
   nomp_free(&log);
   nomp_test_assert(eq);
 
@@ -98,10 +96,8 @@ static int test_empty_user_callback(void) {
   nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
   char *log = nomp_get_err_str(err);
-  int eq =
-      logcmp(log, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* \"transform\" "
-                  "clause should be followed by a file name and a function "
-                  "name. At least one of them is not provided.");
+  int eq = logcmp(log, "\\[Error\\] .*src\\/.*.c:[0-9]* Module "
+                       "name and/or function name not provided.");
   nomp_free(&log);
   nomp_test_assert(eq);
 
@@ -117,9 +113,8 @@ static int test_syntax_error_in_kernel(void) {
   nomp_test_assert(nomp_get_err_no(err) == NOMP_LOOPY_CONVERSION_FAILURE);
 
   char *log = nomp_get_err_str(err);
-  int eq =
-      logcmp(log, "\\[Error\\] .*libnomp\\/src\\/loopy.c:[0-9]* C to Loopy "
-                  "conversion failed.");
+  int eq = logcmp(log, "\\[Error\\] .*src\\/.*.c:[0-9]* C to Loopy "
+                       "conversion failed.");
   nomp_free(&log);
   nomp_test_assert(eq);
 
@@ -140,7 +135,7 @@ static int test_syntax_error_in_transform_function(void) {
   char *log = nomp_get_err_str(err);
   int eq = logcmp(
       log,
-      "\\[Error\\] .*src\\/loopy.c:[0-9]* Failed to call user transform "
+      "\\[Error\\] .*src\\/.*.c:[0-9]* Failed to call user transform "
       "function: \"function_with_syntax_error\" in file: \"nomp-api-100\".");
 
   nomp_free(&log);

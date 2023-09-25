@@ -10,9 +10,7 @@ static const char *ERR_STR_BACKEND_FAILURE = "HIP %s failure: %s.";
 #define RUNTIME hip
 
 #define backendDeviceProp_t hipDeviceProp_t
-
 #define backendModuleLaunchKernel hipModuleLaunchKernel
-
 #define backendModule hipModule_t
 #define backendFunction hipFunction_t
 
@@ -32,10 +30,8 @@ static const char *ERR_STR_BACKEND_FAILURE = "HIP %s failure: %s.";
 
 #undef backendFunction
 #undef backendModule
-
 #undef backendModuleLaunchKernel
-
-#undef backendDeviceProp
+#undef backendDeviceProp_t
 
 #undef RUNTIME
 #undef RUNTIME_COMPILATION

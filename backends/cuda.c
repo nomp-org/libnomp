@@ -11,9 +11,7 @@ static const char *ERR_STR_BACKEND_FAILURE = "CUDA %s failure: %s.";
 #define RUNTIME cu
 
 #define backendDeviceProp_t struct cudaDeviceProp
-
 #define backendModuleLaunchKernel cuLaunchKernel
-
 #define backendModule CUmodule
 #define backendFunction CUfunction
 
@@ -42,10 +40,8 @@ static const char *ERR_STR_BACKEND_FAILURE = "CUDA %s failure: %s.";
 
 #undef backendFunction
 #undef backendModule
-
 #undef backendModuleLaunchKernel
-
-#undef backendDeviceProp
+#undef backendDeviceProp_t
 
 #undef RUNTIME
 #undef RUNTIME_COMPILATION
