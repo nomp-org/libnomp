@@ -227,8 +227,6 @@ static int backend_device_query(struct nomp_backend_t *bnd, int device) {
 
   set_int("device::max_threads_per_block", prop.maxThreadsPerBlock);
 
-  nomp_log(0, NOMP_INFO, "maxThreadsPerBlock = %d\n", prop.maxThreadsPerBlock);
-
 #undef set_int
 #undef set_string
 
