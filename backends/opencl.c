@@ -7,14 +7,53 @@
 #include <CL/cl.h>
 #endif
 
-static const char *ERR_STR_OPENCL_FAILURE = "%s failed with error code: %d.";
+static const char *ERR_STR_OPENCL_FAILURE = "%s failed with error: %d (%s).";
+
+#define CASE(MSG, VAL, STR)                                                    \
+  case VAL:                                                                    \
+    return nomp_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE,   \
+                    MSG, VAL, STR);                                            \
+    break;
+
+// clang-format off
+#define FOR_EACH_ERROR(S)                                                      \
+  CASE(S, CL_INVALID_BINARY, "CL_INVALID_BINARY")                              \
+  CASE(S, CL_INVALID_BUFFER_SIZE, "CL_INVALID_BUFFER_SIZE")                    \
+  CASE(S, CL_INVALID_COMMAND_QUEUE, "CL_INVALID_COMMAND_QUEUE")                \
+  CASE(S, CL_INVALID_CONTEXT, "CL_INVALID_CONTEXT")                            \
+  CASE(S, CL_INVALID_DEVICE, "CL_INVALID_DEVICE")                              \
+  CASE(S, CL_INVALID_EVENT, "CL_INVALID_EVENT")                                \
+  CASE(S, CL_INVALID_EVENT_WAIT_LIST, "CL_INVALID_EVENT_WAIT_LIST")            \
+  CASE(S, CL_INVALID_GLOBAL_OFFSET, "CL_INVALID_GLOBAL_OFFSET")                \
+  CASE(S, CL_INVALID_GLOBAL_WORK_SIZE, "CL_INVALID_GLOBAL_WORK_SIZE")          \
+  CASE(S, CL_INVALID_KERNEL, "CL_INVALID_KERNEL")                              \
+  CASE(S, CL_INVALID_KERNEL_ARGS, "CL_INVALID_KERNEL_ARGS")                    \
+  CASE(S, CL_INVALID_KERNEL_DEFINITION, "CL_INVALID_KERNEL_DEFINITION")        \
+  CASE(S, CL_INVALID_KERNEL_NAME, "CL_INVALID_KERNEL_NAME")                    \
+  CASE(S, CL_INVALID_MEM_OBJECT, "CL_INVALID_MEM_OBJECT")                      \
+  CASE(S, CL_INVALID_OPERATION, "CL_INVALID_OPERATION")                        \
+  CASE(S, CL_INVALID_PROGRAM, "CL_INVALID_PROGRAM")                            \
+  CASE(S, CL_INVALID_PROGRAM_EXECUTABLE, "CL_INVALID_PROGRAM_EXECUTABLE")      \
+  CASE(S, CL_INVALID_VALUE, "CL_INVALID_VALUE")                                \
+  CASE(S, CL_INVALID_WORK_DIMENSION, "CL_INVALID_WORK_DIMENSION")              \
+  CASE(S, CL_INVALID_WORK_GROUP_SIZE, "CL_INVALID_WORK_GROUP_SIZE")            \
+  CASE(S, CL_INVALID_WORK_ITEM_SIZE, "CL_INVALID_WORK_ITEM_SIZE")              \
+  CASE(S, CL_MEM_OBJECT_ALLOCATION_FAILURE, "CL_MEM_OBJECT_ALLOCATION_FAILURE")\
+  CASE(S, CL_MISALIGNED_SUB_BUFFER_OFFSET, "CL_MISALIGNED_SUB_BUFFER_OFFSET")  \
+  CASE(S, CL_OUT_OF_RESOURCES, "CL_OUT_OF_RESOURCES")                          \
+  CASE(S, CL_OUT_OF_HOST_MEMORY, "CL_OUT_OF_HOST_MEMORY")
+// clang-format on
 
 #define check(call, msg)                                                       \
   {                                                                            \
     cl_int err_ = (call);                                                      \
     if (err_ != CL_SUCCESS) {                                                  \
-      return nomp_log(NOMP_OPENCL_FAILURE, NOMP_ERROR, ERR_STR_OPENCL_FAILURE, \
-                      msg, err_);                                              \
+      switch (err_) {                                                          \
+        FOR_EACH_ERROR(msg)                                                    \
+      default:                                                                 \
+        return nomp_log(NOMP_OPENCL_FAILURE, NOMP_ERROR,                       \
+                        ERR_STR_OPENCL_FAILURE, msg, err_, "UNKNOWN");         \
+      }                                                                        \
     }                                                                          \
   }
 
