@@ -367,13 +367,6 @@ static int parse_clauses(struct nomp_meta_t *meta, struct nomp_prog_t *prg,
   unsigned i = 0;
   while (clauses[i]) {
     if (strncmp(clauses[i], "transform", NOMP_MAX_BUFFER_SIZE) == 0) {
-      if (clauses[i + 1] == NULL || clauses[i + 2] == NULL) {
-        return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                        "\"transform\" clause should be followed "
-                        "by a file name and a "
-                        "function name. At least one of them is "
-                        "not provided.");
-      }
       nomp_check(nomp_py_check_module((const char *)clauses[i + 1],
                                       (const char *)clauses[i + 2]));
       meta->file = strndup(clauses[i + 1], PATH_MAX);
@@ -417,8 +410,7 @@ static int parse_clauses(struct nomp_meta_t *meta, struct nomp_prog_t *prg,
         prg->redn_op = NOMP_PROD;
       i += 3;
     } else if (strncmp(clauses[i], "pin", NOMP_MAX_BUFFER_SIZE) == 0) {
-      // Check if we have to use pinned memory on the
-      // device.
+      // Check if we have to use pinned memory.
       return nomp_log(NOMP_NOT_IMPLEMENTED_ERROR, NOMP_ERROR,
                       "Pinned memory support is "
                       "not yet implemented.");

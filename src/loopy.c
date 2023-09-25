@@ -99,6 +99,10 @@ err:
  * @return int
  */
 int nomp_py_check_module(const char *module, const char *function) {
+  if (module == NULL || function == NULL) {
+    return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                    "Module name and/or function name not provided.");
+  }
   PyObject *py_str_module = PyUnicode_FromString(module);
   if (!py_str_module) {
     return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
