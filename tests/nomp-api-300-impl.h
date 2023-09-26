@@ -94,14 +94,14 @@ static int nomp_api_300_transpose(unsigned rows, unsigned cols) {
   TOKEN_PASTE(nomp_api_300_multiply_aux, TEST_SUFFIX)
 static int nomp_api_300_multiply_aux(const char *fmt, TEST_TYPE *a,
                                      TEST_TYPE *b, TEST_TYPE *c, int n,
-                                     int a_size, int b_size,
-                                     const char *transform_name) {
+                                     int a_size, int b_size, const char *module,
+                                     const char *function) {
   nomp_test_check(nomp_update(a, 0, a_size, sizeof(TEST_TYPE), NOMP_TO));
   nomp_test_check(nomp_update(b, 0, b_size, sizeof(TEST_TYPE), NOMP_TO));
   nomp_test_check(nomp_update(c, 0, b_size, sizeof(TEST_TYPE), NOMP_ALLOC));
 
   int id = -1;
-  const char *clauses[4] = {"transform", "nomp_api_300", transform_name, 0};
+  const char *clauses[4] = {"transform", module, function, 0};
   char *knl = generate_knl(fmt, 3, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE),
                            TOSTRING(TEST_TYPE));
   nomp_test_check(nomp_jit(&id, knl, clauses, 4, "a", sizeof(TEST_TYPE),
@@ -145,7 +145,8 @@ static int nomp_api_300_mxm(unsigned n) {
       "    }                                                   \n"
       "  }                                                     \n"
       "}                                                       \n";
-  nomp_api_300_multiply_aux(knl_fmt, a, b, c, n, n * n, n * n, "mxm_transform");
+  nomp_api_300_multiply_aux(knl_fmt, a, b, c, n, n * n, n * n, "nomp_api_300",
+                            "mxm_transform");
 
 #if defined(TEST_TOL)
   for (unsigned i = 0; i < n * n; i++)
@@ -181,7 +182,8 @@ static int nomp_api_300_vxm(unsigned n) {
       "    c[i] = dot;                                         \n"
       "  }                                                     \n"
       "}                                                       \n";
-  nomp_api_300_multiply_aux(knl_fmt, a, b, c, n, n * n, n, "vxm_transform");
+  nomp_api_300_multiply_aux(knl_fmt, a, b, c, n, n * n, n, "nomp_api_215",
+                            "tile_outer");
 
 #if defined(TEST_TOL)
   for (unsigned i = 0; i < n; i++)

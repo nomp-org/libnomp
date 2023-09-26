@@ -8,7 +8,7 @@ static int nomp_api_205_aux(const char *fmt, TEST_TYPE *a, TEST_TYPE *b,
   nomp_test_check(nomp_update(c, 0, n, sizeof(TEST_TYPE), NOMP_TO));
 
   int id = -1;
-  const char *clauses[4] = {"transform", "nomp_api_205", "transform", 0};
+  const char *clauses[4] = {"transform", "nomp_api_100", "tile", 0};
   char *knl = generate_knl(fmt, 3, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE),
                            TOSTRING(TEST_TYPE));
   nomp_test_check(nomp_jit(&id, knl, clauses, 4, "a", sizeof(TEST_TYPE),
