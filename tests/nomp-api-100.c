@@ -32,7 +32,7 @@ static int test_missing_transform_file(void) {
 
 // Calling nomp_jit() with missing function should return an error.
 static int test_missing_transform_function(void) {
-  const char *clauses[4] = {"transform", "nomp-api-100", "missing_func", 0};
+  const char *clauses[4] = {"transform", "nomp_api_100", "missing_func", 0};
 
   static int id = -1;
   int err = nomp_jit(&id, valid_knl, clauses, 2, "a", sizeof(int), NOMP_PTR,
@@ -42,7 +42,7 @@ static int test_missing_transform_function(void) {
   char *log = nomp_get_err_str(err);
   int eq =
       logcmp(log, "\\[Error\\] .*src\\/.*.c:[0-9]* Python function "
-                  "\"missing_func\" not found in module \"nomp-api-100\".");
+                  "\"missing_func\" not found in module \"nomp_api_100\".");
   nomp_free(&log);
   nomp_test_assert(eq);
 
@@ -51,7 +51,7 @@ static int test_missing_transform_function(void) {
 
 // Calling nomp_jit() with invalid clauses should return an error.
 static int test_invalid_clause(void) {
-  const char *clauses[4] = {"invalid-clause", "nomp-api-100", "transform", 0};
+  const char *clauses[4] = {"invalid-clause", "nomp_api_100", "transform", 0};
 
   static int id = -1;
   int err = nomp_jit(&id, valid_knl, clauses, 2, "a", sizeof(int), NOMP_PTR,
@@ -88,7 +88,7 @@ static int test_empty_filename(void) {
 
 // Empty user callback in nomp_jit() should return an error.
 static int test_empty_user_callback(void) {
-  const char *clauses[4] = {"transform", "nomp-api-100", NULL, 0};
+  const char *clauses[4] = {"transform", "nomp_api_100", NULL, 0};
 
   static int id = -1;
   int err = nomp_jit(&id, valid_knl, clauses, 2, "a", sizeof(int), NOMP_PTR,
@@ -107,7 +107,7 @@ static int test_empty_user_callback(void) {
 // The kernel has a syntax error due to a missing a semicolon.
 static int test_syntax_error_in_kernel(void) {
   static int id = -1;
-  const char *clauses0[4] = {"transform", "nomp-api-100", "transform", 0};
+  const char *clauses0[4] = {"transform", "nomp_api_100", "transform", 0};
   int err = nomp_jit(&id, invalid_knl, clauses0, 2, "a", sizeof(int), NOMP_PTR,
                      "N", sizeof(int), NOMP_INT);
   nomp_test_assert(nomp_get_err_no(err) == NOMP_LOOPY_CONVERSION_FAILURE);
@@ -124,7 +124,7 @@ static int test_syntax_error_in_kernel(void) {
 // Calling nomp_jit() with a transform function with a syntax error should
 // return an error.
 static int test_syntax_error_in_transform_function(void) {
-  const char *clauses[4] = {"transform", "nomp-api-100",
+  const char *clauses[4] = {"transform", "nomp_api_100",
                             "function_with_syntax_error", 0};
 
   static int id = -1;
@@ -136,7 +136,7 @@ static int test_syntax_error_in_transform_function(void) {
   int eq = logcmp(
       log,
       "\\[Error\\] .*src\\/.*.c:[0-9]* Failed to call user transform "
-      "function: \"function_with_syntax_error\" in file: \"nomp-api-100\".");
+      "function: \"function_with_syntax_error\" in file: \"nomp_api_100\".");
 
   nomp_free(&log);
   nomp_test_assert(eq);

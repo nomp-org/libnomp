@@ -11,13 +11,13 @@ def annotate(
     context: Dict[str, str],
 ) -> lp.translation_unit.TranslationUnit:
     inames = knl.default_entrypoint.all_inames()
+    block_size = min(512, context["device::max_threads_per_block"])
     dof_axis = 0
     for key in annotations:
         if key == "dof_loop":
             loop = annotations[key]
             if loop in inames:
-                split_size = 32
-                lp.split_iname(knl, loop, split_size, inner_tag=f"l.{dof_axis}")
+                lp.split_iname(knl, loop, block_size, inner_tag=f"l.{dof_axis}")
                 dof_axis += 1
         elif key == "element_loop":
             loop = annotations[key]
@@ -26,7 +26,7 @@ def annotate(
         elif key == "grid_loop":
             loop = annotations[key]
             if loop in inames:
-                knl = lp.split_iname(knl, loop, 32)
+                knl = lp.split_iname(knl, loop, block_size)
                 knl = lp.tag_inames(
                     knl, [(f"{loop}_outer", "g.0"), (f"{loop}_inner", "l.0")]
                 )
