@@ -9,7 +9,7 @@ static int nomp_api_300_aux(const char *fmt, TEST_TYPE *a, TEST_TYPE *b,
   nomp_test_check(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO));
 
   int id = -1;
-  const char *clauses[4] = {"transform", "nomp-api-300", "transform", 0};
+  const char *clauses[4] = {"transform", "nomp_api_300", "madd_transform", 0};
   char *knl = generate_knl(fmt, 2, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE));
   nomp_test_check(nomp_jit(&id, knl, clauses, 4, "a", sizeof(TEST_TYPE),
                            NOMP_PTR, "b", sizeof(TEST_TYPE), NOMP_PTR, "rows",
@@ -39,9 +39,9 @@ static int nomp_api_300_add(unsigned rows, unsigned cols) {
 
   const char *knl_fmt =
       "void foo(%s *a, %s *b, int rows, int cols) {                    \n"
-      "  for (int e = 0; e < rows; e++)                                \n"
+      "  for (int j = 0; j < rows; j++)                                \n"
       "    for (int i = 0; i < cols; i++)                              \n"
-      "      a[e * cols + i] = a[e * cols + i] + b[e * cols + i];      \n"
+      "      a[j * cols + i] = a[j * cols + i] + b[j * cols + i];      \n"
       "}                                                               \n";
   nomp_api_300_aux(knl_fmt, a, b, rows, cols, n);
 
@@ -101,7 +101,7 @@ static int nomp_api_300_multiply_aux(const char *fmt, TEST_TYPE *a,
   nomp_test_check(nomp_update(c, 0, b_size, sizeof(TEST_TYPE), NOMP_ALLOC));
 
   int id = -1;
-  const char *clauses[4] = {"transform", "nomp-api-300", transform_name, 0};
+  const char *clauses[4] = {"transform", "nomp_api_300", transform_name, 0};
   char *knl = generate_knl(fmt, 3, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE),
                            TOSTRING(TEST_TYPE));
   nomp_test_check(nomp_jit(&id, knl, clauses, 4, "a", sizeof(TEST_TYPE),

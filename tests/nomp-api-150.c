@@ -11,7 +11,7 @@ static int test_invalid_kernel_id(int argc, const char **argv, int *id, int *a,
   nomp_test_check(nomp_init(argc, argv));
   nomp_test_check(nomp_update(a, 0, n, sizeof(int), NOMP_TO));
 
-  const char *clauses[4] = {"transform", "nomp-api-100", "transform", 0};
+  const char *clauses[4] = {"transform", "nomp_api_100", "transform", 0};
   nomp_test_check(nomp_jit(id, knl, clauses, 3, "a", sizeof(int *), NOMP_PTR,
                            "b", sizeof(int *), NOMP_PTR, "N", sizeof(int),
                            NOMP_INT));
