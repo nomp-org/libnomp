@@ -334,16 +334,14 @@ int nomp_py_get_knl_name_and_src(char **name, char **src, const PyObject *knl) {
     if (module) {
       PyObject *knl_name = PyObject_GetAttrString(module, get_knl_name);
       if (knl_name) {
-        PyObject *py_backend = PyUnicode_FromString(backend);
-        PyObject *py_name =
-            PyObject_CallFunctionObjArgs(knl_name, knl, py_backend, NULL);
+        PyObject *py_name = PyObject_CallFunctionObjArgs(knl_name, knl, NULL);
         if (py_name) {
           Py_ssize_t size;
           const char *name_ = PyUnicode_AsUTF8AndSize(py_name, &size);
           *name = strndup(name_, size);
           Py_DECREF(py_name), err = 0;
         }
-        Py_XDECREF(py_backend), Py_DECREF(knl_name);
+        Py_DECREF(knl_name);
       }
       if (err) {
         return nomp_log(NOMP_LOOPY_KNL_NAME_NOT_FOUND, NOMP_ERROR,
@@ -353,16 +351,14 @@ int nomp_py_get_knl_name_and_src(char **name, char **src, const PyObject *knl) {
       err = 1;
       PyObject *knl_src = PyObject_GetAttrString(module, get_knl_src);
       if (knl_src) {
-        PyObject *py_backend = PyUnicode_FromString(backend);
-        PyObject *py_src =
-            PyObject_CallFunctionObjArgs(knl_src, knl, py_backend, NULL);
+        PyObject *py_src = PyObject_CallFunctionObjArgs(knl_src, knl, NULL);
         if (py_src) {
           Py_ssize_t size;
           const char *src_ = PyUnicode_AsUTF8AndSize(py_src, &size);
           *src = strndup(src_, size);
           Py_DECREF(py_src), err = 0;
         }
-        Py_XDECREF(py_backend), Py_DECREF(knl_src);
+        Py_DECREF(knl_src);
       }
       Py_DECREF(module);
     }
