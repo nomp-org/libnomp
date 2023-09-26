@@ -46,7 +46,7 @@ static int nomp_api_350_for_loop_bounds(unsigned N) {
       "    a[i] = t;                                                   \n"
       "  }                                                             \n"
       "}                                                               \n";
-  const char *clauses[4] = {"transform", "nomp_api_350", "transform", 0};
+  const char *clauses[4] = {"transform", "nomp_api_215", "tile_outer", 0};
   nomp_api_350_aux(knl_fmt, clauses, a, b, N);
 
 #if defined(TEST_TOL)

@@ -51,7 +51,7 @@ static int test_missing_transform_function(void) {
 
 // Calling nomp_jit() with invalid clauses should return an error.
 static int test_invalid_clause(void) {
-  const char *clauses[4] = {"invalid-clause", "nomp_api_100", "transform", 0};
+  const char *clauses[4] = {"invalid-clause", "nomp_api_100", "tile", 0};
 
   static int id = -1;
   int err = nomp_jit(&id, valid_knl, clauses, 2, "a", sizeof(int), NOMP_PTR,
@@ -70,7 +70,7 @@ static int test_invalid_clause(void) {
 
 // Empty file name in nomp_jit() should return an error.
 static int test_empty_filename(void) {
-  const char *clauses[4] = {"transform", NULL, "transform", 0};
+  const char *clauses[4] = {"transform", NULL, "tile", 0};
 
   static int id = -1;
   int err = nomp_jit(&id, valid_knl, clauses, 2, "a", sizeof(int), NOMP_PTR,
@@ -107,7 +107,7 @@ static int test_empty_user_callback(void) {
 // The kernel has a syntax error due to a missing a semicolon.
 static int test_syntax_error_in_kernel(void) {
   static int id = -1;
-  const char *clauses0[4] = {"transform", "nomp_api_100", "transform", 0};
+  const char *clauses0[4] = {"transform", "nomp_api_100", "tile", 0};
   int err = nomp_jit(&id, invalid_knl, clauses0, 2, "a", sizeof(int), NOMP_PTR,
                      "N", sizeof(int), NOMP_INT);
   nomp_test_assert(nomp_get_err_no(err) == NOMP_LOOPY_CONVERSION_FAILURE);

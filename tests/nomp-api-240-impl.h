@@ -41,7 +41,7 @@ static int nomp_api_240_break(unsigned N) {
       "    a[i] = t;                                                   \n"
       "  }                                                             \n"
       "}                                                               \n";
-  const char *clauses[4] = {"transform", "nomp_api_240", "transform", 0};
+  const char *clauses[4] = {"transform", "nomp_api_215", "tile_outer", 0};
   nomp_api_240_aux(knl_fmt, clauses, a, N);
 
 #if defined(TEST_TOL)
@@ -76,7 +76,7 @@ static int nomp_api_240_continue(unsigned N) {
       "    a[i] = t;                                                   \n"
       "  }                                                             \n"
       "}                                                               \n";
-  const char *clauses[4] = {"transform", "nomp_api_240", "transform", 0};
+  const char *clauses[4] = {"transform", "nomp_api_215", "tile_outer", 0};
   nomp_api_240_aux(knl_fmt, clauses, a, N);
 
 #if defined(TEST_TOL)

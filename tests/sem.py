@@ -1,3 +1,4 @@
+""" Annotation script for the spectral element kernels. """
 from typing import Dict
 
 import loopy as lp
@@ -10,6 +11,7 @@ def annotate(
     annotations: Dict[str, str],
     context: Dict[str, str],
 ) -> lp.translation_unit.TranslationUnit:
+    """Annotate the spectral element kernels based on domain knowledge."""
     inames = knl.default_entrypoint.all_inames()
     block_size = min(512, context["device::max_threads_per_block"])
     dof_axis = 0
