@@ -1,6 +1,6 @@
 [MASTER]
 ignore = build, docs
-fail-under = 9.8
+fail-under = 9.93
 
 [FORMAT]
 max-line-length = 80
