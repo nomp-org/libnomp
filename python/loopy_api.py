@@ -826,16 +826,11 @@ def c_to_loopy(c_str: str, backend: str) -> lp.translation_unit.TranslationUnit:
     return knl
 
 
-def get_wrapper(backend: str) -> BaseKernelWrapper:
-    """Returns the wrapper for a given backend."""
-    return BaseKernelWrapper()
-
-
-def get_knl_src(knl: lp.translation_unit.TranslationUnit, backend: str) -> str:
+def get_knl_src(knl: lp.translation_unit.TranslationUnit) -> str:
     """Returns the kernel source for a given backend."""
-    return get_wrapper(backend).get_src(knl)
+    return BaseKernelWrapper().get_src(knl)
 
 
-def get_knl_name(knl: lp.translation_unit.TranslationUnit, backend: str) -> str:
+def get_knl_name(knl: lp.translation_unit.TranslationUnit) -> str:
     """Returns the kernel name for a given backend."""
-    return get_wrapper(backend).get_entry_point(knl)
+    return BaseKernelWrapper().get_entry_point(knl)
