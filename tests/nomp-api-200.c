@@ -11,6 +11,13 @@ static int test_vector_addition(void) {
   return err;
 }
 
+static int test_vector_addition_ui(void) {
+  int err = 0;
+  TEST_BUILTIN_TYPES(200_add_ui, 10)
+  TEST_BUILTIN_TYPES(200_add_ui, 50)
+  return err;
+}
+
 static int test_vector_subtraction(void) {
   int err = 0;
   TEST_BUILTIN_TYPES(200_sub, 10)
@@ -51,6 +58,7 @@ int main(int argc, const char *argv[]) {
   nomp_test_check(err);
 
   err |= SUBTEST(test_vector_addition);
+  err |= SUBTEST(test_vector_addition_ui);
   err |= SUBTEST(test_vector_subtraction);
   err |= SUBTEST(test_vector_multiplication1);
   err |= SUBTEST(test_vector_multiplication2);
