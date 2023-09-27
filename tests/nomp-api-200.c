@@ -18,17 +18,17 @@ static int test_vector_subtraction(void) {
   return err;
 }
 
-static int test_vector_multiplication_sum(void) {
+static int test_vector_multiplication1(void) {
   int err = 0;
-  TEST_BUILTIN_TYPES(200_mul_sum, 10)
-  TEST_BUILTIN_TYPES(200_mul_sum, 50)
+  TEST_BUILTIN_TYPES(200_mul1, 10)
+  TEST_BUILTIN_TYPES(200_mul1, 50)
   return err;
 }
 
-static int test_vector_multiplication(void) {
+static int test_vector_multiplication2(void) {
   int err = 0;
-  TEST_BUILTIN_TYPES(200_mul, 10)
-  TEST_BUILTIN_TYPES(200_mul, 50)
+  TEST_BUILTIN_TYPES(200_mul2, 10)
+  TEST_BUILTIN_TYPES(200_mul2, 50)
   return err;
 }
 
@@ -39,10 +39,10 @@ static int test_vector_square_sum(void) {
   return err;
 }
 
-static int test_vector_linear(void) {
+static int test_vector_saxpy(void) {
   int err = 0;
-  TEST_BUILTIN_TYPES(200_linear, 10)
-  TEST_BUILTIN_TYPES(200_linear, 50)
+  TEST_BUILTIN_TYPES(200_saxpy, 10)
+  TEST_BUILTIN_TYPES(200_saxpy, 50)
   return err;
 }
 
@@ -52,10 +52,10 @@ int main(int argc, const char *argv[]) {
 
   err |= SUBTEST(test_vector_addition);
   err |= SUBTEST(test_vector_subtraction);
-  err |= SUBTEST(test_vector_multiplication_sum);
-  err |= SUBTEST(test_vector_multiplication);
+  err |= SUBTEST(test_vector_multiplication1);
+  err |= SUBTEST(test_vector_multiplication2);
   err |= SUBTEST(test_vector_square_sum);
-  err |= SUBTEST(test_vector_linear);
+  err |= SUBTEST(test_vector_saxpy);
 
   err |= nomp_finalize();
   nomp_test_check(err);

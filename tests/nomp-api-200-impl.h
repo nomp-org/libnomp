@@ -80,35 +80,8 @@ static int nomp_api_200_sub(unsigned n) {
 }
 #undef nomp_api_200_sub
 
-#define nomp_api_200_mul_sum TOKEN_PASTE(nomp_api_200_mul_sum, TEST_SUFFIX)
-static int nomp_api_200_mul_sum(unsigned n) {
-  nomp_test_assert(n <= TEST_MAX_SIZE);
-
-  TEST_TYPE a[TEST_MAX_SIZE], b[TEST_MAX_SIZE];
-  for (unsigned i = 0; i < n; i++)
-    a[i] = n - i, b[i] = i;
-
-  const char *knl_fmt =
-      "void foo(%s *a, %s *b, int N) {                        \n"
-      "  for (int i = 0; i < N; i++)                          \n"
-      "    a[i] *= b[i] + 1;                                  \n"
-      "}                                                      \n";
-  nomp_api_200_aux(knl_fmt, a, b, n);
-
-#if defined(TEST_TOL)
-  for (unsigned i = 0; i < n; i++)
-    nomp_test_assert(fabs(a[i] - (n - i) * (i + 1)) < TEST_TOL);
-#else
-  for (unsigned i = 0; i < n; i++)
-    nomp_test_assert(a[i] == (TEST_TYPE)((n - i) * (i + 1)));
-#endif
-
-  return 0;
-}
-#undef nomp_api_200_mul_sum
-
-#define nomp_api_200_mul TOKEN_PASTE(nomp_api_200_mul, TEST_SUFFIX)
-static int nomp_api_200_mul(unsigned n) {
+#define nomp_api_200_mul1 TOKEN_PASTE(nomp_api_200_mul1, TEST_SUFFIX)
+static int nomp_api_200_mul1(unsigned n) {
   nomp_test_assert(n <= TEST_MAX_SIZE);
 
   TEST_TYPE a[TEST_MAX_SIZE], b[TEST_MAX_SIZE];
@@ -132,7 +105,34 @@ static int nomp_api_200_mul(unsigned n) {
 
   return 0;
 }
-#undef nomp_api_200_mul
+#undef nomp_api_200_mul1
+
+#define nomp_api_200_mul2 TOKEN_PASTE(nomp_api_200_mul2, TEST_SUFFIX)
+static int nomp_api_200_mul2(unsigned n) {
+  nomp_test_assert(n <= TEST_MAX_SIZE);
+
+  TEST_TYPE a[TEST_MAX_SIZE], b[TEST_MAX_SIZE];
+  for (unsigned i = 0; i < n; i++)
+    a[i] = n - i, b[i] = i;
+
+  const char *knl_fmt =
+      "void foo(%s *a, %s *b, int N) {                        \n"
+      "  for (int i = 0; i < N; i++)                          \n"
+      "    a[i] *= b[i] + 1;                                  \n"
+      "}                                                      \n";
+  nomp_api_200_aux(knl_fmt, a, b, n);
+
+#if defined(TEST_TOL)
+  for (unsigned i = 0; i < n; i++)
+    nomp_test_assert(fabs(a[i] - (n - i) * (i + 1)) < TEST_TOL);
+#else
+  for (unsigned i = 0; i < n; i++)
+    nomp_test_assert(a[i] == (TEST_TYPE)((n - i) * (i + 1)));
+#endif
+
+  return 0;
+}
+#undef nomp_api_200_mul2
 
 #define nomp_api_200_square TOKEN_PASTE(nomp_api_200_square, TEST_SUFFIX)
 static int nomp_api_200_square(unsigned n) {
@@ -161,8 +161,8 @@ static int nomp_api_200_square(unsigned n) {
 }
 #undef nomp_api_200_square
 
-#define nomp_api_200_linear TOKEN_PASTE(nomp_api_200_linear, TEST_SUFFIX)
-static int nomp_api_200_linear(unsigned n) {
+#define nomp_api_200_saxpy TOKEN_PASTE(nomp_api_200_saxpy, TEST_SUFFIX)
+static int nomp_api_200_saxpy(unsigned n) {
   nomp_test_assert(n <= TEST_MAX_SIZE);
 
   TEST_TYPE a[TEST_MAX_SIZE] = {0}, b[TEST_MAX_SIZE] = {1, 2, 3, 4, 5};
@@ -184,5 +184,5 @@ static int nomp_api_200_linear(unsigned n) {
 
   return 0;
 }
-#undef nomp_api_200_linear
+#undef nomp_api_200_saxpy
 #undef nomp_api_200_aux
