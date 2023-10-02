@@ -170,32 +170,41 @@ int nomp_py_realize_reduction(PyObject **kernel, const char *const var,
  * @ingroup nomp_py_utils
  * @brief Creates loopy kernel from C source.
  *
- * @param[out] knl Loopy kernel object.
+ * @param[out] knl Loopy Kernel object.
  * @param[in] src C kernel source.
  * @return int
  */
 int nomp_py_c_to_loopy(PyObject **knl, const char *src) {
-  int err = 1;
-  PyObject *lpy_api = PyUnicode_FromString(module_loopy_api);
-  if (lpy_api) {
-    PyObject *module = PyImport_Import(lpy_api);
-    if (module) {
-      PyObject *c_to_lpy = PyObject_GetAttrString(module, c_to_loopy);
-      if (c_to_lpy) {
-        PyObject *psrc = PyUnicode_FromString(src);
-        PyObject *pbackend = PyUnicode_FromString(backend);
-        *knl = PyObject_CallFunctionObjArgs(c_to_lpy, psrc, pbackend, NULL);
-        err = (*knl == NULL);
-        Py_XDECREF(psrc), Py_XDECREF(pbackend), Py_DECREF(c_to_lpy);
-      }
-      Py_DECREF(module);
-    }
-    Py_DECREF(lpy_api);
+#define check_error(obj)                                                       \
+  {                                                                            \
+    if (!obj) {                                                                \
+      return nomp_log(NOMP_LOOPY_CONVERSION_FAILURE, NOMP_ERROR,               \
+                      "C to Loopy conversion failed.\n");                      \
+    }                                                                          \
   }
-  if (err) {
-    return nomp_log(NOMP_LOOPY_CONVERSION_FAILURE, NOMP_ERROR,
-                    "C to Loopy conversion failed.\n");
-  }
+
+  PyObject *py_loopy_api = PyUnicode_FromString(module_loopy_api);
+  check_error(py_loopy_api);
+
+  PyObject *py_module = PyImport_Import(py_loopy_api);
+  check_error(py_module);
+
+  PyObject *py_c_to_loopy = PyObject_GetAttrString(py_module, c_to_loopy);
+  check_error(py_c_to_loopy);
+
+  PyObject *py_src = PyUnicode_FromString(src);
+  check_error(py_src);
+
+  PyObject *py_backend = PyUnicode_FromString(backend);
+  check_error(py_backend);
+
+  *knl = PyObject_CallFunctionObjArgs(py_c_to_loopy, py_src, py_backend, NULL);
+  check_error(*knl);
+
+  Py_XDECREF(py_src), Py_XDECREF(py_backend);
+  Py_DECREF(py_c_to_loopy), Py_DECREF(py_module), Py_DECREF(py_loopy_api);
+
+#undef check_error
 
   return 0;
 }
