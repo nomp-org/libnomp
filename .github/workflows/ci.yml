@@ -25,7 +25,7 @@ jobs:
         shell: bash -l {0}
     strategy:
       matrix:
-        compiler: [gcc-10, clang-12]
+        compiler: [gcc-10, clang-15]
       fail-fast: false
     name: "${{ matrix.compiler }}"
     env:
