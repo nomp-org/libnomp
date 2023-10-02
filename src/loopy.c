@@ -128,35 +128,40 @@ int nomp_py_check_module(const char *module, const char *function) {
  * @ingroup nomp_py_utils
  * @brief Realize reductions if present in the kernel.
  *
- * @param[in,out] knl Loopy kernel object.
- * @param[in] var Name of the reduction variable.
- * @param[in] context Python dictionary with context information.
+ * @param[in,out] kernel Loopy kernel object.
+ * @param[in] var Name of the reduction variable as a C-string.
+ * @param[in] py_context Python dictionary with context information.
  * @return int
  */
-int nomp_py_realize_reduction(PyObject **knl, const char *var,
-                              const PyObject *context) {
-  int err = 1;
-  PyObject *reduction = PyUnicode_FromString(module_reduction);
-  if (reduction) {
-    PyObject *module = PyImport_Import(reduction);
-    if (module) {
-      PyObject *rr = PyObject_GetAttrString(module, realize_reduction);
-      if (rr) {
-        PyObject *pvar = PyUnicode_FromString(var);
-        PyObject *result =
-            PyObject_CallFunctionObjArgs(rr, *knl, pvar, context, NULL);
-        if (result)
-          Py_DECREF(*knl), *knl = result, err = 0;
-        Py_XDECREF(pvar), Py_DECREF(rr);
-      }
-      Py_DECREF(module);
-    }
-    Py_DECREF(reduction);
+int nomp_py_realize_reduction(PyObject **kernel, const char *const var,
+                              const PyObject *const py_context) {
+#define check_error(obj)                                                       \
+  if (!obj) {                                                                  \
+    return nomp_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,                          \
+                    "Call to realize_reduction() failed.");                    \
   }
-  if (err) {
-    return nomp_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,
-                    "Call to realize_reduction() failed.");
-  }
+
+  PyObject *py_str_reduction = PyUnicode_FromString(module_reduction);
+  check_error(py_str_reduction);
+  PyObject *py_module = PyImport_Import(py_str_reduction);
+  check_error(py_module);
+
+  PyObject *py_realize_reduction =
+      PyObject_GetAttrString(py_module, realize_reduction);
+  check_error(py_realize_reduction);
+
+  PyObject *py_str_var = PyUnicode_FromString(var);
+  check_error(py_str_var);
+
+  PyObject *py_result = PyObject_CallFunctionObjArgs(
+      py_realize_reduction, *kernel, py_str_var, py_context, NULL);
+  check_error(py_result);
+
+  Py_DECREF(*kernel), *kernel = py_result;
+  Py_DECREF(py_str_var), Py_DECREF(py_realize_reduction);
+  Py_DECREF(py_module), Py_DECREF(py_str_reduction);
+
+#undef check_error
 
   return 0;
 }
