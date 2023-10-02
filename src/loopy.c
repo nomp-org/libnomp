@@ -12,18 +12,20 @@ static char backend[NOMP_MAX_BUFFER_SIZE + 1];
 /**
  * @ingroup nomp_py_utils
  *
- * @brief Get the string representation of python object.
+ * @brief Print the string representation of python object along with a debug
+ * message to stderr.
  *
- * @param msg Debug message before printing the object.
- * @param obj Python object.
+ * @param message Debug message to be printed before the object as a C-string.
+ * @param obj Python object to be printed.
  * @return void
  */
-void nomp_py_print(const char *msg, PyObject *obj) {
-  PyObject *repr = PyObject_Repr(obj);
-  PyObject *py_str = PyUnicode_AsEncodedString(repr, "utf-8", "~E~");
+void nomp_py_print(const char *const message, const PyObject *const obj) {
+  PyObject *py_repr = PyObject_Repr(obj);
+  PyObject *py_str = PyUnicode_AsEncodedString(py_repr, "utf-8", "~E~");
   const char *str = PyBytes_AS_STRING(py_str);
-  printf("%s: %s\n", msg, str);
-  Py_XDECREF(repr), Py_XDECREF(py_str);
+  fprintf(stderr, "%s: %s\n", message, str);
+  fflush(stderr);
+  Py_XDECREF(py_repr), Py_XDECREF(py_str);
 }
 
 /**

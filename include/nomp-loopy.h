@@ -44,7 +44,7 @@ int nomp_symengine_eval_grid_size(struct nomp_prog_t *prg);
 
 int nomp_symengine_update(CMapBasicBasic *map, const char *key, const long val);
 
-void nomp_py_print(const char *msg, PyObject *obj);
+void nomp_py_print(const char *msg, const PyObject *obj);
 
 #ifdef __cplusplus
 }
