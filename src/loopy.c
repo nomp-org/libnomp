@@ -68,21 +68,25 @@ int nomp_py_init(const struct nomp_config_t *const cfg) {
  * @return int
  */
 int nomp_py_append_to_sys_path(const char *path) {
+#define check_error(obj)                                                       \
+  if (!obj) {                                                                  \
+    return nomp_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,                          \
+                    "Appending path \"%s\" to the sys.path failed.", path);    \
+  }
+
   PyObject *py_sys = PyImport_ImportModule("sys");
-  if (!py_sys)
-    goto err;
+  check_error(py_sys);
   PyObject *py_path = PyObject_GetAttrString(py_sys, "path");
-  if (!py_path)
-    goto err;
+  check_error(py_path);
   PyObject *py_str = PyUnicode_FromString(path);
-  if (PyList_Append(py_path, py_str))
-    goto err;
-  Py_DECREF(py_path), Py_XDECREF(py_str), Py_DECREF(py_sys);
+  check_error(py_str);
+  check_error(!PyList_Append(py_path, py_str));
+
+  Py_DECREF(py_path), Py_DECREF(py_str), Py_DECREF(py_sys);
+
+#undef check_error
 
   return 0;
-err:
-  return nomp_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,
-                  "Appending path \"%s\" to the sys.path failed.", path);
 }
 
 /**
