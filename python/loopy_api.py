@@ -8,7 +8,6 @@ import loopy as lp
 import numpy as np
 import pymbolic.primitives as prim
 from clang import cindex
-from kernel_wrappers import BaseKernelWrapper
 from loopy.isl_helpers import make_slab
 from loopy.kernel.data import AddressSpace
 from loopy.symbolic import aff_from_expr
@@ -828,9 +827,9 @@ def c_to_loopy(c_str: str, backend: str) -> lp.translation_unit.TranslationUnit:
 
 def get_knl_src(knl: lp.translation_unit.TranslationUnit) -> str:
     """Returns the kernel source for a given backend."""
-    return BaseKernelWrapper().get_src(knl)
+    return lp.generate_code_v2(knl).device_code()
 
 
 def get_knl_name(knl: lp.translation_unit.TranslationUnit) -> str:
     """Returns the kernel name for a given backend."""
-    return BaseKernelWrapper().get_entry_point(knl)
+    return knl.default_entrypoint.name
