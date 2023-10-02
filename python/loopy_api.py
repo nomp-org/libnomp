@@ -346,7 +346,7 @@ class ForLoopInfo:
                 "lbound": lbound[0],
                 "ubound": ubound[0],
                 "params": [*lbound[1], *ubound[1]],
-                "accumulators": [*lbound[2], *ubound[2]],
+                "statements": [*lbound[2], *ubound[2]],
             }
 
         decls = list(self.decl.get_children())
@@ -427,8 +427,8 @@ def set_tf_results(
 class CToLoopyMapper(IdentityMapper):
     """Map C expressions and statemements to Loopy expressions."""
 
-    def combine(self, values):
-        """Combine mapped expressions."""
+    def accumulate(self, values):
+        """accumulate mapped expressions."""
         # FIXME: Needs slightly more sophisticated checks here..
         # For example.
         # 1. No domain should have the dim_sets repeated.
@@ -463,36 +463,35 @@ class CToLoopyMapper(IdentityMapper):
                 ),
             )
 
-            return self.combine(set_result_stmts((true_result, false_result)))
+            return self.accumulate(
+                set_result_stmts((true_result, false_result))
+            )
         return true_result
 
     def map_for_stmt(
         self, expr: cindex.CursorKind.FOR_STMT, context: CToLoopyMapperContext
     ) -> CToLoopyMapperAccumulator:
         """Maps a C For loop."""
-        loop_info = ForLoopInfo(expr).check_and_parse(context)
+        loop = ForLoopInfo(expr).check_and_parse(context)
 
         space = isl.Space.create_from_names(
             isl.DEFAULT_CONTEXT,
-            set=[loop_info["iname"]],
-            params=loop_info["params"],
+            set=[loop["iname"]],
+            params=loop["params"],
         )
-
         domain = make_slab(
             space,
-            loop_info["iname"],
-            aff_from_expr(space, loop_info["lbound"]),
-            aff_from_expr(space, loop_info["ubound"]),
+            loop["iname"],
+            aff_from_expr(space, loop["lbound"]),
+            aff_from_expr(space, loop["ubound"]),
         )
 
-        new_inames = context.inames | {loop_info["iname"]}
-        new_context = context.copy(inames=new_inames)
-
-        children_result = self.rec(loop_info["body"], new_context)
-        loop_info["accumulators"].append(
-            children_result.copy(domains=children_result.domains + [domain])
+        body = self.rec(
+            loop["body"],
+            context.copy(inames=context.inames | {loop["iname"]}),
         )
-        return self.combine(loop_info["accumulators"])
+        loop["statements"].append(body.copy(domains=body.domains + [domain]))
+        return self.accumulate(loop["statements"])
 
     def map_decl_stmt(
         self, expr: cindex.CursorKind.DECL_STMT, context: CToLoopyMapperContext
@@ -578,7 +577,7 @@ class CToLoopyMapper(IdentityMapper):
     ) -> CToLoopyMapperAccumulator:
         """Maps a C compound expression."""
         if expr.get_children() is not None:
-            return self.combine(
+            return self.accumulate(
                 [self.rec(child, context) for child in expr.get_children()]
             )
         return CToLoopyMapperAccumulator([], [], [])
@@ -596,7 +595,7 @@ class CToLoopyMapper(IdentityMapper):
         # Map assignment to an if-else if rhs is a conditional operator
         # statement
         if isinstance(rhs, tuple):
-            return self.combine(
+            return self.accumulate(
                 set_result_stmts(set_tf_results(lhs, rhs, context))
             )
         return CToLoopyMapperAccumulator(
@@ -638,7 +637,7 @@ class CToLoopyMapper(IdentityMapper):
                         f"Mapping not implemented for {op_str}"
                     )
 
-            return self.combine(
+            return self.accumulate(
                 set_result_stmts(set_tf_results(lhs, rhs, context))
             )
 
