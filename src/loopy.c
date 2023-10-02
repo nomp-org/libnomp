@@ -262,28 +262,32 @@ int nomp_py_set_annotate_func(PyObject **annotate_func, const char *path_) {
  * @ingroup nomp_py_utils
  * @brief Apply transformations on a loopy kernel based on annotations.
  *
- * Apply the transformations to the loopy kernel \p knl based on the annotation
- * function \p func and the key value pairs (annotations) passed in \p annts.
- * \p knl will be modified based on the transformations.
+ * Apply the transformations to the loopy kernel \p kernel based on the
+ * annotation function \p function and the key value pairs (annotations) passed
+ * in \p annotations. \p kernel will be modified based on the transformations.
  *
- * @param[in,out] knl Pointer to loopy kernel object.
- * @param[in] func Function which performs transformations based on annotations.
- * @param[in] annts Annotations (as a PyDict) to specify which transformations
- * to apply.
+ * @param[in,out] kernel Pointer to loopy kernel object.
+ * @param[in] function Function which performs transformations based on
+ * annotations.
+ * @param[in] annotations Annotations (as a PyDict) to specify which
+ * transformations to apply.
  * @param[in] context Context (as a PyDict) to pass around information such
  * as backend, device details, etc.
  * @return int
  */
-int nomp_py_apply_annotations(PyObject **knl, PyObject *func,
-                              const PyObject *annts, const PyObject *context) {
-  if (knl && *knl && func) {
-    if (PyCallable_Check(func)) {
-      PyObject *tknl =
-          PyObject_CallFunctionObjArgs(func, *knl, annts, context, NULL);
-      if (tknl)
-        Py_DECREF(*knl), *knl = tknl;
-    }
+int nomp_py_apply_annotations(PyObject **kernel, const PyObject *const function,
+                              const PyObject *const annotations,
+                              const PyObject *const context) {
+  if (!kernel || !*kernel || !function)
+    return 0;
+
+  if (!PyCallable_Check(function)) {
+    return nomp_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,
+                    "Annotation function is not callable.");
   }
+  PyObject *temp = PyObject_CallFunctionObjArgs(function, *kernel, annotations,
+                                                context, NULL);
+  Py_DECREF(*kernel), *kernel = temp;
 
   return 0;
 }

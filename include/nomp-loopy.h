@@ -30,8 +30,9 @@ int nomp_py_realize_reduction(PyObject **knl, const char *var,
 
 int nomp_py_set_annotate_func(PyObject **func, const char *path);
 
-int nomp_py_apply_annotations(PyObject **knl, PyObject *func,
-                              const PyObject *annts, const PyObject *context);
+int nomp_py_apply_annotations(PyObject **kernel, const PyObject *function,
+                              const PyObject *annotations,
+                              const PyObject *context);
 
 int nomp_py_apply_transform(PyObject **knl, const char *file, const char *func,
                             const PyObject *context);
