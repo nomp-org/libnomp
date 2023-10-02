@@ -356,36 +356,33 @@ class ForLoopInfo:
             )
         if len(decls) > 1:
             raise NotImplementedError(
-                f"Multiple variable initializations are not supported: {decls}"
+                f"Multiple variable initializations are not supported: {decls}."
             )
 
-        cond_ok, cname, cleft, cright = False, None, None, None
+        cond_name, cond_left, cond_right = None, None, None
         if self.cond.kind == cindex.CursorKind.BINARY_OPERATOR:
-            (cleft, cright) = self.cond.get_children()
-            if get_op_str(self.cond, cleft) in ["<", "<="]:
-                cond_ok, cname = True, list(cleft.get_children())[0].spelling
-        if not cond_ok:
+            (cond_left, cond_right) = self.cond.get_children()
+            if get_op_str(self.cond, cond_left) in ["<", "<="]:
+                cond_name = list(cond_left.get_children())[0].spelling
+        if cond_name is None:
             raise NotImplementedError("For loop condition must be < or <=.")
 
-        update_ok, uname = False, None
+        update_name = None
         if self.update.kind == cindex.CursorKind.UNARY_OPERATOR:
             if "++" in [token.spelling for token in self.update.get_tokens()]:
-                update_ok, uname = (
-                    True,
-                    list(self.update.get_children())[0].spelling,
-                )
-        if not update_ok:
-            raise NotImplementedError("For loop update must be ++")
+                update_name = list(self.update.get_children())[0].spelling
+        if update_name is None:
+            raise NotImplementedError("For loop update operation must be ++.")
 
-        if uname != cname:
+        if update_name != cond_name:
             raise SyntaxError(
                 "For loop variable must be same in initialization, condition"
-                f" and increment. {uname} {cname}"
+                f" and increment. {update_name} {cond_name}."
             )
 
         return {
-            **check_and_parse_bounds(decls[0], cright),
-            "iname": cname,
+            **check_and_parse_bounds(decls[0], cond_right),
+            "iname": cond_name,
             "body": self.body,
         }
 
