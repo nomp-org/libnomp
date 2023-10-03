@@ -282,14 +282,14 @@
 <section id="python-helper-functions">
 <h2>Python Helper Functions<a class="headerlink" href="#python-helper-functions" title="Permalink to this heading"></a></h2>
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv413nomp_py_printPKcP8PyObject">
-<span id="_CPPv313nomp_py_printPKcP8PyObject"></span><span id="_CPPv213nomp_py_printPKcP8PyObject"></span><span id="nomp_py_print__cCP.PyObjectP"></span><span class="target" id="group__nomp__py__utils_1gac33651d2915d8db9be94316cae2a2b56"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_print</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">msg</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">obj</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413nomp_py_printPKcP8PyObject" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Get the string representation of python object. </p>
+<dt class="sig sig-object cpp" id="_CPPv413nomp_py_printPCKcPCK8PyObject">
+<span id="_CPPv313nomp_py_printPCKcPCK8PyObject"></span><span id="_CPPv213nomp_py_printPCKcPCK8PyObject"></span><span id="nomp_py_print__cCPC.PyObjectCPC"></span><span class="target" id="group__nomp__py__utils_1gacffbca77af3e59049a675fae0c91d8b2"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_print</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">message</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">obj</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413nomp_py_printPCKcPCK8PyObject" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Print the string representation of python object along with a debug message to stderr. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>msg</strong> – Debug message before printing the object. </p></li>
-<li><p><strong>obj</strong> – Python object. </p></li>
+<li><p><strong>message</strong> – Debug message to be printed before the object as a C-string. </p></li>
+<li><p><strong>obj</strong> – Python object to be printed. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -327,15 +327,15 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv425nomp_py_realize_reductionPP8PyObjectPKcPK8PyObject">
-<span id="_CPPv325nomp_py_realize_reductionPP8PyObjectPKcPK8PyObject"></span><span id="_CPPv225nomp_py_realize_reductionPP8PyObjectPKcPK8PyObject"></span><span id="nomp_py_realize_reduction__PyObjectPP.cCP.PyObjectCP"></span><span class="target" id="group__nomp__py__utils_1ga1299017b3e5a66333d3944e4d95e3aee"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_realize_reduction</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">knl</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">var</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">context</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425nomp_py_realize_reductionPP8PyObjectPKcPK8PyObject" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv425nomp_py_realize_reductionPP8PyObjectPCKcPCK8PyObject">
+<span id="_CPPv325nomp_py_realize_reductionPP8PyObjectPCKcPCK8PyObject"></span><span id="_CPPv225nomp_py_realize_reductionPP8PyObjectPCKcPCK8PyObject"></span><span id="nomp_py_realize_reduction__PyObjectPP.cCPC.PyObjectCPC"></span><span class="target" id="group__nomp__py__utils_1ga3a4fc1b61e90f671f2d196a79cd1b2e1"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_realize_reduction</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">kernel</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">var</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">py_context</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425nomp_py_realize_reductionPP8PyObjectPCKcPCK8PyObject" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Realize reductions if present in the kernel. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>knl</strong> – <strong>[inout]</strong> Loopy kernel object. </p></li>
-<li><p><strong>var</strong> – <strong>[in]</strong> Name of the reduction variable. </p></li>
-<li><p><strong>context</strong> – <strong>[in]</strong> Python dictionary with context information. </p></li>
+<li><p><strong>kernel</strong> – <strong>[inout]</strong> Loopy kernel object. </p></li>
+<li><p><strong>var</strong> – <strong>[in]</strong> Name of the reduction variable as a C-string. </p></li>
+<li><p><strong>py_context</strong> – <strong>[in]</strong> Python dictionary with context information. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -351,7 +351,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>knl</strong> – <strong>[out]</strong> Loopy kernel object. </p></li>
+<li><p><strong>knl</strong> – <strong>[out]</strong> Loopy Kernel object. </p></li>
 <li><p><strong>src</strong> – <strong>[in]</strong> C kernel source. </p></li>
 </ul>
 </dd>
@@ -379,16 +379,16 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv425nomp_py_apply_annotationsPP8PyObjectP8PyObjectPK8PyObjectPK8PyObject">
-<span id="_CPPv325nomp_py_apply_annotationsPP8PyObjectP8PyObjectPK8PyObjectPK8PyObject"></span><span id="_CPPv225nomp_py_apply_annotationsPP8PyObjectP8PyObjectPK8PyObjectPK8PyObject"></span><span id="nomp_py_apply_annotations__PyObjectPP.PyObjectP.PyObjectCP.PyObjectCP"></span><span class="target" id="group__nomp__py__utils_1ga289e75a776b6c6aa5015c9e0524e21dd"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_apply_annotations</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">knl</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">func</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">annts</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">context</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425nomp_py_apply_annotationsPP8PyObjectP8PyObjectPK8PyObjectPK8PyObject" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv425nomp_py_apply_annotationsPP8PyObjectPCK8PyObjectPCK8PyObjectPCK8PyObject">
+<span id="_CPPv325nomp_py_apply_annotationsPP8PyObjectPCK8PyObjectPCK8PyObjectPCK8PyObject"></span><span id="_CPPv225nomp_py_apply_annotationsPP8PyObjectPCK8PyObjectPCK8PyObjectPCK8PyObject"></span><span id="nomp_py_apply_annotations__PyObjectPP.PyObjectCPC.PyObjectCPC.PyObjectCPC"></span><span class="target" id="group__nomp__py__utils_1ga564b930c4ffb2d120f98b3de2bde637b"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_apply_annotations</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">kernel</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">function</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">annotations</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">context</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425nomp_py_apply_annotationsPP8PyObjectPCK8PyObjectPCK8PyObjectPCK8PyObject" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Apply transformations on a loopy kernel based on annotations. </p>
-<p>Apply the transformations to the loopy kernel <code class="docutils literal notranslate"><span class="pre">knl</span></code> based on the annotation function <code class="docutils literal notranslate"><span class="pre">func</span></code> and the key value pairs (annotations) passed in <code class="docutils literal notranslate"><span class="pre">annts</span></code>. <code class="docutils literal notranslate"><span class="pre">knl</span></code> will be modified based on the transformations.</p>
+<p>Apply the transformations to the loopy kernel <code class="docutils literal notranslate"><span class="pre">kernel</span></code> based on the annotation function <code class="docutils literal notranslate"><span class="pre">function</span></code> and the key value pairs (annotations) passed in <code class="docutils literal notranslate"><span class="pre">annotations</span></code>. <code class="docutils literal notranslate"><span class="pre">kernel</span></code> will be modified based on the transformations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>knl</strong> – <strong>[inout]</strong> Pointer to loopy kernel object. </p></li>
-<li><p><strong>func</strong> – <strong>[in]</strong> Function which performs transformations based on annotations. </p></li>
-<li><p><strong>annts</strong> – <strong>[in]</strong> Annotations (as a PyDict) to specify which transformations to apply. </p></li>
+<li><p><strong>kernel</strong> – <strong>[inout]</strong> Pointer to loopy kernel object. </p></li>
+<li><p><strong>function</strong> – <strong>[in]</strong> Function which performs transformations based on annotations. </p></li>
+<li><p><strong>annotations</strong> – <strong>[in]</strong> Annotations (as a PyDict) to specify which transformations to apply. </p></li>
 <li><p><strong>context</strong> – <strong>[in]</strong> Context (as a PyDict) to pass around information such as backend, device details, etc. </p></li>
 </ul>
 </dd>
