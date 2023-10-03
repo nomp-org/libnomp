@@ -134,14 +134,14 @@ int nomp_py_check_module(const char *module, const char *function) {
 
 /**
  * @ingroup nomp_py_utils
- * @brief Realize reductions if present in the kernel.
+ * @brief Realize reductions if one is present in the kernel.
  *
  * @param[in,out] kernel Loopy kernel object.
- * @param[in] var Name of the reduction variable as a C-string.
+ * @param[in] variable Name of the reduction variable as a C-string.
  * @param[in] py_context Python dictionary with context information.
  * @return int
  */
-int nomp_py_realize_reduction(PyObject **kernel, const char *const var,
+int nomp_py_realize_reduction(PyObject **kernel, const char *const variable,
                               const PyObject *const py_context) {
 #define check_error(obj)                                                       \
   {                                                                            \
@@ -160,15 +160,15 @@ int nomp_py_realize_reduction(PyObject **kernel, const char *const var,
       PyObject_GetAttrString(py_module, realize_reduction);
   check_error(py_realize_reduction);
 
-  PyObject *py_str_var = PyUnicode_FromString(var);
-  check_error(py_str_var);
+  PyObject *py_str_variable = PyUnicode_FromString(variable);
+  check_error(py_str_variable);
 
   PyObject *py_result = PyObject_CallFunctionObjArgs(
-      py_realize_reduction, *kernel, py_str_var, py_context, NULL);
+      py_realize_reduction, *kernel, py_str_variable, py_context, NULL);
   check_error(py_result);
 
   Py_DECREF(*kernel), *kernel = py_result;
-  Py_DECREF(py_str_var), Py_DECREF(py_realize_reduction);
+  Py_DECREF(py_str_variable), Py_DECREF(py_realize_reduction);
   Py_DECREF(py_module), Py_DECREF(py_str_reduction);
 
 #undef check_error
@@ -180,11 +180,11 @@ int nomp_py_realize_reduction(PyObject **kernel, const char *const var,
  * @ingroup nomp_py_utils
  * @brief Creates loopy kernel from C source.
  *
- * @param[out] knl Loopy Kernel object.
+ * @param[out] kernel Loopy Kernel object.
  * @param[in] src C kernel source.
  * @return int
  */
-int nomp_py_c_to_loopy(PyObject **knl, const char *src) {
+int nomp_py_c_to_loopy(PyObject **kernel, const char *src) {
 #define check_error(obj)                                                       \
   {                                                                            \
     if (!obj) {                                                                \
@@ -208,8 +208,9 @@ int nomp_py_c_to_loopy(PyObject **knl, const char *src) {
   PyObject *py_backend = PyUnicode_FromString(backend);
   check_error(py_backend);
 
-  *knl = PyObject_CallFunctionObjArgs(py_c_to_loopy, py_src, py_backend, NULL);
-  check_error(*knl);
+  *kernel =
+      PyObject_CallFunctionObjArgs(py_c_to_loopy, py_src, py_backend, NULL);
+  check_error(*kernel);
 
   Py_XDECREF(py_src), Py_XDECREF(py_backend);
   Py_DECREF(py_c_to_loopy), Py_DECREF(py_module), Py_DECREF(py_loopy_api);
@@ -225,52 +226,62 @@ int nomp_py_c_to_loopy(PyObject **knl, const char *src) {
  *
  * @param[out] name Kernel name as a C-string.
  * @param[out] src Kernel source as a C-string.
- * @param[in] knl Loopy kernel object.
+ * @param[in] kernel Loopy kernel object.
  * @return int
  */
-int nomp_py_get_knl_name_and_src(char **name, char **src, const PyObject *knl) {
-  int err = 1;
-  PyObject *lpy_api = PyUnicode_FromString(module_loopy_api);
-  if (lpy_api) {
-    PyObject *module = PyImport_Import(lpy_api);
-    if (module) {
-      PyObject *knl_name = PyObject_GetAttrString(module, get_knl_name);
-      if (knl_name) {
-        PyObject *py_name = PyObject_CallFunctionObjArgs(knl_name, knl, NULL);
-        if (py_name) {
-          Py_ssize_t size;
-          const char *name_ = PyUnicode_AsUTF8AndSize(py_name, &size);
-          *name = strndup(name_, size);
-          Py_DECREF(py_name), err = 0;
-        }
-        Py_DECREF(knl_name);
-      }
-      if (err) {
-        return nomp_log(NOMP_LOOPY_KNL_NAME_NOT_FOUND, NOMP_ERROR,
-                        "Unable to get loopy kernel name.");
-      }
-
-      err = 1;
-      PyObject *knl_src = PyObject_GetAttrString(module, get_knl_src);
-      if (knl_src) {
-        PyObject *py_src = PyObject_CallFunctionObjArgs(knl_src, knl, NULL);
-        if (py_src) {
-          Py_ssize_t size;
-          const char *src_ = PyUnicode_AsUTF8AndSize(py_src, &size);
-          *src = strndup(src_, size);
-          Py_DECREF(py_src), err = 0;
-        }
-        Py_DECREF(knl_src);
-      }
-      Py_DECREF(module);
-    }
-    Py_DECREF(lpy_api);
-    if (err) {
-      return nomp_log(
-          NOMP_LOOPY_CODEGEN_FAILURE, NOMP_ERROR,
-          "Backend code generation from loopy kernel \"%s\" failed.", *name);
-    }
+int nomp_py_get_knl_name_and_src(char **name, char **src,
+                                 const PyObject *kernel) {
+#define check_error(obj)                                                       \
+  {                                                                            \
+    if (!obj) {                                                                \
+      return nomp_log(NOMP_LOOPY_KNL_NAME_NOT_FOUND, NOMP_ERROR,               \
+                      "Unable to get loopy kernel name.");                     \
+    }                                                                          \
   }
+
+  PyObject *py_loopy_api = PyUnicode_FromString(module_loopy_api);
+  check_error(py_loopy_api);
+
+  PyObject *py_module = PyImport_Import(py_loopy_api);
+  check_error(py_module);
+
+  PyObject *py_kernel_name = PyObject_GetAttrString(py_module, get_knl_name);
+  check_error(py_kernel_name);
+
+  PyObject *py_name =
+      PyObject_CallFunctionObjArgs(py_kernel_name, kernel, NULL);
+  check_error(py_name);
+
+  Py_ssize_t size;
+  const char *const name_ = PyUnicode_AsUTF8AndSize(py_name, &size);
+  *name = strndup(name_, size);
+
+  Py_DECREF(py_name), Py_DECREF(py_kernel_name);
+
+#undef check_error
+
+#define check_error(obj)                                                       \
+  {                                                                            \
+    if (!obj) {                                                                \
+      return nomp_log(                                                         \
+          NOMP_LOOPY_CODEGEN_FAILURE, NOMP_ERROR,                              \
+          "Backend code generation from loopy kernel \"%s\" failed.", *name);  \
+    }                                                                          \
+  }
+
+  PyObject *py_kernel_src = PyObject_GetAttrString(py_module, get_knl_src);
+  check_error(py_kernel_src);
+
+  PyObject *py_src = PyObject_CallFunctionObjArgs(py_kernel_src, kernel, NULL);
+  check_error(py_src);
+
+  const char *const src_ = PyUnicode_AsUTF8AndSize(py_src, &size);
+  *src = strndup(src_, size);
+
+  Py_DECREF(py_src), Py_DECREF(py_kernel_src), Py_DECREF(py_module);
+  Py_DECREF(py_loopy_api);
+
+#undef check_error
 
   return 0;
 }
