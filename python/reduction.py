@@ -1,7 +1,5 @@
 """Module to do reductions with using Loopy."""
 
-from typing import Dict, List
-
 import loopy as lp
 import pymbolic.mapper
 import pymbolic.primitives as prim
@@ -21,7 +19,7 @@ class InameCollector(pymbolic.mapper.WalkMapper):
         self.inames.append(expr.name)
         super().map_variable(expr, args, kwargs)
 
-    def get_inames(self) -> List[str]:
+    def get_inames(self) -> list[str]:
         """Returns the inames which were found."""
         return self.inames
 
@@ -32,7 +30,7 @@ class InameCollector(pymbolic.mapper.WalkMapper):
 def realize_reduction(
     tunit: lp.translation_unit.TranslationUnit,
     var: str,
-    context: Dict[str, str],
+    context: dict[str, str],
 ) -> lp.translation_unit.TranslationUnit:
     """Perform transformations to realize a reduction."""
 

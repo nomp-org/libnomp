@@ -1,7 +1,6 @@
 """Loopy API wrapper"""
 import hashlib
 from dataclasses import dataclass, replace
-from typing import Dict, FrozenSet, List, Union
 
 import islpy as isl
 import loopy as lp
@@ -234,9 +233,9 @@ class CToLoopyMapperContext:
 
     # We don't need inner/outer inames. User should do these
     # transformations with loopy API. So we should just track inames.
-    inames: FrozenSet[str]
-    value_args: FrozenSet[str]
-    predicates: FrozenSet[Union[prim.Comparison, prim.LogicalNot]]
+    inames: frozenset[str]
+    value_args: frozenset[str]
+    predicates: frozenset[prim.Comparison | prim.LogicalNot]
     name_gen: UniqueNameGenerator
 
     def copy(self, **kwargs) -> "CToLoopyMapperContext":
@@ -248,9 +247,9 @@ class CToLoopyMapperContext:
 class CToLoopyMapperAccumulator:
     """Record C statements and expressions."""
 
-    domains: List[isl.BasicSet]
-    statements: List[lp.InstructionBase]
-    kernel_data: List[Union[lp.ValueArg, lp.TemporaryVariable]]
+    domains: list[isl.BasicSet]
+    statements: list[lp.InstructionBase]
+    kernel_data: list[lp.ValueArg | lp.TemporaryVariable]
 
     def copy(self, *, domains=None, statements=None, kernel_data=None):
         """Return a copy of the current object."""
@@ -715,8 +714,8 @@ class CKernel:
     """Store the plain C kernel."""
 
     knl_name: str
-    knl_body: cindex.Cursor
-    var_to_decl: Dict[str, cindex.Cursor]
+    knl_body: cindex.CursorKind.COMPOUND_STMT
+    var_to_decl: dict[str, cindex.CursorKind.DECL_STMT]
 
     def __init__(self, function: cindex.CursorKind.FUNCTION_DECL):
         self.knl_name = function.spelling
@@ -727,7 +726,7 @@ class CKernel:
             if arg.kind == cindex.CursorKind.PARM_DECL:
                 self.var_to_decl[arg.spelling] = arg
 
-    def get_knl_args(self) -> List[lp.KernelArgument]:
+    def get_knl_args(self) -> list[lp.KernelArgument]:
         """Return Loopy kernel arguments for C function argument."""
         knl_args = []
         for arg in self.var_to_decl.values():
