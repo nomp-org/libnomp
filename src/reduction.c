@@ -1,4 +1,4 @@
-#include "nomp-reduction.h"
+#include "nomp-impl.h"
 
 #define NOMP_DO_SUM(a, b) (a) += (b)
 #define NOMP_DO_PROD(a, b) (a) *= (b)

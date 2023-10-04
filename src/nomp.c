@@ -1,7 +1,6 @@
 #include "nomp-aux.h"
 #include "nomp-impl.h"
 #include "nomp-loopy.h"
-#include "nomp-reduction.h"
 
 static nomp_backend_t nomp;
 static int initialized = 0;

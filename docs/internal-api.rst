@@ -42,10 +42,6 @@ Memory Management Functions and Macros
 
 Reductions and Related Functions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. doxygengroup:: nomp_reduction_ops
-   :project: libnomp
-   :content-only:
-
 .. doxygengroup:: nomp_reduction_utils
    :project: libnomp
    :content-only:

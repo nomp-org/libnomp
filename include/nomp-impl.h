@@ -81,6 +81,22 @@ typedef struct {
 } nomp_arg_t;
 
 /**
+ * @defgroup nomp_reduction_utils Reduction utilities
+ *
+ * @brief Utilities used to perform reduction operations.
+ */
+
+/**
+ * @ingroup nomp_reduction_utils
+ *
+ * @brief Enum for different reduction operations.
+ */
+typedef enum {
+  NOMP_SUM = 0, /*!< Sum reduction. */
+  NOMP_PROD = 1 /*!< Multiplication reduction.*/
+} nomp_reduction_op_t;
+
+/**
  * @ingroup nomp_internal_types
  *
  * @brief Structure to keep track of nomp program.
@@ -103,7 +119,11 @@ typedef struct {
    */
   CVecBasic *sym_global, *sym_local;
   /**
-   * Map of variable names and their values use to evaluate
+   * Flag used to determine if the grid size should be evaluated or not.
+   */
+  int eval_grid;
+  /**
+   * Map of variable names and their values used to evaluate
    * the kernel launch parameters.
    */
   CMapBasicBasic *map;
@@ -112,12 +132,29 @@ typedef struct {
    * input changes).
    */
   size_t global[3], local[3], gws[3];
-  // Boolean flag to determine if the grid size should be evaluated or not.
-  int eval_grid;
-  // Pointer to keep track of backend specific data.
+  /**
+   * Pointer to keep track of backend specific data for the active backend.
+   */
   void *bptr;
-  // Reduction related metadata.
-  int redn_idx, redn_op, redn_type, redn_size;
+  /**
+   * Index of the deduction argument if one exists.
+   */
+  int redn_idx;
+  /**
+   * Reduction operation to be performed.
+   */
+  nomp_reduction_op_t redn_op;
+  /**
+   * Type of the reduction variable.
+   */
+  nomp_type_t redn_type;
+  /**
+   * Size of the reduction variable given by sizeof().
+   */
+  int redn_size;
+  /**
+   * Pointer to the reduction variable.
+   */
   void *redn_ptr;
 } nomp_prog_t;
 
@@ -233,6 +270,14 @@ int opencl_init(nomp_backend_t *backend, int platform, int device);
 int cuda_init(nomp_backend_t *backend, int platform, int device);
 
 int hip_init(nomp_backend_t *backend, int platform, int device);
+
+/**
+ * @ingroup nomp_reduction_utils
+ *
+ * @brief Perform residual host side reductions.
+ */
+int nomp_host_side_reduction(nomp_backend_t *bnd, nomp_prog_t *prg,
+                             nomp_mem_t *m);
 
 #ifdef __cplusplus
 }
