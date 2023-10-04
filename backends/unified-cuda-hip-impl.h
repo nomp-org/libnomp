@@ -76,7 +76,7 @@ static backendrtcResult backend_compile(backendrtcProgram prog,
   return backendrtcCompileProgram(prog, 1, opts);
 }
 
-static int backend_update(nomp_backend_t *bnd, nomp_mem_t *m,
+static int backend_update(nomp_backend_t *NOMP_UNUSED(bnd), nomp_mem_t *m,
                           const nomp_map_direction_t op, size_t start,
                           size_t end, size_t usize) {
   if (op & NOMP_ALLOC)
@@ -142,7 +142,7 @@ static int backend_knl_build(nomp_backend_t *bnd, nomp_prog_t *prg,
   return 0;
 }
 
-static int backend_knl_run(nomp_backend_t *bnd, nomp_prog_t *prg) {
+static int backend_knl_run(nomp_backend_t *NOMP_UNUSED(bnd), nomp_prog_t *prg) {
   nomp_arg_t *args = prg->args;
   void *vargs[NOMP_MAX_KERNEL_ARGS_SIZE];
   for (unsigned i = 0; i < prg->nargs; i++) {
@@ -168,7 +168,7 @@ static int backend_knl_free(nomp_prog_t *prg) {
   return 0;
 }
 
-static int backend_sync(nomp_backend_t *bnd) {
+static int backend_sync(nomp_backend_t *NOMP_UNUSED(bnd)) {
   check_driver(backendDeviceSynchronize());
   return 0;
 }
@@ -219,7 +219,7 @@ static int backend_device_query(nomp_backend_t *bnd, int device) {
 }
 
 #define backend_init TOKEN_PASTE(DRIVER, _init)
-int backend_init(nomp_backend_t *const backend, const int platform,
+int backend_init(nomp_backend_t *const backend, const int NOMP_UNUSED(platform),
                  const int device) {
   int num_devices;
   check_driver(backendGetDeviceCount(&num_devices));
