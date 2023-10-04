@@ -26,22 +26,21 @@ int nomp_py_realize_reduction(PyObject **knl, const char *var,
 
 int nomp_py_set_annotate_func(PyObject **func, const char *path);
 
-int nomp_py_apply_annotations(PyObject **kernel, PyObject *function,
-                              const PyObject *annotations,
-                              const PyObject *context);
+int nomp_py_annotate(PyObject **kernel, PyObject *function,
+                     const PyObject *annotations, const PyObject *context);
 
-int nomp_py_apply_transform(PyObject **knl, const char *file, const char *func,
-                            const PyObject *context);
+int nomp_py_transform(PyObject **knl, const char *file, const char *func,
+                      const PyObject *context);
 
 int nomp_py_get_knl_name_and_src(char **name, char **src, const PyObject *knl);
 
 int nomp_py_get_grid_size(nomp_prog_t *prg, PyObject *knl);
 
+void nomp_py_get_str(const char *msg, PyObject *obj);
+
 int nomp_symengine_eval_grid_size(nomp_prog_t *prg);
 
 int nomp_symengine_update(CMapBasicBasic *map, const char *key, const long val);
-
-void nomp_py_print(const char *msg, PyObject *obj);
 
 #ifdef __cplusplus
 }

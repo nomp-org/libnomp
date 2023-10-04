@@ -78,7 +78,7 @@ static inline int nomp_check_cmd_line(nomp_config_t *const cfg, unsigned argc,
       strncpy(cfg->scripts_dir, argv[i], PATH_MAX), valid = 1;
 
     if (!valid) {
-      nomp_log(0, NOMP_WARNING, "Unknown command line argument: %s.",
+      nomp_log(NOMP_SUCCESS, NOMP_WARNING, "Unknown command line argument: %s.",
                argv[i - 1]);
     }
 
@@ -239,7 +239,7 @@ int nomp_init(int argc, const char **argv) {
 
   initialized = 1;
 
-  nomp_log(0, NOMP_INFO, "libnomp initialized successfully.");
+  nomp_log(NOMP_SUCCESS, NOMP_INFO, "libnomp initialized successfully.");
 
   return 0;
 }
@@ -504,12 +504,11 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
   nomp_check(nomp_py_c_to_loopy(&knl, csrc));
 
   // Handle annotate clauses if they exist.
-  nomp_check(nomp_py_apply_annotations(&knl, nomp.py_annotate, m.dict,
-                                       nomp.py_context));
+  nomp_check(nomp_py_annotate(&knl, nomp.py_annotate, m.dict, nomp.py_context));
   Py_XDECREF(m.dict);
 
   // Handle transform clauses.
-  nomp_check(nomp_py_apply_transform(&knl, m.file, m.func, nomp.py_context));
+  nomp_check(nomp_py_transform(&knl, m.file, m.func, nomp.py_context));
   nomp_free(&m.file), nomp_free(&m.func);
 
   // Handle reductions if they exist.
