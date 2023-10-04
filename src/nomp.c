@@ -145,24 +145,25 @@ static inline int deallocate_scratch_memory(nomp_backend_t *bnd) {
   return 0;
 }
 
-static inline int init_backend(nomp_backend_t *const bnd,
+static inline int init_backend(nomp_backend_t *const backend,
                                const nomp_config_t *const cfg) {
-  bnd->py_context = PyDict_New();
-  PyObject *obj = PyUnicode_FromString(cfg->backend);
-  PyDict_SetItemString(bnd->py_context, "backend::name", obj);
-  Py_XDECREF(obj);
+  backend->py_context = PyDict_New();
+
+  PyObject *py_str_backend = PyUnicode_FromString(cfg->backend);
+  PyDict_SetItemString(backend->py_context, "backend::name", py_str_backend);
+  Py_XDECREF(py_str_backend);
 
   if (strncmp(cfg->backend, "opencl", NOMP_MAX_BUFFER_SIZE) == 0) {
 #if defined(OPENCL_ENABLED)
-    nomp_check(opencl_init(bnd, cfg->platform, cfg->device));
+    nomp_check(opencl_init(backend, cfg->platform, cfg->device));
 #endif
   } else if (strncmp(cfg->backend, "cuda", NOMP_MAX_BUFFER_SIZE) == 0) {
 #if defined(CUDA_ENABLED)
-    nomp_check(cuda_init(bnd, cfg->platform, cfg->device));
+    nomp_check(cuda_init(backend, cfg->platform, cfg->device));
 #endif
   } else if (strncmp(cfg->backend, "hip", NOMP_MAX_BUFFER_SIZE) == 0) {
 #if defined(HIP_ENABLED)
-    nomp_check(hip_init(bnd, cfg->platform, cfg->device));
+    nomp_check(hip_init(backend, cfg->platform, cfg->device));
 #endif
   } else {
     return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
@@ -355,72 +356,43 @@ static nomp_prog_t **progs = NULL;
 static unsigned progs_n = 0;
 static unsigned progs_max = 0;
 
-struct nomp_meta_t {
-  char *file, *func;
-  PyObject *dict;
-};
-
-static int parse_clauses(struct nomp_meta_t *meta, nomp_prog_t *prg,
-                         const char **clauses) {
-  // Currently, we only support `transform` and
-  // `annotate` and `jit`.
-  meta->dict = PyDict_New(), meta->file = meta->func = NULL;
+static int act_on_clases(PyObject **kernel, nomp_prog_t *program,
+                         const char **const clauses,
+                         const nomp_backend_t *const backend) {
+  // Currently, we only support `transform` and `reduce` clauses.
   unsigned i = 0;
   while (clauses[i]) {
     if (strncmp(clauses[i], "transform", NOMP_MAX_BUFFER_SIZE) == 0) {
-      nomp_check(nomp_py_check_module((const char *)clauses[i + 1],
-                                      (const char *)clauses[i + 2]));
-      meta->file = strndup(clauses[i + 1], PATH_MAX);
-      meta->func = strndup(clauses[i + 2], NOMP_MAX_BUFFER_SIZE);
+      const char *file = clauses[i + 1], *function = clauses[i + 2];
+      nomp_check(nomp_py_check_module(file, function));
+      nomp_check(
+          nomp_py_transform(kernel, file, function, backend->py_context));
       i += 3;
-    } else if (strncmp(clauses[i], "annotate", NOMP_MAX_BUFFER_SIZE) == 0) {
-      if (clauses[i + 1] == NULL || clauses[i + 2] == NULL) {
-        return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                        "\"annotate\" clause should be followed by "
-                        "a key value "
-                        "pair. At least one of them is not "
-                        "provided.");
-      }
-      const char *key = clauses[i + 1], *val = clauses[i + 2];
-      PyObject *pkey =
-          PyUnicode_FromStringAndSize(key, strnlen(key, NOMP_MAX_BUFFER_SIZE));
-      PyObject *pval =
-          PyUnicode_FromStringAndSize(val, strnlen(val, NOMP_MAX_BUFFER_SIZE));
-      PyDict_SetItem(meta->dict, pkey, pval);
-      Py_XDECREF(pkey), Py_XDECREF(pval);
-      i += 3;
-    } else if (strncmp(clauses[i], "reduce", NOMP_MAX_BUFFER_SIZE) == 0) {
-      if (clauses[i + 1] == NULL || clauses[i + 2] == NULL) {
-        return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                        "\"reduce\" clause should be followed by a "
-                        "variable name and an "
-                        "operation. At least one of them is not "
-                        "provided.");
-      }
-      for (unsigned j = 0; j < prg->nargs; j++) {
-        if (strncmp(prg->args[j].name, clauses[i + 1], NOMP_MAX_BUFFER_SIZE) ==
-            0) {
-          prg->redn_type = prg->args[j].type, prg->args[j].type = NOMP_PTR;
-          prg->redn_size = prg->args[j].size, prg->redn_idx = j;
+      continue;
+    }
+
+    if (strncmp(clauses[i], "reduce", NOMP_MAX_BUFFER_SIZE) == 0) {
+      for (unsigned j = 0; j < program->nargs; j++) {
+        if (strncmp(program->args[j].name, clauses[i + 1],
+                    NOMP_MAX_BUFFER_SIZE) == 0) {
+          program->redn_type = program->args[j].type;
+          program->redn_size = program->args[j].size;
+          program->redn_idx = j;
+          program->args[j].type = NOMP_PTR;
           break;
         }
       }
       if (strncmp(clauses[i + 2], "+", 2) == 0)
-        prg->redn_op = NOMP_SUM;
-      else if (strncmp(clauses[i + 2], "*", 2) == 0)
-        prg->redn_op = NOMP_PROD;
+        program->redn_op = NOMP_SUM;
+      if (strncmp(clauses[i + 2], "*", 2) == 0)
+        program->redn_op = NOMP_PROD;
       i += 3;
-    } else if (strncmp(clauses[i], "pin", NOMP_MAX_BUFFER_SIZE) == 0) {
-      // Check if we have to use pinned memory.
-      return nomp_log(NOMP_NOT_IMPLEMENTED_ERROR, NOMP_ERROR,
-                      "Pinned memory support is "
-                      "not yet implemented.");
-    } else {
-      return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                      "Clause \"%s\" passed into nomp_jit is not a "
-                      "valid clause.",
-                      clauses[i]);
+      continue;
     }
+
+    return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                    "Clause \"%s\" passed into nomp_jit is not a valid clause.",
+                    clauses[i]);
   }
 
   return 0;
@@ -429,7 +401,8 @@ static int parse_clauses(struct nomp_meta_t *meta, nomp_prog_t *prg,
 static inline nomp_prog_t *init_args(int progs_n, int nargs, va_list args) {
   nomp_prog_t *prg = progs[progs_n] = nomp_calloc(nomp_prog_t, 1);
   prg->args = nomp_calloc(nomp_arg_t, nargs);
-  prg->nargs = nargs, prg->redn_idx = -1;
+  prg->nargs = nargs;
+  prg->redn_idx = -1;
   prg->map = mapbasicbasic_new();
   prg->sym_global = vecbasic_new(), prg->sym_local = vecbasic_new();
 
@@ -494,22 +467,12 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
   nomp_prog_t *prg = init_args(progs_n, nargs, args);
   va_end(args);
 
-  // Parse the clauses to find transformations file, function and other
-  // annotations. Annotations are returned as a Python dictionary.
-  struct nomp_meta_t m;
-  nomp_check(parse_clauses(&m, prg, clauses));
-
   // Create loopy kernel from C source.
   PyObject *knl = NULL;
   nomp_check(nomp_py_c_to_loopy(&knl, csrc));
 
-  // Handle annotate clauses if they exist.
-  nomp_check(nomp_py_annotate(&knl, nomp.py_annotate, m.dict, nomp.py_context));
-  Py_XDECREF(m.dict);
-
-  // Handle transform clauses.
-  nomp_check(nomp_py_transform(&knl, m.file, m.func, nomp.py_context));
-  nomp_free(&m.file), nomp_free(&m.func);
+  // Act on the clauses: transform, reduce, etc. and get the kernel
+  nomp_check(act_on_clases(&knl, prg, clauses, &nomp));
 
   // Handle reductions if they exist.
   if (prg->redn_idx >= 0)
