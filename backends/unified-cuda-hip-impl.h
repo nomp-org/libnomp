@@ -97,10 +97,8 @@ static int backend_update(nomp_backend_t *NOMP_UNUSED(bnd), nomp_mem_t *m,
   return 0;
 }
 
-static int backend_knl_build(nomp_backend_t *bnd, nomp_prog_t *prg,
+static int backend_knl_build(nomp_backend_t *NOMP_UNUSED(bnd), nomp_prog_t *prg,
                              const char *source, const char *name) {
-  struct backend_t *backend = (struct backend_t *)bnd->bptr;
-
   backendrtcProgram prog;
   check_rtc(backendrtcCreateProgram(&prog, source, NULL, 0, NULL, NULL));
 
