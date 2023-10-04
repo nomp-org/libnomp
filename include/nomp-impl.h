@@ -158,9 +158,35 @@ typedef struct {
   void *redn_ptr;
 } nomp_prog_t;
 
+/**
+ * @ingroup nomp_internal_types
+ *
+ * @brief Structure to keep track of memory allocated by the backend.
+ */
 typedef struct {
-  size_t idx0, idx1, usize;
-  void *hptr, *bptr;
+  /**
+   * Start index of the memory region.
+   */
+  size_t idx0;
+  /**
+   * End index of the memory region.
+   */
+  size_t idx1;
+  /**
+   * Size of a single unit of memory type given by sizeof().
+   */
+  size_t usize;
+  /**
+   * Host pointer of the memory region.
+   */
+  void *hptr;
+  /**
+   * Device pointer allocated by the backend for the memory region.
+   */
+  void *bptr;
+  /**
+   * Size of the \ref bptr given by sizeof().
+   */
   size_t bsize;
 } nomp_mem_t;
 
