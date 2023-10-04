@@ -256,6 +256,12 @@ typedef struct nomp_backend nomp_backend_t;
 extern "C" {
 #endif
 
+#ifdef __GNUC__
+#define NOMP_UNUSED(x) NOMP_UNUSED_##x __attribute__((__unused__))
+#else
+#define NOMP_UNUSED(x) NOMP_UNUSED_##x
+#endif
+
 /**
  * @defgroup nomp_internal_macros Internal macros
  * @brief Internal macros used in libnomp.

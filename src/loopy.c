@@ -39,6 +39,7 @@ void nomp_py_print(const char *const message, PyObject *const obj) {
  */
 int nomp_py_init(const nomp_config_t *const cfg) {
   strncpy(backend, cfg->backend, NOMP_MAX_BUFFER_SIZE);
+  backend[NOMP_MAX_BUFFER_SIZE] = '\0';
 
   if (!Py_IsInitialized()) {
     // May be we need the isolated configuration listed here:
