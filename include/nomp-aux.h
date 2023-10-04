@@ -10,7 +10,7 @@ extern "C" {
 /**
  * @defgroup nomp_other_utils Other helper functions.
  *
- * @brief Various helper functions used for implementing the library.
+ * @brief Various helper functions used internally by libnomp core library.
  */
 
 char *nomp_str_cat(unsigned n, unsigned max_len, ...);

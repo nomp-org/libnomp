@@ -13,15 +13,10 @@ extern "C" {
 #endif
 
 /**
- * @defgroup nomp_internal_types Internal types
- *
- * @brief Data types used internally by the library.
- */
-
-/**
  * @ingroup nomp_internal_types
  *
- * @brief Defines nomp log types. It can be an error, warning or information.
+ * @brief Defines nomp log levels. A log can be an error, warning or general
+ * information.
  */
 typedef enum {
   NOMP_ERROR = 1,   /**< Error type. */
