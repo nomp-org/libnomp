@@ -46,14 +46,14 @@
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Nomp Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user-api.html">User API</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Internal API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#data-types">Data Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#internal-types">Internal Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#helper-macros">Helper Macros</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#backend-init-functions">Backend Init Functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#python-helper-functions">Python Helper Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#memory-management-functions-and-macros">Memory Management Functions and Macros</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#backend-initialization-functions">Backend Initialization Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#python-helper-functions">Python Helper Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#reductions-and-related-functions">Reductions and Related Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#logging-functions">Logging Functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#profiler-functions">Profiler Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#profiling-functions">Profiling Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#other-helper-functions">Other helper Functions</a></li>
 </ul>
 </li>
@@ -88,13 +88,14 @@
 </div>
 <section id="internal-api">
 <h1>Internal API<a class="headerlink" href="#internal-api" title="Permalink to this heading"></a></h1>
-<section id="data-types">
-<h2>Data Types<a class="headerlink" href="#data-types" title="Permalink to this heading"></a></h2>
-<p>Below is a list of data types used internally by libnomp.</p>
+<section id="internal-types">
+<h2>Internal Types<a class="headerlink" href="#internal-types" title="Permalink to this heading"></a></h2>
+<p>Below is a list of internal types (structures and enums) used internally by
+libnomp.</p>
 <dl class="cpp enum">
 <dt class="sig sig-object cpp" id="_CPPv415nomp_log_type_t">
 <span id="_CPPv315nomp_log_type_t"></span><span id="_CPPv215nomp_log_type_t"></span><span class="target" id="group__nomp__internal__types_1ga2c163c219eb9c294ee22fda2afc34175"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_log_type_t</span></span></span><a class="headerlink" href="#_CPPv415nomp_log_type_t" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Defines nomp log types. It can be an error, warning or information. </p>
+<dd><p>Defines nomp log levels. A log can be an error, warning or general information. </p>
 <p><em>Values:</em></p>
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N15nomp_log_type_t10NOMP_ERRORE">
@@ -434,8 +435,77 @@
 </dd></dl>
 
 </section>
-<section id="backend-init-functions">
-<h2>Backend Init Functions<a class="headerlink" href="#backend-init-functions" title="Permalink to this heading"></a></h2>
+<section id="memory-management-functions-and-macros">
+<h2>Memory Management Functions and Macros<a class="headerlink" href="#memory-management-functions-and-macros" title="Permalink to this heading"></a></h2>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413mem_if_mappedPv">
+<span id="_CPPv313mem_if_mappedPv"></span><span id="_CPPv213mem_if_mappedPv"></span><span id="mem_if_mapped__voidP"></span><span class="target" id="group__nomp__mem__utils_1gaba3d7b4b2d3945008e375c851743ef78"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410nomp_mem_t" title="nomp_mem_t"><span class="n"><span class="pre">nomp_mem_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">mem_if_mapped</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413mem_if_mappedPv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the nomp_mem object corresponding to host pointer <code class="docutils literal notranslate"><span class="pre">p</span></code>. </p>
+<p>Returns the nomp_mem object corresponding to host ponter <code class="docutils literal notranslate"><span class="pre">p</span></code>. If no buffer has been allocated for <code class="docutils literal notranslate"><span class="pre">p</span></code> on the device, returns NULL.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>p</strong> – <strong>[in]</strong> Host pointer </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference internal" href="#structnomp__mem__t"><span class="std std-ref">nomp_mem_t</span></a> * </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.nomp_free">
+<span class="target" id="group__nomp__mem__utils_1ga7f94b25dae56929daada2a73b36f6934"></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_free</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nomp_free" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Helper macro for deallocating or freeing a memory block using nomp_free_(). File name and line number are passed implicitly. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p</strong> – Address of the pointer to the memory to deallocate. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>void </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.nomp_calloc">
+<span class="target" id="group__nomp__mem__utils_1ga391260c7fa2d91cf34ce1ab3fd45398f"></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_calloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">T</span></span>, <span class="n"><span class="pre">count</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nomp_calloc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Helper macro for allocating an array in memory with elements initialized to 0 using nomp_calloc_(). File name and line number are passed implicitly. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>T</strong> – Type of element. </p></li>
+<li><p><strong>count</strong> – Number of elements. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pointer of type T. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.nomp_realloc">
+<span class="target" id="group__nomp__mem__utils_1gab9ebd934f0e5b373037c5e2bbe6a28dc"></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_realloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ptr</span></span>, <span class="n"><span class="pre">T</span></span>, <span class="n"><span class="pre">count</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nomp_realloc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Helper macro for reallocating memory blocks using nomp_realloc_(). File name and line number are passed implicitly. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ptr</strong> – Pointer to the memory area to be reallocated. </p></li>
+<li><p><strong>T</strong> – Type of element. </p></li>
+<li><p><strong>count</strong> – Number of elements. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pointer of type T </p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="backend-initialization-functions">
+<h2>Backend Initialization Functions<a class="headerlink" href="#backend-initialization-functions" title="Permalink to this heading"></a></h2>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv411opencl_initP14nomp_backend_tKiKi">
 <span id="_CPPv311opencl_initP14nomp_backend_tKiKi"></span><span id="_CPPv211opencl_initP14nomp_backend_tKiKi"></span><span id="opencl_init__nomp_backend_tP.iC.iC"></span><span class="target" id="group__nomp__backend__init_1ga387d4752a4322151d8be4d62e11f770c"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">opencl_init</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">nomp_backend_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">bnd</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">platform_id</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">device_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411opencl_initP14nomp_backend_tKiKi" title="Permalink to this definition"></a><br /></dt>
@@ -664,75 +734,6 @@
 </dd></dl>
 
 </section>
-<section id="memory-management-functions-and-macros">
-<h2>Memory Management Functions and Macros<a class="headerlink" href="#memory-management-functions-and-macros" title="Permalink to this heading"></a></h2>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv413mem_if_mappedPv">
-<span id="_CPPv313mem_if_mappedPv"></span><span id="_CPPv213mem_if_mappedPv"></span><span id="mem_if_mapped__voidP"></span><span class="target" id="group__nomp__mem__utils_1gaba3d7b4b2d3945008e375c851743ef78"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv410nomp_mem_t" title="nomp_mem_t"><span class="n"><span class="pre">nomp_mem_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">mem_if_mapped</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413mem_if_mappedPv" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Returns the nomp_mem object corresponding to host pointer <code class="docutils literal notranslate"><span class="pre">p</span></code>. </p>
-<p>Returns the nomp_mem object corresponding to host ponter <code class="docutils literal notranslate"><span class="pre">p</span></code>. If no buffer has been allocated for <code class="docutils literal notranslate"><span class="pre">p</span></code> on the device, returns NULL.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>p</strong> – <strong>[in]</strong> Host pointer </p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><a class="reference internal" href="#structnomp__mem__t"><span class="std std-ref">nomp_mem_t</span></a> * </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.nomp_free">
-<span class="target" id="group__nomp__mem__utils_1ga7f94b25dae56929daada2a73b36f6934"></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_free</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nomp_free" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Helper macro for deallocating or freeing a memory block using nomp_free_(). File name and line number are passed implicitly. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>p</strong> – Address of the pointer to the memory to deallocate. </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>void </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.nomp_calloc">
-<span class="target" id="group__nomp__mem__utils_1ga391260c7fa2d91cf34ce1ab3fd45398f"></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_calloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">T</span></span>, <span class="n"><span class="pre">count</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nomp_calloc" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Helper macro for allocating an array in memory with elements initialized to 0 using nomp_calloc_(). File name and line number are passed implicitly. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>T</strong> – Type of element. </p></li>
-<li><p><strong>count</strong> – Number of elements. </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Pointer of type T. </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.nomp_realloc">
-<span class="target" id="group__nomp__mem__utils_1gab9ebd934f0e5b373037c5e2bbe6a28dc"></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_realloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">ptr</span></span>, <span class="n"><span class="pre">T</span></span>, <span class="n"><span class="pre">count</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nomp_realloc" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Helper macro for reallocating memory blocks using nomp_realloc_(). File name and line number are passed implicitly. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ptr</strong> – Pointer to the memory area to be reallocated. </p></li>
-<li><p><strong>T</strong> – Type of element. </p></li>
-<li><p><strong>count</strong> – Number of elements. </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Pointer of type T </p>
-</dd>
-</dl>
-</dd></dl>
-
-</section>
 <section id="reductions-and-related-functions">
 <h2>Reductions and Related Functions<a class="headerlink" href="#reductions-and-related-functions" title="Permalink to this heading"></a></h2>
 <dl class="cpp enum">
@@ -836,8 +837,8 @@
 </dd></dl>
 
 </section>
-<section id="profiler-functions">
-<h2>Profiler Functions<a class="headerlink" href="#profiler-functions" title="Permalink to this heading"></a></h2>
+<section id="profiling-functions">
+<h2>Profiling Functions<a class="headerlink" href="#profiling-functions" title="Permalink to this heading"></a></h2>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv422nomp_profile_set_levelKi">
 <span id="_CPPv322nomp_profile_set_levelKi"></span><span id="_CPPv222nomp_profile_set_levelKi"></span><span id="nomp_profile_set_level__iC"></span><span class="target" id="group__nomp__profiler__utils_1ga9ff7d18226de2e99484261b8578a706b"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_profile_set_level</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">profile_level_in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422nomp_profile_set_levelKi" title="Permalink to this definition"></a><br /></dt>

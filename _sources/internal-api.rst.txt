@@ -6,10 +6,11 @@
 Internal API
 ============
 
-Data Types
-^^^^^^^^^^
+Internal Types
+^^^^^^^^^^^^^^
 
-Below is a list of data types used internally by libnomp.
+Below is a list of internal types (structures and enums) used internally by
+libnomp.
 
 .. doxygengroup:: nomp_internal_types
    :project: libnomp
@@ -22,8 +23,14 @@ Helper Macros
    :project: libnomp
    :content-only:
 
-Backend Init Functions
-^^^^^^^^^^^^^^^^^^^^^^
+Memory Management Functions and Macros
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. doxygengroup:: nomp_mem_utils
+   :project: libnomp
+   :content-only:
+
+Backend Initialization Functions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. doxygengroup:: nomp_backend_init
    :project: libnomp
    :content-only:
@@ -31,12 +38,6 @@ Backend Init Functions
 Python Helper Functions
 ^^^^^^^^^^^^^^^^^^^^^^^^
 .. doxygengroup:: nomp_py_utils
-   :project: libnomp
-   :content-only:
-
-Memory Management Functions and Macros
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. doxygengroup:: nomp_mem_utils
    :project: libnomp
    :content-only:
 
@@ -52,8 +53,8 @@ Logging Functions
    :project: libnomp
    :content-only:
 
-Profiler Functions
-^^^^^^^^^^^^^^^^^^
+Profiling Functions
+^^^^^^^^^^^^^^^^^^^
 .. doxygengroup:: nomp_profiler_utils
    :project: libnomp
    :content-only:
