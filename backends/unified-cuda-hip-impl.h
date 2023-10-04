@@ -67,7 +67,6 @@ struct backend_prog_t {
   backendFunction kernel;
 };
 
-#define backend_compile TOKEN_PASTE(DRIVER, _compile)
 static backendrtcResult backend_compile(backendrtcProgram prog,
                                         struct backend_t *bnd) {
   char arch[NOMP_MAX_BUFFER_SIZE];
@@ -77,7 +76,6 @@ static backendrtcResult backend_compile(backendrtcProgram prog,
   return backendrtcCompileProgram(prog, 1, opts);
 }
 
-#define backend_update TOKEN_PASTE(DRIVER, _update)
 static int backend_update(struct nomp_backend_t *bnd, struct nomp_mem_t *m,
                           const nomp_map_direction_t op, size_t start,
                           size_t end, size_t usize) {
@@ -104,12 +102,6 @@ static int backend_update(struct nomp_backend_t *bnd, struct nomp_mem_t *m,
   return 0;
 }
 
-#define backend_update_ptr TOKEN_PASTE(DRIVER, _update_ptr)
-static void backend_update_ptr(void **p, size_t *size, struct nomp_mem_t *m) {
-  *p = (void *)m->bptr, *size = sizeof(m->bptr);
-}
-
-#define backend_knl_build TOKEN_PASTE(DRIVER, _knl_build)
 static int backend_knl_build(struct nomp_backend_t *bnd,
                              struct nomp_prog_t *prg, const char *source,
                              const char *name) {
@@ -151,7 +143,6 @@ static int backend_knl_build(struct nomp_backend_t *bnd,
   return 0;
 }
 
-#define backend_knl_run TOKEN_PASTE(DRIVER, _knl_run)
 static int backend_knl_run(struct nomp_backend_t *bnd,
                            struct nomp_prog_t *prg) {
   struct nomp_arg_t *args = prg->args;
@@ -172,7 +163,6 @@ static int backend_knl_run(struct nomp_backend_t *bnd,
   return 0;
 }
 
-#define backend_knl_free TOKEN_PASTE(DRIVER, _knl_free)
 static int backend_knl_free(struct nomp_prog_t *prg) {
   struct backend_prog_t *bprg = (struct backend_prog_t *)prg->bptr;
   if (bprg)
@@ -180,19 +170,16 @@ static int backend_knl_free(struct nomp_prog_t *prg) {
   return 0;
 }
 
-#define backend_sync TOKEN_PASTE(DRIVER, _sync)
 static int backend_sync(struct nomp_backend_t *bnd) {
   check_driver(backendDeviceSynchronize());
   return 0;
 }
 
-#define backend_finalize TOKEN_PASTE(DRIVER, _finalize)
 static int backend_finalize(struct nomp_backend_t *bnd) {
   nomp_free(&bnd->bptr);
   return 0;
 }
 
-#define backend_device_query TOKEN_PASTE(DRIVER, _device_query)
 static int backend_device_query(struct nomp_backend_t *bnd, int device) {
   backendDeviceProp_t prop;
   check_driver(backendGetDeviceProperties(&prop, device));
@@ -264,15 +251,6 @@ int backend_init(struct nomp_backend_t *const backend, const int platform,
 }
 
 #undef backend_init
-#undef backend_finalize
-#undef backend_sync
-#undef backend_knl_free
-#undef backend_knl_run
-#undef backend_knl_build
-#undef backend_update_ptr
-#undef backend_update
-#undef backend_compile
-
 #undef backend_prog_t
 #undef backend_t
 
@@ -287,28 +265,28 @@ int backend_init(struct nomp_backend_t *const backend, const int platform,
 #undef backendCtxCreate
 #undef backendInit
 
-#undef backendError_t
-#undef backendSuccess
-#undef backendGetErrorName
-#undef backendMalloc
-#undef backendMemcpy
-#undef backendFree
-#undef backendMemcpyHostToDevice
-#undef backendMemcpyDeviceToHost
-#undef backendDeviceSynchronize
-#undef backendGetDeviceCount
-#undef backendSetDevice
-#undef backendGetDeviceProperties
-#undef backendDriverGetVersion
-
-#undef backendrtcResult
-#undef backendrtcGetErrorString
-#undef backendrtcProgram
-#undef backendrtcCreateProgram
-#undef backendrtcCompileProgram
-#undef backendrtcGetProgramLogSize
-#undef backendrtcGetProgramLog
 #undef backendrtcDestroyProgram
+#undef backendrtcGetProgramLog
+#undef backendrtcGetProgramLogSize
+#undef backendrtcCompileProgram
+#undef backendrtcCreateProgram
+#undef backendrtcProgram
+#undef backendrtcGetErrorString
+#undef backendrtcResult
+
+#undef backendDriverGetVersion
+#undef backendGetDeviceProperties
+#undef backendSetDevice
+#undef backendGetDeviceCount
+#undef backendDeviceSynchronize
+#undef backendMemcpyDeviceToHost
+#undef backendMemcpyHostToDevice
+#undef backendFree
+#undef backendMemcpy
+#undef backendMalloc
+#undef backendGetErrorName
+#undef backendSuccess
+#undef backendError_t
 
 #undef TOKEN_PASTE
 #undef TOKEN_PASTE_
