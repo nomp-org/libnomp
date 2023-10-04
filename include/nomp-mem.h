@@ -1,7 +1,6 @@
 #if !defined(_NOMP_MEM_H_)
 #define _NOMP_MEM_H_
 
-#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 

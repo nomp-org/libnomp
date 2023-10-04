@@ -1,8 +1,7 @@
 #if !defined(_NOMP_LOOPY_H_)
 #define _NOMP_LOOPY_H_
 
-#define PY_SSIZE_T_CLEAN
-#include <Python.h>
+#include "nomp-impl.h"
 
 #ifdef __cplusplus
 extern "C" {

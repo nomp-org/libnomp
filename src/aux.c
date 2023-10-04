@@ -1,4 +1,13 @@
-#include "nomp-impl.h"
+#include <ctype.h>
+#include <limits.h>
+#include <stdarg.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+#include "nomp-aux.h"
+#include "nomp-log.h"
+#include "nomp-mem.h"
 
 /**
  * @ingroup nomp_other_utils

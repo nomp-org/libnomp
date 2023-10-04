@@ -1,5 +1,6 @@
+#include "nomp-aux.h"
 #include "nomp-impl.h"
-#include <symengine/cwrapper.h>
+#include "nomp-loopy.h"
 
 static const char *module_loopy_api = "loopy_api";
 static const char *module_reduction = "reduction";
