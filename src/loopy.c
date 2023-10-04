@@ -20,7 +20,7 @@ static char backend[NOMP_MAX_BUFFER_SIZE + 1];
  * @param obj Python object to be printed.
  * @return void
  */
-void nomp_py_print(const char *const message, PyObject *const obj) {
+void nomp_py_get_str(const char *const message, PyObject *const obj) {
   PyObject *py_repr = PyObject_Repr(obj);
   PyObject *py_str = PyUnicode_AsEncodedString(py_repr, "utf-8", "~E~");
   const char *str = PyBytes_AS_STRING(py_str);
@@ -305,9 +305,9 @@ int nomp_py_get_knl_name_and_src(char **name, char **src,
  * as backend, device details, etc.
  * @return int
  */
-int nomp_py_apply_annotations(PyObject **kernel, PyObject *const function,
-                              const PyObject *const annotations,
-                              const PyObject *const context) {
+int nomp_py_annotate(PyObject **kernel, PyObject *const function,
+                     const PyObject *const annotations,
+                     const PyObject *const context) {
   if (!kernel || !*kernel || !function)
     return 0;
 
@@ -341,9 +341,8 @@ int nomp_py_apply_annotations(PyObject **kernel, PyObject *const function,
  * information such as backend, device details, etc.
  * @return int
  */
-int nomp_py_apply_transform(PyObject **kernel, const char *const file,
-                            const char *function,
-                            const PyObject *const context) {
+int nomp_py_transform(PyObject **kernel, const char *const file,
+                      const char *function, const PyObject *const context) {
   // If either kernel, file, or function are NULL, we don't have to do anything:
   if (kernel == NULL || *kernel == NULL || file == NULL || function == NULL)
     return 0;
