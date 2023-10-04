@@ -76,7 +76,7 @@ static backendrtcResult backend_compile(backendrtcProgram prog,
   return backendrtcCompileProgram(prog, 1, opts);
 }
 
-static int backend_update(struct nomp_backend_t *bnd, struct nomp_mem_t *m,
+static int backend_update(nomp_backend_t *bnd, nomp_mem_t *m,
                           const nomp_map_direction_t op, size_t start,
                           size_t end, size_t usize) {
   if (op & NOMP_ALLOC)
@@ -102,9 +102,8 @@ static int backend_update(struct nomp_backend_t *bnd, struct nomp_mem_t *m,
   return 0;
 }
 
-static int backend_knl_build(struct nomp_backend_t *bnd,
-                             struct nomp_prog_t *prg, const char *source,
-                             const char *name) {
+static int backend_knl_build(nomp_backend_t *bnd, nomp_prog_t *prg,
+                             const char *source, const char *name) {
   struct backend_t *backend = (struct backend_t *)bnd->bptr;
 
   backendrtcProgram prog;
@@ -143,9 +142,8 @@ static int backend_knl_build(struct nomp_backend_t *bnd,
   return 0;
 }
 
-static int backend_knl_run(struct nomp_backend_t *bnd,
-                           struct nomp_prog_t *prg) {
-  struct nomp_arg_t *args = prg->args;
+static int backend_knl_run(nomp_backend_t *bnd, nomp_prog_t *prg) {
+  nomp_arg_t *args = prg->args;
   void *vargs[NOMP_MAX_KERNEL_ARGS_SIZE];
   for (unsigned i = 0; i < prg->nargs; i++) {
     if (args[i].type == NOMP_PTR)
@@ -163,24 +161,24 @@ static int backend_knl_run(struct nomp_backend_t *bnd,
   return 0;
 }
 
-static int backend_knl_free(struct nomp_prog_t *prg) {
+static int backend_knl_free(nomp_prog_t *prg) {
   struct backend_prog_t *bprg = (struct backend_prog_t *)prg->bptr;
   if (bprg)
     check_runtime(backendModuleUnload(bprg->module));
   return 0;
 }
 
-static int backend_sync(struct nomp_backend_t *bnd) {
+static int backend_sync(nomp_backend_t *bnd) {
   check_driver(backendDeviceSynchronize());
   return 0;
 }
 
-static int backend_finalize(struct nomp_backend_t *bnd) {
+static int backend_finalize(nomp_backend_t *bnd) {
   nomp_free(&bnd->bptr);
   return 0;
 }
 
-static int backend_device_query(struct nomp_backend_t *bnd, int device) {
+static int backend_device_query(nomp_backend_t *bnd, int device) {
   backendDeviceProp_t prop;
   check_driver(backendGetDeviceProperties(&prop, device));
 
@@ -221,7 +219,7 @@ static int backend_device_query(struct nomp_backend_t *bnd, int device) {
 }
 
 #define backend_init TOKEN_PASTE(DRIVER, _init)
-int backend_init(struct nomp_backend_t *const backend, const int platform,
+int backend_init(nomp_backend_t *const backend, const int platform,
                  const int device) {
   int num_devices;
   check_driver(backendGetDeviceCount(&num_devices));

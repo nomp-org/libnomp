@@ -47,7 +47,7 @@ static int symengine_evaluate(size_t *out, unsigned i, CVecBasic *vec,
  * @param[in] prg Nomp program.
  * @return int
  */
-int nomp_symengine_eval_grid_size(struct nomp_prog_t *prg) {
+int nomp_symengine_eval_grid_size(nomp_prog_t *prg) {
   // If the expressions are not NULL, iterate through them and evaluate with
   // pymbolic. Also, we should calculate and store a hash of the dict that
   // is passed. If the hash is the same, no need of re-evaluating the grid

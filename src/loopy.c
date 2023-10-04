@@ -36,7 +36,7 @@ void nomp_py_print(const char *const message, PyObject *const obj) {
  * @param[in] cfg Nomp configuration struct of type ::nomp_config_t.
  * @return int
  */
-int nomp_py_init(const struct nomp_config_t *const cfg) {
+int nomp_py_init(const nomp_config_t *const cfg) {
   strncpy(backend, cfg->backend, NOMP_MAX_BUFFER_SIZE);
 
   if (!Py_IsInitialized()) {
@@ -430,7 +430,7 @@ static int py_get_grid_size_aux(PyObject *exp, CVecBasic *vec) {
  * @param[in] knl Python kernel object.
  * @return int
  */
-int nomp_py_get_grid_size(struct nomp_prog_t *prg, PyObject *knl) {
+int nomp_py_get_grid_size(nomp_prog_t *prg, PyObject *knl) {
   int err = 1;
   if (knl) {
     PyObject *callables = PyObject_GetAttrString(knl, "callables_table");
