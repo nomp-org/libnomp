@@ -67,13 +67,8 @@ struct backend_prog_t {
   backendFunction kernel;
 };
 
-static backendrtcResult backend_compile(backendrtcProgram prog,
-                                        struct backend_t *bnd) {
-  char arch[NOMP_MAX_BUFFER_SIZE];
-  snprintf(arch, NOMP_MAX_BUFFER_SIZE, "-arch=compute_%d%d", bnd->prop.major,
-           bnd->prop.minor);
-  const char *opts[2] = {arch, NULL};
-  return backendrtcCompileProgram(prog, 1, opts);
+static backendrtcResult backend_compile(backendrtcProgram prog) {
+  return backendrtcCompileProgram(prog, 0, NULL);
 }
 
 static int backend_update(nomp_backend_t *NOMP_UNUSED(bnd), nomp_mem_t *m,
@@ -109,7 +104,7 @@ static int backend_knl_build(nomp_backend_t *bnd, nomp_prog_t *prg,
   backendrtcProgram prog;
   check_rtc(backendrtcCreateProgram(&prog, source, NULL, 0, NULL, NULL));
 
-  backendrtcResult result = backend_compile(prog, backend);
+  backendrtcResult result = backend_compile(prog);
   if (result != RTC_SUCCESS) {
     const char *err = backendrtcGetErrorString(result);
 
