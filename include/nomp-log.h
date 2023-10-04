@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 
-#include "nomp.h"
+#include "nomp-impl.h"
 
 extern const char *ERR_STR_USER_MAP_PTR_IS_INVALID;
 extern const char *ERR_STR_USER_DEVICE_IS_INVALID;

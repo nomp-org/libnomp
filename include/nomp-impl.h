@@ -6,18 +6,11 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
-#include <assert.h>
-#include <ctype.h>
-#include <limits.h>
-#include <math.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include <symengine/cwrapper.h>
 
 #include "nomp-defs.h"
+#include "nomp-log.h"
+#include "nomp-mem.h"
 #include "nomp.h"
 
 /**
@@ -196,6 +189,10 @@ struct nomp_backend {
 
 typedef struct nomp_backend nomp_backend_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @defgroup nomp_internal_macros Internal macros
  * @brief Internal macros used in libnomp.
@@ -220,17 +217,8 @@ typedef struct nomp_backend nomp_backend_t;
       return err_;                                                             \
   }
 
-#include "nomp-aux.h"
-#include "nomp-log.h"
-#include "nomp-loopy.h"
-#include "nomp-mem.h"
-
 #define NOMP_MEM_OFFSET(start, usize) ((start) * (usize))
 #define NOMP_MEM_BYTES(start, end, usize) (((end) - (start)) * (usize))
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /**
  * @defgroup nomp_backend_init Backend initialization functions

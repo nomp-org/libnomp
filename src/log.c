@@ -1,7 +1,9 @@
-#include "nomp-impl.h"
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+
+#include "nomp-impl.h"
+#include "nomp-log.h"
 
 const char *ERR_STR_USER_MAP_PTR_IS_INVALID =
     "Map pointer %p was not found on device.";

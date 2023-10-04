@@ -1,12 +1,7 @@
 #if !defined(_NOMP_AUX_H_)
 #define _NOMP_AUX_H_
 
-#include <ctype.h>
-#include <limits.h>
-#include <stdarg.h>
 #include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 
 #ifdef __cplusplus
 extern "C" {
