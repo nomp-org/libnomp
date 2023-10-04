@@ -21,8 +21,8 @@ Functions
    :project: libnomp
    :content-only:
 
-Errors
-^^^^^^
-.. doxygengroup:: nomp_user_errors
+Error Codes
+^^^^^^^^^^^
+.. doxygengroup:: nomp_error_codes
    :project: libnomp
    :content-only:

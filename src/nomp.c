@@ -453,7 +453,7 @@ static inline nomp_prog_t *init_args(int progs_n, int nargs, va_list args) {
  * data can be passed using the \p clauses as well. After \p clauses, number of
  * arguments to the kernel must be provided. Then for each argument, three
  * values has to be passed. First is the argument name as a string. Second is
- * is the `sizeof` argument and the third if argument type (one of @ref
+ * is the `sizeof` argument and the third if argument type (one of \ref
  * nomp_user_types).
  *
  * <b>Example usage:</b>

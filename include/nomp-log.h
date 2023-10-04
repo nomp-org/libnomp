@@ -57,9 +57,9 @@ int nomp_log_(const char *desc, int errorno, nomp_log_type_t type, ...);
  * @def nomp_log
  *
  * @brief Log an error, warning or an info message. Use this instead of
- * using the @ref nomp_log_ function directly.
+ * using the nomp_log_() function directly.
  *
- * @param errorno Error number (One of @ref nomp_user_errors. used only when
+ * @param errorno Error number (One of \ref nomp_error_codes. used only when
  * type is an error).
  * @param type Log type one of ::nomp_log_type_t.
  * @param ... Log message as a C-string followed by arguments.

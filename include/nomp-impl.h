@@ -15,6 +15,7 @@
 
 /**
  * @defgroup nomp_internal_types Internal types
+ *
  * @brief Internal types used in libnomp.
  */
 
@@ -256,16 +257,26 @@ typedef struct nomp_backend nomp_backend_t;
 extern "C" {
 #endif
 
+/**
+ * @defgroup nomp_internal_macros Internal macros
+ *
+ * @brief Internal macros used in libnomp.
+ */
+
+/**
+ * @ingroup nomp_internal_macros
+ *
+ * @def NOMP_UNUSED
+ *
+ * @brief Macro to mark unused variables. Used to avoid `-Wunused-variable`
+ * warning. This required since Some backend functions may not use all the
+ * arguments defined in the function signature.
+ */
 #ifdef __GNUC__
 #define NOMP_UNUSED(x) NOMP_UNUSED_##x __attribute__((__unused__))
 #else
 #define NOMP_UNUSED(x) NOMP_UNUSED_##x
 #endif
-
-/**
- * @defgroup nomp_internal_macros Internal macros
- * @brief Internal macros used in libnomp.
- */
 
 /**
  * @ingroup nomp_internal_macros

@@ -101,7 +101,7 @@ int nomp_py_append_to_sys_path(const char *path) {
  * Check if there is python function \p function exist in the python module
  * \p module.  Returns 0 if both module and function exist, otherwise returns
  * an error id which can beused to query the error id and string using
- * nomp_get_err_str() and nomp_get_err_id(). The \p module should be provided
+ * nomp_get_err_str() and nomp_get_err_no(). The \p module should be provided
  * without the ".py" extension.
  *
  * @param[in] module Python module name without the ".py" extension.

@@ -3,6 +3,10 @@
 
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @defgroup nomp_user_types User types
  * @brief Data types used in libnomp user API.
@@ -11,8 +15,9 @@
 /**
  * @ingroup nomp_user_types
  *
- * @brief Defines argument types for a nomp kernel. Currently, only integer,
- * float or pointer types are supported.
+ * @brief Defines argument types supported for a nomp kernel. Used in nomp_jit()
+ * which is used for kernel creation. Currently, only integer, float or pointer
+ * types are supported as kernel arguments.
  */
 typedef enum {
   NOMP_INT = 2048,   /*!< Signed integer argument type.*/
@@ -23,7 +28,7 @@ typedef enum {
 
 /**
  * @ingroup nomp_user_types
- * @brief Defines the update method (or operation) in nomp_update().
+ * @brief Defines the update method (operation) in nomp_update().
  */
 typedef enum {
   NOMP_ALLOC = 1, /*!< Allocate memory on the device.*/
@@ -34,102 +39,124 @@ typedef enum {
 } nomp_map_direction_t;
 
 /**
- * @defgroup nomp_user_errors Error codes returned to the user.
+ * @defgroup nomp_error_codes Error codes returned to the user
  *
- * @brief Error codes returned by libnomp user API calls to the
- * user. These error codes are negative integers.
+ * @brief Error codes used by internal libnomp functions when calling
+ * nomp_log() with ::NOMP_ERROR. User can query these error codes using
+ * nomp_get_err_no() by passing the return value of a libnomp function call
+ * in case of an error. \p NOMP_SUCCESS is used for error code when
+ * nomp_log() is called with ::NOMP_WARNING or ::NOMP_INFO.
  */
 
 /**
- * @ingroup nomp_user_errors
+ * @ingroup nomp_error_codes
+ *
+ * @brief libnomp API call was successful.
+ */
+#define NOMP_SUCCESS 0
+/**
+ * @ingroup nomp_error_codes
+ *
  * @brief One of the inputs to a libnomp function call are not valid.
  */
 #define NOMP_USER_INPUT_IS_INVALID -128
 /**
- * @ingroup nomp_user_errors
+ * @ingroup nomp_error_codes
+ *
  * @brief Map pointer provided to libnomp is not valid.
  */
 #define NOMP_USER_MAP_PTR_IS_INVALID -130
 /**
- * @ingroup nomp_user_errors
+ * @ingroup nomp_error_codes
+ *
  * @brief Map operation provided to libnomp is not applicable.
  */
 #define NOMP_USER_MAP_OP_IS_INVALID -132
 /**
- * @ingroup nomp_user_errors
+ * @ingroup nomp_error_codes
+ *
  * @brief Log id provided to libnomp is not valid.
  */
 #define NOMP_USER_LOG_ID_IS_INVALID -134
 /**
- * @ingroup nomp_user_errors
+ * @ingroup nomp_error_codes
+ *
  * @brief Kernel argument type provided to libnomp is not valid.
  */
 #define NOMP_USER_KNL_ARG_TYPE_IS_INVALID -136
 
 /**
- * @ingroup nomp_user_errors
+ * @ingroup nomp_error_codes
+ *
  * @brief libnomp is already initialized.
  */
 #define NOMP_INITIALIZE_FAILURE -256
 /**
- * @ingroup nomp_user_errors
+ * @ingroup nomp_error_codes
+ *
  * @brief Failed to finalize libnomp.
  */
 #define NOMP_FINALIZE_FAILURE -258
 /**
- * @ingroup nomp_user_errors
+ * @ingroup nomp_error_codes
+ *
  * @brief The feature is not implemented.
  */
 #define NOMP_NOT_IMPLEMENTED_ERROR -260
 
 /**
- * @ingroup nomp_user_errors
+ *
+ * @ingroup nomp_error_codes
  * @brief A python call made by libnomp failed.
  */
 #define NOMP_PY_CALL_FAILURE -384
 /**
- * @ingroup nomp_user_errors
+ * @ingroup nomp_error_codes
+ *
  * @brief Loopy conversion failed.
  */
 #define NOMP_LOOPY_CONVERSION_FAILURE -386
 /**
- * @ingroup nomp_user_errors
+ * @ingroup nomp_error_codes
+ *
  * @brief Failed to find loopy kernel.
  */
 #define NOMP_LOOPY_KNL_NAME_NOT_FOUND -388
 /**
- * @ingroup nomp_user_errors
+ * @ingroup nomp_error_codes
+ *
  * @brief Code generation from loopy kernel failed.
  */
 #define NOMP_LOOPY_CODEGEN_FAILURE -390
 /**
- * @ingroup nomp_user_errors
+ * @ingroup nomp_error_codes
+ *
  * @brief Code generation from loopy kernel failed.
  */
 #define NOMP_LOOPY_GRIDSIZE_FAILURE -392
 /**
- * @ingroup nomp_user_errors
+ * @ingroup nomp_error_codes
+ *
  * @brief libnomp CUDA operation failed.
  */
 #define NOMP_CUDA_FAILURE -512
 /**
- * @ingroup nomp_user_errors
+ * @ingroup nomp_error_codes
+ *
  * @brief libnomp HIP failed.
  */
 #define NOMP_HIP_FAILURE -514
 /**
- * @ingroup nomp_user_errors
+ * @ingroup nomp_error_codes
+ *
  * @brief libnomp OpenCL failure.
  */
 #define NOMP_OPENCL_FAILURE -516
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /**
  * @defgroup nomp_user_api User API
- * @brief libnomp API functions defined in `nomp.h`.
+ *
+ * @brief libnomp user API functions.
  */
 
 int nomp_init(int argc, const char **argv);
