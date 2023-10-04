@@ -1,10 +1,10 @@
 #include "nomp-impl.h"
 #include "nomp-reduction.h"
 
-static struct nomp_backend_t nomp;
+static nomp_backend_t nomp;
 static int initialized = 0;
 
-static inline int check_env_vars(struct nomp_config_t *const cfg) {
+static inline int check_env_vars(nomp_config_t *const cfg) {
   char *tmp = NULL;
 
   if ((tmp = getenv("NOMP_INSTALL_DIR")))
@@ -40,8 +40,8 @@ static inline int nomp_check_cmd_line_aux(const unsigned i, const unsigned argc,
   return 0;
 }
 
-static inline int nomp_check_cmd_line(struct nomp_config_t *const cfg,
-                                      unsigned argc, const char **argv) {
+static inline int nomp_check_cmd_line(nomp_config_t *const cfg, unsigned argc,
+                                      const char **argv) {
   if (argc <= 1 || argv == NULL)
     return 0;
 
@@ -88,7 +88,7 @@ static inline int nomp_check_cmd_line(struct nomp_config_t *const cfg,
 }
 
 static inline int nomp_set_configs(int argc, const char **argv,
-                                   struct nomp_config_t *const cfg) {
+                                   nomp_config_t *const cfg) {
   // verbose, profile, device and platform id are all initialized to zero.
   // Everything else has to be set by user explicitly.
   cfg->verbose = NOMP_DEFAULT_VERBOSE;
@@ -129,23 +129,23 @@ static inline int nomp_set_configs(int argc, const char **argv,
   return 0;
 }
 
-static inline int allocate_scratch_memory(struct nomp_backend_t *bnd) {
-  struct nomp_mem_t *m = &bnd->scratch;
+static inline int allocate_scratch_memory(nomp_backend_t *bnd) {
+  nomp_mem_t *m = &bnd->scratch;
   m->idx0 = 0, m->idx1 = NOMP_MAX_SCRATCH_SIZE, m->usize = sizeof(char);
   nomp_check(bnd->update(bnd, m, NOMP_ALLOC, m->idx0, m->idx1, m->usize));
   m->hptr = nomp_calloc(char, m->idx1 - m->idx0);
   return 0;
 }
 
-static inline int deallocate_scratch_memory(struct nomp_backend_t *bnd) {
-  struct nomp_mem_t *m = &bnd->scratch;
+static inline int deallocate_scratch_memory(nomp_backend_t *bnd) {
+  nomp_mem_t *m = &bnd->scratch;
   nomp_check(bnd->update(bnd, m, NOMP_FREE, m->idx0, m->idx1, m->usize));
   nomp_free(&m->hptr);
   return 0;
 }
 
-static inline int init_backend(struct nomp_backend_t *const bnd,
-                               const struct nomp_config_t *const cfg) {
+static inline int init_backend(nomp_backend_t *const bnd,
+                               const nomp_config_t *const cfg) {
   bnd->py_context = PyDict_New();
   PyObject *obj = PyUnicode_FromString(cfg->backend);
   PyDict_SetItemString(bnd->py_context, "backend::name", obj);
@@ -219,7 +219,7 @@ int nomp_init(int argc, const char **argv) {
                     "libnomp is already initialized.");
   }
 
-  struct nomp_config_t cfg;
+  nomp_config_t cfg;
   nomp_check(nomp_set_configs(argc, argv, &cfg));
 
   nomp_check(nomp_py_init(&cfg));
@@ -243,7 +243,7 @@ int nomp_init(int argc, const char **argv) {
   return 0;
 }
 
-static struct nomp_mem_t **mems = NULL;
+static nomp_mem_t **mems = NULL;
 static unsigned mems_n = 0;
 static unsigned mems_max = 0;
 
@@ -255,9 +255,9 @@ static unsigned mems_max = 0;
  * has been allocated for \p p on the device, returns NULL.
  *
  * @param[in] p Host pointer
- * @return struct nomp_mem_t *
+ * @return nomp_mem_t *
  */
-static inline struct nomp_mem_t *mem_if_mapped(void *p) {
+static inline nomp_mem_t *mem_if_mapped(void *p) {
   // FIXME: This is O(N) in number of allocations.
   // Needs to go. Must store a hashmap.
   for (unsigned i = 0; i < mems_n; i++) {
@@ -331,9 +331,9 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize,
     op |= NOMP_ALLOC;
     if (mems_n == mems_max) {
       mems_max += mems_max / 2 + 1;
-      mems = nomp_realloc(mems, struct nomp_mem_t *, mems_max);
+      mems = nomp_realloc(mems, nomp_mem_t *, mems_max);
     }
-    struct nomp_mem_t *m = mems[mems_n] = nomp_calloc(struct nomp_mem_t, 1);
+    nomp_mem_t *m = mems[mems_n] = nomp_calloc(nomp_mem_t, 1);
     m->idx0 = idx0, m->idx1 = idx1, m->usize = usize;
     m->hptr = ptr, m->bptr = NULL;
   }
@@ -350,7 +350,7 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize,
   return 0;
 }
 
-static struct nomp_prog_t **progs = NULL;
+static nomp_prog_t **progs = NULL;
 static unsigned progs_n = 0;
 static unsigned progs_max = 0;
 
@@ -359,7 +359,7 @@ struct nomp_meta_t {
   PyObject *dict;
 };
 
-static int parse_clauses(struct nomp_meta_t *meta, struct nomp_prog_t *prg,
+static int parse_clauses(struct nomp_meta_t *meta, nomp_prog_t *prg,
                          const char **clauses) {
   // Currently, we only support `transform` and
   // `annotate` and `jit`.
@@ -425,10 +425,9 @@ static int parse_clauses(struct nomp_meta_t *meta, struct nomp_prog_t *prg,
   return 0;
 }
 
-static inline struct nomp_prog_t *init_args(int progs_n, int nargs,
-                                            va_list args) {
-  struct nomp_prog_t *prg = progs[progs_n] = nomp_calloc(struct nomp_prog_t, 1);
-  prg->args = nomp_calloc(struct nomp_arg_t, nargs);
+static inline nomp_prog_t *init_args(int progs_n, int nargs, va_list args) {
+  nomp_prog_t *prg = progs[progs_n] = nomp_calloc(nomp_prog_t, 1);
+  prg->args = nomp_calloc(nomp_arg_t, nargs);
   prg->nargs = nargs, prg->redn_idx = -1;
   prg->map = mapbasicbasic_new();
   prg->sym_global = vecbasic_new(), prg->sym_local = vecbasic_new();
@@ -437,7 +436,7 @@ static inline struct nomp_prog_t *init_args(int progs_n, int nargs,
     strncpy(prg->args[i].name, va_arg(args, const char *),
             NOMP_MAX_BUFFER_SIZE);
     prg->args[i].size = va_arg(args, size_t);
-    prg->args[i].type = va_arg(args, int);
+    prg->args[i].type = va_arg(args, nomp_type_t);
   }
   return prg;
 }
@@ -485,13 +484,13 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
 
   if (progs_n == progs_max) {
     progs_max += progs_max / 2 + 1;
-    progs = nomp_realloc(progs, struct nomp_prog_t *, progs_max);
+    progs = nomp_realloc(progs, nomp_prog_t *, progs_max);
   }
 
-  // Initialize the struct nomp_prog_t with the kernel input arguments.
+  // Initialize the nomp_prog_t with the kernel input arguments.
   va_list args;
   va_start(args, nargs);
-  struct nomp_prog_t *prg = init_args(progs_n, nargs, args);
+  nomp_prog_t *prg = init_args(progs_n, nargs, args);
   va_end(args);
 
   // Parse the clauses to find transformations file, function and other
@@ -569,11 +568,11 @@ int nomp_run(int id, ...) {
                     "Kernel id %d passed to nomp_run is not valid.", id);
   }
 
-  struct nomp_prog_t *prg = progs[id];
+  nomp_prog_t *prg = progs[id];
   prg->eval_grid = 0;
 
-  struct nomp_arg_t *args = prg->args;
-  struct nomp_mem_t *m;
+  nomp_arg_t *args = prg->args;
+  nomp_mem_t *m;
   long val;
 
   va_list vargs;
@@ -601,6 +600,9 @@ int nomp_run(int id, ...) {
         }
       }
       args[i].size = m->bsize, args[i].ptr = m->bptr;
+      break;
+    case NOMP_FLOAT:
+    default:
       break;
     }
   }

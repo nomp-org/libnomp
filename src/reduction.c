@@ -30,8 +30,8 @@ NOMP_FOR_EACH_DOMAIN(NOMP_REDUCTION, PROD)
  * @param[in] m Memory used to store device side partial reductions.
  * @return int
  */
-int nomp_host_side_reduction(struct nomp_backend_t *backend,
-                             struct nomp_prog_t *prg, struct nomp_mem_t *m) {
+int nomp_host_side_reduction(nomp_backend_t *backend, nomp_prog_t *prg,
+                             nomp_mem_t *m) {
   int dom = prg->redn_type, op = prg->redn_op;
   size_t size = prg->redn_size;
   void *out = prg->redn_ptr;

@@ -68,7 +68,7 @@ struct opencl_prog_t {
   cl_kernel knl;
 };
 
-static int opencl_update(struct nomp_backend_t *bnd, struct nomp_mem_t *m,
+static int opencl_update(nomp_backend_t *bnd, nomp_mem_t *m,
                          const nomp_map_direction_t op, size_t start,
                          size_t end, size_t usize) {
   struct opencl_backend_t *ocl = (struct opencl_backend_t *)bnd->bptr;
@@ -105,7 +105,7 @@ static int opencl_update(struct nomp_backend_t *bnd, struct nomp_mem_t *m,
   return 0;
 }
 
-static int opencl_knl_build(struct nomp_backend_t *bnd, struct nomp_prog_t *prg,
+static int opencl_knl_build(nomp_backend_t *bnd, nomp_prog_t *prg,
                             const char *source, const char *name) {
   struct opencl_prog_t *ocl_prg = nomp_calloc(struct opencl_prog_t, 1);
 
@@ -138,7 +138,7 @@ static int opencl_knl_build(struct nomp_backend_t *bnd, struct nomp_prog_t *prg,
   return 0;
 }
 
-static int opencl_knl_run(struct nomp_backend_t *bnd, struct nomp_prog_t *prg) {
+static int opencl_knl_run(nomp_backend_t *bnd, nomp_prog_t *prg) {
   struct opencl_prog_t *ocl_prg = (struct opencl_prog_t *)prg->bptr;
 
   for (unsigned i = 0; i < prg->nargs; i++) {
@@ -155,7 +155,7 @@ static int opencl_knl_run(struct nomp_backend_t *bnd, struct nomp_prog_t *prg) {
   return 0;
 }
 
-static int opencl_knl_free(struct nomp_prog_t *prg) {
+static int opencl_knl_free(nomp_prog_t *prg) {
   struct opencl_prog_t *ocl_prg = (struct opencl_prog_t *)prg->bptr;
 
   if (ocl_prg) {
@@ -167,13 +167,13 @@ static int opencl_knl_free(struct nomp_prog_t *prg) {
   return 0;
 }
 
-static int opencl_sync(struct nomp_backend_t *bnd) {
+static int opencl_sync(nomp_backend_t *bnd) {
   struct opencl_backend_t *ocl = (struct opencl_backend_t *)bnd->bptr;
   check(clFinish(ocl->queue), "clFinish");
   return 0;
 }
 
-static int opencl_finalize(struct nomp_backend_t *bnd) {
+static int opencl_finalize(nomp_backend_t *bnd) {
   struct opencl_backend_t *ocl = (struct opencl_backend_t *)bnd->bptr;
 
   if (ocl) {
@@ -185,7 +185,7 @@ static int opencl_finalize(struct nomp_backend_t *bnd) {
   return 0;
 }
 
-static int opencl_device_query(struct nomp_backend_t *bnd, cl_device_id id) {
+static int opencl_device_query(nomp_backend_t *bnd, cl_device_id id) {
 #define set_string(KEY, VAL)                                                   \
   {                                                                            \
     PyObject *obj = PyUnicode_FromString(VAL);                                 \
@@ -251,7 +251,7 @@ static int opencl_device_query(struct nomp_backend_t *bnd, cl_device_id id) {
  * @param[in] device_id Target device id.
  * @return int
  */
-int opencl_init(struct nomp_backend_t *bnd, const int platform_id,
+int opencl_init(nomp_backend_t *bnd, const int platform_id,
                 const int device_id) {
   cl_uint num_platforms;
   check(clGetPlatformIDs(0, NULL, &num_platforms), "clGetPlatformIDs");

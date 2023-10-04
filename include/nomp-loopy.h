@@ -4,9 +4,6 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
-struct nomp_prog_t;
-struct nomp_config_t;
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -17,7 +14,7 @@ extern "C" {
  * @brief Python helper functions for calling loopy and other python functions.
  */
 
-int nomp_py_init(const struct nomp_config_t *cfg);
+int nomp_py_init(const nomp_config_t *cfg);
 
 int nomp_py_append_to_sys_path(const char *path);
 
@@ -39,9 +36,9 @@ int nomp_py_apply_transform(PyObject **knl, const char *file, const char *func,
 
 int nomp_py_get_knl_name_and_src(char **name, char **src, const PyObject *knl);
 
-int nomp_py_get_grid_size(struct nomp_prog_t *prg, PyObject *knl);
+int nomp_py_get_grid_size(nomp_prog_t *prg, PyObject *knl);
 
-int nomp_symengine_eval_grid_size(struct nomp_prog_t *prg);
+int nomp_symengine_eval_grid_size(nomp_prog_t *prg);
 
 int nomp_symengine_update(CMapBasicBasic *map, const char *key, const long val);
 

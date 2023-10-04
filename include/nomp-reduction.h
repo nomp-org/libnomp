@@ -25,7 +25,7 @@
  * @defgroup nomp_reduction_utils Reduction utilities
  * @brief Perform host side reductions.
  */
-int nomp_host_side_reduction(struct nomp_backend_t *bnd,
-                             struct nomp_prog_t *prg, struct nomp_mem_t *m);
+int nomp_host_side_reduction(nomp_backend_t *bnd, nomp_prog_t *prg,
+                             nomp_mem_t *m);
 
 #endif
