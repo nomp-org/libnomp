@@ -96,7 +96,7 @@ int nomp_log_(const char *description, int errorno, nomp_log_type_t type, ...) {
  * @details Returns the log of the given error id. Returns NULL if the
  * id is invalid.
  *
- * @param[in] id id of the error log returned by @ref nomp_log.
+ * @param[in] id id of the error log returned by nomp_log().
  * @return char*
  */
 char *nomp_get_err_str(unsigned id) {
@@ -112,9 +112,9 @@ char *nomp_get_err_str(unsigned id) {
  * @brief Return log number given the log id.
  *
  * @details Returns the error number given the id. If id is invalid return
- * NOMP_USER_LOG_ID_IS_INVALID. Error number is one of @ref nomp_user_errors.
+ * NOMP_USER_LOG_ID_IS_INVALID. Error number is one of @ref nomp_error_codes.
  *
- * @param[in] id id of the log returned by @ref nomp_log().
+ * @param[in] id id of the log returned by nomp_log().
  * @return int
  */
 int nomp_get_err_no(unsigned id) {

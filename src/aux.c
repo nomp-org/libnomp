@@ -128,7 +128,7 @@ char *nomp_copy_env(const char *name, size_t size) {
  * length resolution was successful. Otherwise, it is set to zero. On success,
  * the function returns zero. Otherwise, it returns an error id which can be
  * used to query the error id and string using nomp_get_err_str() and
- * nomp_get_err_id().
+ * nomp_get_err_no().
  *
  * @param[out] len Lenth of path specified in \p path.
  * @param[in] path Path to get the maximum length.
