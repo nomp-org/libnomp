@@ -281,19 +281,21 @@ static unsigned mem_if_exist(void *p, size_t idx0, size_t idx1, size_t usize) {
 
 /**
  * @ingroup nomp_user_api
- * @brief Performs device to host (D2H) and host to device (H2D) memory
- * transfers, allocating and freeing of memory in the device.
  *
- * @param[in] ptr Pointer to the host memory location.
- * @param[in] idx0 Start index in the vector to start copying.
- * @param[in] idx1 End index in the vector to end the copying.
- * @param[in] usize Size of a single vector element.
- * @param[in] op Operation to perform (One of #nomp_map_direction_t).
- * @return int
+ * @brief libnomp function for managing device memory. This can be used to
+ * performs device to host (D2H) and host to device (H2D) memory
+ * transfers, device memory allocation and release.
  *
  * @details Operation \p op will be performed on the array slice [\p start_idx,
  * \p end_idx), i.e., on array elements start_idx, ... end_idx - 1. This method
  * returns a non-zero value if there is an error and 0 otherwise.
+ *
+ * @param[in] ptr Pointer to host memory location (start of host memory array).
+ * @param[in] idx0 Start index in the \p ptr to start copying.
+ * @param[in] idx1 End index in the \p ptr to end the copying.
+ * @param[in] unit_size Size of a single element in the array \p ptr.
+ * @param[in] op Operation to perform (One of ::nomp_map_direction_t).
+ * @return int
  *
  * <b>Example usage:</b>
  * @code{.c}
@@ -316,9 +318,9 @@ static unsigned mem_if_exist(void *p, size_t idx0, size_t idx1, size_t usize) {
  *
  * @endcode
  */
-int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize,
+int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t unit_size,
                 nomp_map_direction_t op) {
-  unsigned idx = mem_if_exist(ptr, idx0, idx1, usize);
+  unsigned idx = mem_if_exist(ptr, idx0, idx1, unit_size);
   if (idx == mems_n) {
     // A new entry can't be created with NOMP_FREE or
     // NOMP_FROM.
@@ -334,11 +336,11 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t usize,
       mems = nomp_realloc(mems, nomp_mem_t *, mems_max);
     }
     nomp_mem_t *m = mems[mems_n] = nomp_calloc(nomp_mem_t, 1);
-    m->idx0 = idx0, m->idx1 = idx1, m->usize = usize;
+    m->idx0 = idx0, m->idx1 = idx1, m->usize = unit_size;
     m->hptr = ptr, m->bptr = NULL;
   }
 
-  nomp_check(nomp.update(&nomp, mems[idx], op, idx0, idx1, usize));
+  nomp_check(nomp.update(&nomp, mems[idx], op, idx0, idx1, unit_size));
 
   // Device memory object was released.
   if (mems[idx]->bptr == NULL)
@@ -415,6 +417,7 @@ static inline nomp_prog_t *init_args(int progs_n, int nargs, va_list args) {
 
 /**
  * @ingroup nomp_user_api
+ *
  * @brief Generate and compile a kernel for the target backend (OpenCL, etc.)
  * from C source.
  *
