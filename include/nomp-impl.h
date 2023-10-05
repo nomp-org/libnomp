@@ -292,10 +292,10 @@ extern "C" {
  */
 #define nomp_check(err)                                                        \
   {                                                                            \
+    nomp_log(NOMP_SUCCESS, NOMP_INFO, "Calling %s ...", #err);                 \
     int err_ = (err);                                                          \
     if (err_ > 0)                                                              \
       return err_;                                                             \
-    nomp_log(NOMP_SUCCESS, NOMP_INFO, "OK. Function: %s", __func__);           \
   }
 
 #define NOMP_MEM_OFFSET(start, usize) ((start) * (usize))
