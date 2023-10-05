@@ -240,8 +240,6 @@ int nomp_init(int argc, const char **argv) {
 
   initialized = 1;
 
-  nomp_log(NOMP_SUCCESS, NOMP_INFO, "libnomp initialized successfully.");
-
   return 0;
 }
 
@@ -356,9 +354,9 @@ static nomp_prog_t **progs = NULL;
 static unsigned progs_n = 0;
 static unsigned progs_max = 0;
 
-static int act_on_clases(PyObject **kernel, nomp_prog_t *program,
-                         const char **const clauses,
-                         const nomp_backend_t *const backend) {
+static int act_on_clauses(PyObject **kernel, nomp_prog_t *program,
+                          const char **const clauses,
+                          const nomp_backend_t *const backend) {
   // Currently, we only support `transform` and `reduce` clauses.
   unsigned i = 0;
   while (clauses[i]) {
@@ -472,7 +470,7 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
   nomp_check(nomp_py_c_to_loopy(&knl, csrc));
 
   // Act on the clauses: transform, reduce, etc. and get the kernel
-  nomp_check(act_on_clases(&knl, prg, clauses, &nomp));
+  nomp_check(act_on_clauses(&knl, prg, clauses, &nomp));
 
   // Handle reductions if they exist.
   if (prg->redn_idx >= 0)
