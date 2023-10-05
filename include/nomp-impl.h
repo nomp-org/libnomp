@@ -16,7 +16,7 @@
 /**
  * @defgroup nomp_internal_types Internal types
  *
- * @brief Internal types used in libnomp.
+ * @brief Internal types (structures and enums) used by libnomp.
  */
 
 /**

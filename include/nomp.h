@@ -9,7 +9,8 @@ extern "C" {
 
 /**
  * @defgroup nomp_user_types User types
- * @brief Data types used in libnomp user API.
+ *
+ * @brief Below is a list of data types that are used in the user API.
  */
 
 /**
