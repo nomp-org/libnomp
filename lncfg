@@ -3,7 +3,7 @@
 # Check for nomp environment variables.
 : "${NOMP_SOURCE_DIR:="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"}"
 : "${NOMP_BUILD_DIR:="${NOMP_SOURCE_DIR}/build"}"
-: "${NOMP_INSTALL_DIR:="${HOME}/.nomp"}"
+: "${NOMP_INSTALL_DIR:="${HOME}/.nomp/libnomp"}"
 : "${NOMP_PREFIX_PATH:=""}"
 : "${NOMP_BUILD_TYPE:="RelWithDebInfo"}"
 : "${NOMP_ENABLE_OPENCL:="OFF"}"
