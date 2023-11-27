@@ -72,6 +72,12 @@ function print_help() {
 : ${NOMP_ISORT_CHECK:="no"}
 : ${NOMP_FLAKE8:="no"}
 : ${NOMP_PROMPT:="no"}
+
+if [[ $# -eq 0 ]]; then
+  print_help
+  exit 1
+fi
+
 while [[ $# -gt 0 ]]; do
   case $1 in
     --help)
