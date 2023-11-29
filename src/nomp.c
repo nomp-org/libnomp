@@ -153,24 +153,26 @@ static inline int init_backend(nomp_backend_t *const backend,
   PyDict_SetItemString(backend->py_context, "backend::name", py_str_backend);
   Py_XDECREF(py_str_backend);
 
-  if (strncmp(cfg->backend, "opencl", NOMP_MAX_BUFFER_SIZE) == 0) {
 #if defined(OPENCL_ENABLED)
+  if (strncmp(cfg->backend, "opencl", NOMP_MAX_BUFFER_SIZE) == 0) {
     nomp_check(opencl_init(backend, cfg->platform, cfg->device));
-#endif
-  } else if (strncmp(cfg->backend, "cuda", NOMP_MAX_BUFFER_SIZE) == 0) {
-#if defined(CUDA_ENABLED)
-    nomp_check(cuda_init(backend, cfg->platform, cfg->device));
-#endif
-  } else if (strncmp(cfg->backend, "hip", NOMP_MAX_BUFFER_SIZE) == 0) {
-#if defined(HIP_ENABLED)
-    nomp_check(hip_init(backend, cfg->platform, cfg->device));
-#endif
-  } else {
-    return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                    "Invalid backend: %s.", cfg->backend);
+    return 0;
   }
-
-  return 0;
+#endif
+#if defined(CUDA_ENABLED)
+  if (strncmp(cfg->backend, "cuda", NOMP_MAX_BUFFER_SIZE) == 0) {
+    nomp_check(cuda_init(backend, cfg->platform, cfg->device));
+    return 0;
+  }
+#endif
+#if defined(HIP_ENABLED)
+  if (strncmp(cfg->backend, "hip", NOMP_MAX_BUFFER_SIZE) == 0) {
+    nomp_check(hip_init(backend, cfg->platform, cfg->device));
+    return 0;
+  }
+#endif
+  return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
+                  "Invalid backend: %s.", cfg->backend);
 }
 
 /**
