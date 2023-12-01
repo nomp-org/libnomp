@@ -65,7 +65,11 @@ _BACKEND_TO_TARGET = {
     "cuda": lp.CudaTarget(),
     "hip": lp.CudaTarget(),
 }
-_ARRAY_TYPES = [cindex.TypeKind.CONSTANTARRAY, cindex.TypeKind.INCOMPLETEARRAY]
+_ARRAY_TYPES = [
+    cindex.TypeKind.CONSTANTARRAY,
+    cindex.TypeKind.VARIABLEARRAY,
+    cindex.TypeKind.INCOMPLETEARRAY,
+]
 _ARRAY_TYPES_W_PTR = _ARRAY_TYPES + [cindex.TypeKind.POINTER]
 
 
@@ -505,27 +509,23 @@ class CToLoopyMapper(IdentityMapper):
         """Maps a C variable declaration."""
 
         def check_and_parse_decl(expr: cindex.CursorKind):
-            name, init = expr.spelling, None
+            name = expr.spelling
             children = list(expr.get_children())
-            if expr.type.kind == cindex.TypeKind.CONSTANTARRAY:
+
+            init = None
+            if expr.type.kind in _ARRAY_TYPES:
                 dims = []
                 for child in children:
                     if child.kind == cindex.CursorKind.INIT_LIST_EXPR:
                         init = child
-                    # FIXME: This is wrong.
-                    elif child.kind == cindex.CursorKind.INTEGER_LITERAL:
-                        dims.append(child)
                     else:
-                        raise NotImplementedError(
-                            f"Unable to parse: {child.kind}"
-                        )
+                        dims.append(child)
                 shape = tuple(CToLoopyExpressionMapper()(dim) for dim in dims)
                 return (name, shape, init)
             if isinstance(expr.type.kind, cindex.TypeKind):
                 if len(children) == 1:
                     init = children[0]
                 return (name, (), init)
-            raise NotImplementedError(f"Unable to parse: {expr.type.kind}")
 
         (name, shape, init) = check_and_parse_decl(expr)
 
@@ -557,6 +557,7 @@ class CToLoopyMapper(IdentityMapper):
                     )
                 ],
             )
+
         return CToLoopyMapperAccumulator(
             [],
             [],
