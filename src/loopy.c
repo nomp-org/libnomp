@@ -21,7 +21,7 @@ static char backend[NOMP_MAX_BUFFER_SIZE + 1];
  * @return void
  */
 void nomp_py_get_str(const char *const message, PyObject *const obj) {
-  PyObject *py_repr = PyObject_Repr(obj);
+  PyObject *py_repr = PyObject_Str(obj);
   PyObject *py_str = PyUnicode_AsEncodedString(py_repr, "utf-8", "~E~");
   const char *str = PyBytes_AS_STRING(py_str);
   fprintf(stderr, "%s: %s\n", message, str);
