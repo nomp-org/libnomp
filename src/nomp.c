@@ -132,9 +132,9 @@ static inline int nomp_set_configs(int argc, const char **argv,
 
 static inline int allocate_scratch_memory(nomp_backend_t *bnd) {
   nomp_mem_t *m = &bnd->scratch;
-  m->idx0 = 0, m->idx1 = NOMP_MAX_SCRATCH_SIZE, m->usize = sizeof(char);
+  m->idx0 = 0, m->idx1 = NOMP_MAX_SCRATCH_SIZE, m->usize = sizeof(double);
   nomp_check(bnd->update(bnd, m, NOMP_ALLOC, m->idx0, m->idx1, m->usize));
-  m->hptr = nomp_calloc(char, m->idx1 - m->idx0);
+  m->hptr = nomp_calloc(double, m->idx1 - m->idx0);
   return 0;
 }
 
