@@ -1,6 +1,6 @@
 #include "nomp-test.h"
 
-// Invoke with invalid kernel_id
+// Invoking nomp_run() with invalid kernel_id should return an error.
 static int test_invalid_kernel_id(int argc, const char **argv, int *id, int *a,
                                   int *b, int n) {
   const char *knl = "void foo(int *a, int *b, int N) {                      \n"
@@ -27,7 +27,7 @@ static int test_invalid_kernel_id(int argc, const char **argv, int *id, int *a,
   return 0;
 }
 
-// Invoke fails because b is not mapped
+// nomp_run() should fail because `b` is not mapped.
 static int test_unmapped_variable(int id, int *a, int *b, int n) {
   int err = nomp_run(id, a, b, &n);
   nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_MAP_PTR_IS_INVALID);

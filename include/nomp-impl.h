@@ -269,7 +269,7 @@ extern "C" {
  * @def NOMP_UNUSED
  *
  * @brief Macro to mark unused variables. Used to avoid `-Wunused-variable`
- * warning. This required since Some backend functions may not use all the
+ * warning. This is required since some backend functions may not use all the
  * arguments defined in the function signature.
  */
 #ifdef __GNUC__
@@ -305,7 +305,7 @@ extern "C" {
  * @defgroup nomp_backend_init Backend initialization functions
  *
  * @brief Functions for initializing different backend as OpenCL, CUDA, etc.
- * These has to be refactored to handle the case when the backend is not
+ * These have to be refactored to handle the case when the backend is not
  * available.
  */
 
