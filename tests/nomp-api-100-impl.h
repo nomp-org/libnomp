@@ -1,7 +1,7 @@
 #include "nomp-test.h"
 
-#define nomp_api_105_aux TOKEN_PASTE(nomp_api_105_aux, TEST_SUFFIX)
-static int nomp_api_105_aux(const char **clauses) {
+#define nomp_api_100_aux TOKEN_PASTE(nomp_api_100_aux, TEST_SUFFIX)
+static int nomp_api_100_aux(const char **clauses) {
   const char *fmt =
       "void foo(%s *a, int N) {                                             \n"
       "  for (int i = 0; i < N; i++)                                        \n"
@@ -16,21 +16,30 @@ static int nomp_api_105_aux(const char **clauses) {
   return err;
 }
 
-#define nomp_api_105_valid TOKEN_PASTE(nomp_api_105_valid, TEST_SUFFIX)
-static int nomp_api_105_valid(void) {
-  const char *clauses[4] = {"transform", "nomp_api_100", "tile", 0};
-  nomp_test_check(nomp_api_105_aux(clauses));
+#define nomp_api_100_invalid_file                                              \
+  TOKEN_PASTE(nomp_api_100_invalid_file, TEST_SUFFIX)
+static int nomp_api_100_invalid_file(void) {
+  const char *clauses[4] = {"transform", "invalid_file", "tile", 0};
+  int err = nomp_api_100_aux(clauses);
+  nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_INPUT_IS_INVALID);
+
+  char *log = nomp_get_err_str(err);
+  int eq = logcmp(log, "\\[Error\\] .*src\\/.*.c:[0-9]* Python module "
+                       "\"invalid_file\" not found.");
+  nomp_free(&log);
+  nomp_test_assert(eq);
 
   return 0;
 }
-#undef nomp_api_105_valid
+#undef nomp_api_100_invalid_file
 
-#define nomp_api_105_invalid TOKEN_PASTE(nomp_api_105_invalid, TEST_SUFFIX)
-static int nomp_api_105_invalid(void) {
+#define nomp_api_100_invalid_function                                          \
+  TOKEN_PASTE(nomp_api_100_invalid_function, TEST_SUFFIX)
+static int nomp_api_100_invalid_function(void) {
   const char *clauses[4] = {"transform", "nomp_api_100", "invalid_func", 0};
-  int err = nomp_api_105_aux(clauses);
-
+  int err = nomp_api_100_aux(clauses);
   nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_INPUT_IS_INVALID);
+
   char *log = nomp_get_err_str(err);
   int eq =
       logcmp(log, "\\[Error\\] .*src\\/loopy.c:[0-9]* Python function "
@@ -40,5 +49,5 @@ static int nomp_api_105_invalid(void) {
 
   return 0;
 }
-#undef nomp_api_105_invalid
-#undef nomp_api_105_aux
+#undef nomp_api_100_invalid_function
+#undef nomp_api_100_aux
