@@ -182,7 +182,7 @@ static int nomp_api_300_vxm(unsigned n) {
       "    c[i] = dot;                                         \n"
       "  }                                                     \n"
       "}                                                       \n";
-  nomp_api_300_multiply_aux(knl_fmt, a, b, c, n, n * n, n, "nomp_api_215",
+  nomp_api_300_multiply_aux(knl_fmt, a, b, c, n, n * n, n, "nomp_api_225",
                             "tile_outer");
 
 #if defined(TEST_TOL)

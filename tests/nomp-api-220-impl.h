@@ -1,7 +1,7 @@
 #include "nomp-test.h"
 
-#define nomp_api_210_aux TOKEN_PASTE(nomp_api_210_aux, TEST_SUFFIX)
-static int nomp_api_210_aux(const char *fmt, TEST_TYPE *a, int n) {
+#define nomp_api_220_aux TOKEN_PASTE(nomp_api_220_aux, TEST_SUFFIX)
+static int nomp_api_220_aux(const char *fmt, TEST_TYPE *a, int n) {
   nomp_test_check(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO));
 
   int id = -1;
@@ -21,9 +21,9 @@ static int nomp_api_210_aux(const char *fmt, TEST_TYPE *a, int n) {
   return 0;
 }
 
-#define nomp_api_210_bitwise_and                                               \
-  TOKEN_PASTE(nomp_api_210_bitwise_and, TEST_SUFFIX)
-static int nomp_api_210_bitwise_and(unsigned n) {
+#define nomp_api_220_bitwise_and                                               \
+  TOKEN_PASTE(nomp_api_220_bitwise_and, TEST_SUFFIX)
+static int nomp_api_220_bitwise_and(unsigned n) {
   nomp_test_assert(n <= TEST_MAX_SIZE);
 
   TEST_TYPE a[TEST_MAX_SIZE];
@@ -35,18 +35,18 @@ static int nomp_api_210_bitwise_and(unsigned n) {
       "  for (int i = 0; i < N; i++)                                   \n"
       "    a[i] = a[i] & 3;                                            \n"
       "}                                                               \n";
-  nomp_api_210_aux(fmt, a, n);
+  nomp_api_220_aux(fmt, a, n);
 
   for (unsigned i = 0; i < n; i++)
     nomp_test_assert(a[i] == ((TEST_TYPE)i & 3));
 
   return 0;
 }
-#undef nomp_api_210_bitwise_and
+#undef nomp_api_220_bitwise_and
 
-#define nomp_api_210_bitwise_or                                                \
-  TOKEN_PASTE(nomp_api_210_bitwise_or, TEST_SUFFIX)
-static int nomp_api_210_bitwise_or(unsigned n) {
+#define nomp_api_220_bitwise_or                                                \
+  TOKEN_PASTE(nomp_api_220_bitwise_or, TEST_SUFFIX)
+static int nomp_api_220_bitwise_or(unsigned n) {
   nomp_test_assert(n <= TEST_MAX_SIZE);
 
   TEST_TYPE a[TEST_MAX_SIZE];
@@ -58,18 +58,18 @@ static int nomp_api_210_bitwise_or(unsigned n) {
       "  for (int i = 0; i < N; i++)                                   \n"
       "    a[i] = i | 3;                                               \n"
       "}                                                               \n";
-  nomp_api_210_aux(fmt, a, n);
+  nomp_api_220_aux(fmt, a, n);
 
   for (unsigned i = 0; i < n; i++)
     nomp_test_assert(a[i] == ((TEST_TYPE)i | 3));
 
   return 0;
 }
-#undef nomp_api_210_bitwise_or
+#undef nomp_api_220_bitwise_or
 
-#define nomp_api_210_bitwise_xor                                               \
-  TOKEN_PASTE(nomp_api_210_bitwise_xor, TEST_SUFFIX)
-static int nomp_api_210_bitwise_xor(unsigned n) {
+#define nomp_api_220_bitwise_xor                                               \
+  TOKEN_PASTE(nomp_api_220_bitwise_xor, TEST_SUFFIX)
+static int nomp_api_220_bitwise_xor(unsigned n) {
   nomp_test_assert(n <= TEST_MAX_SIZE);
 
   TEST_TYPE a[TEST_MAX_SIZE];
@@ -81,18 +81,18 @@ static int nomp_api_210_bitwise_xor(unsigned n) {
       "  for (int i = 0; i < N; i++)                                   \n"
       "    a[i] = i ^ 3;                                               \n"
       "}                                                               \n";
-  nomp_api_210_aux(fmt, a, n);
+  nomp_api_220_aux(fmt, a, n);
 
   for (unsigned i = 0; i < n; i++)
     nomp_test_assert(a[i] == ((TEST_TYPE)i ^ 3));
 
   return 0;
 }
-#undef nomp_api_210_bitwise_xor
+#undef nomp_api_220_bitwise_xor
 
-#define nomp_api_210_bitwise_left_shift                                        \
-  TOKEN_PASTE(nomp_api_210_bitwise_left_shift, TEST_SUFFIX)
-static int nomp_api_210_bitwise_left_shift(unsigned n) {
+#define nomp_api_220_bitwise_left_shift                                        \
+  TOKEN_PASTE(nomp_api_220_bitwise_left_shift, TEST_SUFFIX)
+static int nomp_api_220_bitwise_left_shift(unsigned n) {
   nomp_test_assert(n <= TEST_MAX_SIZE);
 
   TEST_TYPE a[TEST_MAX_SIZE];
@@ -104,18 +104,18 @@ static int nomp_api_210_bitwise_left_shift(unsigned n) {
       "  for (int i = 0; i < N; i++)                                   \n"
       "    a[i] = a[i] << 3;                                           \n"
       "}                                                               \n";
-  nomp_api_210_aux(fmt, a, n);
+  nomp_api_220_aux(fmt, a, n);
 
   for (unsigned i = 0; i < n; i++)
     nomp_test_assert(a[i] == ((TEST_TYPE)i << 3));
 
   return 0;
 }
-#undef nomp_api_210_bitwise_left_shift
+#undef nomp_api_220_bitwise_left_shift
 
-#define nomp_api_210_bitwise_right_shift                                       \
-  TOKEN_PASTE(nomp_api_210_bitwise_right_shift, TEST_SUFFIX)
-static int nomp_api_210_bitwise_right_shift(unsigned n) {
+#define nomp_api_220_bitwise_right_shift                                       \
+  TOKEN_PASTE(nomp_api_220_bitwise_right_shift, TEST_SUFFIX)
+static int nomp_api_220_bitwise_right_shift(unsigned n) {
   nomp_test_assert(n <= TEST_MAX_SIZE);
 
   TEST_TYPE a[TEST_MAX_SIZE];
@@ -127,18 +127,18 @@ static int nomp_api_210_bitwise_right_shift(unsigned n) {
       "  for (int i = 0; i < N; i++)                                   \n"
       "    a[i] = a[i] >> 3;                                           \n"
       "}                                                               \n";
-  nomp_api_210_aux(fmt, a, n);
+  nomp_api_220_aux(fmt, a, n);
 
   for (unsigned i = 0; i < n; i++)
     nomp_test_assert(a[i] == ((TEST_TYPE)i >> 3));
 
   return 0;
 }
-#undef nomp_api_210_bitwise_right_shift
+#undef nomp_api_220_bitwise_right_shift
 
-#define nomp_api_210_bitwise_complement                                        \
-  TOKEN_PASTE(nomp_api_210_bitwise_complement, TEST_SUFFIX)
-static int nomp_api_210_bitwise_complement(unsigned n) {
+#define nomp_api_220_bitwise_complement                                        \
+  TOKEN_PASTE(nomp_api_220_bitwise_complement, TEST_SUFFIX)
+static int nomp_api_220_bitwise_complement(unsigned n) {
   nomp_test_assert(n <= TEST_MAX_SIZE);
 
   TEST_TYPE a[TEST_MAX_SIZE];
@@ -150,12 +150,12 @@ static int nomp_api_210_bitwise_complement(unsigned n) {
       "  for (int i = 0; i < N; i++)                                   \n"
       "    a[i] = ~ a[i];                                              \n"
       "}                                                               \n";
-  nomp_api_210_aux(fmt, a, n);
+  nomp_api_220_aux(fmt, a, n);
 
   for (unsigned i = 0; i < n; i++)
     nomp_test_assert(a[i] == (~(TEST_TYPE)i));
 
   return 0;
 }
-#undef nomp_api_210_bitwise_complement
-#undef nomp_api_210_aux
+#undef nomp_api_220_bitwise_complement
+#undef nomp_api_220_aux
