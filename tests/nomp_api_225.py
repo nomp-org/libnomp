@@ -1,4 +1,5 @@
-""" Transform script for nomp-api-215 and nomp-api-240. """
+""" Transform script for nomp-api-225, nomp-api-240, nomp-api-300 and
+nomp-api-350. """
 import loopy as lp
 
 LOOPY_LANG_VERSION = (2018, 2)
