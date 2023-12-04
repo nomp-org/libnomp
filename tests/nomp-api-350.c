@@ -13,13 +13,11 @@ static int test_for_loop_bounds(void) {
 }
 
 int main(int argc, const char *argv[]) {
-  int err = nomp_init(argc, argv);
-  nomp_test_check(err);
+  nomp_test_check(nomp_init(argc, argv));
 
-  err |= SUBTEST(test_for_loop_bounds);
+  int err = SUBTEST(test_for_loop_bounds);
 
-  err |= nomp_finalize();
-  nomp_test_check(err);
+  nomp_test_check(nomp_finalize());
 
   return err;
 }
