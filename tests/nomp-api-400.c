@@ -13,6 +13,7 @@ static int test_static_1d_array(void) {
 
 static int test_variable_length_1d_array(void) {
   int err = 0;
+  TEST_BUILTIN_TYPES(400_dynamic_1d_array, 16, 16);
   return err;
 }
 
