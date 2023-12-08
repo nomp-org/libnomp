@@ -23,8 +23,8 @@ extern "C" {
 typedef enum {
   NOMP_INT = 2048,   /*!< Signed integer argument type.*/
   NOMP_UINT = 4096,  /*!< Unsigned integer argument type.*/
-  NOMP_FLOAT = 6144, /*!< Floating point argument type.*/
-  NOMP_PTR = 8192    /*!< Pointer argument type.*/
+  NOMP_FLOAT = 8192, /*!< Floating point argument type.*/
+  NOMP_PTR = 16384   /*!< Pointer argument type.*/
 } nomp_type_t;
 
 /**
