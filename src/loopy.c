@@ -503,6 +503,47 @@ int nomp_py_get_grid_size(nomp_prog_t *prg, PyObject *knl) {
 
 /**
  * @ingroup nomp_py_utils
+ * @brief Fix the arguments which were marked as `jit` in the kernel.
+ *
+ * @param[in,out] knl Python kernel object.
+ * @param[in] py_dict Dictionary containing jit argument names and values.
+ * @return int
+ */
+int nomp_py_fix_parameters(PyObject **knl, const PyObject *py_dict) {
+#define check_error(obj, msg)                                                  \
+  {                                                                            \
+    if (!obj) {                                                                \
+      return nomp_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,                        \
+                      "Failed to %s in file: %s, line: %d", msg, __FILE__,     \
+                      __LINE__);                                               \
+    }                                                                          \
+  }
+
+  PyObject *py_loopy = PyImport_ImportModule("loopy");
+  check_error(py_loopy, "import loopy");
+
+  PyObject *py_fix_parameters =
+      PyObject_GetAttrString(py_loopy, "fix_parameters");
+  check_error(py_fix_parameters, "get loopy.fix_parameters");
+
+  check_error(PyCallable_Check(py_fix_parameters), "call loopy.fix_parameters");
+
+  PyObject *py_temp =
+      PyObject_CallFunctionObjArgs(py_fix_parameters, *knl, py_dict, NULL);
+  check_error(py_temp, "call loopy.fix_parameters");
+
+  Py_DECREF(*knl), *knl = py_temp;
+
+#undef check_error
+
+  Py_DECREF(py_fix_parameters);
+  Py_DECREF(py_loopy);
+
+  return 0;
+}
+
+/**
+ * @ingroup nomp_py_utils
  *
  * @brief Print the string representation of python object along with a debug
  * message to stderr.
