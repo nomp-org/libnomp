@@ -117,6 +117,50 @@ int nomp_py_check_module(const char *module, const char *function) {
 
 /**
  * @ingroup nomp_py_utils
+ * @brief Creates loopy kernel from C source.
+ *
+ * @param[out] kernel Loopy Kernel object.
+ * @param[in] src C kernel source.
+ * @return int
+ */
+int nomp_py_c_to_loopy(PyObject **kernel, const char *src) {
+#define check_error(obj)                                                       \
+  {                                                                            \
+    if (!obj) {                                                                \
+      return nomp_log(NOMP_LOOPY_CONVERSION_FAILURE, NOMP_ERROR,               \
+                      "C to Loopy conversion failed.\n");                      \
+    }                                                                          \
+  }
+
+  PyObject *py_loopy_api = PyUnicode_FromString(module_loopy_api);
+  check_error(py_loopy_api);
+
+  PyObject *py_module = PyImport_Import(py_loopy_api);
+  check_error(py_module);
+
+  PyObject *py_c_to_loopy = PyObject_GetAttrString(py_module, c_to_loopy);
+  check_error(py_c_to_loopy);
+
+  PyObject *py_src = PyUnicode_FromString(src);
+  check_error(py_src);
+
+  PyObject *py_backend = PyUnicode_FromString(backend);
+  check_error(py_backend);
+
+  *kernel =
+      PyObject_CallFunctionObjArgs(py_c_to_loopy, py_src, py_backend, NULL);
+  check_error(*kernel);
+
+  Py_XDECREF(py_src), Py_XDECREF(py_backend);
+  Py_DECREF(py_c_to_loopy), Py_DECREF(py_module), Py_DECREF(py_loopy_api);
+
+#undef check_error
+
+  return 0;
+}
+
+/**
+ * @ingroup nomp_py_utils
  * @brief Realize reductions if one is present in the kernel.
  *
  * @param[in,out] kernel Loopy kernel object.
@@ -161,42 +205,58 @@ int nomp_py_realize_reduction(PyObject **kernel, const char *const variable,
 
 /**
  * @ingroup nomp_py_utils
- * @brief Creates loopy kernel from C source.
+ * @brief Apply kernel specific user transformations on a loopy kernel.
  *
- * @param[out] kernel Loopy Kernel object.
- * @param[in] src C kernel source.
+ * Call the user transform function \p function in file \p file on the loopy
+ * kernel \p kernel. \p kernel will be modified based on the transformations.
+ * Python file (module) must reside on nomp scripts directory which is set
+ * using `--nomp-scripts-dir` option or environment variable `NOMP_SCRIPTS_DIR`.
+ * Function will return a non-zero value if there was an error. Non-zero return
+ * value can be used to query the error code using nomp_get_err_no() and
+ * error message using nomp_get_err_str().
+ *
+ * @param[in,out] kernel Pointer to loopy kernel object.
+ * @param[in] file Name of the file containing transform function \p function.
+ * @param[in] function Name of the transform function.
+ * @param[in] context Context (as a Python dictionary) to pass around
+ * information such as backend, device details, etc.
  * @return int
  */
-int nomp_py_c_to_loopy(PyObject **kernel, const char *src) {
+int nomp_py_transform(PyObject **kernel, const char *const file,
+                      const char *function, const PyObject *const context) {
+  // If either kernel, file, or function are NULL, we don't have to do anything:
+  if (kernel == NULL || *kernel == NULL || file == NULL || function == NULL)
+    return 0;
+
 #define check_error(obj)                                                       \
   {                                                                            \
     if (!obj) {                                                                \
-      return nomp_log(NOMP_LOOPY_CONVERSION_FAILURE, NOMP_ERROR,               \
-                      "C to Loopy conversion failed.\n");                      \
+      return nomp_log(                                                         \
+          NOMP_PY_CALL_FAILURE, NOMP_ERROR,                                    \
+          "Failed to call user transform function: \"%s\" in file: "           \
+          "\"%s\".",                                                           \
+          function, file);                                                     \
     }                                                                          \
   }
 
-  PyObject *py_loopy_api = PyUnicode_FromString(module_loopy_api);
-  check_error(py_loopy_api);
+  PyObject *py_str_file = PyUnicode_FromString(file);
+  check_error(py_str_file);
 
-  PyObject *py_module = PyImport_Import(py_loopy_api);
+  PyObject *py_module = PyImport_Import(py_str_file);
   check_error(py_module);
 
-  PyObject *py_c_to_loopy = PyObject_GetAttrString(py_module, c_to_loopy);
-  check_error(py_c_to_loopy);
+  PyObject *py_function = PyObject_GetAttrString(py_module, function);
+  check_error(py_function);
+  check_error(PyCallable_Check(py_function));
 
-  PyObject *py_src = PyUnicode_FromString(src);
-  check_error(py_src);
+  PyObject *py_temp =
+      PyObject_CallFunctionObjArgs(py_function, *kernel, context, NULL);
+  check_error(py_temp);
+  Py_DECREF(*kernel), *kernel = py_temp;
 
-  PyObject *py_backend = PyUnicode_FromString(backend);
-  check_error(py_backend);
-
-  *kernel =
-      PyObject_CallFunctionObjArgs(py_c_to_loopy, py_src, py_backend, NULL);
-  check_error(*kernel);
-
-  Py_XDECREF(py_src), Py_XDECREF(py_backend);
-  Py_DECREF(py_c_to_loopy), Py_DECREF(py_module), Py_DECREF(py_loopy_api);
+  Py_DECREF(py_function);
+  Py_DECREF(py_module);
+  Py_DECREF(py_str_file);
 
 #undef check_error
 
@@ -271,6 +331,49 @@ int nomp_py_get_knl_name_and_src(char **name, char **src,
 
 /**
  * @ingroup nomp_py_utils
+ * @brief Set the annotate function based on the path to annotation script and
+ * function.
+ *
+ * @param[out] annotate_func Pointer to the annotate function.
+ * @param[in] path_ Path to the annotation script followed by function name
+ * (path and function name must be separated by "::").
+ * @return int
+ */
+int nomp_py_set_annotate_func(PyObject **annotate_func, const char *path_) {
+  // Find file and function from path.
+  char *path = strndup(path_, PATH_MAX + NOMP_MAX_BUFFER_SIZE);
+  char *file = strtok(path, "::"), *func = strtok(NULL, "::");
+  if (file == NULL || func == NULL) {
+    nomp_free(&path);
+    return 0;
+  }
+
+  // nomp_check(nomp_py_check_module(file));
+
+  int err = 1;
+  PyObject *pfile = PyUnicode_FromString(file);
+  if (pfile) {
+    PyObject *module = PyImport_Import(pfile);
+    if (module) {
+      PyObject *pfunc = PyObject_GetAttrString(module, func);
+      if (pfunc && PyCallable_Check(pfunc))
+        Py_XDECREF(*annotate_func), *annotate_func = pfunc, err = 0;
+      Py_DECREF(module);
+    }
+    Py_DECREF(pfile);
+  }
+  if (err) {
+    err = nomp_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,
+                   "Failed to find annotate function \"%s\" in file \"%s\".",
+                   func, file);
+  }
+
+  nomp_free(&path);
+  return err;
+}
+
+/**
+ * @ingroup nomp_py_utils
  * @brief Apply transformations on a loopy kernel based on annotations.
  *
  * Apply the transformations to the loopy kernel \p kernel based on the
@@ -299,64 +402,6 @@ int nomp_py_annotate(PyObject **kernel, PyObject *const function,
   PyObject *py_temp = PyObject_CallFunctionObjArgs(function, *kernel,
                                                    annotations, context, NULL);
   Py_DECREF(*kernel), *kernel = py_temp;
-
-  return 0;
-}
-
-/**
- * @ingroup nomp_py_utils
- * @brief Apply kernel specific user transformations on a loopy kernel.
- *
- * Call the user transform function \p function in file \p file on the loopy
- * kernel \p kernel. \p kernel will be modified based on the transformations.
- * Python file (module) must reside on nomp scripts directory which is set
- * using `--nomp-scripts-dir` option or environment variable `NOMP_SCRIPTS_DIR`.
- * Function will return a non-zero value if there was an error. Non-zero return
- * value can be used to query the error code using nomp_get_err_no() and
- * error message using nomp_get_err_str().
- *
- * @param[in,out] kernel Pointer to loopy kernel object.
- * @param[in] file Name of the file containing transform function \p function.
- * @param[in] function Name of the transform function.
- * @param[in] context Context (as a Python dictionary) to pass around
- * information such as backend, device details, etc.
- * @return int
- */
-int nomp_py_transform(PyObject **kernel, const char *const file,
-                      const char *function, const PyObject *const context) {
-  // If either kernel, file, or function are NULL, we don't have to do anything:
-  if (kernel == NULL || *kernel == NULL || file == NULL || function == NULL)
-    return 0;
-
-#define check_error(obj)                                                       \
-  {                                                                            \
-    if (!obj) {                                                                \
-      return nomp_log(                                                         \
-          NOMP_PY_CALL_FAILURE, NOMP_ERROR,                                    \
-          "Failed to call user transform function: \"%s\" in file: "           \
-          "\"%s\".",                                                           \
-          function, file);                                                     \
-    }                                                                          \
-  }
-
-  PyObject *py_str_file = PyUnicode_FromString(file);
-  check_error(py_str_file);
-
-  PyObject *py_module = PyImport_Import(py_str_file);
-  check_error(py_module);
-
-  PyObject *py_function = PyObject_GetAttrString(py_module, function);
-  check_error(py_function);
-  check_error(PyCallable_Check(py_function));
-
-  PyObject *py_temp =
-      PyObject_CallFunctionObjArgs(py_function, *kernel, context, NULL);
-  check_error(py_temp);
-  Py_DECREF(*kernel), *kernel = py_temp;
-
-  Py_DECREF(py_function);
-  Py_DECREF(py_module);
-  Py_DECREF(py_str_file);
 
   return 0;
 }
@@ -454,49 +499,6 @@ int nomp_py_get_grid_size(nomp_prog_t *prg, PyObject *knl) {
   }
 
   return 0;
-}
-
-/**
- * @ingroup nomp_py_utils
- * @brief Set the annotate function based on the path to annotation script and
- * function.
- *
- * @param[out] annotate_func Pointer to the annotate function.
- * @param[in] path_ Path to the annotation script followed by function name
- * (path and function name must be separated by "::").
- * @return int
- */
-int nomp_py_set_annotate_func(PyObject **annotate_func, const char *path_) {
-  // Find file and function from path.
-  char *path = strndup(path_, PATH_MAX + NOMP_MAX_BUFFER_SIZE);
-  char *file = strtok(path, "::"), *func = strtok(NULL, "::");
-  if (file == NULL || func == NULL) {
-    nomp_free(&path);
-    return 0;
-  }
-
-  // nomp_check(nomp_py_check_module(file));
-
-  int err = 1;
-  PyObject *pfile = PyUnicode_FromString(file);
-  if (pfile) {
-    PyObject *module = PyImport_Import(pfile);
-    if (module) {
-      PyObject *pfunc = PyObject_GetAttrString(module, func);
-      if (pfunc && PyCallable_Check(pfunc))
-        Py_XDECREF(*annotate_func), *annotate_func = pfunc, err = 0;
-      Py_DECREF(module);
-    }
-    Py_DECREF(pfile);
-  }
-  if (err) {
-    err = nomp_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,
-                   "Failed to find annotate function \"%s\" in file \"%s\".",
-                   func, file);
-  }
-
-  nomp_free(&path);
-  return err;
 }
 
 /**
