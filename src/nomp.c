@@ -404,12 +404,15 @@ static inline int nomp_jit_act_on_clauses(PyObject **kernel,
 
 static inline nomp_prog_t *nomp_jit_init_args(int progs_n, int nargs,
                                               va_list args) {
+  // Allocate memory for the program.
   nomp_prog_t *prg = progs[progs_n] = nomp_calloc(nomp_prog_t, 1);
   prg->args = nomp_calloc(nomp_arg_t, nargs);
   prg->nargs = nargs;
   prg->reduction_idx = -1;
+  // Symengine map to store grid size expressions.
   prg->map = mapbasicbasic_new();
-  prg->sym_global = vecbasic_new(), prg->sym_local = vecbasic_new();
+  prg->sym_global = vecbasic_new();
+  prg->sym_local = vecbasic_new();
 
   for (unsigned i = 0; i < prg->nargs; i++) {
     strncpy(prg->args[i].name, va_arg(args, const char *),
@@ -620,24 +623,30 @@ int nomp_finalize(void) {
   if (!initialized)
     return NOMP_FINALIZE_FAILURE;
 
-  Py_XDECREF(nomp.py_annotate), Py_XDECREF(nomp.py_context), Py_Finalize();
+  Py_XDECREF(nomp.py_annotate);
+  Py_XDECREF(nomp.py_context);
+  Py_Finalize();
 
+  // Free all the allocated memory.
   for (unsigned i = 0; i < mems_n; i++) {
-    if (mems[i]) {
-      nomp_check(nomp.update(&nomp, mems[i], NOMP_FREE, mems[i]->idx0,
-                             mems[i]->idx1, mems[i]->usize));
-      nomp_free(&mems[i]);
-    }
+    if (!mems[i])
+      continue;
+    nomp_check(nomp.update(&nomp, mems[i], NOMP_FREE, mems[i]->idx0,
+                           mems[i]->idx1, mems[i]->usize));
+    nomp_free(&mems[i]);
   }
   nomp_free(&mems), mems_n = mems_max = 0;
   nomp_check(nomp_deallocate_scratch_memory(&nomp));
 
+  // Free all the allocated programs.
   for (unsigned i = 0; i < progs_n; i++) {
-    if (progs[i]) {
-      nomp_check(nomp.knl_free(progs[i]));
-      vecbasic_free(progs[i]->sym_global), vecbasic_free(progs[i]->sym_local);
-      mapbasicbasic_free(progs[i]->map), nomp_free(&progs[i]->args);
-    }
+    if (!progs[i])
+      continue;
+    nomp_check(nomp.knl_free(progs[i]));
+    vecbasic_free(progs[i]->sym_global);
+    vecbasic_free(progs[i]->sym_local);
+    mapbasicbasic_free(progs[i]->map);
+    nomp_free(&progs[i]->args);
     nomp_free(&progs[i]);
   }
   nomp_free(&progs), progs_n = progs_max = 0;
