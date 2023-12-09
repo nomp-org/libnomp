@@ -557,13 +557,12 @@ int nomp_py_fix_parameters(PyObject **knl, const PyObject *py_dict) {
  * @return char*
  */
 char *nomp_py_get_str(PyObject *const obj) {
-  PyObject *py_repr = PyObject_Str(obj);
-  PyObject *py_str = PyUnicode_AsEncodedString(py_repr, "utf-8", "~E~");
-  const char *str_ = PyBytes_AS_STRING(py_str);
-
-  char *str = nomp_calloc(char, strnlen(str_, NOMP_MAX_BUFFER_SIZE));
-  strncpy(str, str_, NOMP_MAX_BUFFER_SIZE);
-  Py_XDECREF(py_repr), Py_XDECREF(py_str);
+  PyObject *py_str = PyObject_Str(obj);
+  Py_ssize_t size;
+  const char *str_ = PyUnicode_AsUTF8AndSize(py_str, &size);
+  char *str = nomp_calloc(char, size + 1);
+  strncpy(str, str_, size);
+  Py_XDECREF(py_str);
   return str;
 }
 
