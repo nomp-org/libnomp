@@ -8,7 +8,7 @@ static int nomp_api_400_static_aux(const char *fmt, TEST_TYPE *b, TEST_TYPE *a,
                            TOSTRING(TEST_TYPE));
 
   int id = -1;
-  const char *clauses[4] = {"transform", "nomp_api_400", "static", 0};
+  const char *clauses[4] = {"transform", "nomp_api_400", "transform", 0};
   nomp_test_check(nomp_jit(&id, knl, clauses, 3, "b", sizeof(TEST_TYPE),
                            NOMP_PTR, "a", sizeof(TEST_TYPE), NOMP_PTR, "n",
                            sizeof(int), NOMP_INT));
@@ -76,7 +76,7 @@ static int nomp_api_400_dynamic_aux(const char *fmt, TEST_TYPE *b, TEST_TYPE *a,
                            TOSTRING(TEST_TYPE));
 
   int id = -1;
-  const char *clauses[4] = {"transform", "nomp_api_400", "static", 0};
+  const char *clauses[4] = {"transform", "nomp_api_400", "transform", 0};
   nomp_test_check(nomp_jit(&id, knl, clauses, 4, "b", sizeof(TEST_TYPE),
                            NOMP_PTR, "a", sizeof(TEST_TYPE), NOMP_PTR, "n",
                            sizeof(int), NOMP_INT, "m", sizeof(int),
