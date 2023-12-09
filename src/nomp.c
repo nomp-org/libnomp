@@ -629,17 +629,12 @@ int nomp_sync(void) { return nomp.sync(&nomp); }
  * @return int
  */
 int nomp_finalize(void) {
-  // Free bookkeeping structures for the logger and profiler since these can be
-  // released irrespective of whether libnomp is initialized or not.
-  nomp_log_finalize();
-  nomp_profile_finalize();
-
   if (!initialized)
     return NOMP_FINALIZE_FAILURE;
 
   Py_XDECREF(nomp.py_annotate);
   Py_XDECREF(nomp.py_context);
-  Py_Finalize();
+  nomp_check(nomp_py_finalize());
 
   // Free all the allocated memory.
   for (unsigned i = 0; i < mems_n; i++) {
@@ -667,5 +662,11 @@ int nomp_finalize(void) {
 
   if ((initialized = nomp.finalize(&nomp)))
     return NOMP_FINALIZE_FAILURE;
+
+  // Free bookkeeping structures for the logger and profiler since these can be
+  // released irrespective of whether libnomp is initialized or not.
+  nomp_profile_finalize();
+  nomp_log_finalize();
+
   return 0;
 }
