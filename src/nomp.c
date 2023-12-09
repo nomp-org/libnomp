@@ -454,8 +454,8 @@ static inline nomp_prog_t *nomp_jit_init_args(int progs_n, int nargs,
     // dictionary and continue.
     if (type & NOMP_JIT) {
       type &= ~NOMP_JIT;
-      void *value_ptr = va_arg(args, void *);
 
+      void *value_ptr = va_arg(args, void *);
       PyObject *value = nomp_get_py_object_from_type(type, size, value_ptr);
       PyDict_SetItemString(prg->py_dict, name, value);
       Py_XDECREF(value);
