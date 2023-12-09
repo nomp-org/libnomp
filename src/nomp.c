@@ -5,7 +5,7 @@
 static nomp_backend_t nomp;
 static int initialized = 0;
 
-static inline int check_env_vars(nomp_config_t *const cfg) {
+static inline int nomp_check_env_vars(nomp_config_t *const cfg) {
   char *tmp = NULL;
 
   if ((tmp = getenv("NOMP_INSTALL_DIR")))
@@ -101,7 +101,7 @@ static inline int nomp_set_configs(int argc, const char **argv,
   strcpy(cfg->scripts_dir, "");
 
   nomp_check(nomp_check_cmd_line(cfg, argc, argv));
-  check_env_vars(cfg);
+  nomp_check_env_vars(cfg);
 
   size_t n = strnlen(cfg->backend, NOMP_MAX_BUFFER_SIZE);
   for (unsigned i = 0; i < n; i++)
@@ -130,7 +130,7 @@ static inline int nomp_set_configs(int argc, const char **argv,
   return 0;
 }
 
-static inline int allocate_scratch_memory(nomp_backend_t *bnd) {
+static inline int nomp_allocate_scratch_memory(nomp_backend_t *bnd) {
   nomp_mem_t *m = &bnd->scratch;
   m->idx0 = 0, m->idx1 = NOMP_MAX_SCRATCH_SIZE, m->usize = sizeof(double);
   nomp_check(bnd->update(bnd, m, NOMP_ALLOC, m->idx0, m->idx1, m->usize));
@@ -138,15 +138,15 @@ static inline int allocate_scratch_memory(nomp_backend_t *bnd) {
   return 0;
 }
 
-static inline int deallocate_scratch_memory(nomp_backend_t *bnd) {
+static inline int nomp_deallocate_scratch_memory(nomp_backend_t *bnd) {
   nomp_mem_t *m = &bnd->scratch;
   nomp_check(bnd->update(bnd, m, NOMP_FREE, m->idx0, m->idx1, m->usize));
   nomp_free(&m->hptr);
   return 0;
 }
 
-static inline int init_backend(nomp_backend_t *const backend,
-                               const nomp_config_t *const cfg) {
+static inline int nomp_init_backend(nomp_backend_t *const backend,
+                                    const nomp_config_t *const cfg) {
   backend->py_context = PyDict_New();
 
   PyObject *py_str_backend = PyUnicode_FromString(cfg->backend);
@@ -235,10 +235,10 @@ int nomp_init(int argc, const char **argv) {
   nomp_check(nomp_log_set_verbose(cfg.verbose));
 
   // Initialize the backend.
-  nomp_check(init_backend(&nomp, &cfg));
+  nomp_check(nomp_init_backend(&nomp, &cfg));
 
   // Allocate scratch memory.
-  nomp_check(allocate_scratch_memory(&nomp));
+  nomp_check(nomp_allocate_scratch_memory(&nomp));
 
   initialized = 1;
 
@@ -259,7 +259,7 @@ static unsigned mems_max = 0;
  * @param[in] p Host pointer
  * @return nomp_mem_t *
  */
-static inline nomp_mem_t *mem_if_mapped(void *p) {
+static inline nomp_mem_t *nomp_get_memory_if_mapped(void *p) {
   // FIXME: This is O(N) in number of allocations.
   // Needs to go. Must store a hashmap.
   for (unsigned i = 0; i < mems_n; i++) {
@@ -269,7 +269,8 @@ static inline nomp_mem_t *mem_if_mapped(void *p) {
   return NULL;
 }
 
-static unsigned mem_if_exist(void *p, size_t idx0, size_t idx1, size_t usize) {
+static inline unsigned nomp_get_index_if_mapped(void *p, size_t idx0,
+                                                size_t idx1, size_t usize) {
   // FIXME: This is O(N) in number of allocations.
   // Needs to go. Must store a hash map.
   for (unsigned i = 0; i < mems_n; i++) {
@@ -322,7 +323,7 @@ static unsigned mem_if_exist(void *p, size_t idx0, size_t idx1, size_t usize) {
  */
 int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t unit_size,
                 nomp_map_direction_t op) {
-  unsigned idx = mem_if_exist(ptr, idx0, idx1, unit_size);
+  unsigned idx = nomp_get_index_if_mapped(ptr, idx0, idx1, unit_size);
   if (idx == mems_n) {
     // A new entry can't be created with NOMP_FREE or
     // NOMP_FROM.
@@ -358,9 +359,10 @@ static nomp_prog_t **progs = NULL;
 static unsigned progs_n = 0;
 static unsigned progs_max = 0;
 
-static int act_on_clauses(PyObject **kernel, nomp_prog_t *program,
-                          const char **const clauses,
-                          const nomp_backend_t *const backend) {
+static inline int nomp_jit_act_on_clauses(PyObject **kernel,
+                                          nomp_prog_t *program,
+                                          const char **const clauses,
+                                          const nomp_backend_t *const backend) {
   // Currently, we only support `transform` and `reduce` clauses.
   unsigned i = 0;
   while (clauses[i]) {
@@ -400,7 +402,8 @@ static int act_on_clauses(PyObject **kernel, nomp_prog_t *program,
   return 0;
 }
 
-static inline nomp_prog_t *init_args(int progs_n, int nargs, va_list args) {
+static inline nomp_prog_t *nomp_jit_init_args(int progs_n, int nargs,
+                                              va_list args) {
   nomp_prog_t *prg = progs[progs_n] = nomp_calloc(nomp_prog_t, 1);
   prg->args = nomp_calloc(nomp_arg_t, nargs);
   prg->nargs = nargs;
@@ -467,7 +470,7 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
   // Initialize the nomp_prog_t with the kernel input arguments.
   va_list args;
   va_start(args, nargs);
-  nomp_prog_t *prg = init_args(progs_n, nargs, args);
+  nomp_prog_t *prg = nomp_jit_init_args(progs_n, nargs, args);
   va_end(args);
 
   // Create loopy kernel from C source.
@@ -475,7 +478,7 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
   nomp_check(nomp_py_c_to_loopy(&knl, csrc));
 
   // Act on the clauses: transform, reduce, etc. and get the kernel
-  nomp_check(act_on_clauses(&knl, prg, clauses, &nomp));
+  nomp_check(nomp_jit_act_on_clauses(&knl, prg, clauses, &nomp));
 
   // Handle reductions if they exist.
   if (prg->reduction_idx >= 0) {
@@ -556,7 +559,7 @@ int nomp_run(int id, ...) {
       prg->eval_grid |= nomp_symengine_update(prg->map, args[i].name, val);
       break;
     case NOMP_PTR:
-      m = mem_if_mapped(args[i].ptr);
+      m = nomp_get_memory_if_mapped(args[i].ptr);
       if (m == NULL) {
         if (prg->reduction_idx == (int)i) {
           prg->reduction_ptr = args[i].ptr;
@@ -627,7 +630,7 @@ int nomp_finalize(void) {
     }
   }
   nomp_free(&mems), mems_n = mems_max = 0;
-  nomp_check(deallocate_scratch_memory(&nomp));
+  nomp_check(nomp_deallocate_scratch_memory(&nomp));
 
   for (unsigned i = 0; i < progs_n; i++) {
     if (progs[i]) {
