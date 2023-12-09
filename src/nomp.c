@@ -405,9 +405,33 @@ static inline int nomp_jit_act_on_clauses(PyObject **kernel,
   return 0;
 }
 
+static inline PyObject *nomp_get_py_object_from_type(nomp_arg_type_t type,
+                                                     size_t size, void *ptr) {
+  PyObject *value = NULL;
+  switch (type) {
+  case NOMP_INT:
+    value = PyLong_FromLong(*((int *)ptr));
+    break;
+  case NOMP_UINT:
+    value = PyLong_FromUnsignedLong(*((unsigned *)ptr));
+    break;
+  case NOMP_FLOAT:
+    if (size == 32)
+      value = PyFloat_FromDouble(*((float *)ptr));
+    if (size == 64)
+      value = PyFloat_FromDouble(*((double *)ptr));
+    break;
+  case NOMP_PTR:
+    value = PyLong_FromVoidPtr(ptr);
+    break;
+  default:
+    break;
+  }
+  return value;
+}
+
 static inline nomp_prog_t *nomp_jit_init_args(int progs_n, int nargs,
-                                              va_list args,
-                                              nomp_backend_t *backend) {
+                                              va_list args) {
   // Allocate memory for the program.
   nomp_prog_t *prg = progs[progs_n] = nomp_calloc(nomp_prog_t, 1);
   prg->args = nomp_calloc(nomp_arg_t, nargs);
@@ -418,16 +442,25 @@ static inline nomp_prog_t *nomp_jit_init_args(int progs_n, int nargs,
   prg->map = mapbasicbasic_new();
   prg->sym_global = vecbasic_new();
   prg->sym_local = vecbasic_new();
+  // Dictionary to hold jit kernel arguments.
+  prg->py_dict = PyDict_New();
 
   for (unsigned i = 0; i < prg->nargs; i++) {
     const char *name = va_arg(args, const char *);
     const size_t size = va_arg(args, size_t);
     int type = va_arg(args, int);
 
-    // Check if the argument is a jit argument. If yes, add it to the py_context
+    // Check if the argument is a jit argument. If yes, add it to the
     // dictionary and continue.
     if (type & NOMP_JIT) {
       type &= ~NOMP_JIT;
+      void *value_ptr = va_arg(args, void *);
+
+      PyObject *value = nomp_get_py_object_from_type(type, size, value_ptr);
+      PyDict_SetItemString(prg->py_dict, name, value);
+      Py_XDECREF(value);
+
+      continue;
     }
 
     strncpy(prg->args[i].name, name, NOMP_MAX_BUFFER_SIZE);
@@ -487,7 +520,7 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
   // Initialize the nomp_prog_t with the kernel input arguments.
   va_list args;
   va_start(args, nargs);
-  nomp_prog_t *prg = nomp_jit_init_args(progs_n, nargs, args, &nomp);
+  nomp_prog_t *prg = nomp_jit_init_args(progs_n, nargs, args);
   va_end(args);
 
   // Create loopy kernel from C source.
@@ -502,6 +535,9 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
     nomp_check(nomp_py_realize_reduction(
         &knl, prg->args[prg->reduction_index].name, nomp.py_context));
   }
+
+  // Call fix_parameters on the loopy kernel.
+  nomp_py_fix_parameters(&knl, prg->py_dict);
 
   // Get OpenCL, CUDA, etc. source and name from the loopy kernel and build
   // the program.
@@ -634,7 +670,6 @@ int nomp_finalize(void) {
 
   Py_XDECREF(nomp.py_annotate);
   Py_XDECREF(nomp.py_context);
-  nomp_check(nomp_py_finalize());
 
   // Free all the allocated memory.
   for (unsigned i = 0; i < mems_n; i++) {
@@ -652,21 +687,26 @@ int nomp_finalize(void) {
     if (!progs[i])
       continue;
     nomp_check(nomp.knl_free(progs[i]));
+
+    Py_XDECREF(progs[i]->py_dict);
+
     vecbasic_free(progs[i]->sym_global);
     vecbasic_free(progs[i]->sym_local);
     mapbasicbasic_free(progs[i]->map);
+
     nomp_free(&progs[i]->args);
     nomp_free(&progs[i]);
   }
   nomp_free(&progs), progs_n = progs_max = 0;
-
-  if ((initialized = nomp.finalize(&nomp)))
-    return NOMP_FINALIZE_FAILURE;
+  nomp_check(nomp_py_finalize());
 
   // Free bookkeeping structures for the logger and profiler since these can be
   // released irrespective of whether libnomp is initialized or not.
   nomp_profile_finalize();
   nomp_log_finalize();
+
+  if ((initialized = nomp.finalize(&nomp)))
+    return NOMP_FINALIZE_FAILURE;
 
   return 0;
 }

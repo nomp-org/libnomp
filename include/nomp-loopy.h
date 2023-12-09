@@ -36,6 +36,8 @@ int nomp_py_annotate(PyObject **kernel, PyObject *function,
 
 int nomp_py_get_grid_size(nomp_prog_t *prg, PyObject *knl);
 
+int nomp_py_fix_parameters(PyObject **knl, const PyObject *py_dict);
+
 void nomp_py_get_str(const char *msg, PyObject *obj);
 
 int nomp_py_finalize(void);

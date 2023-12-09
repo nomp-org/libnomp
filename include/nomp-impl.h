@@ -157,6 +157,10 @@ typedef struct {
    * Pointer to the reduction variable.
    */
   void *reduction_ptr;
+  /**
+   * Dictionary to hold jit argument names and values.
+   */
+  PyObject *py_dict;
 } nomp_prog_t;
 
 /**
