@@ -225,8 +225,8 @@ int nomp_py_realize_reduction(PyObject **kernel, const char *const variable,
  */
 int nomp_py_transform(PyObject **kernel, const char *const file,
                       const char *function, const PyObject *const context) {
-  // If either kernel, file, or function are NULL, we don't have to do anything:
-  if (kernel == NULL || *kernel == NULL || file == NULL || function == NULL)
+  // If either file, or function are NULL, we don't have to do anything:
+  if (file == NULL || function == NULL)
     return 0;
 
 #define check_error(obj)                                                       \
@@ -553,8 +553,8 @@ int nomp_py_fix_parameters(PyObject **knl, const PyObject *py_dict) {
  *
  * @brief Get the string representation of a Python object.
  *
- * @param obj Python object to be printed.
- * @return void
+ * @param obj Python object.
+ * @return char*
  */
 char *nomp_py_get_str(PyObject *const obj) {
   PyObject *py_repr = PyObject_Str(obj);
@@ -562,9 +562,8 @@ char *nomp_py_get_str(PyObject *const obj) {
   const char *str_ = PyBytes_AS_STRING(py_str);
 
   char *str = nomp_calloc(char, strnlen(str_, NOMP_MAX_BUFFER_SIZE));
-  Py_XDECREF(py_repr), Py_XDECREF(py_str);
   strncpy(str, str_, NOMP_MAX_BUFFER_SIZE);
-
+  Py_XDECREF(py_repr), Py_XDECREF(py_str);
   return str;
 }
 
