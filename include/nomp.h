@@ -170,8 +170,8 @@ typedef enum {
 
 int nomp_init(int argc, const char **argv);
 
-int nomp_update(void *ptr, size_t start_idx, size_t end_idx, size_t unit_size,
-                nomp_map_direction_t op);
+int nomp_update(void *ptr, size_t start_index, size_t end_index,
+                size_t unit_size, nomp_map_direction_t op);
 
 int nomp_jit(int *id, const char *src, const char **clauses, int nargs, ...);
 

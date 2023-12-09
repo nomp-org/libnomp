@@ -291,9 +291,10 @@ static inline unsigned nomp_get_index_if_mapped(void *p, size_t idx0,
  * performs device to host (D2H) and host to device (H2D) memory
  * transfers, device memory allocation and release.
  *
- * @details Operation \p op will be performed on the array slice [\p start_idx,
- * \p end_idx), i.e., on array elements start_idx, ... end_idx - 1. This method
- * returns a non-zero value if there is an error and 0 otherwise.
+ * @details Operation \p op will be performed on the array slice [\p
+ * start_index, \p end_index), i.e., on array elements start_index, ...
+ * end_index - 1. This method returns a non-zero value if there is an error and
+ * 0 otherwise.
  *
  * @param[in] ptr Pointer to host memory location (start of host memory array).
  * @param[in] idx0 Start index in the \p ptr to start copying.
@@ -383,7 +384,7 @@ static inline int nomp_jit_act_on_clauses(PyObject **kernel,
                     NOMP_MAX_BUFFER_SIZE) == 0) {
           program->reduction_type = program->args[j].type;
           program->reduction_size = program->args[j].size;
-          program->reduction_idx = j;
+          program->reduction_index = j;
           program->args[j].type = NOMP_PTR;
           break;
         }
@@ -412,8 +413,8 @@ static inline nomp_prog_t *nomp_jit_init_args(int progs_n, int nargs,
   prg->args = nomp_calloc(nomp_arg_t, nargs);
   prg->nargs = nargs;
   // Reduction index is set to -1 by default.
-  prg->reduction_idx = -1;
-  // Symengine map to store grid size expressions.
+  prg->reduction_index = -1;
+  // SymEngine map to store grid size expressions.
   prg->map = mapbasicbasic_new();
   prg->sym_global = vecbasic_new();
   prg->sym_local = vecbasic_new();
@@ -497,9 +498,9 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
   nomp_check(nomp_jit_act_on_clauses(&knl, prg, clauses, &nomp));
 
   // Handle reductions if they exist.
-  if (prg->reduction_idx >= 0) {
+  if (prg->reduction_index >= 0) {
     nomp_check(nomp_py_realize_reduction(
-        &knl, prg->args[prg->reduction_idx].name, nomp.py_context));
+        &knl, prg->args[prg->reduction_index].name, nomp.py_context));
   }
 
   // Get OpenCL, CUDA, etc. source and name from the loopy kernel and build
@@ -577,7 +578,7 @@ int nomp_run(int id, ...) {
     case NOMP_PTR:
       m = nomp_get_memory_if_mapped(args[i].ptr);
       if (m == NULL) {
-        if (prg->reduction_idx == (int)i) {
+        if (prg->reduction_index == (int)i) {
           prg->reduction_ptr = args[i].ptr;
           m = &nomp.scratch;
         } else {
@@ -599,7 +600,7 @@ int nomp_run(int id, ...) {
     nomp_check(nomp_symengine_eval_grid_size(prg));
 
   nomp_check(nomp.knl_run(&nomp, prg));
-  if (prg->reduction_idx >= 0)
+  if (prg->reduction_index >= 0)
     nomp_check(nomp_host_side_reduction(&nomp, prg, &nomp.scratch));
 
   return 0;
