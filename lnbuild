@@ -130,7 +130,7 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     *) echo "${red}Invalid option: ${1}${reset}."
-    echo "See ${cyan}./${0} --help${reset} for the accepted options."
+    echo "See ${cyan}${0} --help${reset} for the accepted options."
     exit 1 ;;
   esac
 done

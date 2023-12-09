@@ -140,7 +140,7 @@ typedef struct {
   /**
    * Index of the reduction argument if one exists.
    */
-  int reduction_idx;
+  int reduction_index;
   /**
    * Reduction operation to be performed.
    */
