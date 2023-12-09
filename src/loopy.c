@@ -13,25 +13,6 @@ static char backend[NOMP_MAX_BUFFER_SIZE + 1];
 /**
  * @ingroup nomp_py_utils
  *
- * @brief Print the string representation of python object along with a debug
- * message to stderr.
- *
- * @param message Debug message to be printed before the object as a C-string.
- * @param obj Python object to be printed.
- * @return void
- */
-void nomp_py_get_str(const char *const message, PyObject *const obj) {
-  PyObject *py_repr = PyObject_Str(obj);
-  PyObject *py_str = PyUnicode_AsEncodedString(py_repr, "utf-8", "~E~");
-  const char *str = PyBytes_AS_STRING(py_str);
-  fprintf(stderr, "%s: %s\n", message, str);
-  fflush(stderr);
-  Py_XDECREF(py_repr), Py_XDECREF(py_str);
-}
-
-/**
- * @ingroup nomp_py_utils
- *
  * @brief Initialize the nomp python interface.
  *
  * @param[in] cfg Nomp configuration struct of type ::nomp_config_t.
@@ -516,4 +497,34 @@ int nomp_py_set_annotate_func(PyObject **annotate_func, const char *path_) {
 
   nomp_free(&path);
   return err;
+}
+
+/**
+ * @ingroup nomp_py_utils
+ *
+ * @brief Print the string representation of python object along with a debug
+ * message to stderr.
+ *
+ * @param message Debug message to be printed before the object as a C-string.
+ * @param obj Python object to be printed.
+ * @return void
+ */
+void nomp_py_get_str(const char *const message, PyObject *const obj) {
+  PyObject *py_repr = PyObject_Str(obj);
+  PyObject *py_str = PyUnicode_AsEncodedString(py_repr, "utf-8", "~E~");
+  const char *str = PyBytes_AS_STRING(py_str);
+  fprintf(stderr, "%s: %s\n", message, str);
+  fflush(stderr);
+  Py_XDECREF(py_repr), Py_XDECREF(py_str);
+}
+
+/**
+ * @ingroup nomp_py_utils
+ * @brief Finalize the nomp python interface.
+ *
+ * @return int
+ */
+int nomp_py_finalize(void) {
+  Py_Finalize();
+  return 0;
 }

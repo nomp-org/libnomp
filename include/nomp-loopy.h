@@ -38,6 +38,8 @@ int nomp_py_get_grid_size(nomp_prog_t *prg, PyObject *knl);
 
 void nomp_py_get_str(const char *msg, PyObject *obj);
 
+int nomp_py_finalize(void);
+
 int nomp_symengine_eval_grid_size(nomp_prog_t *prg);
 
 int nomp_symengine_update(CMapBasicBasic *map, const char *key, const long val);
