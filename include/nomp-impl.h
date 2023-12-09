@@ -72,9 +72,9 @@ typedef struct {
    */
   size_t size;
   /**
-   * Type of the argument (one of ::nomp_type_t).
+   * Type of the argument (one of ::nomp_arg_type_t).
    */
-  nomp_type_t type;
+  nomp_arg_type_t type;
   /**
    * Pointer to the argument.
    */
@@ -148,7 +148,7 @@ typedef struct {
   /**
    * Type of the reduction variable.
    */
-  nomp_type_t reduction_type;
+  nomp_arg_type_t reduction_type;
   /**
    * Size of the reduction variable given by sizeof().
    */
