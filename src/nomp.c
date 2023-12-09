@@ -430,12 +430,11 @@ static inline PyObject *nomp_get_py_object_from_type(nomp_arg_type_t type,
   return value;
 }
 
-static inline nomp_prog_t *nomp_jit_init_args(int progs_n, int nargs,
+static inline nomp_prog_t *nomp_jit_init_args(unsigned progs_n, unsigned nargs,
                                               va_list args) {
   // Allocate memory for the program.
   nomp_prog_t *prg = progs[progs_n] = nomp_calloc(nomp_prog_t, 1);
   prg->args = nomp_calloc(nomp_arg_t, nargs);
-  prg->nargs = nargs;
   // Reduction index is set to -1 by default.
   prg->reduction_index = -1;
   // SymEngine map to store grid size expressions.
@@ -445,7 +444,8 @@ static inline nomp_prog_t *nomp_jit_init_args(int progs_n, int nargs,
   // Dictionary to hold jit kernel arguments.
   prg->py_dict = PyDict_New();
 
-  for (unsigned i = 0; i < prg->nargs; i++) {
+  unsigned current_narg = 0;
+  for (unsigned i = 0; i < nargs; i++) {
     const char *name = va_arg(args, const char *);
     const size_t size = va_arg(args, size_t);
     int type = va_arg(args, int);
@@ -463,10 +463,13 @@ static inline nomp_prog_t *nomp_jit_init_args(int progs_n, int nargs,
       continue;
     }
 
-    strncpy(prg->args[i].name, name, NOMP_MAX_BUFFER_SIZE);
-    prg->args[i].size = size;
-    prg->args[i].type = type;
+    strncpy(prg->args[current_narg].name, name, NOMP_MAX_BUFFER_SIZE);
+    prg->args[current_narg].size = size;
+    prg->args[current_narg].type = type;
+    current_narg++;
   }
+  prg->nargs = current_narg;
+
   return prg;
 }
 
@@ -537,7 +540,8 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
   }
 
   // Call fix_parameters on the loopy kernel.
-  nomp_py_fix_parameters(&knl, prg->py_dict);
+  if (PyDict_Size(prg->py_dict))
+    nomp_py_fix_parameters(&knl, prg->py_dict);
 
   // Get OpenCL, CUDA, etc. source and name from the loopy kernel and build
   // the program.
