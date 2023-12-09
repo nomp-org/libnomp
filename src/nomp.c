@@ -403,11 +403,13 @@ static inline int nomp_jit_act_on_clauses(PyObject **kernel,
 }
 
 static inline nomp_prog_t *nomp_jit_init_args(int progs_n, int nargs,
-                                              va_list args) {
+                                              va_list args,
+                                              nomp_backend_t *backend) {
   // Allocate memory for the program.
   nomp_prog_t *prg = progs[progs_n] = nomp_calloc(nomp_prog_t, 1);
   prg->args = nomp_calloc(nomp_arg_t, nargs);
   prg->nargs = nargs;
+  // Reduction index is set to -1 by default.
   prg->reduction_idx = -1;
   // Symengine map to store grid size expressions.
   prg->map = mapbasicbasic_new();
@@ -415,10 +417,19 @@ static inline nomp_prog_t *nomp_jit_init_args(int progs_n, int nargs,
   prg->sym_local = vecbasic_new();
 
   for (unsigned i = 0; i < prg->nargs; i++) {
-    strncpy(prg->args[i].name, va_arg(args, const char *),
-            NOMP_MAX_BUFFER_SIZE);
-    prg->args[i].size = va_arg(args, size_t);
-    prg->args[i].type = va_arg(args, nomp_arg_type_t);
+    const char *name = va_arg(args, const char *);
+    const size_t size = va_arg(args, size_t);
+    int type = va_arg(args, int);
+
+    // Check if the argument is a jit argument. If yes, add it to the py_context
+    // dictionary and continue.
+    if (type & NOMP_JIT) {
+      type &= ~NOMP_JIT;
+    }
+
+    strncpy(prg->args[i].name, name, NOMP_MAX_BUFFER_SIZE);
+    prg->args[i].size = size;
+    prg->args[i].type = type;
   }
   return prg;
 }
@@ -473,7 +484,7 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
   // Initialize the nomp_prog_t with the kernel input arguments.
   va_list args;
   va_start(args, nargs);
-  nomp_prog_t *prg = nomp_jit_init_args(progs_n, nargs, args);
+  nomp_prog_t *prg = nomp_jit_init_args(progs_n, nargs, args, &nomp);
   va_end(args);
 
   // Create loopy kernel from C source.

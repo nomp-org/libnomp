@@ -40,6 +40,14 @@ typedef enum {
 } nomp_map_direction_t;
 
 /**
+ * @ingroup nomp_user_types
+ * @brief Defines various argument properties.
+ */
+typedef enum {
+  NOMP_JIT = 1 /*!< Argument value is fixed when the kernel is generated. */
+} nomp_arg_properties_t;
+
+/**
  * @defgroup nomp_error_codes Error codes returned to the user
  *
  * @brief Error codes used by internal libnomp functions when calling
