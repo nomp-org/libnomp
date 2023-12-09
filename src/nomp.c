@@ -377,17 +377,17 @@ static int act_on_clauses(PyObject **kernel, nomp_prog_t *program,
       for (unsigned j = 0; j < program->nargs; j++) {
         if (strncmp(program->args[j].name, clauses[i + 1],
                     NOMP_MAX_BUFFER_SIZE) == 0) {
-          program->redn_type = program->args[j].type;
-          program->redn_size = program->args[j].size;
-          program->redn_idx = j;
+          program->reduction_type = program->args[j].type;
+          program->reduction_size = program->args[j].size;
+          program->reduction_idx = j;
           program->args[j].type = NOMP_PTR;
           break;
         }
       }
       if (strncmp(clauses[i + 2], "+", 2) == 0)
-        program->redn_op = NOMP_SUM;
+        program->reduction_op = NOMP_SUM;
       if (strncmp(clauses[i + 2], "*", 2) == 0)
-        program->redn_op = NOMP_PROD;
+        program->reduction_op = NOMP_PROD;
       i += 3;
       continue;
     }
@@ -404,7 +404,7 @@ static inline nomp_prog_t *init_args(int progs_n, int nargs, va_list args) {
   nomp_prog_t *prg = progs[progs_n] = nomp_calloc(nomp_prog_t, 1);
   prg->args = nomp_calloc(nomp_arg_t, nargs);
   prg->nargs = nargs;
-  prg->redn_idx = -1;
+  prg->reduction_idx = -1;
   prg->map = mapbasicbasic_new();
   prg->sym_global = vecbasic_new(), prg->sym_local = vecbasic_new();
 
@@ -478,9 +478,10 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
   nomp_check(act_on_clauses(&knl, prg, clauses, &nomp));
 
   // Handle reductions if they exist.
-  if (prg->redn_idx >= 0)
-    nomp_check(nomp_py_realize_reduction(&knl, prg->args[prg->redn_idx].name,
-                                         nomp.py_context));
+  if (prg->reduction_idx >= 0) {
+    nomp_check(nomp_py_realize_reduction(
+        &knl, prg->args[prg->reduction_idx].name, nomp.py_context));
+  }
 
   // Get OpenCL, CUDA, etc. source and name from the loopy kernel and build
   // the program.
@@ -557,15 +558,16 @@ int nomp_run(int id, ...) {
     case NOMP_PTR:
       m = mem_if_mapped(args[i].ptr);
       if (m == NULL) {
-        if (prg->redn_idx == (int)i) {
-          prg->redn_ptr = args[i].ptr;
+        if (prg->reduction_idx == (int)i) {
+          prg->reduction_ptr = args[i].ptr;
           m = &nomp.scratch;
         } else {
           return nomp_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
                           ERR_STR_USER_MAP_PTR_IS_INVALID, args[i].ptr);
         }
       }
-      args[i].size = m->bsize, args[i].ptr = m->bptr;
+      args[i].size = m->bsize;
+      args[i].ptr = m->bptr;
       break;
     case NOMP_FLOAT:
     default:
@@ -578,7 +580,7 @@ int nomp_run(int id, ...) {
     nomp_check(nomp_symengine_eval_grid_size(prg));
 
   nomp_check(nomp.knl_run(&nomp, prg));
-  if (prg->redn_idx >= 0)
+  if (prg->reduction_idx >= 0)
     nomp_check(nomp_host_side_reduction(&nomp, prg, &nomp.scratch));
 
   return 0;

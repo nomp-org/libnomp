@@ -138,25 +138,25 @@ typedef struct {
    */
   void *bptr;
   /**
-   * Index of the deduction argument if one exists.
+   * Index of the reduction argument if one exists.
    */
-  int redn_idx;
+  int reduction_idx;
   /**
    * Reduction operation to be performed.
    */
-  nomp_reduction_op_t redn_op;
+  nomp_reduction_op_t reduction_op;
   /**
    * Type of the reduction variable.
    */
-  nomp_type_t redn_type;
+  nomp_type_t reduction_type;
   /**
    * Size of the reduction variable given by sizeof().
    */
-  int redn_size;
+  int reduction_size;
   /**
    * Pointer to the reduction variable.
    */
-  void *redn_ptr;
+  void *reduction_ptr;
 } nomp_prog_t;
 
 /**
