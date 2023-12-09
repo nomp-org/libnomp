@@ -5,7 +5,7 @@ LOOPY_LANG_VERSION = (2018, 2)
 
 
 # pylint: disable=unused-argument
-def static(knl, context):
+def transform(knl, context):
     """Tag `i` as global and `j*` as local."""
     knl = lp.tag_inames(
         knl,
