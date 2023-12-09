@@ -5,6 +5,7 @@
 static const char *module_loopy_api = "loopy_api";
 static const char *module_reduction = "reduction";
 static const char *c_to_loopy = "c_to_loopy";
+static const char *fix_parameters = "fix_parameters";
 static const char *get_knl_src = "get_knl_src";
 static const char *get_knl_name = "get_knl_name";
 static const char *realize_reduction = "realize_reduction";
@@ -519,14 +520,18 @@ int nomp_py_fix_parameters(PyObject **knl, const PyObject *py_dict) {
     }                                                                          \
   }
 
-  PyObject *py_loopy = PyImport_ImportModule("loopy");
-  check_error(py_loopy, "import loopy");
+  PyObject *py_loopy_api = PyUnicode_FromString(module_loopy_api);
+  check_error(py_loopy_api, "convert c-string to Python string");
+
+  PyObject *py_module = PyImport_Import(py_loopy_api);
+  check_error(py_module, "import loopy_api module");
 
   PyObject *py_fix_parameters =
-      PyObject_GetAttrString(py_loopy, "fix_parameters");
-  check_error(py_fix_parameters, "get loopy.fix_parameters");
+      PyObject_GetAttrString(py_module, fix_parameters);
+  check_error(py_fix_parameters, "get loopy_api.fix_parameters");
 
-  check_error(PyCallable_Check(py_fix_parameters), "call loopy.fix_parameters");
+  check_error(PyCallable_Check(py_fix_parameters),
+              "call loopy_api.fix_parameters");
 
   PyObject *py_temp =
       PyObject_CallFunctionObjArgs(py_fix_parameters, *knl, py_dict, NULL);
@@ -537,7 +542,8 @@ int nomp_py_fix_parameters(PyObject **knl, const PyObject *py_dict) {
 #undef check_error
 
   Py_DECREF(py_fix_parameters);
-  Py_DECREF(py_loopy);
+  Py_DECREF(py_module);
+  Py_DECREF(py_loopy_api);
 
   return 0;
 }
@@ -556,8 +562,7 @@ char *nomp_py_get_str(PyObject *const obj) {
   const char *str_ = PyBytes_AS_STRING(py_str);
 
   char *str = nomp_calloc(char, strnlen(str_, NOMP_MAX_BUFFER_SIZE));
-  Py_XDECREF(py_repr);
-  Py_XDECREF(py_str);
+  Py_XDECREF(py_repr), Py_XDECREF(py_str);
   strncpy(str, str_, NOMP_MAX_BUFFER_SIZE);
 
   return str;

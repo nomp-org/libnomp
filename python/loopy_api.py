@@ -829,3 +829,8 @@ def get_knl_src(knl: lp.translation_unit.TranslationUnit) -> str:
 def get_knl_name(knl: lp.translation_unit.TranslationUnit) -> str:
     """Returns the kernel name for a given backend."""
     return knl.default_entrypoint.name
+
+
+def fix_parameters(knl, params) -> lp.translation_unit.TranslationUnit:
+    """Returns the kernel source for a given backend."""
+    return lp.fix_parameters(knl, **params)
