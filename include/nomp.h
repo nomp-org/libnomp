@@ -25,7 +25,7 @@ typedef enum {
   NOMP_UINT = 4096,  /*!< Unsigned integer argument type.*/
   NOMP_FLOAT = 8192, /*!< Floating point argument type.*/
   NOMP_PTR = 16384   /*!< Pointer argument type.*/
-} nomp_type_t;
+} nomp_arg_type_t;
 
 /**
  * @ingroup nomp_user_types

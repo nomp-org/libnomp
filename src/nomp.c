@@ -412,7 +412,7 @@ static inline nomp_prog_t *init_args(int progs_n, int nargs, va_list args) {
     strncpy(prg->args[i].name, va_arg(args, const char *),
             NOMP_MAX_BUFFER_SIZE);
     prg->args[i].size = va_arg(args, size_t);
-    prg->args[i].type = va_arg(args, nomp_type_t);
+    prg->args[i].type = va_arg(args, nomp_arg_type_t);
   }
   return prg;
 }
