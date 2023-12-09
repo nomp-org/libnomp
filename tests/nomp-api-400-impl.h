@@ -76,10 +76,11 @@ static int nomp_api_400_dynamic_aux(const char *fmt, TEST_TYPE *b, TEST_TYPE *a,
                            TOSTRING(TEST_TYPE));
 
   int id = -1;
-  const char *clauses[4] = {"transform", "nomp_api_400", "dynamic", 0};
+  const char *clauses[4] = {"transform", "nomp_api_400", "static", 0};
   nomp_test_check(nomp_jit(&id, knl, clauses, 3, "b", sizeof(TEST_TYPE),
                            NOMP_PTR, "a", sizeof(TEST_TYPE), NOMP_PTR, "n",
-                           sizeof(int), NOMP_INT, "m", sizeof(int), NOMP_INT));
+                           sizeof(int), NOMP_INT, "m", sizeof(int),
+                           NOMP_INT | NOMP_JIT, &m));
   nomp_free(&knl);
 
   nomp_test_check(nomp_update(a, 0, TEST_MAX_SIZE, sizeof(TEST_TYPE), NOMP_TO));
