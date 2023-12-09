@@ -24,15 +24,15 @@ int nomp_py_c_to_loopy(PyObject **knl, const char *src);
 int nomp_py_realize_reduction(PyObject **knl, const char *var,
                               const PyObject *context);
 
-int nomp_py_set_annotate_func(PyObject **func, const char *path);
-
-int nomp_py_annotate(PyObject **kernel, PyObject *function,
-                     const PyObject *annotations, const PyObject *context);
-
 int nomp_py_transform(PyObject **knl, const char *file, const char *func,
                       const PyObject *context);
 
 int nomp_py_get_knl_name_and_src(char **name, char **src, const PyObject *knl);
+
+int nomp_py_set_annotate_func(PyObject **func, const char *path);
+
+int nomp_py_annotate(PyObject **kernel, PyObject *function,
+                     const PyObject *annotations, const PyObject *context);
 
 int nomp_py_get_grid_size(nomp_prog_t *prg, PyObject *knl);
 
