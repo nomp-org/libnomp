@@ -427,6 +427,28 @@ def set_tf_results(
     return true_result, false_result
 
 
+def check_and_parse_decl(expr: cindex.CursorKind):
+    """Check and parse a C variable declaration."""
+    name = expr.spelling
+    shape = ()
+    init = None
+    children = list(expr.get_children())
+
+    if expr.type.kind in _ARRAY_TYPES:
+        dims = []
+        for child in children:
+            if child.kind == cindex.CursorKind.INIT_LIST_EXPR:
+                init = child
+            else:
+                dims.append(child)
+        shape = tuple(CToLoopyExpressionMapper()(dim) for dim in dims)
+        return (name, shape, init)
+    if isinstance(expr.type.kind, cindex.TypeKind):
+        if len(children) == 1:
+            init = children[0]
+        return (name, shape, init)
+
+
 class CToLoopyMapper(IdentityMapper):
     """Map C expressions and statemements to Loopy expressions."""
 
@@ -507,25 +529,6 @@ class CToLoopyMapper(IdentityMapper):
         self, expr: cindex.CursorKind.VAR_DECL, context: CToLoopyMapperContext
     ) -> CToLoopyMapperAccumulator:
         """Maps a C variable declaration."""
-
-        def check_and_parse_decl(expr: cindex.CursorKind):
-            name = expr.spelling
-            children = list(expr.get_children())
-
-            init = None
-            if expr.type.kind in _ARRAY_TYPES:
-                dims = []
-                for child in children:
-                    if child.kind == cindex.CursorKind.INIT_LIST_EXPR:
-                        init = child
-                    else:
-                        dims.append(child)
-                shape = tuple(CToLoopyExpressionMapper()(dim) for dim in dims)
-                return (name, shape, init)
-            if isinstance(expr.type.kind, cindex.TypeKind):
-                if len(children) == 1:
-                    init = children[0]
-                return (name, (), init)
 
         (name, shape, init) = check_and_parse_decl(expr)
 
@@ -733,11 +736,13 @@ class CKernel:
         for arg in self.var_to_decl.values():
             dtype = _get_dtype_from_decl_type(arg.type)
             if arg.type.kind in _ARRAY_TYPES_W_PTR:
+                (_, shape, _) = check_and_parse_decl(arg)
                 knl_args.append(
                     lp.ArrayArg(
                         arg.spelling,
                         dtype=dtype,
                         address_space=AddressSpace.GLOBAL,
+                        shape=shape if shape else None,
                     )
                 )
             elif isinstance(arg.type.kind, cindex.TypeKind):
