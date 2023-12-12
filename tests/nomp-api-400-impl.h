@@ -29,9 +29,9 @@ static int nomp_api_400_static_aux(const char *fmt, TEST_TYPE *b, TEST_TYPE *a,
   return 0;
 }
 
-#define nomp_api_400_static_1d_array                                           \
-  TOKEN_PASTE(nomp_api_400_static_1d_array, TEST_SUFFIX)
-static int nomp_api_400_static_1d_array(int n) {
+#define nomp_api_400_fixed_size_1d_array                                       \
+  TOKEN_PASTE(nomp_api_400_fixed_size_1d_array, TEST_SUFFIX)
+static int nomp_api_400_fixed_size_1d_array(int n) {
   nomp_test_assert(n <= TEST_MAX_SIZE / 32);
 
   const char *knl_fmt =
@@ -65,8 +65,7 @@ static int nomp_api_400_static_1d_array(int n) {
 
   return 0;
 }
-#undef nomp_api_400_static_1d_array
-#undef nomp_api_400_static_aux
+#undef nomp_api_400_fixed_size_1d_array
 
 #define nomp_api_400_dynamic_aux                                               \
   TOKEN_PASTE(nomp_api_400_dynamic_aux, TEST_SUFFIX)
@@ -135,4 +134,82 @@ static int nomp_api_400_dynamic_1d_array(int n, int m) {
   return 0;
 }
 #undef nomp_api_400_dynamic_1d_array
+
+#define nomp_api_400_fixed_size_2d_array                                       \
+  TOKEN_PASTE(nomp_api_400_fixed_size_2d_array, TEST_SUFFIX)
+static int nomp_api_400_fixed_size_2d_array(int n) {
+  nomp_test_assert(n <= TEST_MAX_SIZE / 32);
+
+  const char *knl_fmt =
+      "void foo(%s *b, const %s *a, int n) {                           \n"
+      "  for (int i = 0; i < n; i++) {                                 \n"
+      "    %s s[32][8];                                                \n"
+      "    for (int j = 0; j < 32; j++)                                \n"
+      "      s[j][4] = a[i * 32 + j];                                  \n"
+      "    for (int j = 0; j < 32; j++)                                \n"
+      "      s[j][4] += s[j][4];                                       \n"
+      "    for (int j = 0; j < 32; j++)                                \n"
+      "      b[i * 32 + j] = s[j][4];                                  \n"
+      "  }                                                             \n"
+      "}                                                               \n";
+
+  TEST_TYPE a[TEST_MAX_SIZE], b[TEST_MAX_SIZE];
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < 32; j++)
+      a[i * 32 + j] = i;
+  }
+
+  nomp_api_400_static_aux(knl_fmt, b, a, n);
+
+#if defined(TEST_TOL)
+  for (int i = 0; i < 32 * n; i++)
+    nomp_test_assert(fabs(b[i] - (TEST_TYPE)(2 * a[i])) < TEST_TOL);
+#else
+  for (int i = 0; i < 32 * n; i++)
+    nomp_test_assert(b[i] == (TEST_TYPE)(2 * a[i]));
+#endif
+
+  return 0;
+}
+#undef nomp_api_400_fixed_size_2d_array
+#undef nomp_api_400_static_aux
+
+#define nomp_api_400_dynamic_2d_array                                          \
+  TOKEN_PASTE(nomp_api_400_dynamic_2d_array, TEST_SUFFIX)
+static int nomp_api_400_dynamic_2d_array(int n, int m) {
+  nomp_test_assert(n * m <= TEST_MAX_SIZE);
+  nomp_test_assert(m > 4);
+
+  const char *knl_fmt =
+      "void foo(%s *b, const %s *a, int n, int m) {                    \n"
+      "  for (int i = 0; i < n; i++) {                                 \n"
+      "    %s s[m][m];                                                 \n"
+      "    for (int j = 0; j < m; j++)                                 \n"
+      "      s[j][4] = a[i * m + j];                                   \n"
+      "    for (int j = 0; j < m; j++)                                 \n"
+      "      s[j][4] += s[j][4];                                       \n"
+      "    for (int j = 0; j < m; j++)                                 \n"
+      "      b[i * m + j] = s[j][4];                                   \n"
+      "  }                                                             \n"
+      "}                                                               \n";
+
+  TEST_TYPE a[TEST_MAX_SIZE], b[TEST_MAX_SIZE];
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < m; j++)
+      a[i * m + j] = i;
+  }
+
+  nomp_api_400_dynamic_aux(knl_fmt, b, a, n, m);
+
+#if defined(TEST_TOL)
+  for (int i = 0; i < n * m; i++)
+    nomp_test_assert(fabs(b[i] - (TEST_TYPE)(2 * a[i])) < TEST_TOL);
+#else
+  for (int i = 0; i < n * m; i++)
+    nomp_test_assert(b[i] == (TEST_TYPE)(2 * a[i]));
+#endif
+
+  return 0;
+}
+#undef nomp_api_400_dynamic_2d_array
 #undef nomp_api_400_dynamic_aux
