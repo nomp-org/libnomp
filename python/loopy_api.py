@@ -166,20 +166,13 @@ class CToLoopyExpressionMapper(IdentityMapper):
         self, expr: cindex.CursorKind.ARRAY_SUBSCRIPT_EXPR
     ) -> prim.Subscript:
         """Maps a C array subscript expression."""
-        (unexpsd_expr, index) = expr.get_children()
-        (child,) = unexpsd_expr.get_children()
-        if child.kind == cindex.CursorKind.DECL_REF_EXPR:
-            return prim.Subscript(self.rec(child), self.rec(index))
-        if child.kind == cindex.CursorKind.ARRAY_SUBSCRIPT_EXPR:
-            (unexpsd_expr_2, index_2) = child.get_children()
-            (child_2,) = unexpsd_expr_2.get_children()
-            return prim.Subscript(
-                self.rec(child_2), (self.rec(index_2), self.rec(index))
-            )
-        raise NotImplementedError(
-            f"{child.kind} is not recognized as a child of a"
-            " ARRAY_SUBSCRIPT_EXPR"
-        )
+
+        (unexposed_expr, index) = expr.get_children()
+        left = self.rec(unexposed_expr)
+        right = self.rec(index)
+        if isinstance(left, prim.Subscript):
+            return prim.Subscript(left.aggregate, left.index + (right,))
+        return prim.Subscript(left, (right,))
 
     def map_unary_operator(
         self, expr: cindex.CursorKind.UNARY_OPERATOR
