@@ -434,6 +434,7 @@ def check_and_parse_decl(expr: cindex.CursorKind):
                 init = child
             else:
                 dims.append(child)
+        dims.reverse()
         shape = tuple(CToLoopyExpressionMapper()(dim) for dim in dims)
         return (name, shape, init)
     if isinstance(expr.type.kind, cindex.TypeKind):
