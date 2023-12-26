@@ -152,13 +152,13 @@ typedef enum {
 /**
  * @ingroup nomp_error_codes
  *
- * @brief libnomp HIP failed.
+ * @brief libnomp HIP operation failed.
  */
 #define NOMP_HIP_FAILURE -514
 /**
  * @ingroup nomp_error_codes
  *
- * @brief libnomp OpenCL failure.
+ * @brief libnomp OpenCL operation failed.
  */
 #define NOMP_OPENCL_FAILURE -516
 
