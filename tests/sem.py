@@ -21,11 +21,11 @@ def annotate(
             if loop in inames:
                 lp.split_iname(knl, loop, block_size, inner_tag=f"l.{dof_axis}")
                 dof_axis += 1
-        elif key == "element_loop":
+        if key == "element_loop":
             loop = annotations[key]
             if loop in inames:
                 knl = lp.tag_inames(knl, [(loop, "g.0")])
-        elif key == "grid_loop":
+        if key == "grid_loop":
             loop = annotations[key]
             if loop in inames:
                 knl = lp.split_iname(knl, loop, block_size)
