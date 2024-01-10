@@ -54,6 +54,10 @@ typedef struct {
    * Directory where transform and annotations scripts are located.
    */
   char scripts_dir[PATH_MAX + 1];
+  /**
+   * Name of the annotation script.
+   */
+  char annotations_script[NOMP_MAX_BUFFER_SIZE + 1];
 } nomp_config_t;
 
 /**
