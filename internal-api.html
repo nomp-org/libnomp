@@ -172,6 +172,12 @@
 <dd><p>Directory where transform and annotations scripts are located. </p>
 </dd></dl>
 
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13nomp_config_t18annotations_scriptE">
+<span id="_CPPv3N13nomp_config_t18annotations_scriptE"></span><span id="_CPPv2N13nomp_config_t18annotations_scriptE"></span><span id="nomp_config_t::annotations_script__cA"></span><span class="target" id="structnomp__config__t_1a12e42ca57fa24c71a440f281e5644b1e"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">annotations_script</span></span></span><span class="p"><span class="pre">[</span></span><span class="n"><span class="pre">NOMP_MAX_BUFFER_SIZE</span></span><span class="w"> </span><span class="o"><span class="pre">+</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#_CPPv4N13nomp_config_t18annotations_scriptE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Name of the annotation script. </p>
+</dd></dl>
+
 </div>
 </dd></dl>
 
@@ -679,13 +685,13 @@
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv425nomp_py_set_annotate_funcPP8PyObjectPKc">
-<span id="_CPPv325nomp_py_set_annotate_funcPP8PyObjectPKc"></span><span id="_CPPv225nomp_py_set_annotate_funcPP8PyObjectPKc"></span><span id="nomp_py_set_annotate_func__PyObjectPP.cCP"></span><span class="target" id="group__nomp__py__utils_1ga4c1e18890cbd9d221416d1a782087aac"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_set_annotate_func</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">annotate_func</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">path_</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425nomp_py_set_annotate_funcPP8PyObjectPKc" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv325nomp_py_set_annotate_funcPP8PyObjectPKc"></span><span id="_CPPv225nomp_py_set_annotate_funcPP8PyObjectPKc"></span><span id="nomp_py_set_annotate_func__PyObjectPP.cCP"></span><span class="target" id="group__nomp__py__utils_1ga2f1187d8f2b9e10f02a1124a480536c9"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_set_annotate_func</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">annotate_func</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425nomp_py_set_annotate_funcPP8PyObjectPKc" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Set the annotate function based on the path to annotation script and function. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>annotate_func</strong> – <strong>[out]</strong> Pointer to the annotate function. </p></li>
-<li><p><strong>path_</strong> – <strong>[in]</strong> Path to the annotation script followed by function name (path and function name must be separated by “::”). </p></li>
+<li><p><strong>file</strong> – <strong>[in]</strong> Name of the annotation script. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
