@@ -336,40 +336,36 @@ int nomp_py_get_knl_name_and_src(char **name, char **src,
  * function.
  *
  * @param[out] annotate_func Pointer to the annotate function.
- * @param[in] path_ Path to the annotation script followed by function name
- * (path and function name must be separated by "::").
+ * @param[in] file Name of the annotation script.
  * @return int
  */
-int nomp_py_set_annotate_func(PyObject **annotate_func, const char *path_) {
+int nomp_py_set_annotate_func(PyObject **annotate_func, const char *file) {
   // Find file and function from path.
-  char *path = strndup(path_, PATH_MAX + NOMP_MAX_BUFFER_SIZE);
-  char *file = strtok(path, "::"), *func = strtok(NULL, "::");
-  if (file == NULL || func == NULL) {
-    nomp_free(&path);
+  if (file == NULL || strlen(file) == 0)
     return 0;
-  }
 
   // nomp_check(nomp_py_check_module(file));
 
   int err = 1;
-  PyObject *pfile = PyUnicode_FromString(file);
-  if (pfile) {
-    PyObject *module = PyImport_Import(pfile);
-    if (module) {
-      PyObject *pfunc = PyObject_GetAttrString(module, func);
-      if (pfunc && PyCallable_Check(pfunc))
-        Py_XDECREF(*annotate_func), *annotate_func = pfunc, err = 0;
-      Py_DECREF(module);
+  PyObject *py_file = PyUnicode_FromString(file);
+  if (py_file) {
+    PyObject *py_module = PyImport_Import(py_file);
+    if (py_module) {
+      PyObject *py_func = PyObject_GetAttrString(py_module, "annotate");
+      if (py_func && PyCallable_Check(py_func)) {
+        Py_XDECREF(*annotate_func);
+        *annotate_func = py_func;
+        err = 0;
+      }
+      Py_DECREF(py_module);
     }
-    Py_DECREF(pfile);
+    Py_DECREF(py_file);
   }
   if (err) {
     err = nomp_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,
-                   "Failed to find annotate function \"%s\" in file \"%s\".",
-                   func, file);
+                   "Failed to find annotate function in file \"%s\".", file);
   }
 
-  nomp_free(&path);
   return err;
 }
 

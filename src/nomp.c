@@ -77,6 +77,12 @@ static inline int nomp_check_cmd_line(nomp_config_t *const cfg, unsigned argc,
     if (!strncmp("--nomp-scripts-dir", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
       strncpy(cfg->scripts_dir, argv[i], PATH_MAX), valid = 1;
 
+    if (!strncmp("--nomp-annotations-script", argv[i - 1],
+                 NOMP_MAX_BUFFER_SIZE)) {
+      strncpy(cfg->annotations_script, argv[i], NOMP_MAX_BUFFER_SIZE);
+      valid = 1;
+    }
+
     if (!valid) {
       nomp_log(NOMP_SUCCESS, NOMP_WARNING, "Unknown command line argument: %s.",
                argv[i - 1]);
@@ -99,6 +105,7 @@ static inline int nomp_set_configs(int argc, const char **argv,
   strcpy(cfg->backend, "");
   strcpy(cfg->install_dir, "");
   strcpy(cfg->scripts_dir, "");
+  strcpy(cfg->annotations_script, "");
 
   nomp_check(nomp_check_cmd_line(cfg, argc, argv));
   nomp_check_env_vars(cfg);
@@ -202,7 +209,8 @@ static inline int nomp_init_backend(nomp_backend_t *const backend,
  * \arg `--nomp-verbose <verbose-level>` Specify verbose level.
  * \arg `--nomp-profile <profile-level>` Specify profile level.
  * \arg `--nomp-scripts-dir <scripts-dir>` Specify the directory containing
- * annotation and transformation scripts.
+ * \arg `--nomp-annotations-script <annotations-script>` Specify the name of
+ * the annotations script.
  *
  * @param[in] argc The number of arguments to nomp_init().
  * @param[in] argv Arguments as strings, values followed by options.
@@ -235,6 +243,10 @@ int nomp_init(int argc, const char **argv) {
 
   // Set verbose level.
   nomp_check(nomp_log_set_verbose(cfg.verbose));
+
+  // Setup the annotation script.
+  nomp_check(
+      nomp_py_set_annotate_func(&nomp.py_annotate, cfg.annotations_script));
 
   // Initialize the backend.
   nomp_check(nomp_init_backend(&nomp, &cfg));
@@ -393,6 +405,21 @@ static inline int nomp_jit_act_on_clauses(PyObject **kernel,
         program->reduction_op = NOMP_SUM;
       if (strncmp(clauses[i + 2], "*", 2) == 0)
         program->reduction_op = NOMP_PROD;
+      i += 3;
+      continue;
+    }
+
+    if (strncmp(clauses[i], "annotate", NOMP_MAX_BUFFER_SIZE) == 0) {
+      const char *key = clauses[i + 1];
+      const char *value = clauses[i + 2];
+
+      PyObject *py_annotations = PyDict_New();
+      PyObject *py_value = PyUnicode_FromString(value);
+      PyDict_SetItemString(py_annotations, key, py_value);
+      Py_XDECREF(py_value);
+      nomp_check(nomp_py_annotate(kernel, backend->py_annotate, py_annotations,
+                                  backend->py_context));
+      Py_XDECREF(py_annotations);
       i += 3;
       continue;
     }
@@ -672,8 +699,8 @@ int nomp_finalize(void) {
   if (!initialized)
     return NOMP_FINALIZE_FAILURE;
 
-  Py_XDECREF(nomp.py_annotate);
-  Py_XDECREF(nomp.py_context);
+  Py_XDECREF(nomp.py_annotate), nomp.py_annotate = NULL;
+  Py_XDECREF(nomp.py_context), nomp.py_context = NULL;
 
   // Free all the allocated memory.
   for (unsigned i = 0; i < mems_n; i++) {

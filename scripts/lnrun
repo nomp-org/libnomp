@@ -8,6 +8,7 @@
 : "${NOMP_PORT:=5005}"
 : "${NOMP_BROWSER:="google-chrome"}"
 : "${NOMP_TEST_GROUPS:="*"}"
+: "${NOMP_ANNOTATIONS_SCRIPT:="sem"}"
 
 # Check if NOMP_INSTALL_DIR is set, if not set it to parent directory of the
 # lnrun script location.
@@ -110,9 +111,13 @@ function run_test() {
   ERR=0
   cd "${NOMP_TEST_DIR}" &&
   for t in $(ls  ${TESTS}); do
+    echo " $t --nomp-backend ${NOMP_BACKEND} --nomp-device ${NOMP_DEVICE} \
+      --nomp-platform ${NOMP_PLATFORM} --nomp-install-dir ${NOMP_INSTALL_DIR} \
+      --nomp-verbose ${NOMP_VERBOSE} --nomp-annotations-script ${NOMP_ANNOTATIONS_SCRIPT}"
+
     $t --nomp-backend ${NOMP_BACKEND} --nomp-device ${NOMP_DEVICE} \
       --nomp-platform ${NOMP_PLATFORM} --nomp-install-dir ${NOMP_INSTALL_DIR} \
-      --nomp-verbose ${NOMP_VERBOSE}
+      --nomp-verbose ${NOMP_VERBOSE} --nomp-annotations-script ${NOMP_ANNOTATIONS_SCRIPT}
 
     if [ $? -eq 0 ]; then
       echo "${t}: ${green}Passed${reset}"
