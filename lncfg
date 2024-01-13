@@ -116,6 +116,7 @@ echo -e "NOMP_INSTALL_DIR=${NOMP_INSTALL_DIR}\n" \
 
 # Configure cmake build.
 echo "Configuring build files for libnomp..."
+echo "cmake -B ${NOMP_BUILD_DIR} -S ${NOMP_SOURCE_DIR} ${NOMP_CMAKE_OPTS[@]}"
 cmake -B "${NOMP_BUILD_DIR}" -S "${NOMP_SOURCE_DIR}" "${NOMP_CMAKE_OPTS[@]}"
 
 if [[ $? -eq 0 ]]; then
@@ -124,7 +125,6 @@ if [[ $? -eq 0 ]]; then
     "execute the command: ${cyan}cmake --build ${NOMP_BUILD_DIR} --target" \
     "install${reset}."
   exit 0
-else
-  echo "${red}Failed to create build files for libnomp${reset}."
-  exit 1
 fi
+echo "${red}Failed to create build files for libnomp${reset}."
+exit 1
