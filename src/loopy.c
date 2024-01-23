@@ -2,14 +2,21 @@
 #include "nomp-impl.h"
 #include "nomp-loopy.h"
 
-static const char *module_loopy_api = "loopy_api";
-static const char *module_reduction = "reduction";
-static const char *c_to_loopy = "c_to_loopy";
-static const char *fix_parameters = "fix_parameters";
-static const char *get_knl_src = "get_knl_src";
-static const char *get_knl_name = "get_knl_name";
-static const char *realize_reduction = "realize_reduction";
 static char backend[NOMP_MAX_BUFFER_SIZE + 1];
+static PyObject *py_backend_str = NULL;
+static PyObject *py_pymbolic_to_symengine_str = NULL;
+
+#define check_error_(obj, err, msg)                                            \
+  {                                                                            \
+    if (!obj)                                                                  \
+      return nomp_log(err, NOMP_ERROR, msg);                                   \
+  }
+
+#define check_py_str(obj)                                                      \
+  check_error_(obj, NOMP_PY_CALL_FAILURE,                                      \
+               "Converting C string to python string failed.")
+
+#define check_py_call(err, msg) check_error_(err, NOMP_PY_CALL_FAILURE, msg)
 
 /**
  * @ingroup nomp_py_utils
@@ -41,6 +48,13 @@ int nomp_py_init(const nomp_config_t *const cfg) {
   // Append nomp script directory to sys.path.
   nomp_check(nomp_py_append_to_sys_path(cfg->scripts_dir));
 
+  py_backend_str = PyUnicode_FromString(backend);
+  check_py_str(py_backend_str);
+
+  py_pymbolic_to_symengine_str =
+      PyUnicode_FromString("PymbolicToSymEngineMapper");
+  check_py_str(py_pymbolic_to_symengine_str);
+
   return 0;
 }
 
@@ -52,25 +66,21 @@ int nomp_py_init(const nomp_config_t *const cfg) {
  * @return int
  */
 int nomp_py_append_to_sys_path(const char *path) {
-#define check_error(obj)                                                       \
-  {                                                                            \
-    if (!obj) {                                                                \
-      return nomp_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,                        \
-                      "Appending path \"%s\" to the sys.path failed.", path);  \
-    }                                                                          \
-  }
-
   PyObject *py_sys = PyImport_ImportModule("sys");
-  check_error(py_sys);
-  PyObject *py_path = PyObject_GetAttrString(py_sys, "path");
-  check_error(py_path);
-  PyObject *py_str = PyUnicode_FromString(path);
-  check_error(py_str);
-  check_error(!PyList_Append(py_path, py_str));
+  check_py_call(py_sys, "Importing sys module failed.");
 
-  Py_DECREF(py_path), Py_DECREF(py_str), Py_DECREF(py_sys);
+  PyObject *py_sys_path = PyObject_GetAttrString(py_sys, "path");
+  check_py_call(py_sys_path, "Importing sys.path failed.");
 
-#undef check_error
+  PyObject *py_path_str = PyUnicode_FromString(path);
+  check_py_str(py_path_str);
+
+  char msg[NOMP_MAX_BUFFER_SIZE + 1];
+  snprintf(msg, NOMP_MAX_BUFFER_SIZE,
+           "Appending path \"%s\" to the sys.path failed.", path);
+  check_py_call(!PyList_Append(py_sys_path, py_path_str), msg);
+
+  Py_DECREF(py_sys_path), Py_DECREF(py_path_str), Py_DECREF(py_sys);
 
   return 0;
 }
@@ -95,24 +105,25 @@ int nomp_py_check_module(const char *module, const char *function) {
     return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
                     "Module name and/or function name not provided.");
   }
-  PyObject *py_str_module = PyUnicode_FromString(module);
-  if (!py_str_module) {
-    return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                    "Can't convert string \"%s\" to a python string.", module);
-  }
-  PyObject *py_module = PyImport_Import(py_str_module);
-  if (!py_module) {
-    return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                    "Python module \"%s\" not found.", module);
-  }
-  PyObject *py_function = PyObject_GetAttrString(py_module, function);
-  if (!py_function) {
-    return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
-                    "Python function \"%s\" not found in module \"%s\".",
-                    function, module);
-  }
 
-  Py_DECREF(py_function), Py_DECREF(py_module), Py_DECREF(py_str_module);
+  PyObject *py_module_str = PyUnicode_FromString(module);
+  check_py_str(py_module_str);
+
+  PyObject *py_module = PyImport_Import(py_module_str);
+
+  char msg[BUFSIZ];
+  snprintf(msg, BUFSIZ, "Importing Python module \"%s\" failed.", module);
+  check_py_call(py_module, msg);
+
+  PyObject *py_function = PyObject_GetAttrString(py_module, function);
+
+  snprintf(msg, BUFSIZ,
+           "Importing Python function \"%s\" from module \"%s\" failed.",
+           function, module);
+  check_py_call(py_function, msg);
+
+  Py_DECREF(py_function), Py_DECREF(py_module), Py_DECREF(py_module_str);
+
   return 0;
 }
 
@@ -125,37 +136,22 @@ int nomp_py_check_module(const char *module, const char *function) {
  * @return int
  */
 int nomp_py_c_to_loopy(PyObject **kernel, const char *src) {
-#define check_error(obj)                                                       \
-  {                                                                            \
-    if (!obj) {                                                                \
-      return nomp_log(NOMP_LOOPY_CONVERSION_FAILURE, NOMP_ERROR,               \
-                      "C to Loopy conversion failed.\n");                      \
-    }                                                                          \
-  }
+  PyObject *py_src_str = PyUnicode_FromString(src);
+  check_py_str(py_src_str);
 
-  PyObject *py_loopy_api = PyUnicode_FromString(module_loopy_api);
-  check_error(py_loopy_api);
+  PyObject *py_loopy_api = PyImport_ImportModule("loopy_api");
+  check_py_call(py_loopy_api, "Importing loopy_api module failed.");
 
-  PyObject *py_module = PyImport_Import(py_loopy_api);
-  check_error(py_module);
+  PyObject *py_c_to_loopy = PyObject_GetAttrString(py_loopy_api, "c_to_loopy");
+  check_py_call(py_c_to_loopy,
+                "Importing c_to_loopy function from loop_api module failed.");
 
-  PyObject *py_c_to_loopy = PyObject_GetAttrString(py_module, c_to_loopy);
-  check_error(py_c_to_loopy);
+  *kernel = PyObject_CallFunctionObjArgs(py_c_to_loopy, py_src_str,
+                                         py_backend_str, NULL);
+  check_error_(*kernel, NOMP_LOOPY_CONVERSION_FAILURE,
+               "Converting C source to loopy kernel failed.");
 
-  PyObject *py_src = PyUnicode_FromString(src);
-  check_error(py_src);
-
-  PyObject *py_backend = PyUnicode_FromString(backend);
-  check_error(py_backend);
-
-  *kernel =
-      PyObject_CallFunctionObjArgs(py_c_to_loopy, py_src, py_backend, NULL);
-  check_error(*kernel);
-
-  Py_XDECREF(py_src), Py_XDECREF(py_backend);
-  Py_DECREF(py_c_to_loopy), Py_DECREF(py_module), Py_DECREF(py_loopy_api);
-
-#undef check_error
+  Py_DECREF(py_loopy_api), Py_DECREF(py_c_to_loopy), Py_DECREF(py_src_str);
 
   return 0;
 }
@@ -171,35 +167,24 @@ int nomp_py_c_to_loopy(PyObject **kernel, const char *src) {
  */
 int nomp_py_realize_reduction(PyObject **kernel, const char *const variable,
                               const PyObject *const py_context) {
-#define check_error(obj)                                                       \
-  {                                                                            \
-    if (!obj) {                                                                \
-      return nomp_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,                        \
-                      "Call to realize_reduction() failed.");                  \
-    }                                                                          \
-  }
-
-  PyObject *py_str_reduction = PyUnicode_FromString(module_reduction);
-  check_error(py_str_reduction);
-  PyObject *py_module = PyImport_Import(py_str_reduction);
-  check_error(py_module);
+  PyObject *py_module = PyImport_ImportModule("reduction");
+  check_py_call(py_module, "Importing reduction module failed.");
 
   PyObject *py_realize_reduction =
-      PyObject_GetAttrString(py_module, realize_reduction);
-  check_error(py_realize_reduction);
+      PyObject_GetAttrString(py_module, "realize_reduction");
+  check_py_call(py_realize_reduction, "Importing realize_reduction function "
+                                      "from reduction module failed.");
 
-  PyObject *py_str_variable = PyUnicode_FromString(variable);
-  check_error(py_str_variable);
+  PyObject *py_variable_str = PyUnicode_FromString(variable);
+  check_py_str(py_variable_str);
 
   PyObject *py_result = PyObject_CallFunctionObjArgs(
-      py_realize_reduction, *kernel, py_str_variable, py_context, NULL);
-  check_error(py_result);
+      py_realize_reduction, *kernel, py_variable_str, py_context, NULL);
+  check_py_call(py_result, "Calling realize_reduction() function failed.");
 
   Py_DECREF(*kernel), *kernel = py_result;
-  Py_DECREF(py_str_variable), Py_DECREF(py_realize_reduction);
-  Py_DECREF(py_module), Py_DECREF(py_str_reduction);
-
-#undef check_error
+  Py_DECREF(py_variable_str), Py_DECREF(py_realize_reduction);
+  Py_DECREF(py_module);
 
   return 0;
 }
@@ -229,35 +214,38 @@ int nomp_py_transform(PyObject **kernel, const char *const file,
   if (file == NULL || function == NULL)
     return 0;
 
-#define check_error(obj)                                                       \
-  {                                                                            \
-    if (!obj) {                                                                \
-      return nomp_log(                                                         \
-          NOMP_PY_CALL_FAILURE, NOMP_ERROR,                                    \
-          "Failed to call user transform function: \"%s\" in file: "           \
-          "\"%s\".",                                                           \
-          function, file);                                                     \
-    }                                                                          \
-  }
+  PyObject *py_file_str = PyUnicode_FromString(file);
+  check_py_str(py_file_str);
 
-  PyObject *py_str_file = PyUnicode_FromString(file);
-  check_error(py_str_file);
+  PyObject *py_module = PyImport_Import(py_file_str);
 
-  PyObject *py_module = PyImport_Import(py_str_file);
-  check_error(py_module);
+  char msg[BUFSIZ];
+  snprintf(msg, BUFSIZ, "Importing Python module: \"%s\" failed.", file);
+  check_py_call(py_module, msg);
 
   PyObject *py_function = PyObject_GetAttrString(py_module, function);
-  check_error(py_function);
-  check_error(PyCallable_Check(py_function));
 
-  PyObject *py_temp =
+  snprintf(msg, BUFSIZ,
+           "Importing Python function \"%s\" from  module \"%s\" failed.",
+           function, file);
+  check_py_call(py_function, msg);
+
+  snprintf(msg, BUFSIZ,
+           "Python function \"%s\" from  module \"%s\" is not callable.",
+           function, file);
+  check_py_call(PyCallable_Check(py_function), msg);
+
+  PyObject *py_transformed_kernel =
       PyObject_CallFunctionObjArgs(py_function, *kernel, context, NULL);
-  check_error(py_temp);
-  Py_DECREF(*kernel), *kernel = py_temp;
 
-  Py_DECREF(py_function);
-  Py_DECREF(py_module);
-  Py_DECREF(py_str_file);
+  snprintf(msg, BUFSIZ,
+           "Calling Python function \"%s\" from module \"%s\" failed.",
+           function, file);
+  check_py_call(py_transformed_kernel, msg);
+
+  Py_DECREF(*kernel), *kernel = py_transformed_kernel;
+
+  Py_DECREF(py_function), Py_DECREF(py_module), Py_DECREF(py_file_str);
 
 #undef check_error
 
@@ -275,57 +263,40 @@ int nomp_py_transform(PyObject **kernel, const char *const file,
  */
 int nomp_py_get_knl_name_and_src(char **name, char **src,
                                  const PyObject *kernel) {
-#define check_error(obj)                                                       \
-  {                                                                            \
-    if (!obj) {                                                                \
-      return nomp_log(NOMP_LOOPY_KNL_NAME_NOT_FOUND, NOMP_ERROR,               \
-                      "Unable to get loopy kernel name.");                     \
-    }                                                                          \
-  }
+  PyObject *py_loopy_api = PyImport_ImportModule("loopy_api");
+  check_py_call(py_loopy_api, "Importing module loopy_api failed.");
 
-  PyObject *py_loopy_api = PyUnicode_FromString(module_loopy_api);
-  check_error(py_loopy_api);
-
-  PyObject *py_module = PyImport_Import(py_loopy_api);
-  check_error(py_module);
-
-  PyObject *py_kernel_name = PyObject_GetAttrString(py_module, get_knl_name);
-  check_error(py_kernel_name);
+  PyObject *py_get_knl_name =
+      PyObject_GetAttrString(py_loopy_api, "get_knl_name");
+  check_py_call(py_get_knl_name,
+                "Importing function loop_api.get_knl_name failed.");
 
   PyObject *py_name =
-      PyObject_CallFunctionObjArgs(py_kernel_name, kernel, NULL);
-  check_error(py_name);
+      PyObject_CallFunctionObjArgs(py_get_knl_name, kernel, NULL);
+  check_error_(py_name, NOMP_LOOPY_KNL_NAME_NOT_FOUND,
+               "Unable to get loopy kernel name.");
 
   Py_ssize_t size;
   const char *const name_ = PyUnicode_AsUTF8AndSize(py_name, &size);
   *name = strndup(name_, size);
 
-  Py_DECREF(py_name), Py_DECREF(py_kernel_name);
+  Py_DECREF(py_name), Py_DECREF(py_get_knl_name);
 
-#undef check_error
-
-#define check_error(obj)                                                       \
-  {                                                                            \
-    if (!obj) {                                                                \
-      return nomp_log(                                                         \
-          NOMP_LOOPY_CODEGEN_FAILURE, NOMP_ERROR,                              \
-          "Backend code generation from loopy kernel \"%s\" failed.", *name);  \
-    }                                                                          \
-  }
-
-  PyObject *py_kernel_src = PyObject_GetAttrString(py_module, get_knl_src);
-  check_error(py_kernel_src);
+  PyObject *py_kernel_src = PyObject_GetAttrString(py_loopy_api, "get_knl_src");
+  check_py_call(py_kernel_src,
+                "Importing function loop_api.get_knl_src failed.");
 
   PyObject *py_src = PyObject_CallFunctionObjArgs(py_kernel_src, kernel, NULL);
-  check_error(py_src);
+
+  char msg[BUFSIZ];
+  snprintf(msg, BUFSIZ,
+           "Backend code generation from loopy kernel \"%s\" failed.", *name);
+  check_error_(py_src, NOMP_LOOPY_CODEGEN_FAILURE, msg);
 
   const char *const src_ = PyUnicode_AsUTF8AndSize(py_src, &size);
   *src = strndup(src_, size);
 
-  Py_DECREF(py_src), Py_DECREF(py_kernel_src), Py_DECREF(py_module);
-  Py_DECREF(py_loopy_api);
-
-#undef check_error
+  Py_DECREF(py_src), Py_DECREF(py_kernel_src);
 
   return 0;
 }
@@ -340,33 +311,29 @@ int nomp_py_get_knl_name_and_src(char **name, char **src,
  * @return int
  */
 int nomp_py_set_annotate_func(PyObject **annotate_func, const char *file) {
-  // Find file and function from path.
+  // If file is NULL or empty, we don't have to do anything:
   if (file == NULL || strlen(file) == 0)
     return 0;
 
-  // nomp_check(nomp_py_check_module(file));
+  PyObject *py_file_str = PyUnicode_FromString(file);
+  check_py_str(py_file_str);
 
-  int err = 1;
-  PyObject *py_file = PyUnicode_FromString(file);
-  if (py_file) {
-    PyObject *py_module = PyImport_Import(py_file);
-    if (py_module) {
-      PyObject *py_func = PyObject_GetAttrString(py_module, "annotate");
-      if (py_func && PyCallable_Check(py_func)) {
-        Py_XDECREF(*annotate_func);
-        *annotate_func = py_func;
-        err = 0;
-      }
-      Py_DECREF(py_module);
-    }
-    Py_DECREF(py_file);
-  }
-  if (err) {
-    err = nomp_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,
-                   "Failed to find annotate function in file \"%s\".", file);
-  }
+  PyObject *py_module = PyImport_Import(py_file_str);
+  check_py_call(py_module, "Importing python module failed.");
 
-  return err;
+  PyObject *py_func = PyObject_GetAttrString(py_module, "annotate");
+  char msg[BUFSIZ];
+  snprintf(msg, BUFSIZ, "Failed to find annotate function in file \"%s\".",
+           file);
+  check_py_call(py_func, msg);
+
+  check_py_call(PyCallable_Check(py_func),
+                "Annotate function is not callable.");
+  Py_XDECREF(*annotate_func), *annotate_func = py_func;
+
+  Py_DECREF(py_module), Py_DECREF(py_file_str);
+
+  return 0;
 }
 
 /**
@@ -389,16 +356,16 @@ int nomp_py_set_annotate_func(PyObject **annotate_func, const char *file) {
 int nomp_py_annotate(PyObject **kernel, PyObject *const function,
                      const PyObject *const annotations,
                      const PyObject *const context) {
+  // if kernel or function is NULL, we don't have to do anything:
   if (!kernel || !*kernel || !function)
     return 0;
 
-  if (!PyCallable_Check(function)) {
-    return nomp_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,
-                    "Annotation function is not callable.");
-  }
-  PyObject *py_temp = PyObject_CallFunctionObjArgs(function, *kernel,
-                                                   annotations, context, NULL);
-  Py_DECREF(*kernel), *kernel = py_temp;
+  check_py_call(PyCallable_Check(function), "Annotation function is not "
+                                            "callable.");
+  PyObject *py_annotated_kernel = PyObject_CallFunctionObjArgs(
+      function, *kernel, annotations, context, NULL);
+  check_py_call(py_annotated_kernel, "Annotating loopy kernel failed.");
+  Py_DECREF(*kernel), *kernel = py_annotated_kernel;
 
   return 0;
 }
@@ -406,12 +373,13 @@ int nomp_py_annotate(PyObject **kernel, PyObject *const function,
 static int symengine_vec_push(CVecBasic *vec, const char *str) {
   basic a;
   basic_new_stack(a);
+
   CWRAPPER_OUTPUT_TYPE err = basic_parse(a, str);
-  if (err) {
-    return nomp_log(NOMP_LOOPY_GRIDSIZE_FAILURE, NOMP_ERROR,
-                    "Expression parsing with SymEngine failed with error %d.",
-                    err);
-  }
+  char msg[BUFSIZ];
+  snprintf(msg, BUFSIZ,
+           "Expression parsing with SymEngine failed with error %d.", err);
+  check_error_(!err, NOMP_LOOPY_GRIDSIZE_FAILURE, msg);
+
   vecbasic_push_back(vec, a);
   basic_free_stack(a);
 
@@ -419,27 +387,32 @@ static int symengine_vec_push(CVecBasic *vec, const char *str) {
 }
 
 static int py_get_grid_size_aux(PyObject *exp, CVecBasic *vec) {
-  int err = 1;
-  PyObject *mapper = PyImport_ImportModule("pymbolic.interop.symengine");
-  if (mapper) {
-    PyObject *module_name = PyUnicode_FromString("PymbolicToSymEngineMapper");
-    PyObject *p2s_mapper = PyObject_CallMethodNoArgs(mapper, module_name);
-    if (p2s_mapper) {
-      PyObject *sym_exp = PyObject_CallFunctionObjArgs(p2s_mapper, exp, NULL);
-      if (sym_exp) {
-        PyObject *obj_rep = PyObject_Repr(sym_exp);
-        const char *str = PyUnicode_AsUTF8(obj_rep);
-        err = symengine_vec_push(vec, str);
-        Py_XDECREF(obj_rep), Py_DECREF(sym_exp);
-      }
-      Py_DECREF(p2s_mapper);
-    }
-    Py_DECREF(mapper), Py_XDECREF(module_name);
-  }
-  if (err) {
+  PyObject *py_pymbolic = PyImport_ImportModule("pymbolic.interop.symengine");
+  check_py_call(py_pymbolic,
+                "Importing module pymbolic.interop.symengine failed.");
+
+  PyObject *py_pymolic_to_symengine_mapper =
+      PyObject_CallMethodNoArgs(py_pymbolic, py_pymbolic_to_symengine_str);
+  check_py_call(py_pymolic_to_symengine_mapper,
+                "Calling PymbolicToSymEngineMapper() failed.");
+
+  PyObject *py_symengine_expr =
+      PyObject_CallFunctionObjArgs(py_pymolic_to_symengine_mapper, exp, NULL);
+  check_py_call(py_symengine_expr,
+                "Converting pymbolic expression to SymEngine failed.");
+
+  PyObject *py_expr_str = PyObject_Repr(py_symengine_expr);
+  check_py_call(py_expr_str,
+                "Converting SymEngine expression to string failed.");
+
+  const char *str = PyUnicode_AsUTF8(py_expr_str);
+  if (symengine_vec_push(vec, str)) {
     return nomp_log(NOMP_LOOPY_GRIDSIZE_FAILURE, NOMP_ERROR,
                     "Unable to evaluate grid sizes from loopy kernel.");
   }
+
+  Py_DECREF(py_expr_str), Py_DECREF(py_symengine_expr);
+  Py_DECREF(py_pymolic_to_symengine_mapper), Py_DECREF(py_pymbolic);
 
   return 0;
 }
@@ -451,49 +424,48 @@ static int py_get_grid_size_aux(PyObject *exp, CVecBasic *vec) {
  * Grid sizes are stored in the program object itself.
  *
  * @param[in] prg Nomp program object.
- * @param[in] knl Python kernel object.
+ * @param[in] kernel Python kernel object.
  * @return int
  */
-int nomp_py_get_grid_size(nomp_prog_t *prg, PyObject *knl) {
-  int err = 1;
-  if (knl) {
-    PyObject *callables = PyObject_GetAttrString(knl, "callables_table");
-    if (callables) {
-      PyObject *entry = PyObject_GetAttrString(knl, "default_entrypoint");
-      if (entry) {
-        PyObject *expr = PyObject_GetAttrString(
-            entry, "get_grid_size_upper_bounds_as_exprs");
-        if (expr) {
-          PyObject *grid_size =
-              PyObject_CallFunctionObjArgs(expr, callables, NULL);
-          if (grid_size && PyTuple_Check(grid_size)) {
-            PyObject *py_global = PyTuple_GetItem(grid_size, 0);
-            PyObject *py_local = PyTuple_GetItem(grid_size, 1);
-            prg->ndim =
-                nomp_max(2, PyTuple_Size(py_global), PyTuple_Size(py_local));
+int nomp_py_get_grid_size(nomp_prog_t *prg, PyObject *kernel) {
+  check_py_call(kernel, "Loopy kernel object is NULL.");
 
-            for (int i = 0; i < PyTuple_Size(py_global); i++)
-              nomp_check(py_get_grid_size_aux(PyTuple_GetItem(py_global, i),
-                                              prg->sym_global));
+  PyObject *py_callables = PyObject_GetAttrString(kernel, "callables_table");
+  check_py_call(py_callables, "Loopy kernel's callables_table is NULL.");
 
-            for (int i = 0; i < PyTuple_Size(py_local); i++)
-              nomp_check(py_get_grid_size_aux(PyTuple_GetItem(py_local, i),
-                                              prg->sym_local));
+  PyObject *py_entry = PyObject_GetAttrString(kernel, "default_entrypoint");
+  check_py_call(py_entry, "Loopy kernel's default_entrypoint is NULL.");
 
-            err = 0;
-            Py_DECREF(grid_size);
-          }
-          Py_DECREF(expr);
-        }
-        Py_DECREF(entry);
-      }
-      Py_DECREF(callables);
-    }
-  }
-  if (err) {
-    return nomp_log(NOMP_LOOPY_GRIDSIZE_FAILURE, NOMP_ERROR,
-                    "Unable to get grid sizes from loopy kernel.");
-  }
+  PyObject *py_grid_size_expr =
+      PyObject_GetAttrString(py_entry, "get_grid_size_upper_bounds_as_exprs");
+  check_py_call(
+      py_grid_size_expr,
+      "Loopy kernel's get_grid_size_upper_bounds_as_exprs() is NULL.");
+
+  PyObject *py_grid_size =
+      PyObject_CallFunctionObjArgs(py_grid_size_expr, py_callables, NULL);
+  check_py_call(py_grid_size,
+                "Calling get_grid_size_upper_bounds_as_exprs() failed.");
+  check_py_call(PyTuple_Check(py_grid_size), "Grid size is not a tuple.");
+
+  PyObject *py_global = PyTuple_GetItem(py_grid_size, 0);
+  check_py_call(PyTuple_Check(py_global), "Global grid size is not a tuple.");
+
+  PyObject *py_local = PyTuple_GetItem(py_grid_size, 1);
+  check_py_call(PyTuple_Check(py_local), "Local grid size is not a tuple.");
+
+  prg->ndim = nomp_max(2, PyTuple_Size(py_global), PyTuple_Size(py_local));
+
+  for (int i = 0; i < PyTuple_Size(py_global); i++)
+    nomp_check(
+        py_get_grid_size_aux(PyTuple_GetItem(py_global, i), prg->sym_global));
+
+  for (int i = 0; i < PyTuple_Size(py_local); i++)
+    nomp_check(
+        py_get_grid_size_aux(PyTuple_GetItem(py_local, i), prg->sym_local));
+
+  Py_DECREF(py_grid_size), Py_DECREF(py_grid_size_expr), Py_DECREF(py_entry);
+  Py_DECREF(py_callables);
 
   return 0;
 }
@@ -502,44 +474,28 @@ int nomp_py_get_grid_size(nomp_prog_t *prg, PyObject *knl) {
  * @ingroup nomp_py_utils
  * @brief Fix the arguments which were marked as `jit` in the kernel.
  *
- * @param[in,out] knl Python kernel object.
+ * @param[in,out] kernel Python kernel object.
  * @param[in] py_dict Dictionary containing jit argument names and values.
  * @return int
  */
-int nomp_py_fix_parameters(PyObject **knl, const PyObject *py_dict) {
-#define check_error(obj, msg)                                                  \
-  {                                                                            \
-    if (!obj) {                                                                \
-      return nomp_log(NOMP_PY_CALL_FAILURE, NOMP_ERROR,                        \
-                      "Failed to %s in file: %s, line: %d", msg, __FILE__,     \
-                      __LINE__);                                               \
-    }                                                                          \
-  }
-
-  PyObject *py_loopy_api = PyUnicode_FromString(module_loopy_api);
-  check_error(py_loopy_api, "convert c-string to Python string");
-
-  PyObject *py_module = PyImport_Import(py_loopy_api);
-  check_error(py_module, "import loopy_api module");
+int nomp_py_fix_parameters(PyObject **kernel, const PyObject *py_dict) {
+  PyObject *py_loopy_api = PyImport_ImportModule("loopy_api");
 
   PyObject *py_fix_parameters =
-      PyObject_GetAttrString(py_module, fix_parameters);
-  check_error(py_fix_parameters, "get loopy_api.fix_parameters");
+      PyObject_GetAttrString(py_loopy_api, "fix_parameters");
+  check_py_call(py_fix_parameters,
+                "Importing loopy_api.fix_parameters() failed.");
 
-  check_error(PyCallable_Check(py_fix_parameters),
-              "call loopy_api.fix_parameters");
+  check_py_call(PyCallable_Check(py_fix_parameters),
+                "loopy_api.fix_parameters() is not callable.");
 
-  PyObject *py_temp =
-      PyObject_CallFunctionObjArgs(py_fix_parameters, *knl, py_dict, NULL);
-  check_error(py_temp, "call loopy.fix_parameters");
+  PyObject *py_fixed_kernel =
+      PyObject_CallFunctionObjArgs(py_fix_parameters, *kernel, py_dict, NULL);
+  check_py_call(py_fixed_kernel, "Calling loopy.fix_parameters() failed.");
 
-  Py_DECREF(*knl), *knl = py_temp;
-
-#undef check_error
+  Py_DECREF(*kernel), *kernel = py_fixed_kernel;
 
   Py_DECREF(py_fix_parameters);
-  Py_DECREF(py_module);
-  Py_DECREF(py_loopy_api);
 
   return 0;
 }
@@ -569,6 +525,12 @@ char *nomp_py_get_str(PyObject *const obj) {
  * @return int
  */
 int nomp_py_finalize(void) {
+  Py_XDECREF(py_pymbolic_to_symengine_str), py_pymbolic_to_symengine_str = NULL;
+  Py_XDECREF(py_backend_str), py_backend_str = NULL;
   Py_Finalize();
   return 0;
 }
+
+#undef check_py_call
+#undef check_py_str
+#undef check_error_
