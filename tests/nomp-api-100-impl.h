@@ -21,11 +21,12 @@ static int nomp_api_100_aux(const char **clauses) {
 static int nomp_api_100_invalid_file(void) {
   const char *clauses[4] = {"transform", "invalid_file", "tile", 0};
   int err = nomp_api_100_aux(clauses);
-  nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_INPUT_IS_INVALID);
+  nomp_test_assert(nomp_get_err_no(err) == NOMP_PY_CALL_FAILURE);
 
   char *log = nomp_get_err_str(err);
-  int eq = logcmp(log, "\\[Error\\] .*src\\/.*.c:[0-9]* Python module "
-                       "\"invalid_file\" not found.");
+  int eq =
+      logcmp(log, "\\[Error\\] .*src\\/.*.c:[0-9]* Importing Python module "
+                  "\"invalid_file\" failed.");
   nomp_free(&log);
   nomp_test_assert(eq);
 
@@ -38,12 +39,12 @@ static int nomp_api_100_invalid_file(void) {
 static int nomp_api_100_invalid_function(void) {
   const char *clauses[4] = {"transform", "nomp_api_100", "invalid_func", 0};
   int err = nomp_api_100_aux(clauses);
-  nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_INPUT_IS_INVALID);
+  nomp_test_assert(nomp_get_err_no(err) == NOMP_PY_CALL_FAILURE);
 
   char *log = nomp_get_err_str(err);
-  int eq =
-      logcmp(log, "\\[Error\\] .*src\\/loopy.c:[0-9]* Python function "
-                  "\"invalid_func\" not found in module \"nomp_api_100\".");
+  int eq = logcmp(
+      log, "\\[Error\\] .*src\\/loopy.c:[0-9]* Importing Python function "
+           "\"invalid_func\" from module \"nomp_api_100\" failed.");
   nomp_free(&log);
   nomp_test_assert(eq);
 

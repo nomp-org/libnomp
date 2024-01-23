@@ -94,8 +94,8 @@ static int test_syntax_error_in_kernel(void) {
   nomp_test_assert(nomp_get_err_no(err) == NOMP_LOOPY_CONVERSION_FAILURE);
 
   char *log = nomp_get_err_str(err);
-  int eq = logcmp(log, "\\[Error\\] .*src\\/.*.c:[0-9]* C to Loopy "
-                       "conversion failed.");
+  int eq = logcmp(log, "\\[Error\\] .*src\\/.*.c:[0-9]* Converting C source to "
+                       "loopy kernel failed.");
   nomp_free(&log);
   nomp_test_assert(eq);
 
@@ -116,9 +116,8 @@ static int test_syntax_error_in_transform_function(void) {
   char *log = nomp_get_err_str(err);
   int eq = logcmp(
       log,
-      "\\[Error\\] .*src\\/.*.c:[0-9]* Failed to call user transform "
-      "function: \"function_with_syntax_error\" in file: \"nomp_api_100\".");
-
+      "\\[Error\\] .*src\\/.*.c:[0-9]* Calling Python function "
+      "\"function_with_syntax_error\" from module \"nomp_api_100\" failed.");
   nomp_free(&log);
   nomp_test_assert(eq);
 
