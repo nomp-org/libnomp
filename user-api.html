@@ -367,8 +367,20 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv413nomp_finalizev">
 <span id="_CPPv313nomp_finalizev"></span><span id="_CPPv213nomp_finalizev"></span><span id="nomp_finalize__void"></span><span class="target" id="group__nomp__user__api_1gacbf8860cf851702394683d8eaf29c3e4"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_finalize</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413nomp_finalizev" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Finalizes libnomp runtime. </p>
+<dd><p>Finalizes libnomp runtime including the Python interpreter. </p>
 <p>Frees allocated runtime resources for libnomp. Returns a non-zero value if an error occurs during the finalize process, otherwise returns 0. Calling this method before <a class="reference internal" href="#group__nomp__user__api_1ga9358288c50bff846af3475fdb09e2f5f"><span class="std std-ref">nomp_init()</span></a> will return an error. Calling this method twice will also return an error.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>int </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv435nomp_finalize_excluding_interpreterv">
+<span id="_CPPv335nomp_finalize_excluding_interpreterv"></span><span id="_CPPv235nomp_finalize_excluding_interpreterv"></span><span id="nomp_finalize_excluding_interpreter__void"></span><span class="target" id="group__nomp__user__api_1ga101eb459e13442f657ffa8579f484465"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_finalize_excluding_interpreter</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv435nomp_finalize_excluding_interpreterv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Finalizes libnomp runtime without finalizing the Python interpreter. </p>
+<p>Acts the same as <a class="reference internal" href="#group__nomp__user__api_1gacbf8860cf851702394683d8eaf29c3e4"><span class="std std-ref">nomp_finalize()</span></a> except that this method does not finalize the Python interpreter. This method is useful when libnomp has to be re-initialized multiple times in the same process.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>int </p>
@@ -419,12 +431,6 @@
 </dd></dl>
 
 <dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.NOMP_USER_KNL_ARG_TYPE_IS_INVALID">
-<span class="target" id="group__nomp__error__codes_1gae3a653c8477c8cea5db0d5292f98579b"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_USER_KNL_ARG_TYPE_IS_INVALID</span></span></span><a class="headerlink" href="#c.NOMP_USER_KNL_ARG_TYPE_IS_INVALID" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Kernel argument type provided to libnomp is not valid. </p>
-</dd></dl>
-
-<dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.NOMP_INITIALIZE_FAILURE">
 <span class="target" id="group__nomp__error__codes_1ga13ae026c6c02d62f0a980cc713fa6f9c"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_INITIALIZE_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_INITIALIZE_FAILURE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>libnomp is already initialized. </p>
@@ -434,12 +440,6 @@
 <dt class="sig sig-object cpp" id="c.NOMP_FINALIZE_FAILURE">
 <span class="target" id="group__nomp__error__codes_1ga7affd9633a37be919d471bf99304a956"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_FINALIZE_FAILURE</span></span></span><a class="headerlink" href="#c.NOMP_FINALIZE_FAILURE" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Failed to finalize libnomp. </p>
-</dd></dl>
-
-<dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.NOMP_NOT_IMPLEMENTED_ERROR">
-<span class="target" id="group__nomp__error__codes_1ga7b1792597780372f46ac24737805d80f"></span><span class="sig-name descname"><span class="n"><span class="pre">NOMP_NOT_IMPLEMENTED_ERROR</span></span></span><a class="headerlink" href="#c.NOMP_NOT_IMPLEMENTED_ERROR" title="Permalink to this definition"></a><br /></dt>
-<dd><p>The feature is not implemented. </p>
 </dd></dl>
 
 <dl class="cpp macro">

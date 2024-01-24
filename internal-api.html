@@ -722,14 +722,14 @@
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv421nomp_py_get_grid_sizeP11nomp_prog_tP8PyObject">
-<span id="_CPPv321nomp_py_get_grid_sizeP11nomp_prog_tP8PyObject"></span><span id="_CPPv221nomp_py_get_grid_sizeP11nomp_prog_tP8PyObject"></span><span id="nomp_py_get_grid_size__nomp_prog_tP.PyObjectP"></span><span class="target" id="group__nomp__py__utils_1gad5dc00c180149694527f52296c35d050"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_get_grid_size</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv411nomp_prog_t" title="nomp_prog_t"><span class="n"><span class="pre">nomp_prog_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">prg</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">knl</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421nomp_py_get_grid_sizeP11nomp_prog_tP8PyObject" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv321nomp_py_get_grid_sizeP11nomp_prog_tP8PyObject"></span><span id="_CPPv221nomp_py_get_grid_sizeP11nomp_prog_tP8PyObject"></span><span id="nomp_py_get_grid_size__nomp_prog_tP.PyObjectP"></span><span class="target" id="group__nomp__py__utils_1ga7ce9484a60d814c6973e7a66c7ec4fb7"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_get_grid_size</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv411nomp_prog_t" title="nomp_prog_t"><span class="n"><span class="pre">nomp_prog_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">prg</span></span>, <span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">kernel</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421nomp_py_get_grid_sizeP11nomp_prog_tP8PyObject" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Get global and local grid sizes as <code class="docutils literal notranslate"><span class="pre">pymoblic</span></code> expressions. </p>
 <p>Grid sizes are stored in the program object itself.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>prg</strong> – <strong>[in]</strong> Nomp program object. </p></li>
-<li><p><strong>knl</strong> – <strong>[in]</strong> Python kernel object. </p></li>
+<li><p><strong>kernel</strong> – <strong>[in]</strong> Python kernel object. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -740,12 +740,12 @@
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv422nomp_py_fix_parametersPP8PyObjectPK8PyObject">
-<span id="_CPPv322nomp_py_fix_parametersPP8PyObjectPK8PyObject"></span><span id="_CPPv222nomp_py_fix_parametersPP8PyObjectPK8PyObject"></span><span id="nomp_py_fix_parameters__PyObjectPP.PyObjectCP"></span><span class="target" id="group__nomp__py__utils_1ga66581641d7753fb5b33af8a191cc436a"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_fix_parameters</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">knl</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">py_dict</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422nomp_py_fix_parametersPP8PyObjectPK8PyObject" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv322nomp_py_fix_parametersPP8PyObjectPK8PyObject"></span><span id="_CPPv222nomp_py_fix_parametersPP8PyObjectPK8PyObject"></span><span id="nomp_py_fix_parameters__PyObjectPP.PyObjectCP"></span><span class="target" id="group__nomp__py__utils_1gaa6076f821594370d30831628eda6e8ab"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_fix_parameters</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">kernel</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">py_dict</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422nomp_py_fix_parametersPP8PyObjectPK8PyObject" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Fix the arguments which were marked as <code class="docutils literal notranslate"><span class="pre">jit</span></code> in the kernel. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>knl</strong> – <strong>[inout]</strong> Python kernel object. </p></li>
+<li><p><strong>kernel</strong> – <strong>[inout]</strong> Python kernel object. </p></li>
 <li><p><strong>py_dict</strong> – <strong>[in]</strong> Dictionary containing jit argument names and values. </p></li>
 </ul>
 </dd>
@@ -756,26 +756,15 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv415nomp_py_get_strPC8PyObject">
-<span id="_CPPv315nomp_py_get_strPC8PyObject"></span><span id="_CPPv215nomp_py_get_strPC8PyObject"></span><span id="nomp_py_get_str__PyObjectPC"></span><span class="target" id="group__nomp__py__utils_1gab1c5e4a2cb4e1c4f0d4af9da6565ac5a"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_get_str</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">PyObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">obj</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415nomp_py_get_strPC8PyObject" title="Permalink to this definition"></a><br /></dt>
-<dd><p>Get the string representation of a Python object. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>obj</strong> – Python object. </p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>char* </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv416nomp_py_finalizev">
-<span id="_CPPv316nomp_py_finalizev"></span><span id="_CPPv216nomp_py_finalizev"></span><span id="nomp_py_finalize__void"></span><span class="target" id="group__nomp__py__utils_1ga2e4540d77c7d70ff5a81819254533f43"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_finalize</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416nomp_py_finalizev" title="Permalink to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv416nomp_py_finalizei">
+<span id="_CPPv316nomp_py_finalizei"></span><span id="_CPPv216nomp_py_finalizei"></span><span id="nomp_py_finalize__i"></span><span class="target" id="group__nomp__py__utils_1gaf4b9d71c4ca3cea630473c1d6350cca8"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nomp_py_finalize</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">interpreter</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416nomp_py_finalizei" title="Permalink to this definition"></a><br /></dt>
 <dd><p>Finalize the nomp python interface. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>int </p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>interpreter</strong> – <strong>[in]</strong> If true, finalize the python interpreter.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int </p>
 </dd>
 </dl>
 </dd></dl>
