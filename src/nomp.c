@@ -729,7 +729,7 @@ int nomp_finalize(void) {
     nomp_free(&progs[i]);
   }
   nomp_free(&progs), progs_n = progs_max = 0;
-  nomp_check(nomp_py_finalize());
+  nomp_check(nomp_py_finalize(0));
 
   // Free bookkeeping structures for the logger and profiler since these can be
   // released irrespective of whether libnomp is initialized or not.

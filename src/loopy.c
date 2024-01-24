@@ -16,7 +16,7 @@ static PyObject *py_pymbolic_to_symengine_str = NULL;
   check_error_(obj, NOMP_PY_CALL_FAILURE,                                      \
                "Converting C string to python string failed.")
 
-#define check_py_call(err, msg) check_error_(err, NOMP_PY_CALL_FAILURE, msg)
+#define check_py_call(obj, msg) check_error_(obj, NOMP_PY_CALL_FAILURE, msg)
 
 /**
  * @ingroup nomp_py_utils
@@ -30,12 +30,11 @@ int nomp_py_init(const nomp_config_t *const cfg) {
   strncpy(backend, cfg->backend, NOMP_MAX_BUFFER_SIZE);
   backend[NOMP_MAX_BUFFER_SIZE] = '\0';
 
-  if (!Py_IsInitialized()) {
-    // May be we need the isolated configuration listed here:
-    // https://docs.python.org/3/c-api/init_config.html#init-config
-    // But for now, we do the simplest thing possible.
+  // May be we need the isolated configuration listed here:
+  // https://docs.python.org/3/c-api/init_config.html#init-config
+  // But for now, we do the simplest thing possible.
+  if (!Py_IsInitialized())
     Py_InitializeEx(0);
-  }
 
   // Append current working directory to sys.path.
   nomp_check(nomp_py_append_to_sys_path("."));
@@ -317,7 +316,6 @@ int nomp_py_set_annotate_func(PyObject **annotate_func, const char *file) {
   snprintf(msg, BUFSIZ, "Failed to find annotate function in file \"%s\".",
            file);
   check_py_call(py_func, msg);
-
   check_py_call(PyCallable_Check(py_func),
                 "Annotate function is not callable.");
   Py_XDECREF(*annotate_func), *annotate_func = py_func;
@@ -353,9 +351,11 @@ int nomp_py_annotate(PyObject **kernel, PyObject *const function,
 
   check_py_call(PyCallable_Check(function), "Annotation function is not "
                                             "callable.");
+
   PyObject *py_annotated_kernel = PyObject_CallFunctionObjArgs(
       function, *kernel, annotations, context, NULL);
   check_py_call(py_annotated_kernel, "Annotating loopy kernel failed.");
+
   Py_DECREF(*kernel), *kernel = py_annotated_kernel;
 
   return 0;
@@ -447,13 +447,15 @@ int nomp_py_get_grid_size(nomp_prog_t *prg, PyObject *kernel) {
 
   prg->ndim = nomp_max(2, PyTuple_Size(py_global), PyTuple_Size(py_local));
 
-  for (int i = 0; i < PyTuple_Size(py_global); i++)
+  for (int i = 0; i < PyTuple_Size(py_global); i++) {
     nomp_check(
         py_get_grid_size_aux(PyTuple_GetItem(py_global, i), prg->sym_global));
+  }
 
-  for (int i = 0; i < PyTuple_Size(py_local); i++)
+  for (int i = 0; i < PyTuple_Size(py_local); i++) {
     nomp_check(
         py_get_grid_size_aux(PyTuple_GetItem(py_local, i), prg->sym_local));
+  }
 
   Py_DECREF(py_grid_size), Py_DECREF(py_grid_size_expr), Py_DECREF(py_entry);
   Py_DECREF(py_callables);
@@ -501,24 +503,39 @@ int nomp_py_fix_parameters(PyObject **kernel, const PyObject *py_dict) {
  */
 char *nomp_py_get_str(PyObject *const obj) {
   PyObject *py_str = PyObject_Str(obj);
+  check_py_call(py_str, "Converting Python object to string failed.");
+
   Py_ssize_t size;
   const char *str_ = PyUnicode_AsUTF8AndSize(py_str, &size);
-  char *str = nomp_calloc(char, size + 1);
-  strncpy(str, str_, size);
-  Py_XDECREF(py_str);
+  check_py_call(str_, "Converting Python string to UTF8 failed.");
+
+  char *str = strndup(str_, size);
+
+  Py_DECREF(py_str);
+
   return str;
 }
 
 /**
  * @ingroup nomp_py_utils
+ *
  * @brief Finalize the nomp python interface.
+ *
+ * @param[in] interpreter If true, finalize the python interpreter.
  *
  * @return int
  */
-int nomp_py_finalize(void) {
+int nomp_py_finalize(int interpreter) {
   Py_XDECREF(py_pymbolic_to_symengine_str), py_pymbolic_to_symengine_str = NULL;
   Py_XDECREF(py_backend_str), py_backend_str = NULL;
-  Py_Finalize();
+
+  // We only finalize the python interpreter if user explicitly asked for it.
+  // This is because some modules like numpy can't be re-initialized in the
+  // same program.
+  // See: https://github.com/pybind/pybind11/issues/3112
+  if (interpreter)
+    Py_FinalizeEx();
+
   return 0;
 }
 

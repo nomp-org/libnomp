@@ -43,11 +43,7 @@ int main(int argc, const char *argv[]) {
   int err = 0;
   err |= SUBTEST(test_first_nomp_finalize);
   err |= SUBTEST(test_nomp_init_twice, argc, argv);
-  // FIXME: This fails due to multiple imports of annotation script.
-  // This test re initializes the library, which causes the annotation script
-  // to be imported again, which causes the error. This seems to be an
-  // issue with PyImport_Import().
-  // err |= SUBTEST(test_nomp_finalize_twice, argc, argv);
+  err |= SUBTEST(test_nomp_finalize_twice, argc, argv);
 
   return err;
 }

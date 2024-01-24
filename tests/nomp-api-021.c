@@ -118,11 +118,7 @@ int main(int argc, const char *argv[]) {
     if (strncmp(argv[i], "--nomp-device", NOMP_TEST_MAX_BUFFER_SIZE))
       argvn[argcn] = strndup(argv[i], NOMP_TEST_MAX_BUFFER_SIZE), argcn++;
   }
-  // FIXME: This fails due to multiple imports of annotation script.
-  // This test re initializes the library, which causes the annotation script
-  // to be imported again, which causes the error. This seems to be an
-  // issue with PyImport_Import().
-  // err |= SUBTEST(test_valid_device_id, argcn, (const char **)argvn);
+  err |= SUBTEST(test_valid_device_id, argcn, (const char **)argvn);
   for (unsigned i = 0; i < argcn; i++)
     nomp_free(&argvn[i]);
 
