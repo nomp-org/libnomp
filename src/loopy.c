@@ -506,10 +506,9 @@ int nomp_py_finalize(int interpreter) {
   Py_XDECREF(py_pymbolic_to_symengine_str), py_pymbolic_to_symengine_str = NULL;
   Py_XDECREF(py_backend_str), py_backend_str = NULL;
 
-  // We only finalize the python interpreter if user explicitly asked for it.
+  // We only finalize the Python interpreter if user explicitly asked for it.
   // This is because some modules like numpy can't be re-initialized in the
-  // same program.
-  // See: https://github.com/pybind/pybind11/issues/3112
+  // same process. See: https://github.com/pybind/pybind11/issues/3112
   if (interpreter)
     Py_FinalizeEx();
 
