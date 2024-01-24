@@ -87,12 +87,6 @@ typedef enum {
  * @brief Log id provided to libnomp is not valid.
  */
 #define NOMP_USER_LOG_ID_IS_INVALID -134
-/**
- * @ingroup nomp_error_codes
- *
- * @brief Kernel argument type provided to libnomp is not valid.
- */
-#define NOMP_USER_KNL_ARG_TYPE_IS_INVALID -136
 
 /**
  * @ingroup nomp_error_codes
@@ -106,12 +100,6 @@ typedef enum {
  * @brief Failed to finalize libnomp.
  */
 #define NOMP_FINALIZE_FAILURE -258
-/**
- * @ingroup nomp_error_codes
- *
- * @brief The feature is not implemented.
- */
-#define NOMP_NOT_IMPLEMENTED_ERROR -260
 
 /**
  *
