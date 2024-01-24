@@ -22,7 +22,7 @@ static int test_nomp_init_twice(int argc, const char **argv) {
   nomp_free(&desc);
   nomp_test_assert(eq);
 
-  nomp_test_check(nomp_finalize());
+  nomp_test_check(nomp_finalize_excluding_interpreter());
 
   return 0;
 }

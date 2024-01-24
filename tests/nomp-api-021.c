@@ -73,7 +73,7 @@ static int test_valid_platform_id(int argc, const char **argv) {
   set_test_env(platform, "NOMP_PLATFORM", "0");
 
   nomp_test_check(nomp_init(argc, argv));
-  nomp_test_check(nomp_finalize());
+  nomp_test_check(nomp_finalize_excluding_interpreter());
 
   reset_env(platform, "NOMP_PLATFORM");
 

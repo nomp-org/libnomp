@@ -173,6 +173,8 @@ int nomp_get_err_no(unsigned id);
 
 int nomp_finalize(void);
 
+int nomp_finalize_excluding_interpreter(void);
+
 #ifdef __cplusplus
 }
 #endif
