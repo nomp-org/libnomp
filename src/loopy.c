@@ -496,29 +496,6 @@ int nomp_py_fix_parameters(PyObject **kernel, const PyObject *py_dict) {
 /**
  * @ingroup nomp_py_utils
  *
- * @brief Get the string representation of a Python object.
- *
- * @param obj Python object.
- * @return char*
- */
-char *nomp_py_get_str(PyObject *const obj) {
-  PyObject *py_str = PyObject_Str(obj);
-  check_py_call(py_str, "Converting Python object to string failed.");
-
-  Py_ssize_t size;
-  const char *str_ = PyUnicode_AsUTF8AndSize(py_str, &size);
-  check_py_call(str_, "Converting Python string to UTF8 failed.");
-
-  char *str = strndup(str_, size);
-
-  Py_DECREF(py_str);
-
-  return str;
-}
-
-/**
- * @ingroup nomp_py_utils
- *
  * @brief Finalize the nomp python interface.
  *
  * @param[in] interpreter If true, finalize the python interpreter.
