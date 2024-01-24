@@ -106,10 +106,7 @@ int nomp_py_check_module(const char *module, const char *function) {
                     "Module name and/or function name not provided.");
   }
 
-  PyObject *py_module_str = PyUnicode_FromString(module);
-  check_py_str(py_module_str);
-
-  PyObject *py_module = PyImport_Import(py_module_str);
+  PyObject *py_module = PyImport_ImportModule(module);
 
   char msg[BUFSIZ];
   snprintf(msg, BUFSIZ, "Importing Python module \"%s\" failed.", module);
@@ -122,7 +119,7 @@ int nomp_py_check_module(const char *module, const char *function) {
            function, module);
   check_py_call(py_function, msg);
 
-  Py_DECREF(py_function), Py_DECREF(py_module), Py_DECREF(py_module_str);
+  Py_DECREF(py_function), Py_DECREF(py_module);
 
   return 0;
 }
@@ -214,10 +211,7 @@ int nomp_py_transform(PyObject **kernel, const char *const file,
   if (file == NULL || function == NULL)
     return 0;
 
-  PyObject *py_file_str = PyUnicode_FromString(file);
-  check_py_str(py_file_str);
-
-  PyObject *py_module = PyImport_Import(py_file_str);
+  PyObject *py_module = PyImport_ImportModule(file);
 
   char msg[BUFSIZ];
   snprintf(msg, BUFSIZ, "Importing Python module: \"%s\" failed.", file);
@@ -245,7 +239,7 @@ int nomp_py_transform(PyObject **kernel, const char *const file,
 
   Py_DECREF(*kernel), *kernel = py_transformed_kernel;
 
-  Py_DECREF(py_function), Py_DECREF(py_module), Py_DECREF(py_file_str);
+  Py_DECREF(py_function), Py_DECREF(py_module);
 
 #undef check_error
 
@@ -315,10 +309,7 @@ int nomp_py_set_annotate_func(PyObject **annotate_func, const char *file) {
   if (file == NULL || strlen(file) == 0)
     return 0;
 
-  PyObject *py_file_str = PyUnicode_FromString(file);
-  check_py_str(py_file_str);
-
-  PyObject *py_module = PyImport_Import(py_file_str);
+  PyObject *py_module = PyImport_ImportModule(file);
   check_py_call(py_module, "Importing python module failed.");
 
   PyObject *py_func = PyObject_GetAttrString(py_module, "annotate");
@@ -331,7 +322,7 @@ int nomp_py_set_annotate_func(PyObject **annotate_func, const char *file) {
                 "Annotate function is not callable.");
   Py_XDECREF(*annotate_func), *annotate_func = py_func;
 
-  Py_DECREF(py_module), Py_DECREF(py_file_str);
+  Py_DECREF(py_module);
 
   return 0;
 }
