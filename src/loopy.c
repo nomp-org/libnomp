@@ -6,17 +6,19 @@ static char backend[NOMP_MAX_BUFFER_SIZE + 1];
 static PyObject *py_backend_str = NULL;
 static PyObject *py_pymbolic_to_symengine_str = NULL;
 
-#define check_error_(obj, err, msg)                                            \
+#define check_error_(obj, err, ...)                                            \
   {                                                                            \
     if (!obj)                                                                  \
-      return nomp_log(err, NOMP_ERROR, msg);                                   \
+      return nomp_log(err, NOMP_ERROR,                                         \
+                      NOMP_FIRST(__VA_ARGS__) NOMP_REST(__VA_ARGS__));         \
   }
 
-#define check_py_str(obj)                                                      \
+#define check_py_str(obj, str)                                                 \
   check_error_(obj, NOMP_PY_CALL_FAILURE,                                      \
-               "Converting C string to python string failed.")
+               "Converting C string \"%s\" to python string failed.", str)
 
-#define check_py_call(obj, msg) check_error_(obj, NOMP_PY_CALL_FAILURE, msg)
+#define check_py_call(obj, ...)                                                \
+  check_error_(obj, NOMP_PY_CALL_FAILURE, __VA_ARGS__)
 
 /**
  * @ingroup nomp_py_utils
@@ -48,11 +50,11 @@ int nomp_py_init(const nomp_config_t *const cfg) {
   nomp_check(nomp_py_append_to_sys_path(cfg->scripts_dir));
 
   py_backend_str = PyUnicode_FromString(backend);
-  check_py_str(py_backend_str);
+  check_py_str(py_backend_str, backend);
 
   py_pymbolic_to_symengine_str =
       PyUnicode_FromString("PymbolicToSymEngineMapper");
-  check_py_str(py_pymbolic_to_symengine_str);
+  check_py_str(py_pymbolic_to_symengine_str, "PymbolicToSymEngineMapper");
 
   return 0;
 }
@@ -69,15 +71,13 @@ int nomp_py_append_to_sys_path(const char *path) {
   check_py_call(py_sys, "Importing sys module failed.");
 
   PyObject *py_sys_path = PyObject_GetAttrString(py_sys, "path");
-  check_py_call(py_sys_path, "Importing sys.path failed.");
+  check_py_call(py_sys_path, "Getting attribute sys.path failed.");
 
   PyObject *py_path_str = PyUnicode_FromString(path);
-  check_py_str(py_path_str);
+  check_py_str(py_path_str, path);
 
-  char msg[NOMP_MAX_BUFFER_SIZE + 1];
-  snprintf(msg, NOMP_MAX_BUFFER_SIZE,
-           "Appending path \"%s\" to the sys.path failed.", path);
-  check_py_call(!PyList_Append(py_sys_path, py_path_str), msg);
+  check_py_call(!PyList_Append(py_sys_path, py_path_str),
+                "Appending path \"%s\" to the sys.path failed.", path);
 
   Py_DECREF(py_sys_path), Py_DECREF(py_path_str), Py_DECREF(py_sys);
 
@@ -107,16 +107,13 @@ int nomp_py_check_module(const char *module, const char *function) {
 
   PyObject *py_module = PyImport_ImportModule(module);
 
-  char msg[BUFSIZ];
-  snprintf(msg, BUFSIZ, "Importing Python module \"%s\" failed.", module);
-  check_py_call(py_module, msg);
+  check_py_call(py_module, "Importing Python module \"%s\" failed.", module);
 
   PyObject *py_function = PyObject_GetAttrString(py_module, function);
 
-  snprintf(msg, BUFSIZ,
-           "Importing Python function \"%s\" from module \"%s\" failed.",
-           function, module);
-  check_py_call(py_function, msg);
+  check_py_call(py_function,
+                "Importing Python function \"%s\" from module \"%s\" failed.",
+                function, module);
 
   Py_DECREF(py_function), Py_DECREF(py_module);
 
@@ -133,7 +130,7 @@ int nomp_py_check_module(const char *module, const char *function) {
  */
 int nomp_py_c_to_loopy(PyObject **kernel, const char *src) {
   PyObject *py_src_str = PyUnicode_FromString(src);
-  check_py_str(py_src_str);
+  check_py_str(py_src_str, src);
 
   PyObject *py_loopy_api = PyImport_ImportModule("loopy_api");
   check_py_call(py_loopy_api, "Importing loopy_api module failed.");
@@ -172,7 +169,7 @@ int nomp_py_realize_reduction(PyObject **kernel, const char *const variable,
                                       "from reduction module failed.");
 
   PyObject *py_variable_str = PyUnicode_FromString(variable);
-  check_py_str(py_variable_str);
+  check_py_str(py_variable_str, variable);
 
   PyObject *py_result = PyObject_CallFunctionObjArgs(
       py_realize_reduction, *kernel, py_variable_str, py_context, NULL);
@@ -212,29 +209,24 @@ int nomp_py_transform(PyObject **kernel, const char *const file,
 
   PyObject *py_module = PyImport_ImportModule(file);
 
-  char msg[BUFSIZ];
-  snprintf(msg, BUFSIZ, "Importing Python module: \"%s\" failed.", file);
-  check_py_call(py_module, msg);
+  check_py_call(py_module, "Importing Python module: \"%s\" failed.", file);
 
   PyObject *py_function = PyObject_GetAttrString(py_module, function);
 
-  snprintf(msg, BUFSIZ,
-           "Importing Python function \"%s\" from  module \"%s\" failed.",
-           function, file);
-  check_py_call(py_function, msg);
+  check_py_call(py_function,
+                "Importing Python function \"%s\" from  module \"%s\" failed.",
+                function, file);
 
-  snprintf(msg, BUFSIZ,
-           "Python function \"%s\" from  module \"%s\" is not callable.",
-           function, file);
-  check_py_call(PyCallable_Check(py_function), msg);
+  check_py_call(PyCallable_Check(py_function),
+                "Python function \"%s\" from  module \"%s\" is not callable.",
+                function, file);
 
   PyObject *py_transformed_kernel =
       PyObject_CallFunctionObjArgs(py_function, *kernel, context, NULL);
 
-  snprintf(msg, BUFSIZ,
-           "Calling Python function \"%s\" from module \"%s\" failed.",
-           function, file);
-  check_py_call(py_transformed_kernel, msg);
+  check_py_call(py_transformed_kernel,
+                "Calling Python function \"%s\" from module \"%s\" failed.",
+                function, file);
 
   Py_DECREF(*kernel), *kernel = py_transformed_kernel;
 
@@ -281,10 +273,9 @@ int nomp_py_get_knl_name_and_src(char **name, char **src,
 
   PyObject *py_src = PyObject_CallFunctionObjArgs(py_kernel_src, kernel, NULL);
 
-  char msg[BUFSIZ];
-  snprintf(msg, BUFSIZ,
-           "Backend code generation from loopy kernel \"%s\" failed.", *name);
-  check_error_(py_src, NOMP_LOOPY_CODEGEN_FAILURE, msg);
+  check_error_(py_src, NOMP_LOOPY_CODEGEN_FAILURE,
+               "Backend code generation from loopy kernel \"%s\" failed.",
+               *name);
 
   const char *const src_ = PyUnicode_AsUTF8AndSize(py_src, &size);
   *src = strndup(src_, size);
@@ -312,10 +303,8 @@ int nomp_py_set_annotate_func(PyObject **annotate_func, const char *file) {
   check_py_call(py_module, "Importing python module failed.");
 
   PyObject *py_func = PyObject_GetAttrString(py_module, "annotate");
-  char msg[BUFSIZ];
-  snprintf(msg, BUFSIZ, "Failed to find annotate function in file \"%s\".",
-           file);
-  check_py_call(py_func, msg);
+  check_py_call(py_func, "Failed to find annotate function in file \"%s\".",
+                file);
   check_py_call(PyCallable_Check(py_func),
                 "Annotate function is not callable.");
   Py_XDECREF(*annotate_func), *annotate_func = py_func;
