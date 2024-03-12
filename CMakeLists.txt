@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(libnomp VERSION 0.0.1 DESCRIPTION "nomp runtime library" LANGUAGES C CXX)
+project(libnomp VERSION 0.0.1 DESCRIPTION "nomp runtime library" LANGUAGES C)
 
 # Nomp options.
 option(ENABLE_OPENCL "Build OpenCL backend" OFF)
