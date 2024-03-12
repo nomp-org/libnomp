@@ -15,8 +15,6 @@
 : "${NOMP_ENABLE_ASAN:="OFF"}"
 : "${NOMP_C_COMPILER:=""}"
 : "${NOMP_C_FLAGS:=""}"
-: "${NOMP_CXX_COMPILER:=""}"
-: "${NOMP_CXX_FLAGS:=""}"
 : "${NOMP_LNSTATE_PATH:="${NOMP_SOURCE_DIR}/.lnstate"}"
 
 # Terminal output colors.
@@ -34,8 +32,6 @@ function print_help() {
     "${cyan}--help:${reset} Print this help and exit.\n" \
     "${cyan}--cc:${reset} C Compiler.\n" \
     "${cyan}--cflags:${reset} C Compiler flags.\n" \
-    "${cyan}--cxx:${reset} CXX Compiler.\n" \
-    "${cyan}--cxxflags:${reset} CXX Compiler flags.\n" \
     "${cyan}--build-type:${reset} Build type (Default: ${NOMP_BUILD_TYPE}, " \
     "Allowed: Debug, Release, RelWithDebInfo and MinSizeRel).\n" \
     "${cyan}--build-dir:${reset} Build directory (Default: ${NOMP_BUILD_DIR}).\n" \
@@ -57,8 +53,6 @@ while [ $# -gt 0 ]; do
   --help) print_help ;;
   --cc) shift && NOMP_C_COMPILER="${1}" ;;
   --cflags) shift && NOMP_C_FLAGS="${1}" ;;
-  --cxx) shift && NOMP_CXX_COMPILER="${1}" ;;
-  --cxxflags) shift && NOMP_CXX_FLAGS="${1}" ;;
   --build-type) shift && NOMP_BUILD_TYPE=${1} ;;
   --build-dir) shift && NOMP_BUILD_DIR=$(realpath "${1}") ;;
   --install-prefix) shift && NOMP_INSTALL_DIR=$(realpath "${1}") ;;
@@ -85,11 +79,6 @@ NOMP_CMAKE_OPTS=()
   NOMP_CMAKE_OPTS+=("-DCMAKE_C_COMPILER=${NOMP_C_COMPILER}")
 [[ -n ${NOMP_C_FLAGS} ]] &&
   NOMP_CMAKE_OPTS+=("-DCMAKE_C_FLAGS=${NOMP_C_FLAGS}")
-
-[[ -n ${NOMP_CXX_COMPILER} ]] &&
-  NOMP_CMAKE_OPTS+=("-DCMAKE_CXX_COMPILER=${NOMP_CXX_COMPILER}")
-[[ -n ${NOMP_CXX_FLAGS} ]] &&
-  NOMP_CMAKE_OPTS+=("-DCMAKE_CXX_FLAGS=${NOMP_CXX_FLAGS}")
 
 NOMP_CMAKE_OPTS+=("-DCMAKE_BUILD_TYPE=${NOMP_BUILD_TYPE}")
 NOMP_CMAKE_OPTS+=("-DCMAKE_INSTALL_PREFIX=${NOMP_INSTALL_DIR}")
