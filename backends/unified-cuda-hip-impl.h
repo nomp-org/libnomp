@@ -67,10 +67,6 @@ struct backend_prog_t {
   backendFunction kernel;
 };
 
-static backendrtcResult backend_compile(backendrtcProgram prog) {
-  return backendrtcCompileProgram(prog, 0, NULL);
-}
-
 static int backend_update(nomp_backend_t *NOMP_UNUSED(bnd), nomp_mem_t *m,
                           const nomp_map_direction_t op, size_t start,
                           size_t end, size_t usize) {
@@ -102,25 +98,10 @@ static int backend_knl_build(nomp_backend_t *NOMP_UNUSED(bnd), nomp_prog_t *prg,
   backendrtcProgram prog;
   check_rtc(backendrtcCreateProgram(&prog, source, NULL, 0, NULL, NULL));
 
-  backendrtcResult result = backend_compile(prog);
-  if (result == RTC_SUCCESS) goto get_code;
-
-  const char *err = backendrtcGetErrorString(result);
+  backendrtcResult result = backendrtcCompileProgram(prog, 0, NULL);
+  if (result != RTC_SUCCESS) goto backend_rtc_error;
 
   size_t size;
-  backendrtcGetProgramLogSize(prog, &size);
-  char *log = nomp_calloc(char, size + 1);
-  backendrtcGetProgramLog(prog, log);
-
-  size += strlen(err) + 2 + 1;
-  char *msg = nomp_calloc(char, size);
-  snprintf(msg, size, "%s: %s", err, log);
-  int ret = nomp_log(NOMP_BACKEND_FAILURE, NOMP_ERROR, ERR_STR_BACKEND_FAILURE,
-                     "build", msg);
-  nomp_free(&msg), nomp_free(&log);
-  return ret;
-
-get_code:
   check_rtc(backendrtcGetCodeSize(prog, &size));
   char *code = nomp_calloc(char, size + 1);
   check_rtc(backendrtcGetCode(prog, code));
@@ -133,6 +114,23 @@ get_code:
   prg->bptr = (void *)gprg;
 
   return 0;
+
+backend_rtc_error:
+  backendrtcGetProgramLogSize(prog, &size);
+  char *log = nomp_calloc(char, size + 1);
+  backendrtcGetProgramLog(prog, log);
+
+  const char *err = backendrtcGetErrorString(result);
+  size += strlen(err) + 2 + 1;
+
+  char *msg = nomp_calloc(char, size);
+  snprintf(msg, size, "%s: %s", err, log);
+  int ret = nomp_log(NOMP_BACKEND_FAILURE, NOMP_ERROR, ERR_STR_BACKEND_FAILURE,
+                     "build", msg);
+
+  nomp_free(&msg), nomp_free(&log);
+
+  return ret;
 }
 
 static int backend_knl_run(nomp_backend_t *NOMP_UNUSED(bnd), nomp_prog_t *prg) {
