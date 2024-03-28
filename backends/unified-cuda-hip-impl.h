@@ -1,26 +1,26 @@
 #include "nomp-impl.h"
 
 #define TOKEN_PASTE_(a, b) a##b
-#define TOKEN_PASTE(a, b) TOKEN_PASTE_(a, b)
+#define TOKEN_PASTE(a, b)  TOKEN_PASTE_(a, b)
 
-#define backendError_t TOKEN_PASTE(DRIVER, Error_t)
-#define backendSuccess TOKEN_PASTE(DRIVER, Success)
-#define backendGetErrorName TOKEN_PASTE(DRIVER, GetErrorName)
-#define backendMalloc TOKEN_PASTE(DRIVER, Malloc)
-#define backendMemcpy TOKEN_PASTE(DRIVER, Memcpy)
-#define backendFree TOKEN_PASTE(DRIVER, Free)
-#define backendMemcpyHostToDevice TOKEN_PASTE(DRIVER, MemcpyHostToDevice)
-#define backendMemcpyDeviceToHost TOKEN_PASTE(DRIVER, MemcpyDeviceToHost)
-#define backendDeviceSynchronize TOKEN_PASTE(DRIVER, DeviceSynchronize)
-#define backendGetDeviceCount TOKEN_PASTE(DRIVER, GetDeviceCount)
-#define backendSetDevice TOKEN_PASTE(DRIVER, SetDevice)
+#define backendError_t             TOKEN_PASTE(DRIVER, Error_t)
+#define backendSuccess             TOKEN_PASTE(DRIVER, Success)
+#define backendGetErrorName        TOKEN_PASTE(DRIVER, GetErrorName)
+#define backendMalloc              TOKEN_PASTE(DRIVER, Malloc)
+#define backendMemcpy              TOKEN_PASTE(DRIVER, Memcpy)
+#define backendFree                TOKEN_PASTE(DRIVER, Free)
+#define backendMemcpyHostToDevice  TOKEN_PASTE(DRIVER, MemcpyHostToDevice)
+#define backendMemcpyDeviceToHost  TOKEN_PASTE(DRIVER, MemcpyDeviceToHost)
+#define backendDeviceSynchronize   TOKEN_PASTE(DRIVER, DeviceSynchronize)
+#define backendGetDeviceCount      TOKEN_PASTE(DRIVER, GetDeviceCount)
+#define backendSetDevice           TOKEN_PASTE(DRIVER, SetDevice)
 #define backendGetDeviceProperties TOKEN_PASTE(DRIVER, GetDeviceProperties)
-#define backendDriverGetVersion TOKEN_PASTE(DRIVER, DriverGetVersion)
+#define backendDriverGetVersion    TOKEN_PASTE(DRIVER, DriverGetVersion)
 
 #define backendrtcResult TOKEN_PASTE(RUNTIME_COMPILATION, Result)
 #define backendrtcGetErrorString                                               \
   TOKEN_PASTE(RUNTIME_COMPILATION, GetErrorString)
-#define backendrtcProgram TOKEN_PASTE(RUNTIME_COMPILATION, Program)
+#define backendrtcProgram       TOKEN_PASTE(RUNTIME_COMPILATION, Program)
 #define backendrtcCreateProgram TOKEN_PASTE(RUNTIME_COMPILATION, CreateProgram)
 #define backendrtcCompileProgram                                               \
   TOKEN_PASTE(RUNTIME_COMPILATION, CompileProgram)
@@ -30,12 +30,12 @@
 #define backendrtcDestroyProgram                                               \
   TOKEN_PASTE(RUNTIME_COMPILATION, DestroyProgram)
 
-#define backendInit TOKEN_PASTE(RUNTIME, Init)
-#define backendCtxCreate TOKEN_PASTE(RUNTIME, CtxCreate)
-#define backendCtxDestroy TOKEN_PASTE(RUNTIME, CtxDestroy)
-#define backendModuleLoadData TOKEN_PASTE(RUNTIME, ModuleLoadData)
+#define backendInit              TOKEN_PASTE(RUNTIME, Init)
+#define backendCtxCreate         TOKEN_PASTE(RUNTIME, CtxCreate)
+#define backendCtxDestroy        TOKEN_PASTE(RUNTIME, CtxDestroy)
+#define backendModuleLoadData    TOKEN_PASTE(RUNTIME, ModuleLoadData)
 #define backendModuleGetFunction TOKEN_PASTE(RUNTIME, ModuleGetFunction)
-#define backendModuleUnload TOKEN_PASTE(RUNTIME, ModuleUnload)
+#define backendModuleUnload      TOKEN_PASTE(RUNTIME, ModuleUnload)
 
 #define check_error(CALL, ERR_T, SUCCES, GET_ERR, OP)                          \
   {                                                                            \
@@ -57,13 +57,13 @@
 
 #define backend_t TOKEN_PASTE(DRIVER, _backend_t)
 struct backend_t {
-  int device;
+  int                 device;
   backendDeviceProp_t prop;
 };
 
 #define backend_prog_t TOKEN_PASTE(DRIVER, _prog_t)
 struct backend_prog_t {
-  backendModule module;
+  backendModule   module;
   backendFunction kernel;
 };
 
@@ -103,8 +103,7 @@ static int backend_knl_build(nomp_backend_t *NOMP_UNUSED(bnd), nomp_prog_t *prg,
   check_rtc(backendrtcCreateProgram(&prog, source, NULL, 0, NULL, NULL));
 
   backendrtcResult result = backend_compile(prog);
-  if (result == RTC_SUCCESS)
-    goto get_code;
+  if (result == RTC_SUCCESS) goto get_code;
 
   const char *err = backendrtcGetErrorString(result);
 
@@ -122,7 +121,6 @@ static int backend_knl_build(nomp_backend_t *NOMP_UNUSED(bnd), nomp_prog_t *prg,
   return ret;
 
 get_code:
-  size_t size;
   check_rtc(backendrtcGetCodeSize(prog, &size));
   char *code = nomp_calloc(char, size + 1);
   check_rtc(backendrtcGetCode(prog, code));
@@ -139,7 +137,7 @@ get_code:
 
 static int backend_knl_run(nomp_backend_t *NOMP_UNUSED(bnd), nomp_prog_t *prg) {
   nomp_arg_t *args = prg->args;
-  void *vargs[NOMP_MAX_KERNEL_ARGS_SIZE];
+  void       *vargs[NOMP_MAX_KERNEL_ARGS_SIZE];
   for (unsigned i = 0; i < prg->nargs; i++) {
     if (args[i].type == NOMP_PTR)
       vargs[i] = &args[i].ptr;
@@ -147,7 +145,7 @@ static int backend_knl_run(nomp_backend_t *NOMP_UNUSED(bnd), nomp_prog_t *prg) {
       vargs[i] = args[i].ptr;
   }
 
-  const size_t *global = prg->global, *local = prg->local;
+  const size_t          *global = prg->global, *local = prg->local;
   struct backend_prog_t *bprg = (struct backend_prog_t *)prg->bptr;
   check_runtime(backendModuleLaunchKernel(bprg->kernel, global[0], global[1],
                                           global[2], local[0], local[1],
@@ -158,8 +156,7 @@ static int backend_knl_run(nomp_backend_t *NOMP_UNUSED(bnd), nomp_prog_t *prg) {
 
 static int backend_knl_free(nomp_prog_t *prg) {
   struct backend_prog_t *bprg = (struct backend_prog_t *)prg->bptr;
-  if (bprg)
-    check_runtime(backendModuleUnload(bprg->module));
+  if (bprg) check_runtime(backendModuleUnload(bprg->module));
   return 0;
 }
 
@@ -229,16 +226,16 @@ int backend_init(nomp_backend_t *const backend, const int NOMP_UNUSED(platform),
   nomp_check(backend_device_query(backend, device));
 
   struct backend_t *bptr = nomp_calloc(struct backend_t, 1);
-  bptr->device = device;
+  bptr->device           = device;
   check_driver(backendGetDeviceProperties(&bptr->prop, device));
 
-  backend->bptr = (void *)bptr;
-  backend->update = backend_update;
+  backend->bptr      = (void *)bptr;
+  backend->update    = backend_update;
   backend->knl_build = backend_knl_build;
-  backend->knl_run = backend_knl_run;
-  backend->knl_free = backend_knl_free;
-  backend->sync = backend_sync;
-  backend->finalize = backend_finalize;
+  backend->knl_run   = backend_knl_run;
+  backend->knl_free  = backend_knl_free;
+  backend->sync      = backend_sync;
+  backend->finalize  = backend_finalize;
 
   return 0;
 }

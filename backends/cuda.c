@@ -4,20 +4,20 @@
 
 static const char *ERR_STR_BACKEND_FAILURE = "CUDA %s failure: %s.";
 #define NOMP_BACKEND_FAILURE NOMP_CUDA_FAILURE
-#define NOMP_CUDA 1
+#define NOMP_CUDA            1
 
-#define DRIVER cuda
-#define RUNTIME cu
+#define DRIVER              cuda
+#define RUNTIME             cu
 #define RUNTIME_COMPILATION nvrtc
-#define RTC_SUCCESS NVRTC_SUCCESS
+#define RTC_SUCCESS         NVRTC_SUCCESS
 
-#define backendDeviceProp_t struct cudaDeviceProp
+#define backendDeviceProp_t       struct cudaDeviceProp
 #define backendModuleLaunchKernel cuLaunchKernel
-#define backendModule CUmodule
-#define backendFunction CUfunction
+#define backendModule             CUmodule
+#define backendFunction           CUfunction
 
 #define backendrtcGetCodeSize nvrtcGetPTXSize
-#define backendrtcGetCode nvrtcGetPTX
+#define backendrtcGetCode     nvrtcGetPTX
 
 #define check_runtime(call)                                                    \
   {                                                                            \

@@ -16,10 +16,10 @@
 #include "nomp.h"
 
 #define TOKEN_PASTE_(a, b) a##b
-#define TOKEN_PASTE(a, b) TOKEN_PASTE_(a, b)
+#define TOKEN_PASTE(a, b)  TOKEN_PASTE_(a, b)
 
 #define TOSTRING_(x) #x
-#define TOSTRING(x) TOSTRING_(x)
+#define TOSTRING(x)  TOSTRING_(x)
 
 #if defined(TEST_INT_ONLY)
 #define TEST_BUILTIN_TYPES(api, ...)                                           \
@@ -55,21 +55,19 @@ inline static int subtest_(int err, const char *test_name) {
 #define SUBTEST_IMPL_WITH_2(subtest, ...)                                      \
   subtest_(subtest(__VA_ARGS__), TOSTRING(subtest))
 #define SUBTEST_IMPL_WITH_1(subtest) subtest_(subtest(), TOSTRING(subtest))
-#define SUBTEST_IMPL_(num, ...) SUBTEST_IMPL_WITH_##num(__VA_ARGS__)
-#define SUBTEST_IMPL(num, ...) SUBTEST_IMPL_(num, __VA_ARGS__)
-#define SUBTEST(...) SUBTEST_IMPL(TEST_ARGS_CASE(__VA_ARGS__), __VA_ARGS__)
+#define SUBTEST_IMPL_(num, ...)      SUBTEST_IMPL_WITH_##num(__VA_ARGS__)
+#define SUBTEST_IMPL(num, ...)       SUBTEST_IMPL_(num, __VA_ARGS__)
+#define SUBTEST(...)                 SUBTEST_IMPL(TEST_ARGS_CASE(__VA_ARGS__), __VA_ARGS__)
 
 #define nomp_test_assert(cond)                                                 \
   {                                                                            \
-    if (!(cond))                                                               \
-      return 1;                                                                \
+    if (!(cond)) return 1;                                                     \
   }
 
 #define nomp_test_check(err)                                                   \
   {                                                                            \
     int err_ = (err);                                                          \
-    if (err_ > 0)                                                              \
-      return err_;                                                             \
+    if (err_ > 0) return err_;                                                 \
   }
 
 inline static char *generate_knl(const char *fmt, unsigned nargs, ...) {
@@ -92,9 +90,8 @@ inline static char *generate_knl(const char *fmt, unsigned nargs, ...) {
 
 inline static int logcmp(const char *log, const char *pattern) {
   regex_t regex;
-  int result = regcomp(&regex, pattern, 0);
-  if (!result)
-    result = regexec(&regex, log, 0, NULL, 0);
+  int     result = regcomp(&regex, pattern, 0);
+  if (!result) result = regexec(&regex, log, 0, NULL, 0);
   regfree(&regex);
   return !result;
 }

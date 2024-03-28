@@ -2,8 +2,8 @@
 #include "nomp-impl.h"
 #include "nomp-loopy.h"
 
-static char backend[NOMP_MAX_BUFFER_SIZE + 1];
-static PyObject *py_backend_str = NULL;
+static char      backend[NOMP_MAX_BUFFER_SIZE + 1];
+static PyObject *py_backend_str               = NULL;
 static PyObject *py_pymbolic_to_symengine_str = NULL;
 
 #define check_error_(obj, err, ...)                                            \
@@ -35,8 +35,7 @@ int nomp_py_init(const nomp_config_t *const cfg) {
   // May be we need the isolated configuration listed here:
   // https://docs.python.org/3/c-api/init_config.html#init-config
   // But for now, we do the simplest thing possible.
-  if (!Py_IsInitialized())
-    Py_InitializeEx(0);
+  if (!Py_IsInitialized()) Py_InitializeEx(0);
 
   // Append current working directory to sys.path.
   nomp_check(nomp_py_append_to_sys_path("."));
@@ -204,8 +203,7 @@ int nomp_py_realize_reduction(PyObject **kernel, const char *const variable,
 int nomp_py_transform(PyObject **kernel, const char *const file,
                       const char *function, const PyObject *const context) {
   // If either file, or function are NULL, we don't have to do anything:
-  if (file == NULL || function == NULL)
-    return 0;
+  if (file == NULL || function == NULL) return 0;
 
   PyObject *py_module = PyImport_ImportModule(file);
 
@@ -261,9 +259,9 @@ int nomp_py_get_knl_name_and_src(char **name, char **src,
   check_error_(py_name, NOMP_LOOPY_KNL_NAME_NOT_FOUND,
                "Unable to get loopy kernel name.");
 
-  Py_ssize_t size;
+  Py_ssize_t        size;
   const char *const name_ = PyUnicode_AsUTF8AndSize(py_name, &size);
-  *name = strndup(name_, size);
+  *name                   = strndup(name_, size);
 
   Py_DECREF(py_name), Py_DECREF(py_get_knl_name);
 
@@ -278,7 +276,7 @@ int nomp_py_get_knl_name_and_src(char **name, char **src,
                *name);
 
   const char *const src_ = PyUnicode_AsUTF8AndSize(py_src, &size);
-  *src = strndup(src_, size);
+  *src                   = strndup(src_, size);
 
   Py_DECREF(py_src), Py_DECREF(py_kernel_src);
 
@@ -296,8 +294,7 @@ int nomp_py_get_knl_name_and_src(char **name, char **src,
  */
 int nomp_py_set_annotate_func(PyObject **annotate_func, const char *file) {
   // If file is NULL or empty, we don't have to do anything:
-  if (file == NULL || strlen(file) == 0)
-    return 0;
+  if (file == NULL || strlen(file) == 0) return 0;
 
   PyObject *py_module = PyImport_ImportModule(file);
   check_py_call(py_module, "Importing python module failed.");
@@ -335,8 +332,7 @@ int nomp_py_annotate(PyObject **kernel, PyObject *const function,
                      const PyObject *const annotations,
                      const PyObject *const context) {
   // if kernel or function is NULL, we don't have to do anything:
-  if (!kernel || !*kernel || !function)
-    return 0;
+  if (!kernel || !*kernel || !function) return 0;
 
   check_py_call(PyCallable_Check(function), "Annotation function is not "
                                             "callable.");
@@ -355,7 +351,7 @@ static int symengine_vec_push(CVecBasic *vec, const char *str) {
   basic_new_stack(a);
 
   CWRAPPER_OUTPUT_TYPE err = basic_parse(a, str);
-  char msg[BUFSIZ];
+  char                 msg[BUFSIZ];
   snprintf(msg, BUFSIZ,
            "Expression parsing with SymEngine failed with error %d.", err);
   check_error_(!err, NOMP_LOOPY_GRIDSIZE_FAILURE, msg);
@@ -493,13 +489,12 @@ int nomp_py_fix_parameters(PyObject **kernel, const PyObject *py_dict) {
  */
 int nomp_py_finalize(int interpreter) {
   Py_XDECREF(py_pymbolic_to_symengine_str), py_pymbolic_to_symengine_str = NULL;
-  Py_XDECREF(py_backend_str), py_backend_str = NULL;
+  Py_XDECREF(py_backend_str), py_backend_str                             = NULL;
 
   // We only finalize the Python interpreter if user explicitly asked for it.
   // This is because some modules like numpy can't be re-initialized in the
   // same process. See: https://github.com/pybind/pybind11/issues/3112
-  if (interpreter)
-    Py_FinalizeEx();
+  if (interpreter) Py_FinalizeEx();
 
   return 0;
 }

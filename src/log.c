@@ -11,16 +11,16 @@ const char *ERR_STR_USER_DEVICE_IS_INVALID =
     "Device id %d passed into libnomp is not valid.";
 
 struct log {
-  char *description;
-  int errorno;
+  char           *description;
+  int             errorno;
   nomp_log_type_t type;
 };
 
-static struct log *logs = NULL;
-static unsigned logs_n = 0;
-static unsigned logs_max = 0;
+static struct log *logs              = NULL;
+static unsigned    logs_n            = 0;
+static unsigned    logs_max          = 0;
 static const char *LOG_TYPE_STRING[] = {"Error", "Warning", "Info"};
-static unsigned verbose = 0;
+static unsigned    verbose           = 0;
 
 /**
  * @ingroup nomp_log_utils
@@ -56,11 +56,11 @@ int nomp_log_set_verbose(const unsigned verbose_in) {
  */
 int nomp_log_(const char *description, int errorno, nomp_log_type_t type, ...) {
   const char *type_str = LOG_TYPE_STRING[type - 1];
-  size_t len = strlen(description) + strlen(type_str) + 10;
-  char *desc = nomp_calloc(char, len);
+  size_t      len      = strlen(description) + strlen(type_str) + 10;
+  char       *desc     = nomp_calloc(char, len);
   snprintf(desc, len, "[%s] %%s:%%u %s", type_str, description);
 
-  char buf[BUFSIZ];
+  char    buf[BUFSIZ];
   va_list vargs;
   va_start(vargs, type);
   vsnprintf(buf, BUFSIZ, desc, vargs);
@@ -100,8 +100,7 @@ int nomp_log_(const char *description, int errorno, nomp_log_type_t type, ...) {
  * @return char*
  */
 char *nomp_get_err_str(unsigned id) {
-  if (id == 0 || id > logs_n)
-    return NULL;
+  if (id == 0 || id > logs_n) return NULL;
 
   return strndup(logs[id - 1].description, BUFSIZ);
 }
@@ -118,8 +117,7 @@ char *nomp_get_err_str(unsigned id) {
  * @return int
  */
 int nomp_get_err_no(unsigned id) {
-  if (id == 0 || id > logs_n)
-    return NOMP_USER_LOG_ID_IS_INVALID;
+  if (id == 0 || id > logs_n) return NOMP_USER_LOG_ID_IS_INVALID;
   return logs[id - 1].errorno;
 }
 
@@ -136,17 +134,17 @@ void nomp_log_finalize(void) {
 }
 
 struct time_log {
-  char *entry;
+  char    *entry;
   unsigned total_calls;
-  double total_time;
-  double last_call;
-  clock_t last_tick;
+  double   total_time;
+  double   last_call;
+  clock_t  last_tick;
 };
 
-static struct time_log *time_logs = NULL;
-static unsigned time_logs_n = 0;
-static unsigned time_logs_max = 0;
-static int profile_level = 0;
+static struct time_log *time_logs     = NULL;
+static unsigned         time_logs_n   = 0;
+static unsigned         time_logs_max = 0;
+static int              profile_level = 0;
 
 /**
  * @ingroup nomp_profiler_utils
@@ -162,8 +160,7 @@ int nomp_profile_set_level(const int profile_level_in) {
 
 static unsigned find_time_log(const char *entry) {
   for (unsigned i = 0; i < time_logs_n; i++) {
-    if (strncmp(time_logs[i].entry, entry, NOMP_MAX_BUFFER_SIZE) == 0)
-      return i;
+    if (strncmp(time_logs[i].entry, entry, NOMP_MAX_BUFFER_SIZE) == 0) return i;
   }
   return time_logs_n;
 }
@@ -189,11 +186,9 @@ static unsigned find_time_log(const char *entry) {
  * @return void
  */
 void nomp_profile(const char *name, const int toggle, const int sync) {
-  if (profile_level == 0)
-    return;
+  if (profile_level == 0) return;
 
-  if (toggle == 0 && sync == 1)
-    nomp_sync();
+  if (toggle == 0 && sync == 1) nomp_sync();
   clock_t current_tick = clock();
 
   unsigned id = find_time_log(name);
@@ -208,16 +203,15 @@ void nomp_profile(const char *name, const int toggle, const int sync) {
       }
 
       // Creates a new time_log
-      time_logs[id].entry = strndup(name, NOMP_MAX_BUFFER_SIZE);
+      time_logs[id].entry       = strndup(name, NOMP_MAX_BUFFER_SIZE);
       time_logs[id].total_calls = 0;
-      time_logs[id].total_time = 0;
-      time_logs[id].last_tick = current_tick;
+      time_logs[id].total_time  = 0;
+      time_logs[id].last_tick   = current_tick;
       time_logs_n++;
     }
   } else if (toggle == 0) {
     // Ignore if the user toggles off the timer by accident.
-    if (time_logs[id].last_tick == 0)
-      return;
+    if (time_logs[id].last_tick == 0) return;
 
     // Captures the execution time.
     double elapsed =
@@ -243,8 +237,7 @@ void nomp_profile(const char *name, const int toggle, const int sync) {
  * @return int
  */
 void nomp_profile_result(void) {
-  if (profile_level == 0)
-    return;
+  if (profile_level == 0) return;
 
   printf("| %-24s | %12s | %18s | %18s | %18s |\n", "Entry", "Total Calls",
          "Total Time (ms)", "Last Call (ms)", "Average Time (ms)");

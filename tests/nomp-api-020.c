@@ -3,7 +3,7 @@
 static int test_valid_arguments(const char *backend) {
   const char *argv[7] = {"foo.c", "--nomp-backend",  backend, "--nomp-device",
                          "0",     "--nomp-platform", "0"};
-  int argc = 7;
+  int         argc    = 7;
 
   nomp_test_check(nomp_init(argc, argv));
   nomp_test_check(nomp_finalize());
@@ -15,7 +15,7 @@ static int test_ignore_non_argument_string(const char *backend) {
   const char *argv[8] = {"--nomp-backend",  backend, "cuda",
                          "--nomp-device",   "0",     "1",
                          "--nomp-platform", "0"};
-  int argc = 8;
+  int         argc    = 8;
 
   nomp_test_check(nomp_init(argc, argv));
   nomp_test_check(nomp_finalize());
@@ -26,7 +26,7 @@ static int test_ignore_non_argument_string(const char *backend) {
 static int test_invalid_argument_flag(const char *backend) {
   const char *argv[8] = {"--nomp-backend",  backend, "--nomp-device", "0",
                          "--nomp-platform", "0",     "--unknown-arg", "value"};
-  int argc = 8;
+  int         argc    = 8;
 
   nomp_test_check(nomp_init(argc, argv));
   nomp_test_check(nomp_finalize());
@@ -37,8 +37,8 @@ static int test_invalid_argument_flag(const char *backend) {
 static int test_missing_argument(const char *backend) {
   const char *argv[5] = {"--nomp-backend", backend, "--nomp-device", "0",
                          "--nomp-platform"};
-  int argc = 5;
-  int err = nomp_init(argc, argv);
+  int         argc    = 5;
+  int         err     = nomp_init(argc, argv);
   nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
   err = nomp_finalize();

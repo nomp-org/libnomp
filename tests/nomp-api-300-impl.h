@@ -8,7 +8,7 @@ static int nomp_api_300_aux(const char *fmt, TEST_TYPE *a, TEST_TYPE *b,
   nomp_test_check(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO));
   nomp_test_check(nomp_update(b, 0, n, sizeof(TEST_TYPE), NOMP_TO));
 
-  int id = -1;
+  int         id         = -1;
   const char *clauses[4] = {"transform", "nomp_api_300", "madd_transform", 0};
   char *knl = generate_knl(fmt, 2, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE));
   nomp_test_check(nomp_jit(&id, knl, clauses, 4, "a", sizeof(TEST_TYPE),
@@ -100,7 +100,7 @@ static int nomp_api_300_multiply_aux(const char *fmt, TEST_TYPE *a,
   nomp_test_check(nomp_update(b, 0, b_size, sizeof(TEST_TYPE), NOMP_TO));
   nomp_test_check(nomp_update(c, 0, b_size, sizeof(TEST_TYPE), NOMP_ALLOC));
 
-  int id = -1;
+  int         id         = -1;
   const char *clauses[4] = {"transform", module, function, 0};
   char *knl = generate_knl(fmt, 3, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE),
                            TOSTRING(TEST_TYPE));

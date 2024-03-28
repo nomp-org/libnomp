@@ -19,9 +19,9 @@ extern "C" {
  * information.
  */
 typedef enum {
-  NOMP_ERROR = 1,   /**< Error type. */
+  NOMP_ERROR   = 1, /**< Error type. */
   NOMP_WARNING = 2, /**< Warning type. */
-  NOMP_INFO = 3,    /**< Information type. */
+  NOMP_INFO    = 3, /**< Information type. */
 } nomp_log_type_t;
 
 /**
@@ -35,16 +35,16 @@ int nomp_log_set_verbose(unsigned verbose);
 int nomp_log_(const char *desc, int errorno, nomp_log_type_t type, ...);
 
 #define NOMP_CASE_IMPL(_1, _2, _3, _4, _5, _6, _7, _8, N, ...) N
-#define NOMP_CASE(...) NOMP_CASE_IMPL(__VA_ARGS__, 2, 2, 2, 2, 2, 2, 2, 1, 0)
+#define NOMP_CASE(...)                                         NOMP_CASE_IMPL(__VA_ARGS__, 2, 2, 2, 2, 2, 2, 2, 1, 0)
 
 #define NOMP_FIRST_IMPL(first, ...) first
-#define NOMP_FIRST(...) NOMP_FIRST_IMPL(__VA_ARGS__, throwaway)
+#define NOMP_FIRST(...)             NOMP_FIRST_IMPL(__VA_ARGS__, throwaway)
 
 #define NOMP_REST_IMPL_WITH_2(first, ...) , __VA_ARGS__
 #define NOMP_REST_IMPL_WITH_1(first)
 #define NOMP_REST_IMPL_(num, ...) NOMP_REST_IMPL_WITH_##num(__VA_ARGS__)
-#define NOMP_REST_IMPL(num, ...) NOMP_REST_IMPL_(num, __VA_ARGS__)
-#define NOMP_REST(...) NOMP_REST_IMPL(NOMP_CASE(__VA_ARGS__), __VA_ARGS__)
+#define NOMP_REST_IMPL(num, ...)  NOMP_REST_IMPL_(num, __VA_ARGS__)
+#define NOMP_REST(...)            NOMP_REST_IMPL(NOMP_CASE(__VA_ARGS__), __VA_ARGS__)
 
 /**
  * @ingroup nomp_log_utils

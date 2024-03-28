@@ -13,7 +13,7 @@ static int nomp_api_150_invalid_kernel_id(int n) {
 
   char *knl = generate_knl(fmt, 2, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE));
 
-  int id = -1;
+  int         id         = -1;
   const char *clauses[4] = {"transform", "nomp_api_100", "tile", 0};
   nomp_test_check(nomp_jit(&id, knl, clauses, 3, "a", sizeof(TEST_TYPE),
                            NOMP_PTR, "b", sizeof(TEST_TYPE), NOMP_PTR, "N",
@@ -21,12 +21,12 @@ static int nomp_api_150_invalid_kernel_id(int n) {
   nomp_free(&knl);
 
   TEST_TYPE a[TEST_MAX_SIZE], b[TEST_MAX_SIZE];
-  int err = nomp_run(-1, a, b, &n);
+  int       err = nomp_run(-1, a, b, &n);
   nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
   char *log = nomp_get_err_str(err);
-  int eq = logcmp(log, "\\[Error\\] .*\\/src\\/nomp.[c|cpp]:[0-9]* Kernel "
-                       "id -1 passed to nomp_run is not valid.");
+  int   eq  = logcmp(log, "\\[Error\\] .*\\/src\\/nomp.[c|cpp]:[0-9]* Kernel "
+                             "id -1 passed to nomp_run is not valid.");
   nomp_free(&log);
   nomp_test_assert(eq);
 
@@ -47,7 +47,7 @@ static int nomp_api_150_unmapped_array(int n) {
 
   char *knl = generate_knl(fmt, 2, TOSTRING(TEST_TYPE), TOSTRING(TEST_TYPE));
 
-  int id = -1;
+  int         id         = -1;
   const char *clauses[4] = {"transform", "nomp_api_100", "tile", 0};
   nomp_test_check(nomp_jit(&id, knl, clauses, 3, "a", sizeof(TEST_TYPE),
                            NOMP_PTR, "b", sizeof(TEST_TYPE), NOMP_PTR, "N",

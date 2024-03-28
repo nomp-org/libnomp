@@ -17,8 +17,8 @@ static int test_nomp_init_twice(int argc, const char **argv) {
   nomp_test_assert(nomp_get_err_no(err) == NOMP_INITIALIZE_FAILURE);
 
   char *desc = nomp_get_err_str(err);
-  int eq = logcmp(desc, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* libnomp "
-                        "is already initialized.");
+  int   eq = logcmp(desc, "\\[Error\\] .*libnomp\\/src\\/nomp.c:[0-9]* libnomp "
+                            "is already initialized.");
   nomp_free(&desc);
   nomp_test_assert(eq);
 

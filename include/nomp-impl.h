@@ -97,8 +97,8 @@ typedef struct {
  * @brief Enum for different reduction operations.
  */
 typedef enum {
-  NOMP_SUM = 0, /*!< Sum reduction. */
-  NOMP_PROD = 1 /*!< Multiplication reduction.*/
+  NOMP_SUM  = 0, /*!< Sum reduction. */
+  NOMP_PROD = 1  /*!< Multiplication reduction.*/
 } nomp_reduction_op_t;
 
 /**
@@ -302,11 +302,10 @@ extern "C" {
   {                                                                            \
     nomp_log(NOMP_SUCCESS, NOMP_INFO, "Calling %s ...", #err);                 \
     int err_ = (err);                                                          \
-    if (err_ > 0)                                                              \
-      return err_;                                                             \
+    if (err_ > 0) return err_;                                                 \
   }
 
-#define NOMP_MEM_OFFSET(start, usize) ((start) * (usize))
+#define NOMP_MEM_OFFSET(start, usize)     ((start) * (usize))
 #define NOMP_MEM_BYTES(start, end, usize) (((end) - (start)) * (usize))
 
 /**
