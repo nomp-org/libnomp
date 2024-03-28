@@ -103,23 +103,25 @@ static int backend_knl_build(nomp_backend_t *NOMP_UNUSED(bnd), nomp_prog_t *prg,
   check_rtc(backendrtcCreateProgram(&prog, source, NULL, 0, NULL, NULL));
 
   backendrtcResult result = backend_compile(prog);
-  if (result != RTC_SUCCESS) {
-    const char *err = backendrtcGetErrorString(result);
+  if (result == RTC_SUCCESS)
+    goto get_code;
 
-    size_t size;
-    backendrtcGetProgramLogSize(prog, &size);
-    char *log = nomp_calloc(char, size + 1);
-    backendrtcGetProgramLog(prog, log);
+  const char *err = backendrtcGetErrorString(result);
 
-    size += strlen(err) + 2 + 1;
-    char *msg = nomp_calloc(char, size);
-    snprintf(msg, size, "%s: %s", err, log);
-    int ret = nomp_log(NOMP_BACKEND_FAILURE, NOMP_ERROR,
-                       ERR_STR_BACKEND_FAILURE, "build", msg);
-    nomp_free(&msg), nomp_free(&log);
-    return ret;
-  }
+  size_t size;
+  backendrtcGetProgramLogSize(prog, &size);
+  char *log = nomp_calloc(char, size + 1);
+  backendrtcGetProgramLog(prog, log);
 
+  size += strlen(err) + 2 + 1;
+  char *msg = nomp_calloc(char, size);
+  snprintf(msg, size, "%s: %s", err, log);
+  int ret = nomp_log(NOMP_BACKEND_FAILURE, NOMP_ERROR, ERR_STR_BACKEND_FAILURE,
+                     "build", msg);
+  nomp_free(&msg), nomp_free(&log);
+  return ret;
+
+get_code:
   size_t size;
   check_rtc(backendrtcGetCodeSize(prog, &size));
   char *code = nomp_calloc(char, size + 1);
