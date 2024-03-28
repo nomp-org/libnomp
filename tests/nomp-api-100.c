@@ -40,8 +40,8 @@ static int test_empty_filename(void) {
   nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
   char *log = nomp_get_err_str(err);
-  int eq = logcmp(log, "\\[Error\\] .*src\\/.*.c:[0-9]* Module "
-                       "name and/or function name not provided.");
+  int   eq  = logcmp(log, "\\[Error\\] .*src\\/.*.c:[0-9]* Module "
+                             "name and/or function name not provided.");
   nomp_free(&log);
   nomp_test_assert(eq);
 
@@ -58,8 +58,8 @@ static int test_empty_user_callback(void) {
   nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
   char *log = nomp_get_err_str(err);
-  int eq = logcmp(log, "\\[Error\\] .*src\\/.*.c:[0-9]* Module "
-                       "name and/or function name not provided.");
+  int   eq  = logcmp(log, "\\[Error\\] .*src\\/.*.c:[0-9]* Module "
+                             "name and/or function name not provided.");
   nomp_free(&log);
   nomp_test_assert(eq);
 
@@ -76,9 +76,9 @@ static int test_invalid_clause(void) {
   nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_INPUT_IS_INVALID);
 
   char *log = nomp_get_err_str(err);
-  int eq = logcmp(
+  int   eq  = logcmp(
       log, "\\[Error\\] .*src\\/.*.c:[0-9]* Clause "
-           "\"invalid-clause\" passed into nomp_jit is not a valid clause.");
+              "\"invalid-clause\" passed into nomp_jit is not a valid clause.");
   nomp_free(&log);
   nomp_test_assert(eq);
 
@@ -87,7 +87,7 @@ static int test_invalid_clause(void) {
 
 // Calling nomp_jit() with a kernel which has a syntax error should fail.
 static int test_syntax_error_in_kernel(void) {
-  static int id = -1;
+  static int  id          = -1;
   const char *clauses0[4] = {"transform", "nomp_api_100", "tile", 0};
   int err = nomp_jit(&id, invalid_knl, clauses0, 2, "a", sizeof(int), NOMP_PTR,
                      "N", sizeof(int), NOMP_INT);
@@ -114,10 +114,10 @@ static int test_syntax_error_in_transform_function(void) {
   nomp_test_assert(nomp_get_err_no(err) == NOMP_PY_CALL_FAILURE);
 
   char *log = nomp_get_err_str(err);
-  int eq = logcmp(
+  int   eq  = logcmp(
       log,
       "\\[Error\\] .*src\\/.*.c:[0-9]* Calling Python function "
-      "\"function_with_syntax_error\" from module \"nomp_api_100\" failed.");
+         "\"function_with_syntax_error\" from module \"nomp_api_100\" failed.");
   nomp_free(&log);
   nomp_test_assert(eq);
 

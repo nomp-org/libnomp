@@ -1,9 +1,9 @@
 #include "nomp-impl.h"
 
-#define NOMP_DO_SUM(a, b) (a) += (b)
+#define NOMP_DO_SUM(a, b)  (a) += (b)
 #define NOMP_DO_PROD(a, b) (a) *= (b)
 
-#define NOMP_INIT_SUM(a) (a) = 0
+#define NOMP_INIT_SUM(a)  (a) = 0
 #define NOMP_INIT_PROD(a) (a) = 1
 
 #define NOMP_REDUCTION(T, SUFFIX, OP)                                          \
@@ -32,10 +32,10 @@ NOMP_FOR_EACH_DOMAIN(NOMP_REDUCTION, PROD)
  */
 int nomp_host_side_reduction(nomp_backend_t *backend, nomp_prog_t *prg,
                              nomp_mem_t *m) {
-  int dom = prg->reduction_type;
-  int op = prg->reduction_op;
+  int    dom  = prg->reduction_type;
+  int    op   = prg->reduction_op;
   size_t size = prg->reduction_size;
-  void *out = prg->reduction_ptr;
+  void  *out  = prg->reduction_ptr;
 
   nomp_check(backend->sync(backend));
   nomp_check(backend->update(backend, m, NOMP_FROM, 0, prg->global[0], size));

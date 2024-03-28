@@ -1,5 +1,5 @@
 #define TEST_MAX_SIZE 256
-#define TEST_IMPL_H "nomp-api-350-impl.h"
+#define TEST_IMPL_H   "nomp-api-350-impl.h"
 #include "nomp-generate-tests.h"
 #undef TEST_IMPL_H
 #undef TEST_MAX_SIZE

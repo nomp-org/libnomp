@@ -11,10 +11,10 @@ static int free_before_mapping(unsigned s, unsigned e) {
   nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_MAP_OP_IS_INVALID);
 
   char *desc = nomp_get_err_str(err);
-  int eq = logcmp(
+  int   eq   = logcmp(
       desc, "\\[Error\\] "
-            ".*libnomp\\/src\\/nomp.c:[0-9]* NOMP_FREE or NOMP_FROM can only "
-            "be called on a pointer which is already on the device.");
+                ".*libnomp\\/src\\/nomp.c:[0-9]* NOMP_FREE or NOMP_FROM can only "
+                "be called on a pointer which is already on the device.");
   nomp_free(&desc);
   nomp_test_assert(eq);
 
@@ -27,14 +27,14 @@ static int d2h_before_h2d(unsigned s, unsigned e) {
   nomp_test_assert(e <= TEST_MAX_SIZE);
 
   TEST_TYPE a[TEST_MAX_SIZE] = {0};
-  int err = nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FROM);
+  int       err = nomp_update(a, s, e, sizeof(TEST_TYPE), NOMP_FROM);
   nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_MAP_OP_IS_INVALID);
 
   char *desc = nomp_get_err_str(err);
-  int eq = logcmp(
+  int   eq   = logcmp(
       desc, "\\[Error\\] "
-            ".*libnomp\\/src\\/nomp.c:[0-9]* NOMP_FREE or NOMP_FROM can only "
-            "be called on a pointer which is already on the device.");
+                ".*libnomp\\/src\\/nomp.c:[0-9]* NOMP_FREE or NOMP_FROM can only "
+                "be called on a pointer which is already on the device.");
   nomp_free(&desc);
   nomp_test_assert(eq);
 
@@ -219,7 +219,7 @@ static int dynamic_data_type(unsigned n) {
   char a[TEST_MAX_SIZE];
   nomp_test_check(nomp_update(a, 0, n, sizeof(char), NOMP_ALLOC));
 
-  TEST_TYPE *b = (TEST_TYPE *)a;
+  TEST_TYPE     *b        = (TEST_TYPE *)a;
   const unsigned new_size = n / sizeof(TEST_TYPE);
   for (unsigned i = 0; i < new_size; i++)
     b[i] = i;

@@ -3,7 +3,7 @@
 #include "nomp-loopy.h"
 
 static nomp_backend_t nomp;
-static int initialized = 0;
+static int            initialized = 0;
 
 static inline int nomp_check_env_vars(nomp_config_t *const cfg) {
   char *tmp = NULL;
@@ -43,12 +43,10 @@ static inline int nomp_check_cmd_line_aux(const unsigned i, const unsigned argc,
 
 static inline int nomp_check_cmd_line(nomp_config_t *const cfg, unsigned argc,
                                       const char **argv) {
-  if (argc <= 1 || argv == NULL)
-    return 0;
+  if (argc <= 1 || argv == NULL) return 0;
 
   for (unsigned i = 0; i < argc;) {
-    if (strncmp("--nomp", argv[i++], 6))
-      continue;
+    if (strncmp("--nomp", argv[i++], 6)) continue;
 
     nomp_check(nomp_check_cmd_line_aux(i, argc, argv));
 
@@ -62,7 +60,7 @@ static inline int nomp_check_cmd_line(nomp_config_t *const cfg, unsigned argc,
 
     if (!strncmp("--nomp-platform", argv[i - 1], NOMP_MAX_BUFFER_SIZE)) {
       cfg->platform = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE);
-      valid = 1;
+      valid         = 1;
     }
 
     if (!strncmp("--nomp-device", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
@@ -98,9 +96,9 @@ static inline int nomp_set_configs(int argc, const char **argv,
                                    nomp_config_t *const cfg) {
   // verbose, profile, device and platform id are all initialized to zero.
   // Everything else has to be set by user explicitly.
-  cfg->verbose = NOMP_DEFAULT_VERBOSE;
-  cfg->profile = NOMP_DEFAULT_PROFILE;
-  cfg->device = NOMP_DEFAULT_DEVICE;
+  cfg->verbose  = NOMP_DEFAULT_VERBOSE;
+  cfg->profile  = NOMP_DEFAULT_PROFILE;
+  cfg->device   = NOMP_DEFAULT_DEVICE;
   cfg->platform = NOMP_DEFAULT_PLATFORM;
   strcpy(cfg->backend, "");
   strcpy(cfg->install_dir, "");
@@ -154,7 +152,7 @@ static inline int nomp_deallocate_scratch_memory(nomp_backend_t *backend) {
   return 0;
 }
 
-static inline int nomp_init_backend(nomp_backend_t *const backend,
+static inline int nomp_init_backend(nomp_backend_t *const      backend,
                                     const nomp_config_t *const cfg) {
   backend->py_context = PyDict_New();
 
@@ -259,9 +257,9 @@ int nomp_init(int argc, const char **argv) {
   return 0;
 }
 
-static nomp_mem_t **mems = NULL;
-static unsigned mems_n = 0;
-static unsigned mems_max = 0;
+static nomp_mem_t **mems     = NULL;
+static unsigned     mems_n   = 0;
+static unsigned     mems_max = 0;
 
 /**
  * @ingroup nomp_mem_utils
@@ -278,8 +276,7 @@ static inline nomp_mem_t *nomp_get_memory_if_mapped(void *p) {
   // FIXME: This is O(N) in number of allocations.
   // Needs to go. Must store a hashmap.
   for (unsigned i = 0; i < mems_n; i++) {
-    if (mems[i] && mems[i]->hptr == p)
-      return mems[i];
+    if (mems[i] && mems[i]->hptr == p) return mems[i];
   }
   return NULL;
 }
@@ -362,8 +359,7 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t unit_size,
   nomp_check(nomp.update(&nomp, mems[idx], op, idx0, idx1, unit_size));
 
   // Device memory object was released.
-  if (mems[idx]->bptr == NULL)
-    nomp_free(&mems[idx]);
+  if (mems[idx]->bptr == NULL) nomp_free(&mems[idx]);
   // Or new memory object got created.
   else if (idx == mems_n)
     mems_n++;
@@ -371,13 +367,13 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t unit_size,
   return 0;
 }
 
-static nomp_prog_t **progs = NULL;
-static unsigned progs_n = 0;
-static unsigned progs_max = 0;
+static nomp_prog_t **progs     = NULL;
+static unsigned      progs_n   = 0;
+static unsigned      progs_max = 0;
 
-static inline int nomp_jit_act_on_clauses(PyObject **kernel,
-                                          nomp_prog_t *program,
-                                          const char **const clauses,
+static inline int nomp_jit_act_on_clauses(PyObject                  **kernel,
+                                          nomp_prog_t                *program,
+                                          const char **const          clauses,
                                           const nomp_backend_t *const backend) {
   // Currently, we only support `transform` and `reduce` clauses.
   unsigned i = 0;
@@ -395,10 +391,10 @@ static inline int nomp_jit_act_on_clauses(PyObject **kernel,
       for (unsigned j = 0; j < program->nargs; j++) {
         if (strncmp(program->args[j].name, clauses[i + 1],
                     NOMP_MAX_BUFFER_SIZE) == 0) {
-          program->reduction_type = program->args[j].type;
-          program->reduction_size = program->args[j].size;
+          program->reduction_type  = program->args[j].type;
+          program->reduction_size  = program->args[j].size;
           program->reduction_index = j;
-          program->args[j].type = NOMP_PTR;
+          program->args[j].type    = NOMP_PTR;
           break;
         }
       }
@@ -411,11 +407,11 @@ static inline int nomp_jit_act_on_clauses(PyObject **kernel,
     }
 
     if (strncmp(clauses[i], "annotate", NOMP_MAX_BUFFER_SIZE) == 0) {
-      const char *key = clauses[i + 1];
+      const char *key   = clauses[i + 1];
       const char *value = clauses[i + 2];
 
       PyObject *py_annotations = PyDict_New();
-      PyObject *py_value = PyUnicode_FromString(value);
+      PyObject *py_value       = PyUnicode_FromString(value);
       PyDict_SetItemString(py_annotations, key, py_value);
       Py_XDECREF(py_value);
       nomp_check(nomp_py_annotate(kernel, backend->py_annotate, py_annotations,
@@ -437,23 +433,14 @@ static inline PyObject *nomp_get_py_object_from_type(nomp_arg_type_t type,
                                                      size_t size, void *ptr) {
   PyObject *value = NULL;
   switch (type) {
-  case NOMP_INT:
-    value = PyLong_FromLong(*((int *)ptr));
-    break;
-  case NOMP_UINT:
-    value = PyLong_FromUnsignedLong(*((unsigned *)ptr));
-    break;
+  case NOMP_INT: value = PyLong_FromLong(*((int *)ptr)); break;
+  case NOMP_UINT: value = PyLong_FromUnsignedLong(*((unsigned *)ptr)); break;
   case NOMP_FLOAT:
-    if (size == 32)
-      value = PyFloat_FromDouble(*((float *)ptr));
-    if (size == 64)
-      value = PyFloat_FromDouble(*((double *)ptr));
+    if (size == 32) value = PyFloat_FromDouble(*((float *)ptr));
+    if (size == 64) value = PyFloat_FromDouble(*((double *)ptr));
     break;
-  case NOMP_PTR:
-    value = PyLong_FromVoidPtr(ptr);
-    break;
-  default:
-    break;
+  case NOMP_PTR: value = PyLong_FromVoidPtr(ptr); break;
+  default: break;
   }
   return value;
 }
@@ -462,29 +449,29 @@ static inline nomp_prog_t *nomp_jit_init_args(unsigned progs_n, unsigned nargs,
                                               va_list args) {
   // Allocate memory for the program.
   nomp_prog_t *prg = progs[progs_n] = nomp_calloc(nomp_prog_t, 1);
-  prg->args = nomp_calloc(nomp_arg_t, nargs);
+  prg->args                         = nomp_calloc(nomp_arg_t, nargs);
   // Reduction index is set to -1 by default.
   prg->reduction_index = -1;
   // SymEngine map to store grid size expressions.
-  prg->map = mapbasicbasic_new();
+  prg->map        = mapbasicbasic_new();
   prg->sym_global = vecbasic_new();
-  prg->sym_local = vecbasic_new();
+  prg->sym_local  = vecbasic_new();
   // Dictionary to hold jit kernel arguments.
   prg->py_dict = PyDict_New();
 
   unsigned current_narg = 0;
   for (unsigned i = 0; i < nargs; i++) {
-    const char *name = va_arg(args, const char *);
+    const char  *name = va_arg(args, const char *);
     const size_t size = va_arg(args, size_t);
-    int type = va_arg(args, int);
+    int          type = va_arg(args, int);
 
     // Check if the argument is a jit argument. If yes, add it to the
     // dictionary and continue.
     if (type & NOMP_JIT) {
       type &= ~NOMP_JIT;
 
-      void *value_ptr = va_arg(args, void *);
-      PyObject *value = nomp_get_py_object_from_type(type, size, value_ptr);
+      void     *value_ptr = va_arg(args, void *);
+      PyObject *value     = nomp_get_py_object_from_type(type, size, value_ptr);
       PyDict_SetItemString(prg->py_dict, name, value);
       Py_XDECREF(value);
 
@@ -540,8 +527,7 @@ static inline nomp_prog_t *nomp_jit_init_args(unsigned progs_n, unsigned nargs,
  * @return int
  */
 int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
-  if (*id >= 0)
-    return 0;
+  if (*id >= 0) return 0;
 
   if (progs_n == progs_max) {
     progs_max += progs_max / 2 + 1;
@@ -568,8 +554,7 @@ int nomp_jit(int *id, const char *csrc, const char **clauses, int nargs, ...) {
   }
 
   // Call fix_parameters on the loopy kernel.
-  if (PyDict_Size(prg->py_dict))
-    nomp_py_fix_parameters(&knl, prg->py_dict);
+  if (PyDict_Size(prg->py_dict)) nomp_py_fix_parameters(&knl, prg->py_dict);
 
   // Get OpenCL, CUDA, etc. source and name from the loopy kernel and build
   // the program.
@@ -625,11 +610,11 @@ int nomp_run(int id, ...) {
   }
 
   nomp_prog_t *prg = progs[id];
-  prg->eval_grid = 0;
+  prg->eval_grid   = 0;
 
   nomp_arg_t *args = prg->args;
   nomp_mem_t *m;
-  long val;
+  long        val;
 
   va_list vargs;
   va_start(vargs, id);
@@ -649,24 +634,22 @@ int nomp_run(int id, ...) {
       if (m == NULL) {
         if (prg->reduction_index == (int)i) {
           prg->reduction_ptr = args[i].ptr;
-          m = &nomp.scratch;
+          m                  = &nomp.scratch;
         } else {
           return nomp_log(NOMP_USER_MAP_PTR_IS_INVALID, NOMP_ERROR,
                           ERR_STR_USER_MAP_PTR_IS_INVALID, args[i].ptr);
         }
       }
       args[i].size = m->bsize;
-      args[i].ptr = m->bptr;
+      args[i].ptr  = m->bptr;
       break;
     case NOMP_FLOAT:
-    default:
-      break;
+    default: break;
     }
   }
   va_end(vargs);
 
-  if (prg->eval_grid)
-    nomp_check(nomp_symengine_eval_grid_size(prg));
+  if (prg->eval_grid) nomp_check(nomp_symengine_eval_grid_size(prg));
 
   nomp_check(nomp.knl_run(&nomp, prg));
   if (prg->reduction_index >= 0)
@@ -688,16 +671,14 @@ int nomp_run(int id, ...) {
 int nomp_sync(void) { return nomp.sync(&nomp); }
 
 static int nomp_finalize_impl(int interpreter) {
-  if (!initialized)
-    return NOMP_FINALIZE_FAILURE;
+  if (!initialized) return NOMP_FINALIZE_FAILURE;
 
   Py_XDECREF(nomp.py_annotate), nomp.py_annotate = NULL;
-  Py_XDECREF(nomp.py_context), nomp.py_context = NULL;
+  Py_XDECREF(nomp.py_context), nomp.py_context   = NULL;
 
   // Free all the allocated memory.
   for (unsigned i = 0; i < mems_n; i++) {
-    if (!mems[i])
-      continue;
+    if (!mems[i]) continue;
     nomp_check(nomp.update(&nomp, mems[i], NOMP_FREE, mems[i]->idx0,
                            mems[i]->idx1, mems[i]->usize));
     nomp_free(&mems[i]);
@@ -707,8 +688,7 @@ static int nomp_finalize_impl(int interpreter) {
 
   // Free all the allocated programs.
   for (unsigned i = 0; i < progs_n; i++) {
-    if (!progs[i])
-      continue;
+    if (!progs[i]) continue;
     nomp_check(nomp.knl_free(progs[i]));
 
     Py_XDECREF(progs[i]->py_dict);
@@ -728,8 +708,7 @@ static int nomp_finalize_impl(int interpreter) {
   nomp_profile_finalize();
   nomp_log_finalize();
 
-  if ((initialized = nomp.finalize(&nomp)))
-    return NOMP_FINALIZE_FAILURE;
+  if ((initialized = nomp.finalize(&nomp))) return NOMP_FINALIZE_FAILURE;
 
   return 0;
 }

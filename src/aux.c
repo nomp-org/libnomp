@@ -28,7 +28,7 @@ char *nomp_str_cat(unsigned n, unsigned max_len, ...) {
   va_start(vargs, max_len);
 
   unsigned max = NOMP_MAX_BUFFER_SIZE, len = 0;
-  char *out = nomp_calloc(char, max);
+  char    *out = nomp_calloc(char, max);
   for (unsigned i = 0; i < n; i++) {
     const char *s = va_arg(vargs, const char *);
     if (max <= len + strnlen(s, max_len)) {
@@ -59,13 +59,11 @@ char *nomp_str_cat(unsigned n, unsigned max_len, ...) {
  * @return int
  */
 int nomp_str_toui(const char *str, size_t size) {
-  if (str == NULL)
-    return -1;
+  if (str == NULL) return -1;
 
   char *copy = strndup(str, size), *end_ptr;
-  int num = (int)strtol(copy, &end_ptr, 10);
-  if (copy == end_ptr || *end_ptr != '\0' || num < 0)
-    num = -1;
+  int   num  = (int)strtol(copy, &end_ptr, 10);
+  if (copy == end_ptr || *end_ptr != '\0' || num < 0) num = -1;
   nomp_free(&copy);
 
   return num;
@@ -89,8 +87,7 @@ int nomp_max(unsigned n, ...) {
   int max = INT_MIN;
   for (unsigned i = 0; i < n; i++) {
     int cur = va_arg(valist, int);
-    if (max < cur)
-      max = cur;
+    if (max < cur) max = cur;
   }
 
   va_end(valist);
@@ -114,8 +111,7 @@ int nomp_max(unsigned n, ...) {
  */
 char *nomp_copy_env(const char *name, size_t size) {
   const char *tmp = getenv(name);
-  if (tmp)
-    return strndup(tmp, size);
+  if (tmp) return strndup(tmp, size);
   return NULL;
 }
 
@@ -135,8 +131,7 @@ char *nomp_copy_env(const char *name, size_t size) {
  * @return int
  */
 int nomp_path_len(size_t *len, const char *path) {
-  if (len)
-    *len = 0;
+  if (len) *len = 0;
   char *abs = realpath(path, NULL);
   if (!abs) {
     return nomp_log(NOMP_USER_INPUT_IS_INVALID, NOMP_ERROR,
@@ -144,8 +139,7 @@ int nomp_path_len(size_t *len, const char *path) {
                     strerror(errno));
   }
 
-  if (len)
-    *len = strnlen(abs, PATH_MAX);
+  if (len) *len = strnlen(abs, PATH_MAX);
   nomp_free(&abs);
 
   return 0;

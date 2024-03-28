@@ -4,9 +4,9 @@
 static int nomp_api_220_aux(const char *fmt, TEST_TYPE *a, int n) {
   nomp_test_check(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO));
 
-  int id = -1;
+  int         id         = -1;
   const char *clauses[4] = {"transform", "nomp_api_100", "tile", 0};
-  char *knl = generate_knl(fmt, 1, TOSTRING(TEST_TYPE));
+  char       *knl        = generate_knl(fmt, 1, TOSTRING(TEST_TYPE));
   nomp_test_check(nomp_jit(&id, knl, clauses, 2, "a", sizeof(TEST_TYPE),
                            NOMP_PTR, "N", sizeof(int), NOMP_INT));
   nomp_free(&knl);

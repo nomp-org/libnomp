@@ -14,7 +14,7 @@ extern "C" {
 
 inline static void *check_if_null(void *temp, const char *file,
                                   unsigned int line,
-                                  const char *function_name) {
+                                  const char  *function_name) {
   if (temp == NULL) {
     fprintf(stderr, "[Error] %s:%u: Failed to allocate memory with nomp_%s\n",
             file, line, function_name);

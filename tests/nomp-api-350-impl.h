@@ -6,7 +6,7 @@ static int nomp_api_350_aux(const char *fmt, const char **clauses, TEST_TYPE *a,
   nomp_test_check(nomp_update(a, 0, n, sizeof(TEST_TYPE), NOMP_TO));
   nomp_test_check(nomp_update(b, 0, n + 1, sizeof(int), NOMP_TO));
 
-  int id = -1;
+  int   id  = -1;
   char *knl = generate_knl(fmt, 2, TOSTRING(TEST_TYPE), TOSTRING(int));
   nomp_test_check(nomp_jit(&id, knl, clauses, 3, "a", sizeof(TEST_TYPE),
                            NOMP_PTR, "b", sizeof(int), NOMP_PTR, "N",
@@ -30,7 +30,7 @@ static int nomp_api_350_for_loop_bounds(unsigned N) {
   nomp_test_assert(N <= TEST_MAX_SIZE);
 
   TEST_TYPE a[TEST_MAX_SIZE];
-  int b[TEST_MAX_SIZE + 1];
+  int       b[TEST_MAX_SIZE + 1];
   for (unsigned i = 0; i < N; i++)
     a[i] = 0;
   for (unsigned i = 0; i < N + 1; i++)

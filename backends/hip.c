@@ -3,20 +3,20 @@
 
 static const char *ERR_STR_BACKEND_FAILURE = "HIP %s failure: %s.";
 #define NOMP_BACKEND_FAILURE NOMP_HIP_FAILURE
-#define NOMP_HIP 1
+#define NOMP_HIP             1
 
-#define DRIVER hip
-#define RUNTIME hip
+#define DRIVER              hip
+#define RUNTIME             hip
 #define RUNTIME_COMPILATION hiprtc
-#define RTC_SUCCESS HIPRTC_SUCCESS
+#define RTC_SUCCESS         HIPRTC_SUCCESS
 
-#define backendDeviceProp_t hipDeviceProp_t
+#define backendDeviceProp_t       hipDeviceProp_t
 #define backendModuleLaunchKernel hipModuleLaunchKernel
-#define backendModule hipModule_t
-#define backendFunction hipFunction_t
+#define backendModule             hipModule_t
+#define backendFunction           hipFunction_t
 
 #define backendrtcGetCodeSize hiprtcGetCodeSize
-#define backendrtcGetCode hiprtcGetCode
+#define backendrtcGetCode     hiprtcGetCode
 
 #define check_runtime(call) check_driver(call)
 

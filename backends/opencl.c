@@ -58,14 +58,14 @@ static const char *ERR_STR_OPENCL_FAILURE = "%s failed with error: %d (%s).";
   }
 
 struct opencl_backend_t {
-  cl_device_id device_id;
+  cl_device_id     device_id;
   cl_command_queue queue;
-  cl_context ctx;
+  cl_context       ctx;
 };
 
 struct opencl_prog_t {
   cl_program prg;
-  cl_kernel knl;
+  cl_kernel  knl;
 };
 
 static int opencl_update(nomp_backend_t *bnd, nomp_mem_t *m,
@@ -76,8 +76,8 @@ static int opencl_update(nomp_backend_t *bnd, nomp_mem_t *m,
   cl_int err;
   if (op & NOMP_ALLOC) {
     cl_mem *clm = nomp_calloc(cl_mem, 1);
-    *clm = clCreateBuffer(ocl->ctx, CL_MEM_READ_WRITE,
-                          NOMP_MEM_BYTES(start, end, usize), NULL, &err);
+    *clm        = clCreateBuffer(ocl->ctx, CL_MEM_READ_WRITE,
+                                 NOMP_MEM_BYTES(start, end, usize), NULL, &err);
     check(err, "clCreateBuffer");
     m->bptr = (void *)clm, m->bsize = sizeof(cl_mem);
   }
@@ -110,7 +110,7 @@ static int opencl_knl_build(nomp_backend_t *bnd, nomp_prog_t *prg,
   struct opencl_prog_t *ocl_prg = nomp_calloc(struct opencl_prog_t, 1);
 
   struct opencl_backend_t *ocl = (struct opencl_backend_t *)bnd->bptr;
-  cl_int err;
+  cl_int                   err;
   ocl_prg->prg = clCreateProgramWithSource(
       ocl->ctx, 1, (const char **)(&source), NULL, &err);
   check(err, "clCreateProgramWithSource");
@@ -215,14 +215,11 @@ static int opencl_device_query(nomp_backend_t *bnd, cl_device_id id) {
   check(clGetDeviceInfo(id, CL_DEVICE_TYPE, sizeof(type), &type, NULL),
         "clGetDeviceInfo");
   PyObject *obj = NULL;
-  if (type & CL_DEVICE_TYPE_CPU)
-    obj = PyUnicode_FromString("cpu");
-  if (type & CL_DEVICE_TYPE_GPU)
-    obj = PyUnicode_FromString("gpu");
+  if (type & CL_DEVICE_TYPE_CPU) obj = PyUnicode_FromString("cpu");
+  if (type & CL_DEVICE_TYPE_GPU) obj = PyUnicode_FromString("gpu");
   if (type & CL_DEVICE_TYPE_ACCELERATOR)
     obj = PyUnicode_FromString("accelerator");
-  if (type & CL_DEVICE_TYPE_DEFAULT)
-    obj = PyUnicode_FromString("default");
+  if (type & CL_DEVICE_TYPE_DEFAULT) obj = PyUnicode_FromString("default");
   PyDict_SetItemString(bnd->py_context, "device::type", obj);
   Py_XDECREF(obj);
 
@@ -285,20 +282,20 @@ int opencl_init(nomp_backend_t *bnd, const int platform_id,
   nomp_check(opencl_device_query(bnd, device));
 
   struct opencl_backend_t *ocl = nomp_calloc(struct opencl_backend_t, 1);
-  ocl->device_id = device;
+  ocl->device_id               = device;
   cl_int err;
   ocl->ctx = clCreateContext(NULL, 1, &device, NULL, NULL, &err);
   check(err, "clCreateContext");
   ocl->queue = clCreateCommandQueueWithProperties(ocl->ctx, device, 0, &err);
   check(err, "clCreateCommandQueueWithProperties");
 
-  bnd->bptr = (void *)ocl;
-  bnd->update = opencl_update;
+  bnd->bptr      = (void *)ocl;
+  bnd->update    = opencl_update;
   bnd->knl_build = opencl_knl_build;
-  bnd->knl_run = opencl_knl_run;
-  bnd->knl_free = opencl_knl_free;
-  bnd->sync = opencl_sync;
-  bnd->finalize = opencl_finalize;
+  bnd->knl_run   = opencl_knl_run;
+  bnd->knl_free  = opencl_knl_free;
+  bnd->sync      = opencl_sync;
+  bnd->finalize  = opencl_finalize;
 
   return 0;
 }

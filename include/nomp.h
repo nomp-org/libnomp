@@ -21,10 +21,10 @@ extern "C" {
  * types are supported as kernel arguments.
  */
 typedef enum {
-  NOMP_INT = 2048,   /*!< Signed integer argument type.*/
-  NOMP_UINT = 4096,  /*!< Unsigned integer argument type.*/
+  NOMP_INT   = 2048, /*!< Signed integer argument type.*/
+  NOMP_UINT  = 4096, /*!< Unsigned integer argument type.*/
   NOMP_FLOAT = 8192, /*!< Floating point argument type.*/
-  NOMP_PTR = 16384   /*!< Pointer argument type.*/
+  NOMP_PTR   = 16384 /*!< Pointer argument type.*/
 } nomp_arg_type_t;
 
 /**
@@ -33,7 +33,7 @@ typedef enum {
  */
 typedef enum {
   NOMP_ALLOC = 1, /*!< Allocate memory on the device.*/
-  NOMP_TO = 2,    /*!< Copy host data to device. Memory will be allocated if not
+  NOMP_TO    = 2, /*!< Copy host data to device. Memory will be allocated if not
                    * allocated.*/
   NOMP_FROM = 4,  /*!< Copy device data to host.*/
   NOMP_FREE = 8   /*!< Free memory allocated on the device.*/
