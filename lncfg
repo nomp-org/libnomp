@@ -12,6 +12,7 @@
 : "${NOMP_ENABLE_CUDA:="OFF"}"
 : "${NOMP_ENABLE_HIP:="OFF"}"
 : "${NOMP_ENABLE_DOCS:="OFF"}"
+: "${NOMP_ENABLE_TESTS:="OFF"}"
 : "${NOMP_ENABLE_ASAN:="OFF"}"
 : "${NOMP_C_COMPILER:=""}"
 : "${NOMP_C_FLAGS:=""}"
@@ -43,7 +44,8 @@ function print_help() {
     "${cyan}--opencl-lib:${reset} OpenCL library path.\n" \
     "${cyan}--opencl-headers:${reset} OpenCL header path.\n" \
     "${cyan}--enable-asan:${reset} Build user documentation (Default: ${NOMP_ENABLE_ASAN}).\n" \
-    "${cyan}--enable-docs:${reset} Build user documentation (Default: ${NOMP_ENABLE_DOCS})."
+    "${cyan}--enable-docs:${reset} Build user documentation (Default: ${NOMP_ENABLE_DOCS}).\n" \
+    "${cyan}--enable-tests:${reset} Build libnomp unit tests (Default: ${NOMP_ENABLE_TESTS})."
   exit 0
 }
 
@@ -64,6 +66,7 @@ while [ $# -gt 0 ]; do
   --opencl-headers) shift && NOMP_OPENCL_INCLUDE_DIR=$(realpath "${1}") ;;
   --enable-asan) NOMP_ENABLE_ASAN="ON" ;;
   --enable-docs) NOMP_ENABLE_DOCS="ON" ;;
+  --enable-tests) NOMP_ENABLE_TESTS="ON" ;;
   *) echo "${red}Invalid option: ${1}${reset}."
     echo "See ${cyan}./lncfg -h${reset} or ${cyan}./lncfg --help${reset} for " \
       "the accepted options."
@@ -95,6 +98,7 @@ NOMP_CMAKE_OPTS+=("-DENABLE_OPENCL=${NOMP_ENABLE_OPENCL}")
 
 NOMP_CMAKE_OPTS+=("-DENABLE_ASAN=${NOMP_ENABLE_ASAN}")
 NOMP_CMAKE_OPTS+=("-DENABLE_DOCS=${NOMP_ENABLE_DOCS}")
+NOMP_CMAKE_OPTS+=("-DENABLE_TESTS=${NOMP_ENABLE_TESTS}")
 
 # Update variables for lnstate scripts.
 echo -e "NOMP_INSTALL_DIR=${NOMP_INSTALL_DIR}\n" \

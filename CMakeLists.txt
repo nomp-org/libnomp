@@ -2,9 +2,10 @@ cmake_minimum_required(VERSION 3.22)
 project(libnomp VERSION 0.0.1 DESCRIPTION "nomp runtime library" LANGUAGES C)
 
 # Nomp options.
-option(ENABLE_OPENCL "Build OpenCL backend" OFF)
-option(ENABLE_CUDA "Build CUDA backend" OFF)
-option(ENABLE_HIP "Build HIP backend" OFF)
+option(ENABLE_OPENCL "Build OpenCL Backend" OFF)
+option(ENABLE_CUDA "Build CUDA Backend" OFF)
+option(ENABLE_HIP "Build HIP Backend" OFF)
+option(ENABLE_TESTS "Enable libnomp Unit Tests" OFF)
 option(ENABLE_DOCS "Enable Documentation" OFF)
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 
@@ -37,10 +38,6 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 # Add the automatically determined parts of the RPATH which point to directories
 # outside the build tree to the install RPATH
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-
-if (ENABLE_DOCS)
-  add_subdirectory ("docs")
-endif()
 
 set(SOURCES src/nomp.c src/loopy.c src/symengine.c src/aux.c src/log.c
   src/reduction.c)
@@ -101,23 +98,6 @@ if (ENABLE_HIP)
   target_compile_definitions(nomp PRIVATE HIP_ENABLED)
 endif()
 
-# Tests
-file(GLOB TESTS tests/nomp-*.c)
-foreach(test ${TESTS})
-  string(REPLACE "${CMAKE_SOURCE_DIR}/tests/" "" temp ${test})
-  string(REPLACE ".c" "" test_exe ${temp})
-  add_executable(${test_exe} ${test})
-  target_link_libraries(${test_exe} nomp)
-  target_include_directories(${test_exe} PRIVATE include tests)
-  target_compile_options(${test_exe} PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
-    $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic>)
-  if (HAS_ADDRESS_SANITIZER)
-    target_compile_options(${test_exe} PRIVATE -fsanitize=address)
-    target_link_options(${test_exe} PRIVATE -fsanitize=address)
-  endif()
-  install (TARGETS ${test_exe} RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/tests)
-endforeach()
-
 # Add AddressSanitizer if it is enabled and supported.
 set(HAS_ADDRESS_SANITIZER FALSE)
 if (ENABLE_ASAN)
@@ -130,6 +110,14 @@ if (ENABLE_ASAN)
     target_compile_options(nomp PRIVATE -fsanitize=address)
     target_link_options(nomp PRIVATE -fsanitize=address)
   endif()
+endif()
+
+if (ENABLE_DOCS)
+  add_subdirectory(docs)
+endif()
+
+if (ENABLE_TESTS)
+  add_subdirectory(tests)
 endif()
 
 # Add clang-format as a custom target if available.
@@ -192,9 +180,6 @@ endif()
 install(TARGETS nomp LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
   PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/python DESTINATION ${CMAKE_INSTALL_PREFIX})
-
-install(DIRECTORY tests/ DESTINATION ${CMAKE_INSTALL_PREFIX}/tests
-  FILES_MATCHING PATTERN "*.py")
 
 install(DIRECTORY scripts/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
   FILE_PERMISSIONS OWNER_READ OWNER_EXECUTE OWNER_WRITE
