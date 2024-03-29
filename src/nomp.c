@@ -7,7 +7,6 @@ static int            initialized = 0;
 
 static inline int nomp_check_env_vars(nomp_config_t *const cfg) {
   char *tmp = NULL;
-
   if ((tmp = getenv("NOMP_INSTALL_DIR")))
     strncpy(cfg->install_dir, tmp, PATH_MAX);
 
@@ -51,7 +50,6 @@ static inline int nomp_check_cmd_line(nomp_config_t *const cfg, unsigned argc,
     nomp_check(nomp_check_cmd_line_aux(i, argc, argv));
 
     int valid = 0;
-
     if (!strncmp("--nomp-install-dir", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
       strncpy(cfg->install_dir, argv[i], PATH_MAX), valid = 1;
 
