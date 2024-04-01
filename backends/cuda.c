@@ -3,6 +3,8 @@
 #include <nvrtc.h>
 
 static const char *ERR_STR_BACKEND_FAILURE = "CUDA %s failure: %s.";
+static const char *FAST_MATH_FLAG          = "--use_fast_math";
+
 #define NOMP_BACKEND_FAILURE NOMP_CUDA_FAILURE
 #define NOMP_CUDA            1
 
