@@ -93,12 +93,19 @@ static int backend_update(nomp_backend_t *NOMP_UNUSED(bnd), nomp_mem_t *m,
   return 0;
 }
 
-static int backend_knl_build(nomp_backend_t *NOMP_UNUSED(bnd), nomp_prog_t *prg,
+static int backend_knl_build(nomp_backend_t *bnd, nomp_prog_t *prg,
                              const char *source, const char *name) {
   backendrtcProgram prog;
   check_rtc(backendrtcCreateProgram(&prog, source, NULL, 0, NULL, NULL));
 
-  backendrtcResult result = backendrtcCompileProgram(prog, 0, NULL);
+  PyObject   *py_arch = PyDict_GetItemString(bnd->py_context, "device::arch");
+  const char *arch    = PyUnicode_AsUTF8(py_arch);
+  char        arch_flag[256];
+  snprintf(arch_flag, BUFSIZ, "--gpu-architecture=%s", arch);
+
+  const char      *options[] = {FAST_MATH_FLAG, arch_flag, NULL};
+  backendrtcResult result =
+      backendrtcCompileProgram(prog, 2, (const char **)options);
   if (result != RTC_SUCCESS) goto backend_rtc_error;
 
   size_t size;
@@ -188,17 +195,19 @@ static int backend_device_query(nomp_backend_t *bnd, int device) {
 
   set_string("device::name", prop.name);
 
+  char arch[BUFSIZ];
 #if defined(NOMP_HIP)
   set_string("device::vendor", "AMD");
+  strncpy(arch, prop.gcnArchName, BUFSIZ);
 #elif defined(NOMP_CUDA)
   set_string("device::vendor", "NVIDIA");
+  snprintf(arch, BUFSIZ, "sm_%d%d", prop.major, prop.minor);
 #endif
+  set_string("device::arch", arch);
 
   int driver_version;
   check_driver(backendDriverGetVersion(&driver_version));
   set_int("device::driver", driver_version);
-
-  set_string("device::type", "gpu");
 
   set_int("device::max_threads_per_block", prop.maxThreadsPerBlock);
 

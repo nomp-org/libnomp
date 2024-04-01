@@ -2,6 +2,8 @@
 #include <hip/hiprtc.h>
 
 static const char *ERR_STR_BACKEND_FAILURE = "HIP %s failure: %s.";
+static const char *FAST_MATH_FLAG          = "-ffast-math";
+
 #define NOMP_BACKEND_FAILURE NOMP_HIP_FAILURE
 #define NOMP_HIP             1
 
