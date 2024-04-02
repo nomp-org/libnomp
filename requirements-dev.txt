@@ -1,5 +1,5 @@
 isort==5.10.1
-black==22.8.0
+black==24.3.0
 flake8==4.0.1
 breathe==4.34.0
 Sphinx==5.1.1
