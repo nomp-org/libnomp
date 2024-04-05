@@ -26,26 +26,39 @@ reset=$(tput sgr0)
 
 # Print the options.
 function print_help() {
-  echo -e "Usage: ${0} [--help] [--cc <c compiler>] [--cxx <cxx compiler>] " \
-    "[--build-type <build type>] [--build-dir <build directory>] [--install-prefix <install directory>] " \
-    "[--prefix-path <cmake prefix path>] [--enable-hip] [--enable-cuda] [--enable-opencl] " \
-    "[--opencl-lib <opencl library path>] [--opencl-headers <opencl header path>] [--enable-docs]\n\n" \
-    "${cyan}--help:${reset} Print this help and exit.\n" \
-    "${cyan}--cc:${reset} C Compiler.\n" \
-    "${cyan}--cflags:${reset} C Compiler flags.\n" \
-    "${cyan}--build-type:${reset} Build type (Default: ${NOMP_BUILD_TYPE}, " \
+  echo -e "Usage: ${0} [--help] --cc <c_compiler> [-cflags <c_flags>]" \
+    "[--install-prefix <install_directory>]\n" \
+    "[--build-type <build_type>] [--build-dir <build_directory>]" \
+    "[--prefix-path <cmake_prefix_path>]\n" \
+    "[--enable-opencl] [--opencl-lib <opencl_library_path>]" \
+    "[--opencl-headers <opencl_header_path>]\n" \
+    "[--enable-hip] [--enable-cuda] [--enable-docs] [--enable-tests]" \
+    "[--enable-asan]\n\n" \
+    "${cyan}--help          ${reset}\tPrint this help and exit.\n" \
+    "${cyan}--cc            ${reset}\tC Compiler.\n" \
+    "${cyan}--cflags        ${reset}\tC Compiler flags.\n" \
+    "${cyan}--install-prefix${reset}\tInstall directory" \
+    "(Default: ${NOMP_INSTALL_DIR}).\n" \
+    "${cyan}--build-type    ${reset}\tBuild type (Default: ${NOMP_BUILD_TYPE}," \
     "Allowed: Debug, Release, RelWithDebInfo and MinSizeRel).\n" \
-    "${cyan}--build-dir:${reset} Build directory (Default: ${NOMP_BUILD_DIR}).\n" \
-    "${cyan}--install-prefix:${reset} Install directory (Default: ${NOMP_INSTALL_DIR}).\n" \
-    "${cyan}--prefix-path:${reset} Semicolon separated list of prefix paths for CMake.\n" \
-    "${cyan}--enable-hip:${reset} Build with HIP backend (Default: ${NOMP_ENABLE_HIP}).\n" \
-    "${cyan}--enable-cuda:${reset} Build with CUDA backend (Default: ${NOMP_ENABLE_CUDA}).\n" \
-    "${cyan}--enable-opencl:${reset} Build with OpenCL backend (Default: ${NOMP_ENABLE_OPENCL}).\n" \
-    "${cyan}--opencl-lib:${reset} OpenCL library path.\n" \
-    "${cyan}--opencl-headers:${reset} OpenCL header path.\n" \
-    "${cyan}--enable-asan:${reset} Build user documentation (Default: ${NOMP_ENABLE_ASAN}).\n" \
-    "${cyan}--enable-docs:${reset} Build user documentation (Default: ${NOMP_ENABLE_DOCS}).\n" \
-    "${cyan}--enable-tests:${reset} Build libnomp unit tests (Default: ${NOMP_ENABLE_TESTS})."
+    "${cyan}--build-dir     ${reset}\tBuild directory" \
+    "(Default: ${NOMP_BUILD_DIR}).\n" \
+    "${cyan}--prefix-path   ${reset}\tSemicolon separated list of prefix paths" \
+    "for CMake.\n" \
+    "${cyan}--enable-opencl ${reset}\tBuild with OpenCL backend" \
+    "(Default: ${NOMP_ENABLE_OPENCL}).\n" \
+    "${cyan}--opencl-lib    ${reset}\tOpenCL library path.\n" \
+    "${cyan}--opencl-headers${reset}\tOpenCL header path.\n" \
+    "${cyan}--enable-hip    ${reset}\tBuild with HIP backend" \
+    "(Default: ${NOMP_ENABLE_HIP}).\n" \
+    "${cyan}--enable-cuda   ${reset}\tBuild with CUDA backend" \
+    "(Default: ${NOMP_ENABLE_CUDA}).\n" \
+    "${cyan}--enable-docs   ${reset}\tBuild user documentation" \
+    "(Default: ${NOMP_ENABLE_DOCS}).\n" \
+    "${cyan}--enable-tests  ${reset}\tBuild libnomp unit tests" \
+    "(Default: ${NOMP_ENABLE_TESTS}).\n" \
+    "${cyan}--enable-asan   ${reset}\tBuild with AddressSanitizer" \
+    "(Default: ${NOMP_ENABLE_ASAN})."
   exit 0
 }
 
