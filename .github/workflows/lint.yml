@@ -12,10 +12,9 @@ on:
         required: false
         default: false
 env:
-  # Increase to reset cache manually
-  CACHE_NUMBER: 0
-  LIBNOMP_ENV: /usr/share/miniconda/envs/libnomp-dev
-  INSTALLDIR: install
+  NOMP_CONDA_ENV: /usr/share/miniconda/envs/libnomp-dev
+  NOMP_INSTALL_DIR: ${{ github.workspace }}/install
+  NOMP_CACHE_NUMBER: 0 # Increase to reset cache manually.
 jobs:
   lint-check:
     runs-on: ubuntu-latest
@@ -37,8 +36,8 @@ jobs:
       - name: Cache conda environment
         uses: actions/cache@v3
         with:
-          path: ${{ env.LIBNOMP_ENV }}
-          key:  conda-${{ runner.os }}-${{ hashFiles('environment-dev.yml') }}-${{ hashFiles('requirements.txt') }}-${{ hashFiles('requirements-dev.txt') }}-${{ env.CACHE_NUMBER }}
+          path: ${{ env.NOMP_CONDA_ENV }}
+          key:  conda-${{ runner.os }}-${{ hashFiles('environment-dev.yml') }}-${{ hashFiles('requirements.txt') }}-${{ hashFiles('requirements-dev.txt') }}-${{ env.NOMP_CACHE_NUMBER }}
         id: cache
       - name: Update conda environment
         id: update_env
@@ -47,26 +46,26 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
       - name: Run clang-format check
         run: |
-          ./lncfg --install-prefix ${INSTALLDIR} --prefix-path ${CONDA_PREFIX}
+          ./lncfg --install-prefix ${NOMP_INSTALL_DIR} --prefix-path ${CONDA_PREFIX}
           ./lnbuild --format-check
       - name: Run clang-tidy check
         run: |
-          ./lncfg --install-prefix ${INSTALLDIR} --prefix-path ${CONDA_PREFIX}
+          ./lncfg --install-prefix ${NOMP_INSTALL_DIR} --prefix-path ${CONDA_PREFIX}
           # FIXME: Skipping the clang-tidy checks for now.
           # ./lnbuild --tidy-check
       - name: Run pylint check
         run: |
-          ./lncfg --install-prefix ${INSTALLDIR} --prefix-path ${CONDA_PREFIX}
+          ./lncfg --install-prefix ${NOMP_INSTALL_DIR} --prefix-path ${CONDA_PREFIX}
           ./lnbuild --pylint-check
       - name: Run black check
         run: |
-          ./lncfg --install-prefix ${INSTALLDIR} --prefix-path ${CONDA_PREFIX}
+          ./lncfg --install-prefix ${NOMP_INSTALL_DIR} --prefix-path ${CONDA_PREFIX}
           ./lnbuild --black-check
       - name: Run isort check
         run: |
-          ./lncfg --install-prefix ${INSTALLDIR} --prefix-path ${CONDA_PREFIX}
+          ./lncfg --install-prefix ${NOMP_INSTALL_DIR} --prefix-path ${CONDA_PREFIX}
           ./lnbuild --isort-check
       - name: Run flake8 check
         run: |
-          ./lncfg --install-prefix ${INSTALLDIR} --prefix-path ${CONDA_PREFIX}
+          ./lncfg --install-prefix ${NOMP_INSTALL_DIR} --prefix-path ${CONDA_PREFIX}
           ./lnbuild --flake8-check
