@@ -12,10 +12,10 @@ on:
         required: false
         default: false
 env:
-  # Increase to reset cache manually
-  CACHE_NUMBER: 0
-  LIBNOMP_ENV: /usr/share/miniconda/envs/libnomp-dev
-  INSTALLDIR: install
+  NOMP_CONDA_ENV: /usr/share/miniconda/envs/libnomp-dev
+  NOMP_INSTALL_DIR: ${{ github.workspace }}/install
+  NOMP_CACHE_NUMBER: 0 # Increase to reset cache manually.
+  POCL_CACHE_NUMBER: 0 # Increase to reset cache manually.
 jobs:
   docs:
     runs-on: ubuntu-latest
@@ -39,8 +39,8 @@ jobs:
       - name: Cache conda environment
         uses: actions/cache@v3
         with:
-          path: ${{ env.LIBNOMP_ENV }}
-          key:  conda-${{ runner.os }}-${{ hashFiles('environment-dev.yml') }}-${{ hashFiles('requirements.txt') }}-${{ hashFiles('requirements-dev.txt') }}-${{ env.CACHE_NUMBER }}
+          path: ${{ env.NOMP_CONDA_ENV }}
+          key:  conda-${{ runner.os }}-${{ hashFiles('environment-dev.yml') }}-${{ hashFiles('requirements.txt') }}-${{ hashFiles('requirements-dev.txt') }}-${{ env.NOMP_CACHE_NUMBER }}
         id: cache
       - name: Update conda environment
         id: update_env
@@ -50,13 +50,13 @@ jobs:
       - name: Build documentation
         id: build_docs
         run: |
-          ./lncfg --install-prefix ${INSTALLDIR} --prefix-path ${CONDA_PREFIX} --enable-docs
+          ./lncfg --install-prefix ${NOMP_INSTALL_DIR} --prefix-path ${CONDA_PREFIX} --enable-docs
           ./lnbuild --install --update-shell
       - name: Bypass Jekyll
         id: bypass_jekyll
         if: ${{ fromJSON(env.PUSH_ON_MAIN) }}
         run: |
-          cd ${INSTALLDIR}/docs && touch .nojekyll
+          cd ${NOMP_INSTALL_DIR}/docs && touch .nojekyll
       - name: Deploy to gh-pages
         id: deploy
         if: ${{ fromJSON(env.PUSH_ON_MAIN) }}
@@ -64,7 +64,7 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages
-          FOLDER: ${{ env.INSTALLDIR }}/docs
+          FOLDER: ${{ env.NOMP_INSTALL_DIR }}/docs
       - name: Block to allow inspecting failures
         run: sleep 30m
         if: ${{ failure() && inputs.debug_enabled }}

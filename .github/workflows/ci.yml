@@ -12,11 +12,10 @@ on:
         required: false
         default: false
 env:
-  # Increase to reset cache manually
-  CACHE_NUMBER: 0
-  LIBNOMP_ENV: /usr/share/miniconda/envs/libnomp
-  INSTALLDIR: install
-  POCL_CACHE_NUMBER: 0
+  NOMP_CONDA_ENV: /usr/share/miniconda/envs/libnomp
+  NOMP_INSTALL_DIR: ${{ github.workspace }}/install
+  NOMP_CACHE_NUMBER: 0 # Increase to reset cache manually.
+  POCL_CACHE_NUMBER: 0 # Increase to reset cache manually.
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -46,8 +45,8 @@ jobs:
         uses: actions/cache@v3
         id: cache
         with:
-          path: ${{ env.LIBNOMP_ENV }}
-          key:  conda-${{ runner.os }}-${{ hashFiles('environment.yml') }}-${{ hashFiles('requirements.txt') }}-${{ env.CACHE_NUMBER }}
+          path: ${{ env.NOMP_CONDA_ENV }}
+          key:  conda-${{ runner.os }}-${{ hashFiles('environment.yml') }}-${{ hashFiles('requirements.txt') }}-${{ env.NOMP_CACHE_NUMBER }}
       - name: Update conda environment
         id: update_env
         run: |
@@ -56,7 +55,7 @@ jobs:
       - uses: actions/cache@v3
         id: pocl_cache
         with:
-          path: ${{ env.LIBNOMP_ENV }}/lib/pocl
+          path: ${{ env.NOMP_CONDA_ENV }}/lib/pocl
           key:  ${{ runner.os }}-build-pocl-${{ env.POCL_CACHE_NUMBER }}
       - name: Install pocl
         id: install_pocl
@@ -67,15 +66,15 @@ jobs:
         id: build_libnomp
         run: |
           ./lncfg --cc ${CC} \
-            --install-prefix ${INSTALLDIR} \
+            --install-prefix ${NOMP_INSTALL_DIR} \
             --prefix-path ${CONDA_PREFIX} \
             --enable-opencl --opencl-lib ${CONDA_PREFIX}/lib/libOpenCL.so \
             --enable-tests
-          ./lnbuild --install --update-shell
+          ./lnbuild --install
       - name: Run libnomp tests
         id: run_libnomp
         run: |
-          ${INSTALLDIR}/bin/lnrun test --backend opencl
+          ${NOMP_INSTALL_DIR}/bin/lnrun --test backend=opencl
       - name: Block to allow inspecting failures
         run: sleep 30m
         if: ${{ failure() && inputs.debug_enabled }}
