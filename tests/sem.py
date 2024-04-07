@@ -1,4 +1,5 @@
-""" Annotation script for the spectral element kernels. """
+"""Annotation script for the spectral element kernels."""
+
 from typing import Dict
 
 import loopy as lp

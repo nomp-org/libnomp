@@ -1,4 +1,5 @@
-""" Transform script for nomp-api-300. """
+"""Transform script for nomp-api-300."""
+
 import math
 
 import loopy as lp

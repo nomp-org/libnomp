@@ -1,4 +1,5 @@
 """Loopy API wrapper"""
+
 import hashlib
 from dataclasses import dataclass, replace
 

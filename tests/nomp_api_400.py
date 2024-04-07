@@ -1,4 +1,5 @@
-""" Transform script for nomp-api-400. """
+"""Transform script for nomp-api-400."""
+
 import loopy as lp
 
 LOOPY_LANG_VERSION = (2018, 2)
