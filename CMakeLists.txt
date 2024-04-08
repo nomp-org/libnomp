@@ -72,14 +72,11 @@ set_target_properties(nomp PROPERTIES
   SOVERSION 1
   PUBLIC_HEADER include/nomp.h)
 target_include_directories(nomp PRIVATE include ${CMAKE_BINARY_DIR}/include)
-target_compile_options(nomp PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
-  $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic>)
+target_compile_options(nomp PRIVATE $<$<C_COMPILER_ID:MSVC>:/W4 /WX>
+  $<$<NOT:$<C_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic>)
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 target_link_libraries(nomp PRIVATE Python3::Python)
-
-find_package(OpenSSL REQUIRED)
-target_link_libraries(nomp PRIVATE OpenSSL::SSL)
 
 find_package(SymEngine REQUIRED)
 target_include_directories(nomp PRIVATE ${SYMENGINE_INCLUDE_DIRS})
