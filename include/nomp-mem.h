@@ -33,7 +33,7 @@ inline static void nomp_free_(void **p) { free(*p), *p = NULL; }
  * @param p Address of the pointer to the memory to deallocate.
  * @return void
  */
-#define nomp_free(p) nomp_free_((void **)p)
+#define nomp_free(p) nomp_free_((void **)(p))
 
 inline static void *nomp_calloc_(size_t count, size_t size, const char *file,
                                  unsigned line) {
