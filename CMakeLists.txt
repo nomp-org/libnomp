@@ -140,7 +140,7 @@ endif()
 find_program(PYLINT NAMES pylint)
 if (PYLINT)
   add_custom_target(pylint
-    COMMAND ${PYLINT} ${CMAKE_SOURCE_DIR} --recursive yes --rcfile=${CMAKE_SOURCE_DIR}/.pylintrc
+    COMMAND ${PYLINT} ${CMAKE_SOURCE_DIR} --recursive yes --rcfile=${CMAKE_SOURCE_DIR}/pyproject.toml
     COMMENT "Running pylint ...")
 endif()
 

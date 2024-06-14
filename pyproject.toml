@@ -10,3 +10,10 @@ skip_glob = ['build/*', 'docs/*']
 line_length = 80
 preview = true
 exclude = 'build/|docs/'
+
+[tool.pylint.master]
+ignore = "build,docs"
+fail-under = 9.93
+
+[tool.pylint.format]
+max-line-length = 80
