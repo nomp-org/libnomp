@@ -3,6 +3,7 @@
 #define CL_TARGET_OPENCL_VERSION 220
 #ifdef __APPLE__
 #include <OpenCL/cl.h>
+#define clCreateCommandQueueWithProperties clCreateCommandQueue
 #else
 #include <CL/cl.h>
 #endif

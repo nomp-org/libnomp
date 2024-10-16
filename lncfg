@@ -127,7 +127,7 @@ cmake -B "${NOMP_BUILD_DIR}" -S "${NOMP_SOURCE_DIR}" "${NOMP_CMAKE_OPTS[@]}"
 
 if [[ $? -eq 0 ]]; then
   echo "${green}Successfully created build files for libnomp${reset}."
-  echo "To install libnomp, either execute ${cyan}./lnbuild${reset} or" \
+  echo "To install libnomp, either execute ${cyan}./lnbuild --install${reset} or" \
     "execute the command: ${cyan}cmake --build ${NOMP_BUILD_DIR} --target" \
     "install${reset}."
   exit 0

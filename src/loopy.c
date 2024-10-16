@@ -202,7 +202,7 @@ int nomp_py_realize_reduction(PyObject **kernel, const char *const variable,
  */
 int nomp_py_transform(PyObject **kernel, const char *const file,
                       const char *function, const PyObject *const context) {
-  // If either file, or function are NULL, we don't have to do anything:
+  // If either file or function is NULL, we don't have to do anything.
   if (file == NULL || function == NULL) return 0;
 
   PyObject *py_module = PyImport_ImportModule(file);
@@ -297,7 +297,7 @@ int nomp_py_set_annotate_func(PyObject **annotate_func, const char *file) {
   if (file == NULL || strlen(file) == 0) return 0;
 
   PyObject *py_module = PyImport_ImportModule(file);
-  check_py_call(py_module, "Importing python module failed.");
+  check_py_call(py_module, "Importing python module \"%s\" failed.", file);
 
   PyObject *py_func = PyObject_GetAttrString(py_module, "annotate");
   check_py_call(py_func, "Failed to find annotate function in file \"%s\".",
