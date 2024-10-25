@@ -12,8 +12,7 @@ foreach(test_src ${TESTS})
     target_compile_options(${test_exe} PRIVATE -fsanitize=address)
     target_link_options(${test_exe} PRIVATE -fsanitize=address)
   endif()
-  install (TARGETS ${test_exe} RUNTIME DESTINATION
-    ${CMAKE_INSTALL_PREFIX}/tests)
+  install(TARGETS ${test_exe} RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/tests)
 endforeach()
 
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/tests/ DESTINATION

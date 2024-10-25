@@ -67,11 +67,10 @@ if (ENABLE_HIP)
 endif()
 
 add_library(nomp SHARED ${SOURCES})
-set_target_properties(nomp PROPERTIES
-  VERSION ${PROJECT_VERSION}
-  SOVERSION 1
-  PUBLIC_HEADER include/nomp.h)
-target_include_directories(nomp PRIVATE include ${CMAKE_BINARY_DIR}/include)
+set_target_properties(nomp PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION 1)
+target_include_directories(nomp
+  PUBLIC $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>
+  PRIVATE ${PROJECT_SOURCE_DIR}/include ${CMAKE_BINARY_DIR}/include)
 target_compile_options(nomp PRIVATE $<$<C_COMPILER_ID:MSVC>:/W4 /WX>
   $<$<NOT:$<C_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic>)
 
@@ -174,8 +173,18 @@ if (FLAKE8)
     COMMENT "Running flake8 ...")
 endif()
 
-install(TARGETS nomp LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+install(TARGETS nomp EXPORT nomp-targets
+  LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
   PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
+
+install(EXPORT nomp-targets FILE nomp-targets.cmake NAMESPACE nomp::
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/nomp)
+include(CMakePackageConfigHelpers)
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/nomp-config.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/nomp-config.cmake
+  INSTALL_DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/nomp)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/nomp-config.cmake
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/nomp)
 
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/python DESTINATION ${CMAKE_INSTALL_PREFIX})
 
