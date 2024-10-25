@@ -1,8 +1,8 @@
 Introduction
 ============
 
-nomp: A Framework For Creating Domain Specific Compilers For C
---------------------------------------------------------------
+nomp: A Framework for Domain-Specific Compiler Creation
+-------------------------------------------------------
 
 `nomp` (Originally a recursive acronym: "Nomp isn't OpenMP") is a framework
 for creating domain specific compilers and a runtime or C programming language
