@@ -9,10 +9,8 @@
 
 #define reset_env(VAR, ENVVAR)                                                 \
   {                                                                            \
-    if (VAR)                                                                   \
-      setenv(ENVVAR, VAR, 1);                                                  \
-    else                                                                       \
-      unsetenv(ENVVAR);                                                        \
+    if (VAR) setenv(ENVVAR, VAR, 1);                                           \
+    else unsetenv(ENVVAR);                                                     \
     nomp_free(&VAR);                                                           \
   }
 

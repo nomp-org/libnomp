@@ -144,10 +144,8 @@ static int backend_knl_run(nomp_backend_t *NOMP_UNUSED(bnd), nomp_prog_t *prg) {
   nomp_arg_t *args = prg->args;
   void       *vargs[NOMP_MAX_KERNEL_ARGS_SIZE];
   for (unsigned i = 0; i < prg->nargs; i++) {
-    if (args[i].type == NOMP_PTR)
-      vargs[i] = &args[i].ptr;
-    else
-      vargs[i] = args[i].ptr;
+    if (args[i].type == NOMP_PTR) vargs[i] = &args[i].ptr;
+    else vargs[i] = args[i].ptr;
   }
 
   const size_t          *global = prg->global, *local = prg->local;

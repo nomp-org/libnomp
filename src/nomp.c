@@ -359,8 +359,7 @@ int nomp_update(void *ptr, size_t idx0, size_t idx1, size_t unit_size,
   // Device memory object was released.
   if (mems[idx]->bptr == NULL) nomp_free(&mems[idx]);
   // Or new memory object got created.
-  else if (idx == mems_n)
-    mems_n++;
+  else if (idx == mems_n) mems_n++;
 
   return 0;
 }
