@@ -44,10 +44,8 @@ int nomp_host_side_reduction(nomp_backend_t *backend, nomp_prog_t *prg,
   if (op == NOMP_SUM) {
     switch (dom) {
     case NOMP_INT:
-      if (size == 4)
-        reduce_int_SUM((int *)out, (int *)m->hptr, prg->global[0]);
-      else
-        reduce_long_SUM((long *)out, (long *)m->hptr, prg->global[0]);
+      if (size == 4) reduce_int_SUM((int *)out, (int *)m->hptr, prg->global[0]);
+      else reduce_long_SUM((long *)out, (long *)m->hptr, prg->global[0]);
       break;
     case NOMP_UINT:
       if (size == 4)
@@ -60,8 +58,7 @@ int nomp_host_side_reduction(nomp_backend_t *backend, nomp_prog_t *prg,
     case NOMP_FLOAT:
       if (size == 4)
         reduce_float_SUM((float *)out, (float *)m->hptr, prg->global[0]);
-      else
-        reduce_double_SUM((double *)out, (double *)m->hptr, prg->global[0]);
+      else reduce_double_SUM((double *)out, (double *)m->hptr, prg->global[0]);
       break;
     }
   } else if (op == NOMP_PROD) {
@@ -69,8 +66,7 @@ int nomp_host_side_reduction(nomp_backend_t *backend, nomp_prog_t *prg,
     case NOMP_INT:
       if (size == 4)
         reduce_int_PROD((int *)out, (int *)m->hptr, prg->global[0]);
-      else
-        reduce_long_PROD((long *)out, (long *)m->hptr, prg->global[0]);
+      else reduce_long_PROD((long *)out, (long *)m->hptr, prg->global[0]);
       break;
     case NOMP_UINT:
       if (size == 4)
@@ -83,8 +79,7 @@ int nomp_host_side_reduction(nomp_backend_t *backend, nomp_prog_t *prg,
     case NOMP_FLOAT:
       if (size == 4)
         reduce_float_PROD((float *)out, (float *)m->hptr, prg->global[0]);
-      else
-        reduce_double_PROD((double *)out, (double *)m->hptr, prg->global[0]);
+      else reduce_double_PROD((double *)out, (double *)m->hptr, prg->global[0]);
       break;
     }
   }
