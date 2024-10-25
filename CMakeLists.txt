@@ -67,11 +67,10 @@ if (ENABLE_HIP)
 endif()
 
 add_library(nomp SHARED ${SOURCES})
-set_target_properties(nomp PROPERTIES
-  VERSION ${PROJECT_VERSION}
-  SOVERSION 1
-  PUBLIC_HEADER include/nomp.h)
-target_include_directories(nomp PRIVATE include ${CMAKE_BINARY_DIR}/include)
+set_target_properties(nomp PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION 1)
+target_include_directories(nomp
+  PUBLIC $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>
+  PRIVATE ${PROJECT_SOURCE_DIR}/include ${CMAKE_BINARY_DIR}/include)
 target_compile_options(nomp PRIVATE $<$<C_COMPILER_ID:MSVC>:/W4 /WX>
   $<$<NOT:$<C_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic>)
 
@@ -121,10 +120,10 @@ endif()
 find_program(CLANG_FORMAT NAMES clang-format)
 if (CLANG_FORMAT)
   add_custom_target(format
-    COMMAND ${CLANG_FORMAT} -i ${CMAKE_SOURCE_DIR}/*/*.[ch]
+    COMMAND ${CLANG_FORMAT} -i ${PROJECT_SOURCE_DIR}/*/*.[ch]
     COMMENT "Running clang-format ...")
   add_custom_target(format-check
-    COMMAND ${CLANG_FORMAT} --dry-run --Werror -i ${CMAKE_SOURCE_DIR}/*/*.[ch]
+    COMMAND ${CLANG_FORMAT} --dry-run --Werror -i ${PROJECT_SOURCE_DIR}/*/*.[ch]
     COMMENT "Running clang-format check ...")
 endif()
 
@@ -132,7 +131,7 @@ endif()
 find_program(CLANG_TIDY NAMES clang-tidy)
 if (CLANG_TIDY)
   add_custom_target(tidy
-    COMMAND ${CLANG_TIDY} -p ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/*/*.[ch]
+    COMMAND ${CLANG_TIDY} -p ${CMAKE_BINARY_DIR} ${PROJECT_SOURCE_DIR}/*/*.[ch]
     COMMENT "Running clang-tidy ...")
 endif()
 
@@ -140,18 +139,17 @@ endif()
 find_program(PYLINT NAMES pylint)
 if (PYLINT)
   add_custom_target(pylint
-    COMMAND ${PYLINT} ${CMAKE_SOURCE_DIR} --recursive yes --rcfile=${CMAKE_SOURCE_DIR}/pyproject.toml
+    COMMAND ${PYLINT} ${PROJECT_SOURCE_DIR} --recursive yes
+    --rcfile=${PROJECT_SOURCE_DIR}/pyproject.toml
     COMMENT "Running pylint ...")
 endif()
 
 # Add black as a custom target if available.
 find_program(BLACK NAMES black)
 if (BLACK)
-  add_custom_target(black
-    COMMAND ${BLACK} ${CMAKE_CURRENT_SOURCE_DIR}/
+  add_custom_target(black COMMAND ${BLACK} ${PROJECT_SOURCE_DIR}/
     COMMENT "Running black ...")
-  add_custom_target(black-check
-    COMMAND ${BLACK} --check ${CMAKE_CURRENT_SOURCE_DIR}/
+  add_custom_target(black-check COMMAND ${BLACK} --check ${PROJECT_SOURCE_DIR}/
     COMMENT "Running black check ...")
 endif()
 
@@ -159,10 +157,10 @@ endif()
 find_program(ISORT NAMES isort)
 if (ISORT)
   add_custom_target(isort
-    COMMAND ${ISORT} ${CMAKE_CURRENT_SOURCE_DIR}/
+    COMMAND ${ISORT} ${PROJECT_SOURCE_DIR}/
     COMMENT "Running isort ...")
   add_custom_target(isort-check
-    COMMAND ${ISORT} --check-only ${CMAKE_CURRENT_SOURCE_DIR}/
+    COMMAND ${ISORT} --check-only ${PROJECT_SOURCE_DIR}/
     COMMENT "Running isort check ...")
 endif()
 
@@ -170,18 +168,25 @@ endif()
 find_program(FLAKE8 NAMES flake8)
 if (FLAKE8)
   add_custom_target(flake8
-    COMMAND ${FLAKE8} ${CMAKE_CURRENT_SOURCE_DIR}/
+    COMMAND ${FLAKE8} ${PROJECT_SOURCE_DIR}/
     COMMENT "Running flake8 ...")
 endif()
 
-install(TARGETS nomp LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+install(TARGETS nomp EXPORT nomp-targets
+  LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
   PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/python DESTINATION ${CMAKE_INSTALL_PREFIX})
+
+install(EXPORT nomp-targets FILE nomp-targets.cmake NAMESPACE nomp::
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/nomp)
+include(CMakePackageConfigHelpers)
+configure_package_config_file(cmake/nomp-config.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/nomp-config.cmake
+  INSTALL_DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/nomp)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/nomp-config.cmake
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/nomp)
+
+install(DIRECTORY python DESTINATION ${CMAKE_INSTALL_PREFIX})
 
 install(DIRECTORY scripts/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
   FILE_PERMISSIONS OWNER_READ OWNER_EXECUTE OWNER_WRITE
   GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
-
-configure_file(nomp.pc.in nomp.pc @ONLY)
-install(FILES ${CMAKE_BINARY_DIR}/nomp.pc DESTINATION
-  ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
