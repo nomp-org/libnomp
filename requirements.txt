@@ -3,3 +3,4 @@ pymbolic==2024.2.2
 libclang==14.0.6
 pytools==2024.1.16
 symengine==0.13.0
+siphash24==1.7
