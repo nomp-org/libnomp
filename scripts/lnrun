@@ -117,7 +117,7 @@ function run_test() {
 
   echo -e "Running tests..."
   num_errors=0
-  cd "${NOMP_TEST_DIR}" &&
+  cd "${NOMP_TEST_DIR}"
   for t in $(ls  ${TESTS}); do
     echo " $t --nomp-backend ${NOMP_BACKEND} --nomp-device ${NOMP_DEVICE} \
       --nomp-platform ${NOMP_PLATFORM} --nomp-install-dir ${NOMP_INSTALL_DIR} \

@@ -14,6 +14,7 @@ on:
 env:
   NOMP_CONDA_ENV: /usr/share/miniconda/envs/libnomp
   NOMP_INSTALL_DIR: ${{ github.workspace }}/install
+  NOMP_VERBOSE: 1
   NOMP_CACHE_NUMBER: 0 # Increase to reset cache manually.
   POCL_CACHE_NUMBER: 0 # Increase to reset cache manually.
 jobs:
