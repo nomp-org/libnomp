@@ -124,8 +124,6 @@ int nomp_get_err_no(unsigned id) {
 /**
  * @ingroup nomp_log_utils
  * @brief Free variables used to keep track of logs.
- *
- * @return void
  */
 void nomp_log_finalize(void) {
   for (unsigned i = 0; i < logs_n; i++)
@@ -183,7 +181,6 @@ static unsigned find_time_log(const char *entry) {
  * @param[in] toggle Toggles the timer between tick (start of timing) and a tock
  * (end of timing).
  * @param[in] sync Execute nomp_sync when toggling off the timer.
- * @return void
  */
 void nomp_profile(const char *name, const int toggle, const int sync) {
   if (profile_level == 0) return;
@@ -233,8 +230,6 @@ void nomp_profile(const char *name, const int toggle, const int sync) {
  * @ingroup nomp_profiler_utils
  * @brief Prints all the execution times recorded by the program.
  * This function is executed only when the `--nomp-profile` is provided.
- *
- * @return int
  */
 void nomp_profile_result(void) {
   if (profile_level == 0) return;
@@ -254,8 +249,6 @@ void nomp_profile_result(void) {
 /**
  * @ingroup nomp_profiler_utils
  * @brief Free variables used to keep track of time logs.
- *
- * @return void
  */
 void nomp_profile_finalize(void) {
   for (unsigned i = 0; i < time_logs_n; i++)
