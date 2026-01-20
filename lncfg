@@ -70,7 +70,7 @@ while [ $# -gt 0 ]; do
   --cflags) shift && NOMP_C_FLAGS="${1}" ;;
   --build-type) shift && NOMP_BUILD_TYPE=${1} ;;
   --build-dir) shift && NOMP_BUILD_DIR=$(realpath "${1}") ;;
-  --install-prefix) shift && NOMP_INSTALL_DIR=$(realpath "${1}") ;;
+  --install-prefix) shift && NOMP_INSTALL_DIR="${1}" ;;
   --prefix-path) shift && NOMP_PREFIX_PATH="${1}" ;;
   --enable-hip) NOMP_ENABLE_HIP="ON" ;;
   --enable-cuda) NOMP_ENABLE_CUDA="ON" ;;
