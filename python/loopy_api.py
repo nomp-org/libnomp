@@ -791,22 +791,12 @@ def c_to_loopy(c_str: str, backend: str) -> lp.translation_unit.TranslationUnit:
         ),
     )
 
-    # FIXME: This could probably be done in a more pythonic way.
-    unique_domains = frozenset()
-    for domain in acc.domains:
-        new = True
-        for unique_domain in unique_domains:
-            if unique_domain == domain:
-                new = False
-                for i, j in zip(
-                    unique_domain.get_id_dict().keys(),
-                    domain.get_id_dict().keys(),
-                ):
-                    if i.get_name() != j.get_name():
-                        new = True
-                        break
-        if new:
-            unique_domains = unique_domains | {domain}
+    from constantdict import constantdict
+
+    unique_domains_x_var_dict = frozenset(
+        {(dom, constantdict(dom.get_var_dict())) for dom in acc.domains}
+    )
+    unique_domains = tuple(dom for (dom, _) in unique_domains_x_var_dict)
 
     knl = lp.make_kernel(
         unique_domains,
