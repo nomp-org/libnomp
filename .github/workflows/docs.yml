@@ -50,8 +50,8 @@ jobs:
       - name: Build documentation
         id: build_docs
         run: |
-          ./lncfg --install-prefix ${NOMP_INSTALL_DIR} --prefix-path ${CONDA_PREFIX} --enable-docs
-          ./lnbuild --install --update-shell
+          ./bin/build --install-dir ${NOMP_INSTALL_DIR} --enable-docs \
+          -DCMAKE_PREFIX_PATH=${CONDA_PREFIX}
       - name: Bypass Jekyll
         id: bypass_jekyll
         if: ${{ fromJSON(env.PUSH_ON_MAIN) }}
