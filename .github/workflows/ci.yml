@@ -65,12 +65,8 @@ jobs:
       - name: Build libnomp
         id: build_libnomp
         run: |
-          ./lncfg --cc ${CC} \
-            --install-prefix ${NOMP_INSTALL_DIR} \
-            --prefix-path ${CONDA_PREFIX} \
-            --enable-opencl --opencl-lib ${CONDA_PREFIX}/lib/libOpenCL.so \
+          ./bin/build --enable-opencl --opencl-lib ${CONDA_PREFIX}/lib/libOpenCL.so \
             --enable-tests
-          ./lnbuild --install
       - name: Run libnomp tests
         id: run_libnomp
         run: |

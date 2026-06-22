@@ -2,6 +2,7 @@
 
 # Check for nomp environment variables.
 : ${NOMP_BUILD_DIR:=${PWD}/build}
+: ${NOMP_INSTALL_DIR:=${PWD}/install}
 : ${NOMP_TARGET:=install}
 : ${NOMP_ENABLE_OPENCL:="OFF"}
 : ${NOMP_OPENCL_LIBRARY:=""}
@@ -20,12 +21,14 @@ reset=$(tput sgr0)
 
 # Print the options.
 function print_help() {
-  echo -e "Usage: ${0} [--help] [--build-dir <build_dir>] [--target <cmake_target>] " \
+  echo -e "Usage: ${0} [--help] [--build-dir <build_dir>] " \
+    "[--install-dir <install_dir>] [--target <cmake_target>] " \
     "[--enable-opencl] [--opencl-lib <opencl_lib_path>] " \
     "[--opencl-headers <opencl_header_path>] [--enable-hip] [--enable-cuda] " \
     "[--enable-docs] [--enable-tests] [--enable-asan]\n\n" \
     "${cyan}--help          ${reset}\tPrint this help and exit.\n" \
     "${cyan}--build-dir     ${reset}\tBuild directory.\n" \
+    "${cyan}--install-dir   ${reset}\tInstall directory.\n" \
     "${cyan}--target        ${reset}\tCMake target to execute.\n" \
     "${cyan}--enable-opencl ${reset}\tBuild with OpenCL backend" \
     "${cyan}--opencl-lib    ${reset}\tOpenCL library path.\n" \
@@ -44,6 +47,7 @@ while [ $# -gt 0 ]; do
   case $1 in
   --help) print_help ;;
   --build-dir) shift && NOMP_BUILD_DIR=$1 ;;
+  --install-dir) shift && NOMP_INSTALL_DIR=$1 ;;
   --target) shift && NOMP_TARGET=$1 ;;
   --enable-opencl) NOMP_ENABLE_OPENCL="ON" ;;
   --opencl-lib) shift && NOMP_OPENCL_LIBRARY=$(realpath "$1") ;;
@@ -60,6 +64,7 @@ done
 
 # Update the cmake options.
 NOMP_CMAKE_OPTS=("-S ${PWD} -B ${NOMP_BUILD_DIR}")
+NOMP_CMAKE_OPTS+=("-DCMAKE_INSTALL_PREFIX=${NOMP_INSTALL_DIR}")
 NOMP_CMAKE_OPTS+=("-DENABLE_HIP=${NOMP_ENABLE_HIP}")
 NOMP_CMAKE_OPTS+=("-DENABLE_CUDA=${NOMP_ENABLE_CUDA}")
 NOMP_CMAKE_OPTS+=("-DENABLE_OPENCL=${NOMP_ENABLE_OPENCL}")
