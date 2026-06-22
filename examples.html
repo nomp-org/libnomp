@@ -117,11 +117,11 @@ function that is called by <cite>libnomp</cite> during the creation of accelerat
 This file has the loopy transformations that are applied to the kernel.</p>
 <div class="literal-block-wrapper docutils container" id="id2">
 <div class="code-block-caption"><span class="caption-text">transforms.py</span><a class="headerlink" href="#id2" title="Permalink to this code"></a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">loopy</span> <span class="k">as</span> <span class="nn">lp</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">loopy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">lp</span>
 
 <span class="n">LOOPY_LANG_VERSION</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2018</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="n">knl</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">foo</span><span class="p">(</span><span class="n">knl</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
     <span class="p">(</span><span class="n">iname</span><span class="p">,)</span> <span class="o">=</span> <span class="n">knl</span><span class="o">.</span><span class="n">default_entrypoint</span><span class="o">.</span><span class="n">all_inames</span><span class="p">()</span>
     <span class="n">i_inner</span><span class="p">,</span> <span class="n">i_outer</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">iname</span><span class="si">}</span><span class="s2">_inner&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">iname</span><span class="si">}</span><span class="s2">_outer&quot;</span>
     <span class="n">knl</span> <span class="o">=</span> <span class="n">lp</span><span class="o">.</span><span class="n">split_iname</span><span class="p">(</span>
