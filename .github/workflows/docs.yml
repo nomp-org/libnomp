@@ -40,7 +40,13 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ env.NOMP_CONDA_ENV }}
-          key:  conda-${{ runner.os }}-${{ hashFiles('environment-dev.yml') }}-${{ hashFiles('requirements.txt') }}-${{ hashFiles('requirements-dev.txt') }}-${{ env.NOMP_CACHE_NUMBER }}
+          key: >-
+            conda-
+            ${{ runner.os }}-
+            ${{ hashFiles('environment-dev.yml') }}-
+            ${{ hashFiles('requirements.txt') }}-
+            ${{ hashFiles('requirements-dev.txt') }}-
+            ${{ env.NOMP_CACHE_NUMBER }}
         id: cache
       - name: Update conda environment
         id: update_env
@@ -50,7 +56,7 @@ jobs:
       - name: Build documentation
         id: build_docs
         run: |
-          ./bin/build --install-dir ${NOMP_INSTALL_DIR} --enable-docs \
+          ./bin/lnbld --install-dir ${NOMP_INSTALL_DIR} --enable-docs \
           -DCMAKE_PREFIX_PATH=${CONDA_PREFIX}
       - name: Bypass Jekyll
         id: bypass_jekyll
