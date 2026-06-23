@@ -116,63 +116,6 @@ if (ENABLE_TESTS)
   add_subdirectory(tests)
 endif()
 
-# Add clang-format as a custom target if available.
-find_program(CLANG_FORMAT NAMES clang-format)
-if (CLANG_FORMAT)
-  add_custom_target(format
-    COMMAND ${CLANG_FORMAT} -i ${CMAKE_SOURCE_DIR}/*/*.[ch]
-    COMMENT "Running clang-format ...")
-  add_custom_target(format-check
-    COMMAND ${CLANG_FORMAT} --dry-run --Werror -i ${CMAKE_SOURCE_DIR}/*/*.[ch]
-    COMMENT "Running clang-format check ...")
-endif()
-
-# Add clang-tidy as a custom target if available.
-find_program(CLANG_TIDY NAMES clang-tidy)
-if (CLANG_TIDY)
-  add_custom_target(tidy
-    COMMAND ${CLANG_TIDY} -p ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/*/*.[ch]
-    COMMENT "Running clang-tidy ...")
-endif()
-
-# Add pylint as a custom target if available.
-find_program(PYLINT NAMES pylint)
-if (PYLINT)
-  add_custom_target(pylint
-    COMMAND ${PYLINT} ${CMAKE_SOURCE_DIR} --recursive yes --rcfile=${CMAKE_SOURCE_DIR}/pyproject.toml
-    COMMENT "Running pylint ...")
-endif()
-
-# Add black as a custom target if available.
-find_program(BLACK NAMES black)
-if (BLACK)
-  add_custom_target(black
-    COMMAND ${BLACK} ${CMAKE_CURRENT_SOURCE_DIR}/
-    COMMENT "Running black ...")
-  add_custom_target(black-check
-    COMMAND ${BLACK} --check ${CMAKE_CURRENT_SOURCE_DIR}/
-    COMMENT "Running black check ...")
-endif()
-
-# Add isort as a custom target if available.
-find_program(ISORT NAMES isort)
-if (ISORT)
-  add_custom_target(isort
-    COMMAND ${ISORT} ${CMAKE_CURRENT_SOURCE_DIR}/
-    COMMENT "Running isort ...")
-  add_custom_target(isort-check
-    COMMAND ${ISORT} --check-only ${CMAKE_CURRENT_SOURCE_DIR}/
-    COMMENT "Running isort check ...")
-endif()
-
-# Add flake8 as a custom target if available.
-find_program(FLAKE8 NAMES flake8)
-if (FLAKE8)
-  add_custom_target(flake8
-    COMMAND ${FLAKE8} ${CMAKE_CURRENT_SOURCE_DIR}/
-    COMMENT "Running flake8 ...")
-endif()
-
 install(TARGETS nomp LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
   PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/python DESTINATION ${CMAKE_INSTALL_PREFIX})
