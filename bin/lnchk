@@ -7,35 +7,23 @@ set -o pipefail
 ############################
 # Don't touch what follows #
 ############################
-
 CSRC=
-PYSRC=
 
-function setup_clang_format() {
-  if ! command -v $CLANG_FORMAT >/dev/null 2>&1; then
-    echo "Binary $CLANG_FORMAT not found!"
-    exit 1
-  fi
+if ! command -v $CLANG_FORMAT >/dev/null 2>&1; then
+  echo "Binary $CLANG_FORMAT not found!"
+  exit 1
+fi
 
-  BINDIR=$(dirname -- "$(realpath -- "${BASH_SOURCE[0]}")")
-  SRCDIR=$BINDIR/..
-  CSRC=$(find $SRCDIR -type f -name "*.[ch]")
-}
-
-function clang_format() {
-  setup_clang_format
-  $CLANG_FORMAT -i $CSRC
-}
-
-function check_clang_format() {
-  setup_clang_format
-  $CLANG_FORMAT --dry-run --Werror -i $CSRC
-}
+BINDIR=$(dirname -- "$(realpath -- "${BASH_SOURCE[0]}")")
+CSRC=$(find $BINDIR/.. -type f -name "*.[ch]")
 
 if [[ "$1" == "--fmt" ]]; then
-  clang_format
+  $CLANG_FORMAT -i $CSRC
+  ruff format .
 elif [[ "$1" == "--chk-fmt" ]]; then
-  check_clang_format
+  $CLANG_FORMAT --dry-run --Werror -i $CSRC
+  ruff format --check .
+  ruff check .
 else
   exit 1
 fi
