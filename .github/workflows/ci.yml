@@ -36,7 +36,6 @@ jobs:
         uses: mxschmitt/action-tmate@v3.13
         if: ${{ inputs.debug_enabled }}
       - name: Setup conda environment
-        id: setup_conda
         uses: conda-incubator/setup-miniconda@v2
         with:
           activate-environment: libnomp
@@ -46,9 +45,13 @@ jobs:
         id: cache
         with:
           path: ${{ env.NOMP_CONDA_ENV }}
-          key:  conda-${{ runner.os }}-${{ hashFiles('environment.yml') }}-${{ hashFiles('requirements.txt') }}-${{ env.NOMP_CACHE_NUMBER }}
+          key: >-
+            conda-
+            ${{ runner.os }}-
+            ${{ hashFiles('environment.yml') }}-
+            ${{ hashFiles('requirements.txt') }}-
+            ${{ env.NOMP_CACHE_NUMBER }}
       - name: Update conda environment
-        id: update_env
         run: |
           conda env update -n libnomp -f environment.yml
         if: steps.cache.outputs.cache-hit != 'true'
@@ -58,17 +61,16 @@ jobs:
           path: ${{ env.NOMP_CONDA_ENV }}/lib/pocl
           key:  ${{ runner.os }}-build-pocl-${{ env.POCL_CACHE_NUMBER }}
       - name: Install pocl
-        id: install_pocl
         run: |
           conda install -c conda-forge pocl
-        if: (steps.pocl_cache.outputs.cache-hit != 'true') || (steps.cache.outputs.cache-hit != 'true')
+        if: >-
+          steps.pocl_cache.outputs.cache-hit != 'true' ||
+          steps.cache.outputs.cache-hit != 'true'
       - name: Build libnomp
-        id: build_libnomp
         run: |
-          ./bin/build --enable-opencl --opencl-lib ${CONDA_PREFIX}/lib/libOpenCL.so \
+          ./bin/lnbld --enable-opencl --opencl-lib ${CONDA_PREFIX}/lib/libOpenCL.so \
             --enable-tests
       - name: Run libnomp tests
-        id: run_libnomp
         run: |
           ${NOMP_INSTALL_DIR}/bin/lnrun --test backend=opencl
       - name: Block to allow inspecting failures
