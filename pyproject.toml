@@ -1,15 +1,15 @@
-[tool.isort]
-multi_line_output = 3
-include_trailing_comma = true
-force_grid_wrap = 0
-use_parentheses = true
-line_length = 80
-skip_glob = ['build/*', 'docs/*']
+[tool.ruff]
+line-length = 80
+exclude = ["build", "docs"]
 
-[tool.black]
-line_length = 80
-preview = true
-exclude = 'build/|docs/'
+[tool.ruff.lint]
+# Equivalent to the old flake8 rules + isort (I = isort, E/W = pycodestyle, F = pyflakes)
+select = ["E", "F", "W", "I"]
+
+[tool.ruff.lint.isort]
+# Matches the old isort settings
+force-wrap-aliases = false
+combine-as-imports = false
 
 [tool.pylint.master]
 ignore = "build,docs"
