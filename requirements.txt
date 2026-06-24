@@ -1,4 +1,4 @@
-loopy==2025.2
+loopy==2025.1
 pymbolic==2025.1
 libclang==14.0.6
 pytools==2025.2.2
