@@ -124,19 +124,16 @@ statement in the body, use braces for all the branches like below:</p>
 </section>
 <section id="formatting-files-before-committing">
 <h2>Formatting files before committing<a class="headerlink" href="#formatting-files-before-committing" title="Permalink to this heading"></a></h2>
-<p>Run <cite>clang-format</cite> before committing any changes you make on the source files.
-<cite>clang-format</cite> will be available if you install the dev dependencies with conda.
-Run <cite>clang-format</cite> as follows:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>clang-format<span class="w"> </span>-i<span class="w"> </span>**/*.<span class="o">[</span>ch<span class="o">]</span>
+<p>Run <cite>lnchk –fmt</cite> before committing any changes you make to the source files.
+This formats all C source files with <cite>clang-format</cite> and all python files with
+<cite>ruff</cite>. Both tools will be available if you install the dev dependencies with
+conda.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./bin/lnchk<span class="w"> </span>--fmt
 </pre></div>
 </div>
-<p>If you change any python files, please use <cite>black</cite> and <cite>isort</cite> to format the
-python code and then check with <cite>flake8</cite> before committing. <cite>black</cite>, <cite>isort</cite>
-and <cite>flake8</cite>  will be available if you install the dev dependencies with
-conda.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>black<span class="w"> </span>.
-isort<span class="w"> </span>.
-flake8
+<p>To only check the formatting (and run the <cite>ruff</cite> linter) without modifying any
+files, use <cite>lnchk –chk-fmt</cite>. This is the same check that is run in CI.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./bin/lnchk<span class="w"> </span>--chk-fmt
 </pre></div>
 </div>
 </section>
@@ -166,13 +163,13 @@ As a prerequisite you have to install the <cite>gdbserver</cite> which you can i
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>gdbserver
 </pre></div>
 </div>
-<p>Use <code class="code docutils literal notranslate"><span class="pre">lnrun</span> <span class="pre">debug</span></code> command to host the debugging session. If you want to debug the
-test case <cite>nomp-api-200</cite>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lnrun<span class="w"> </span>debug<span class="w"> </span>api-200
+<p>Use the <code class="code docutils literal notranslate"><span class="pre">lnrun</span> <span class="pre">--debug</span></code> command to host the debugging session. If you want
+to debug the test case <cite>nomp-api-200</cite>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lnrun<span class="w"> </span>--debug<span class="w"> </span>api-200
 </pre></div>
 </div>
 <p>Additionally, you can set the port and the target device for the specific session.
-You can view the available options by <code class="code docutils literal notranslate"><span class="pre">lnrun</span> <span class="pre">help</span> <span class="pre">debug</span></code>.</p>
+You can view the available options by <code class="code docutils literal notranslate"><span class="pre">lnrun</span> <span class="pre">--help</span> <span class="pre">debug</span></code>.</p>
 <p>By default the test starts on <cite>localhost:5005</cite>, and a debug viewer should be connected
 to this target address. For example, the following figure shows how clion connects to
 the test case using remote debug.</p>

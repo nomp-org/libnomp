@@ -52,24 +52,21 @@ instead of:
 Formatting files before committing
 ----------------------------------
 
-Run `clang-format` before committing any changes you make on the source files.
-`clang-format` will be available if you install the dev dependencies with conda.
-Run `clang-format` as follows:
-
-.. code-block:: bash
-
-    clang-format -i **/*.[ch]
-
-If you change any python files, please use `black` and `isort` to format the
-python code and then check with `flake8` before committing. `black`, `isort`
-and `flake8`  will be available if you install the dev dependencies with
+Run `lnchk --fmt` before committing any changes you make to the source files.
+This formats all C source files with `clang-format` and all python files with
+`ruff`. Both tools will be available if you install the dev dependencies with
 conda.
 
 .. code-block:: bash
 
-    black .
-    isort .
-    flake8
+    ./bin/lnchk --fmt
+
+To only check the formatting (and run the `ruff` linter) without modifying any
+files, use `lnchk --chk-fmt`. This is the same check that is run in CI.
+
+.. code-block:: bash
+
+    ./bin/lnchk --chk-fmt
 
 Debugging github actions
 ------------------------
@@ -105,15 +102,15 @@ As a prerequisite you have to install the `gdbserver` which you can install with
 
     sudo apt install gdbserver
 
-Use :code:`lnrun debug` command to host the debugging session. If you want to debug the
-test case `nomp-api-200`:
+Use the :code:`lnrun --debug` command to host the debugging session. If you want
+to debug the test case `nomp-api-200`:
 
 .. code-block:: bash
 
-    lnrun debug api-200
+    lnrun --debug api-200
 
 Additionally, you can set the port and the target device for the specific session.
-You can view the available options by :code:`lnrun help debug`.
+You can view the available options by :code:`lnrun --help debug`.
 
 By default the test starts on `localhost:5005`, and a debug viewer should be connected
 to this target address. For example, the following figure shows how clion connects to
