@@ -6,7 +6,7 @@ copyright = "2022, nomp-org"
 author = "nomp-org"
 
 # -- General configuration ---------------------------------------------------
-extensions = ["breathe"]
+extensions = ["breathe", "sphinx_copybutton"]
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 

@@ -10,6 +10,5 @@ and use libnomp on [nomp-org website](https://nomp-org.github.io/libnomp/).
 While `libnomp` can be used as a standalone C library, it is intended to be used
 with the clang based compiler front-end [nompcc](https://github.com/nomp-org/llvm-project)
 to easily build HPC applications using a pragma based programming model without
-having to directly use `libnomp` C API.
-
-`libnomp` and `nompcc` together form the `nomp` compiler framework.
+having to directly use `libnomp` C API. `libnomp` and `nompcc` together form the
+`nomp` compiler framework.
