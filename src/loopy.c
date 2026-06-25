@@ -6,11 +6,92 @@ static char      backend[NOMP_MAX_BUFFER_SIZE + 1];
 static PyObject *py_backend_str               = NULL;
 static PyObject *py_pymbolic_to_symengine_str = NULL;
 
+/**
+ * Fetch the currently set Python exception (if any) and format it, including
+ * the traceback, into a heap allocated C-string. Returns NULL when no Python
+ * exception is set. The caller is responsible for freeing the returned string
+ * with nomp_free(). This consumes (clears) the Python error indicator.
+ */
+static char *nomp_py_err_str(void) {
+  if (!PyErr_Occurred()) return NULL;
+
+  PyObject *type, *value, *traceback;
+  PyErr_Fetch(&type, &value, &traceback);
+  PyErr_NormalizeException(&type, &value, &traceback);
+
+  char *result = NULL;
+
+  // Prefer traceback.format_exception() for a full, Python-like traceback.
+  PyObject *py_tb_module = PyImport_ImportModule("traceback");
+  if (py_tb_module) {
+    PyObject *py_format =
+        PyObject_GetAttrString(py_tb_module, "format_exception");
+    if (py_format) {
+      PyObject *py_lines = PyObject_CallFunctionObjArgs(
+          py_format, type ? type : Py_None, value ? value : Py_None,
+          traceback ? traceback : Py_None, NULL);
+      if (py_lines) {
+        PyObject *py_sep    = PyUnicode_FromString("");
+        PyObject *py_joined = PyUnicode_Join(py_sep, py_lines);
+        if (py_joined) {
+          const char *str = PyUnicode_AsUTF8(py_joined);
+          if (str) result = strndup(str, BUFSIZ);
+          Py_DECREF(py_joined);
+        }
+        Py_XDECREF(py_sep), Py_DECREF(py_lines);
+      }
+      Py_DECREF(py_format);
+    }
+    Py_DECREF(py_tb_module);
+  }
+
+  // Fall back to str(value) if traceback formatting was unavailable.
+  if (!result && value) {
+    PyObject *py_str = PyObject_Str(value);
+    if (py_str) {
+      const char *str = PyUnicode_AsUTF8(py_str);
+      if (str) result = strndup(str, BUFSIZ);
+      Py_DECREF(py_str);
+    }
+  }
+
+  // Clear any error raised while formatting the exception above.
+  PyErr_Clear();
+  Py_XDECREF(type), Py_XDECREF(value), Py_XDECREF(traceback);
+
+  return result;
+}
+
+/**
+ * Log a libnomp error, appending the active Python exception and its traceback
+ * (if any) to the message. \p file and \p line are forwarded from the call site
+ * so the recorded log points at the failing C call, not this helper. Used via
+ * the check_*() macros below; returns the log id from nomp_log_().
+ */
+static int nomp_py_log_(int errorno, const char *file, unsigned line,
+                        const char *fmt, ...) {
+  char    buf[BUFSIZ];
+  va_list args;
+  va_start(args, fmt);
+  vsnprintf(buf, BUFSIZ, fmt, args);
+  va_end(args);
+
+  char *py_err = nomp_py_err_str();
+  if (py_err) {
+    char full[BUFSIZ];
+    snprintf(full, BUFSIZ, "%s Python traceback:\n%s", buf, py_err);
+    nomp_free(&py_err);
+    // Pass the composed message through a "%s" format so any '%' characters
+    // in the Python traceback are not interpreted as conversions.
+    return nomp_log_("%s", errorno, NOMP_ERROR, file, line, full);
+  }
+
+  return nomp_log_("%s", errorno, NOMP_ERROR, file, line, buf);
+}
+
 #define check_error_(obj, err, ...)                                            \
   {                                                                            \
-    if (!obj)                                                                  \
-      return nomp_log(err, NOMP_ERROR,                                         \
-                      NOMP_FIRST(__VA_ARGS__) NOMP_REST(__VA_ARGS__));         \
+    if (!(obj)) return nomp_py_log_(err, __FILE__, __LINE__, __VA_ARGS__);     \
   }
 
 #define check_py_str(obj, str)                                                 \
