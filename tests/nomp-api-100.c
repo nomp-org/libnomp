@@ -124,6 +124,30 @@ static int test_syntax_error_in_transform_function(void) {
   return 0;
 }
 
+// When a transform function raises a Python exception, the nomp error log
+// should include the Python traceback (e.g. the raised NameError).
+static int test_python_traceback_in_log(void) {
+  const char *clauses[4] = {"transform", "nomp_api_100",
+                            "function_with_syntax_error", 0};
+
+  static int id = -1;
+  int err = nomp_jit(&id, valid_knl, clauses, 2, "a", sizeof(int), NOMP_PTR,
+                     "N", sizeof(int), NOMP_INT);
+  nomp_test_assert(nomp_get_err_no(err) == NOMP_PY_CALL_FAILURE);
+
+  char *log = nomp_get_err_str(err);
+  // The nomp message is followed by the captured Python traceback. The
+  // offending line `return kn` raises a NameError, which must appear in
+  // the log along with the traceback header.
+  int eq = logcmp(log, "Python traceback:") &&
+           logcmp(log, "Traceback (most recent call last):") &&
+           logcmp(log, "NameError");
+  nomp_free(&log);
+  nomp_test_assert(eq);
+
+  return 0;
+}
+
 int main(int argc, const char *argv[]) {
   nomp_test_check(nomp_init(argc, argv));
 
@@ -135,6 +159,7 @@ int main(int argc, const char *argv[]) {
   err |= SUBTEST(test_empty_user_callback);
   err |= SUBTEST(test_syntax_error_in_kernel);
   err |= SUBTEST(test_syntax_error_in_transform_function);
+  err |= SUBTEST(test_python_traceback_in_log);
 
   nomp_test_check(nomp_finalize());
 
