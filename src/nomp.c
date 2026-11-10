@@ -40,57 +40,86 @@ static inline int nomp_check_cmd_line_aux(const unsigned i, const unsigned argc,
   return 0;
 }
 
-static inline int nomp_check_cmd_line(nomp_config_t *const cfg, unsigned argc,
-                                      const char **argv) {
-  if (argc <= 1 || argv == NULL) return 0;
+#define NOMP_OPTION_PREFIX "--nomp-"
+#define NOMP_OPTION_PREFIX_LEN 7
 
-  for (unsigned i = 0; i < argc;) {
-    if (strncmp("--nomp", argv[i++], 6)) continue;
+static inline int nomp_is_option(const char *arg) {
+  return arg != NULL &&
+         strncmp(arg, NOMP_OPTION_PREFIX, NOMP_OPTION_PREFIX_LEN) == 0;
+}
 
-    nomp_check(nomp_check_cmd_line_aux(i, argc, argv));
+static inline int nomp_check_cmd_line(nomp_config_t *const cfg, int *argc,
+                                      const char ***argv) {
+  if (argc == NULL || argv == NULL || *argv == NULL || *argc <= 1) return 0;
+
+  const int argc_orig = *argc;
+
+  // Pass 1: make sure every libnomp option is followed by a value. Nothing is
+  // written here so that *argc and *argv are left untouched on error.
+  for (int i = 0; i < argc_orig; i++) {
+    if (!nomp_is_option((*argv)[i])) continue;
+    nomp_check(nomp_check_cmd_line_aux(i + 1, argc_orig, *argv));
+    i++;
+  }
+
+  // Pass 2: process libnomp options and compact the remaining arguments towards
+  // the front of argv while preserving their relative order.
+  int kept = 0;
+  for (int i = 0; i < argc_orig; i++) {
+    const char *flag = (*argv)[i];
+    if (!nomp_is_option(flag)) {
+      (*argv)[kept++] = flag;
+      continue;
+    }
+
+    // Every libnomp option (including unknown ones) consumes the next argument
+    // as its value. Pass 1 guarantees that the value exists.
+    const char *value = (*argv)[++i];
 
     int valid = 0;
-    if (!strncmp("--nomp-install-dir", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
-      strncpy(cfg->install_dir, argv[i], PATH_MAX), valid = 1;
+    if (!strncmp("--nomp-install-dir", flag, NOMP_MAX_BUFFER_SIZE))
+      strncpy(cfg->install_dir, value, PATH_MAX), valid = 1;
 
-    if (!strncmp("--nomp-backend", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
-      strncpy(cfg->backend, argv[i], NOMP_MAX_BUFFER_SIZE), valid = 1;
+    if (!strncmp("--nomp-backend", flag, NOMP_MAX_BUFFER_SIZE))
+      strncpy(cfg->backend, value, NOMP_MAX_BUFFER_SIZE), valid = 1;
 
-    if (!strncmp("--nomp-platform", argv[i - 1], NOMP_MAX_BUFFER_SIZE)) {
-      cfg->platform = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE);
+    if (!strncmp("--nomp-platform", flag, NOMP_MAX_BUFFER_SIZE)) {
+      cfg->platform = nomp_str_toui(value, NOMP_MAX_BUFFER_SIZE);
       valid         = 1;
     }
 
-    if (!strncmp("--nomp-device", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
-      cfg->device = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE), valid = 1;
+    if (!strncmp("--nomp-device", flag, NOMP_MAX_BUFFER_SIZE))
+      cfg->device = nomp_str_toui(value, NOMP_MAX_BUFFER_SIZE), valid = 1;
 
-    if (!strncmp("--nomp-verbose", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
-      cfg->verbose = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE), valid = 1;
+    if (!strncmp("--nomp-verbose", flag, NOMP_MAX_BUFFER_SIZE))
+      cfg->verbose = nomp_str_toui(value, NOMP_MAX_BUFFER_SIZE), valid = 1;
 
-    if (!strncmp("--nomp-profile", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
-      cfg->profile = nomp_str_toui(argv[i], NOMP_MAX_BUFFER_SIZE), valid = 1;
+    if (!strncmp("--nomp-profile", flag, NOMP_MAX_BUFFER_SIZE))
+      cfg->profile = nomp_str_toui(value, NOMP_MAX_BUFFER_SIZE), valid = 1;
 
-    if (!strncmp("--nomp-scripts-dir", argv[i - 1], NOMP_MAX_BUFFER_SIZE))
-      strncpy(cfg->scripts_dir, argv[i], PATH_MAX), valid = 1;
+    if (!strncmp("--nomp-scripts-dir", flag, NOMP_MAX_BUFFER_SIZE))
+      strncpy(cfg->scripts_dir, value, PATH_MAX), valid = 1;
 
-    if (!strncmp("--nomp-annotations-script", argv[i - 1],
-                 NOMP_MAX_BUFFER_SIZE)) {
-      strncpy(cfg->annotations_script, argv[i], NOMP_MAX_BUFFER_SIZE);
+    if (!strncmp("--nomp-annotations-script", flag, NOMP_MAX_BUFFER_SIZE)) {
+      strncpy(cfg->annotations_script, value, NOMP_MAX_BUFFER_SIZE);
       valid = 1;
     }
 
     if (!valid) {
       nomp_log(NOMP_SUCCESS, NOMP_WARNING, "Unknown command line argument: %s.",
-               argv[i - 1]);
+               flag);
     }
-
-    i++;
   }
+
+  // Only terminate when something was removed, since a slot is then free. The
+  // caller's array may have exactly argc entries and no spare slot otherwise.
+  if (kept < argc_orig) (*argv)[kept] = NULL;
+  *argc = kept;
 
   return 0;
 }
 
-static inline int nomp_set_configs(int argc, const char **argv,
+static inline int nomp_set_configs(int *argc, const char ***argv,
                                    nomp_config_t *const cfg) {
   // verbose, profile, device and platform id are all initialized to zero.
   // Everything else has to be set by user explicitly.
@@ -208,19 +237,41 @@ static inline int nomp_init_backend(nomp_backend_t *const      backend,
  * \arg `--nomp-annotations-script <annotations-script>` Specify the name of
  * the annotations script.
  *
- * @param[in] argc The number of arguments to nomp_init().
- * @param[in] argv Arguments as strings, values followed by options.
+ * <b>Command line handling:</b>
+ * Every argument starting with `--nomp-` is a libnomp option and consumes the
+ * argument that follows it as its value. Options and their values are removed
+ * from \p argv. Unknown `--nomp-*` options are removed together with their
+ * value and a warning is logged. Index 0 is scanned like any other position
+ * (there is no program-name exemption). Nothing is done if \p argc, \p argv or
+ * \p *argv is NULL, or if \p *argc <= 1.
+ *
+ * The pointer array \p *argv is rewritten in place and must be writable. The
+ * strings are never written and remain owned by the caller; configuration
+ * values are copied. Callers with a standard `char **argv` from main() need an
+ * explicit cast: `nomp_init(&argc, (const char ***)&argv)`.
+ *
+ * @param[in,out] argc Number of entries in \p *argv. On success, it is set to
+ * the number of arguments remaining after removing libnomp options and their
+ * values.
+ * @param[in,out] argv Pointer to the argument array. On success, the remaining
+ * arguments occupy the first \p *argc slots in their original relative order.
+ * \p (*argv)[*argc] is set to NULL only when at least one argument was removed;
+ * slots beyond that keep stale pointers. If an option is missing its value, an
+ * error is returned and \p argc and \p argv are left unmodified. On any other
+ * failure after argument parsing (e.g., a missing or invalid backend), the
+ * `--nomp-*` options have already been removed and \p argc has been updated.
  * @return int
  *
  * <b>Example usage:</b>
  * @code{.c}
- * const char *argv[] = {"--nomp-backend", "opencl", "--nomp-device", "0",
- * "--nomp-platform", "0"};
+ * const char *args[] = {"--nomp-backend", "opencl", "--nomp-device", "0",
+ *                       "--nomp-platform", "0"};
+ * const char **argv = args;
  * int argc = 6;
- * int err = nomp_init(argc, argv);
+ * int err = nomp_init(&argc, &argv);
  * @endcode
  */
-int nomp_init(int argc, const char **argv) {
+int nomp_init(int *argc, const char ***argv) {
   // This will be overridden by the user specified verbose level later.
   nomp_log_set_verbose(NOMP_DEFAULT_VERBOSE);
 

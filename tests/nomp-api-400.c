@@ -44,7 +44,7 @@ static int test_variable_length_3d_array(void) {
 }
 
 int main(int argc, const char **argv) {
-  nomp_test_check(nomp_init(argc, argv));
+  nomp_test_check(nomp_init(&argc, &argv));
 
   int err = 0;
   err |= SUBTEST(test_fixed_size_1d_array);

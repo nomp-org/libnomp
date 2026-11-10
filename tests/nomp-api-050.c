@@ -94,7 +94,7 @@ static int test_dynamic_data_type(void) {
 }
 
 int main(int argc, const char *argv[]) {
-  nomp_test_check(nomp_init(argc, argv));
+  nomp_test_check(nomp_init(&argc, &argv));
 
   int err = 0;
   err |= SUBTEST(test_free_before_mapping);
