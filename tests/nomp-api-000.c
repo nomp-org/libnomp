@@ -42,29 +42,21 @@ static int test_nomp_finalize_twice(int argc, const char **argv) {
 int main(int argc, const char *argv[]) {
   nomp_test_assert(argc >= 0 && argc <= 64);
 
-  // nomp_init() rewrites its argv in place: snapshot the original arguments
-  // and hand every subtest a fresh copy.
-  char    *pristine[64], *argvn[64];
-  unsigned argc0 = (unsigned)argc;
+  // nomp_init() rewrites its argv array in place: snapshot the original
+  // argument pointers and hand every subtest a fresh copy of the array.
+  const char *pristine[64], *argvn[64];
+  unsigned    argc0 = (unsigned)argc;
   for (unsigned i = 0; i < argc0; i++)
-    pristine[i] = strndup(argv[i], NOMP_TEST_MAX_BUFFER_SIZE);
+    pristine[i] = argv[i];
 
   int err = 0;
   err |= SUBTEST(test_first_nomp_finalize);
 
-  for (unsigned i = 0; i < argc0; i++)
-    argvn[i] = strndup(pristine[i], NOMP_TEST_MAX_BUFFER_SIZE);
-  err |= SUBTEST(test_nomp_init_twice, argc0, (const char **)argvn);
-  for (unsigned i = 0; i < argc0; i++)
-    nomp_free(&argvn[i]);
+  memcpy(argvn, pristine, argc0 * sizeof(*argvn));
+  err |= SUBTEST(test_nomp_init_twice, argc0, argvn);
 
-  for (unsigned i = 0; i < argc0; i++)
-    argvn[i] = strndup(pristine[i], NOMP_TEST_MAX_BUFFER_SIZE);
-  err |= SUBTEST(test_nomp_finalize_twice, argc0, (const char **)argvn);
-  for (unsigned i = 0; i < argc0; i++)
-    nomp_free(&argvn[i]);
+  memcpy(argvn, pristine, argc0 * sizeof(*argvn));
+  err |= SUBTEST(test_nomp_finalize_twice, argc0, argvn);
 
-  for (unsigned i = 0; i < argc0; i++)
-    nomp_free(&pristine[i]);
   return err;
 }

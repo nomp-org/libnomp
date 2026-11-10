@@ -94,39 +94,35 @@ static int test_valid_device_id(int argc, const char **argv) {
 #define SUBTEST_WITH_FRESH_ARGS(FN, SKIP)                                      \
   {                                                                            \
     argcn = copy_args(argvn, pristine, argc0, SKIP);                           \
-    err |= SUBTEST(FN, argcn, (const char **)argvn);                           \
-    free_args(argvn, argcn);                                                   \
+    err |= SUBTEST(FN, argcn, argvn);                                          \
   }
 
-// Build a fresh, writable copy of the pristine command line arguments. Since
+// Build a fresh pointer array from the pristine command line arguments. Since
 // nomp_init() rewrites the argument array in place, every call needs its own.
-static unsigned copy_args(char **dst, char *const *src, unsigned n,
+// The strings themselves are never modified, so only pointers are copied.
+static unsigned copy_args(const char **dst, const char *const *src, unsigned n,
                           const char *skip) {
   unsigned m = 0;
   for (unsigned i = 0; i < n; i++) {
     if (skip && !strncmp(src[i], skip, NOMP_TEST_MAX_BUFFER_SIZE)) continue;
-    dst[m++] = strndup(src[i], NOMP_TEST_MAX_BUFFER_SIZE);
+    dst[m++] = src[i];
   }
   return m;
-}
-
-static void free_args(char **a, unsigned n) {
-  for (unsigned i = 0; i < n; i++)
-    nomp_free(&a[i]);
 }
 
 int main(int argc, const char *argv[]) {
   nomp_test_assert(argc >= 0 && argc <= 64);
 
-  // Snapshot the original arguments: nomp_init() modifies its argv in place.
-  char    *pristine[64];
-  unsigned argc0 = (unsigned)argc;
+  // Snapshot the original argument pointers: nomp_init() modifies its argv
+  // array in place.
+  const char *pristine[64];
+  unsigned    argc0 = (unsigned)argc;
   for (unsigned i = 0; i < argc0; i++)
-    pristine[i] = strndup(argv[i], NOMP_TEST_MAX_BUFFER_SIZE);
+    pristine[i] = argv[i];
 
-  int   err = 0;
-  char *argvn[64];
-  unsigned argcn;
+  int         err = 0;
+  const char *argvn[64];
+  unsigned    argcn;
 
   SUBTEST_WITH_FRESH_ARGS(test_invalid_nomp_backend, NULL);
   SUBTEST_WITH_FRESH_ARGS(test_invalid_platform_id, NULL);
@@ -135,7 +131,6 @@ int main(int argc, const char *argv[]) {
   SUBTEST_WITH_FRESH_ARGS(test_valid_platform_id, "--nomp-platform");
   SUBTEST_WITH_FRESH_ARGS(test_valid_device_id, "--nomp-device");
 
-  free_args(pristine, argc0);
   return err;
 }
 
