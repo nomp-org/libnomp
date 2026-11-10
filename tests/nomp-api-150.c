@@ -19,7 +19,7 @@ static int test_unmapped_array(int n) {
 }
 
 int main(int argc, const char *argv[]) {
-  nomp_test_check(nomp_init(argc, argv));
+  nomp_test_check(nomp_init(&argc, &argv));
 
   const int n   = 20;
   int       err = 0;

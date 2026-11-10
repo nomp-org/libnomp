@@ -11,9 +11,9 @@ static int test_first_nomp_finalize(void) {
 
 // Calling nomp_init() twice must return an error, but must not segfault.
 static int test_nomp_init_twice(int argc, const char **argv) {
-  nomp_test_check(nomp_init(argc, argv));
+  nomp_test_check(nomp_init(&argc, &argv));
 
-  int err = nomp_init(argc, argv);
+  int err = nomp_init(&argc, &argv);
   nomp_test_assert(nomp_get_err_no(err) == NOMP_INITIALIZE_FAILURE);
 
   char *desc = nomp_get_err_str(err);
@@ -29,7 +29,7 @@ static int test_nomp_init_twice(int argc, const char **argv) {
 
 // Calling nomp_finalize() twice must return an error, but must not segfault.
 static int test_nomp_finalize_twice(int argc, const char **argv) {
-  nomp_test_check(nomp_init(argc, argv));
+  nomp_test_check(nomp_init(&argc, &argv));
   nomp_test_check(nomp_finalize());
 
   int err = nomp_finalize();
@@ -40,10 +40,23 @@ static int test_nomp_finalize_twice(int argc, const char **argv) {
 }
 
 int main(int argc, const char *argv[]) {
+  nomp_test_assert(argc >= 0 && argc <= 64);
+
+  // nomp_init() rewrites its argv array in place: snapshot the original
+  // argument pointers and hand every subtest a fresh copy of the array.
+  const char *pristine[64], *argvn[64];
+  unsigned    argc0 = (unsigned)argc;
+  for (unsigned i = 0; i < argc0; i++)
+    pristine[i] = argv[i];
+
   int err = 0;
   err |= SUBTEST(test_first_nomp_finalize);
-  err |= SUBTEST(test_nomp_init_twice, argc, argv);
-  err |= SUBTEST(test_nomp_finalize_twice, argc, argv);
+
+  memcpy(argvn, pristine, argc0 * sizeof(*argvn));
+  err |= SUBTEST(test_nomp_init_twice, argc0, argvn);
+
+  memcpy(argvn, pristine, argc0 * sizeof(*argvn));
+  err |= SUBTEST(test_nomp_finalize_twice, argc0, argvn);
 
   return err;
 }

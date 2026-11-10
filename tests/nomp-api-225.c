@@ -19,7 +19,7 @@ static int test_ternary_ops(void) {
 }
 
 int main(int argc, const char *argv[]) {
-  nomp_test_check(nomp_init(argc, argv));
+  nomp_test_check(nomp_init(&argc, &argv));
 
   int err = 0;
   err |= SUBTEST(test_logical_ops);

@@ -156,7 +156,7 @@ typedef enum {
  * @brief libnomp user API functions.
  */
 
-int nomp_init(int argc, const char **argv);
+int nomp_init(int *argc, const char ***argv);
 
 int nomp_update(void *ptr, size_t start_index, size_t end_index,
                 size_t unit_size, nomp_map_direction_t op);

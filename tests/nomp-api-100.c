@@ -125,7 +125,7 @@ static int test_syntax_error_in_transform_function(void) {
 }
 
 int main(int argc, const char *argv[]) {
-  nomp_test_check(nomp_init(argc, argv));
+  nomp_test_check(nomp_init(&argc, &argv));
 
   int err = 0;
   err |= SUBTEST(test_invalid_transform_file);
