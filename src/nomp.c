@@ -121,8 +121,9 @@ static inline int nomp_check_cmd_line(nomp_config_t *const cfg, int *argc,
 
 static inline int nomp_set_configs(int *argc, const char ***argv,
                                    nomp_config_t *const cfg) {
-  // verbose, profile, device and platform id are all initialized to zero.
-  // Everything else has to be set by user explicitly.
+  // verbose, profile, device and platform id start from the build-time
+  // defaults (NOMP_DEFAULT_*). Backend and install directory have no default
+  // and must be set by the user (command line or environment).
   cfg->verbose  = NOMP_DEFAULT_VERBOSE;
   cfg->profile  = NOMP_DEFAULT_PROFILE;
   cfg->device   = NOMP_DEFAULT_DEVICE;
@@ -215,11 +216,17 @@ static inline int nomp_init_backend(nomp_backend_t *const      backend,
  * @brief Initializes libnomp with the specified backend, platform, device, etc.
  *
  * @details Initializes nomp code generation for the specified backend (e.g.,
- * OpenCL, CUDA, etc) using command line arguments. Have a look at the accepted
- * arguments below for all available options. If no arguments are specified,
- * default values configured at build time are used for all configurations
- * except for backend and the install directory. The backend name and the
- * install directory are mandatory arguments.
+ * OpenCL, CUDA, etc) using command line arguments and environment variables.
+ * Have a look at the accepted arguments below for all available options. The
+ * verbose level, profile level, device id and platform id default to the
+ * values configured at build time (NOMP_DEFAULT_VERBOSE, NOMP_DEFAULT_PROFILE,
+ * NOMP_DEFAULT_DEVICE and NOMP_DEFAULT_PLATFORM) when not specified. The
+ * backend name and the install directory have no defaults and are mandatory;
+ * each can be given either as a command line argument or through the
+ * corresponding environment variable (NOMP_BACKEND, NOMP_INSTALL_DIR). The
+ * supported NOMP_* environment variables (NOMP_INSTALL_DIR, NOMP_BACKEND,
+ * NOMP_PLATFORM, NOMP_DEVICE, NOMP_VERBOSE, NOMP_PROFILE, NOMP_SCRIPTS_DIR)
+ * override the corresponding command line values when both are set.
  *
  * This function Returns a non-zero value if an error occurs during the
  * initialization, otherwise returns 0. Errors can be queried using
@@ -234,6 +241,7 @@ static inline int nomp_init_backend(nomp_backend_t *const      backend,
  * \arg `--nomp-verbose <verbose-level>` Specify verbose level.
  * \arg `--nomp-profile <profile-level>` Specify profile level.
  * \arg `--nomp-scripts-dir <scripts-dir>` Specify the directory containing
+ * the Python transformation scripts.
  * \arg `--nomp-annotations-script <annotations-script>` Specify the name of
  * the annotations script.
  *
@@ -241,9 +249,14 @@ static inline int nomp_init_backend(nomp_backend_t *const      backend,
  * Every argument starting with `--nomp-` is a libnomp option and consumes the
  * argument that follows it as its value. Options and their values are removed
  * from \p argv. Unknown `--nomp-*` options are removed together with their
- * value and a warning is logged. Index 0 is scanned like any other position
- * (there is no program-name exemption). Nothing is done if \p argc, \p argv or
- * \p *argv is NULL, or if \p *argc <= 1.
+ * value and a warning is logged. The token following an option is always
+ * taken as its value, even if it looks like an option itself (e.g.,
+ * `--nomp-unknown --nomp-backend` consumes `--nomp-backend` as the
+ * unknown option's value). Index 0 is scanned like any other position (there is no
+ * program-name exemption), but only when `*argc > 1`. If \p argc, \p argv or
+ * \p *argv is NULL, or if `*argc <= 1`, command line parsing is skipped (the
+ * arguments are neither scanned nor modified); the rest of initialization
+ * (environment variables, backend setup) still proceeds.
  *
  * The pointer array \p *argv is rewritten in place and must be writable. The
  * strings are never written and remain owned by the caller; configuration
@@ -256,8 +269,11 @@ static inline int nomp_init_backend(nomp_backend_t *const      backend,
  * @param[in,out] argv Pointer to the argument array. On success, the remaining
  * arguments occupy the first \p *argc slots in their original relative order.
  * \p (*argv)[*argc] is set to NULL only when at least one argument was removed;
- * slots beyond that keep stale pointers. If an option is missing its value, an
- * error is returned and \p argc and \p argv are left unmodified. On any other
+ * if nothing was removed, no spare slot after the last entry is required and
+ * none is written. Entries strictly after that terminator are left unchanged
+ * and are stale (they may duplicate remaining arguments). If an option is
+ * missing its value, an error is returned and \p argc and the contents of
+ * \p *argv are left unmodified. On any other
  * failure after argument parsing (e.g., a missing or invalid backend), the
  * `--nomp-*` options have already been removed and \p argc has been updated.
  * @return int
