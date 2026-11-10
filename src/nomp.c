@@ -40,7 +40,7 @@ static inline int nomp_check_cmd_line_aux(const unsigned i, const unsigned argc,
   return 0;
 }
 
-#define NOMP_OPTION_PREFIX "--nomp-"
+#define NOMP_OPTION_PREFIX     "--nomp-"
 #define NOMP_OPTION_PREFIX_LEN 7
 
 static inline int nomp_is_option(const char *arg) {
@@ -252,8 +252,8 @@ static inline int nomp_init_backend(nomp_backend_t *const      backend,
  * value and a warning is logged. The token following an option is always
  * taken as its value, even if it looks like an option itself (e.g.,
  * `--nomp-unknown --nomp-backend` consumes `--nomp-backend` as the
- * unknown option's value). Index 0 is scanned like any other position (there is no
- * program-name exemption), but only when `*argc > 1`. If \p argc, \p argv or
+ * unknown option's value). Index 0 is scanned like any other position (there is
+ * no program-name exemption), but only when `*argc > 1`. If \p argc, \p argv or
  * \p *argv is NULL, or if `*argc <= 1`, command line parsing is skipped (the
  * arguments are neither scanned nor modified); the rest of initialization
  * (environment variables, backend setup) still proceeds.

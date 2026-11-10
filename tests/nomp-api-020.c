@@ -5,18 +5,14 @@
 static char *test_setenv(const char *name, const char *value) {
   const char *old   = getenv(name);
   char       *saved = old ? strdup(old) : NULL;
-  if (value)
-    setenv(name, value, 1);
-  else
-    unsetenv(name);
+  if (value) setenv(name, value, 1);
+  else unsetenv(name);
   return saved;
 }
 
 static void test_restore_env(const char *name, char *saved) {
-  if (saved)
-    setenv(name, saved, 1);
-  else
-    unsetenv(name);
+  if (saved) setenv(name, saved, 1);
+  else unsetenv(name);
   free(saved);
 }
 
@@ -83,10 +79,10 @@ static int test_missing_argument(const char *backend) {
 }
 
 static int test_unknown_option_removed(const char *backend) {
-  const char  *args[7] = {"a",   "--nomp-unknown", "x",    "b",
-                          "--nomp-backend", backend, "c"};
-  const char **argv    = args;
-  int          argc    = 7;
+  const char *args[7] = {
+      "a", "--nomp-unknown", "x", "b", "--nomp-backend", backend, "c"};
+  const char **argv = args;
+  int          argc = 7;
 
   nomp_test_check(nomp_init(&argc, &argv));
   nomp_test_assert(argc == 3);
@@ -224,7 +220,8 @@ static int test_missing_value_unchanged(const char *backend) {
   nomp_test_assert(nomp_get_err_no(err) == NOMP_USER_INPUT_IS_INVALID);
   nomp_test_assert(argc == 6);
   nomp_test_assert(argv == args);
-  for (unsigned i = 0; i < 6; i++) nomp_test_assert(args[i] == copy[i]);
+  for (unsigned i = 0; i < 6; i++)
+    nomp_test_assert(args[i] == copy[i]);
 
   return 0;
 }
