@@ -73,6 +73,7 @@ jobs:
             --enable-tests
       - name: Run libnomp tests
         run: |
+          export LD_LIBRARY_PATH="${CONDA_PREFIX}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
           ${NOMP_INSTALL_DIR}/bin/lnrun --test backend=opencl
       - name: Block to allow inspecting failures
         run: sleep 30m
