@@ -67,13 +67,16 @@ jobs:
         if: >-
           steps.pocl_cache.outputs.cache-hit != 'true' ||
           steps.cache.outputs.cache-hit != 'true'
+      - name: Set Conda library path
+        run: |
+          echo "LD_LIBRARY_PATH=${CONDA_PREFIX}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" \
+            >> "${GITHUB_ENV}"
       - name: Build libnomp
         run: |
           ./bin/lnbld --enable-opencl --opencl-lib ${CONDA_PREFIX}/lib/libOpenCL.so \
             --enable-tests
       - name: Run libnomp tests
         run: |
-          export LD_LIBRARY_PATH="${CONDA_PREFIX}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
           ${NOMP_INSTALL_DIR}/bin/lnrun --test backend=opencl
       - name: Block to allow inspecting failures
         run: sleep 30m
