@@ -38,6 +38,7 @@ jobs:
       - name: Setup conda environment
         uses: conda-incubator/setup-miniconda@v2
         with:
+          miniconda-version: "latest"
           activate-environment: libnomp
           use-mamba: false
       - name: Cache conda environment
@@ -69,7 +70,8 @@ jobs:
       - name: Build libnomp
         run: |
           ./bin/lnbld --enable-opencl --opencl-lib ${CONDA_PREFIX}/lib/libOpenCL.so \
-            --enable-tests
+            --enable-tests \
+            "-DCMAKE_INSTALL_RPATH=${NOMP_INSTALL_DIR}/lib;${CONDA_PREFIX}/lib"
       - name: Run libnomp tests
         run: |
           ${NOMP_INSTALL_DIR}/bin/lnrun --test backend=opencl
